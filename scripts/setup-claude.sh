@@ -45,5 +45,10 @@ claude plugin install ponytail@ponytail || true
 claude plugin install superpowers@claude-plugins-official || true
 claude plugin install goal-ledger@goal-ledger || true
 
+# Disable superpowers:writing-skills — superseded by personal writing-great-skills (duplicate trigger)
+for d in "$HOME"/.claude/plugins/cache/claude-plugins-official/superpowers/*/skills/writing-skills; do
+  [ -f "$d/SKILL.md" ] && mv "$d/SKILL.md" "$d/SKILL.md.disabled"
+done
+
 case ":$PATH:" in *":$bin:"*) ;; *) echo "Note: add $bin to PATH";; esac
 echo "Done. Restart Claude Code."

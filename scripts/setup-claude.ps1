@@ -52,4 +52,8 @@ claude plugin install ponytail@ponytail
 claude plugin install superpowers@claude-plugins-official
 claude plugin install goal-ledger@goal-ledger
 
+# Disable superpowers:writing-skills — superseded by personal writing-great-skills (duplicate trigger)
+Get-ChildItem "$Claude\plugins\cache\claude-plugins-official\superpowers\*\skills\writing-skills\SKILL.md" -ErrorAction SilentlyContinue |
+  ForEach-Object { Move-Item $_.FullName "$($_.FullName).disabled" -Force }
+
 Write-Host "Done. Restart Claude Code."
