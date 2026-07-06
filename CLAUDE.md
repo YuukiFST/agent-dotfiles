@@ -56,7 +56,6 @@ The primary reader of code is now the agent, not a human. These are technical co
 - **gh-axi for GitHub ops** — prefer `gh-axi` (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh`: AXI-format output, ~50% fewer tokens and fewer turns at same task success. Uses the existing `gh auth login` session. Fall back to raw `gh` only for what gh-axi doesn't cover.
 - **RTK:** a PreToolUse hook (`rtk hook claude`, installed by `rtk init -g`) auto-rewrites Bash commands to their `rtk` form — don't manually prefix. `rtk gain` views savings.
   - Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly, never through rtk.
-- **write-time-guard:** a PostToolUse hook (`~/.claude/hooks/write-time-guard.js`, wired by `setup-claude`) that injects a distilled quality checklist for the edited file's area — backend / frontend / test / schema / infra — at the moment you write it. It's the essence of the code-quality skills (security, perf, testability, architecture, error handling) moved from review-time to write-time, so the first draft is already close. Stack-agnostic (fires by file path in any language); once per area per session; never blocks the edit. A project that wants stack-specific digests keeps its own copy under `scripts/hooks/` with tailored content — the hook doesn't replace the skills (which measure real code), it lowers how often you need them.
 
 ## Frontend design — multi-skill pipeline (MANDATORY)
 

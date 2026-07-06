@@ -21,7 +21,6 @@ better code, verify it works.
 | [no-mistakes](https://github.com/kunchenguid/no-mistakes) | Validation gate on push — review/test/lint on throwaway worktree, opens PR only when green. | `git push no-mistakes` instead of `git push origin`. |
 | [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. | Plugin (both agents). |
 | code-quality skills | Max-intensity audit, advisor audit, architecture planning. | `thermo-nuclear..`, `improve`, `improve-codebase-architecture` in `skills/`. |
-| write-time-guard | Injects those skills' distilled checklist at the moment you edit a file — by area (backend/frontend/test/schema/infra) — so the first draft is already good, before any review. Stack-agnostic. | PostToolUse hook (`hooks/write-time-guard.js`), wired into `settings.json` by `setup-claude`. Once per area per session, never blocks. Claude Code only. |
 
 ### Verification / E2E
 
@@ -66,9 +65,8 @@ pwsh -File scripts/setup-claude.ps1     # Windows
 bash scripts/setup-claude.sh            # macOS / Linux
 ```
 
-Installs to `~/.claude`: copies `CLAUDE.md` + `dreaming.md` + `skills/` + `rules/` +
-the `write-time-guard` hook (merged into `settings.json` with an absolute per-machine
-path); installs rtk (+`rtk init -g` hook), no-mistakes, code-review-graph, the agent-browser
+Installs to `~/.claude`: copies `CLAUDE.md` + `dreaming.md` + `skills/` + `rules/`;
+installs rtk (+`rtk init -g` hook), no-mistakes, code-review-graph, the agent-browser
 CLI, gh-axi; registers the code-review-graph MCP server (agent-browser is a CLI, not
 an MCP); installs portless; installs the caveman, ponytail, superpowers and
 goal-ledger plugins. Auto-memory is left **on** (the curated per-project memory dir

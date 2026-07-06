@@ -6,19 +6,13 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"
 claude="$HOME/.claude"
 bin="$HOME/.local/bin"
 crg="$HOME/.local/crg-venv"
-mkdir -p "$claude/skills" "$claude/rules" "$claude/hooks" "$bin"
+mkdir -p "$claude/skills" "$claude/rules" "$bin"
 
 echo "[1/5] Config files"
 cp "$repo/CLAUDE.md" "$claude/CLAUDE.md"
 cp "$repo/dreaming.md" "$claude/dreaming.md"
 cp -r "$repo/skills/." "$claude/skills/"
 cp -r "$repo/rules/." "$claude/rules/"
-# write-time-guard: PostToolUse hook (Claude Code only) — injects the code-quality
-# skills' distilled checklist for the edited file's area at write time. A user-level
-# hook needs an absolute command path (no config-dir placeholder; ~ is not portable),
-# so it is merged into the live settings.json here.
-cp "$repo/hooks/write-time-guard.js" "$claude/hooks/write-time-guard.js"
-node "$repo/scripts/wire-write-time-guard.mjs" "$claude/settings.json" "$claude/hooks/write-time-guard.js"
 # Also populate OpenCode config with companion files
 cfg="$HOME/.config/opencode"
 mkdir -p "$cfg"
