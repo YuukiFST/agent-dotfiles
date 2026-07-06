@@ -6,13 +6,18 @@ $Repo   = Split-Path $PSScriptRoot -Parent
 $Claude = Join-Path $env:USERPROFILE ".claude"
 $Bin    = Join-Path $env:USERPROFILE ".local\bin"
 $Crg    = Join-Path $env:USERPROFILE ".local\crg-venv"
-New-Item -ItemType Directory -Force -Path $Bin, "$Claude\skills", "$Claude\rules" | Out-Null
+New-Item -ItemType Directory -Force -Path $Bin, "$Claude\skills", "$Claude\rules", "$Claude\hooks" | Out-Null
 
 Write-Host "[1/5] Config files"
 Copy-Item "$Repo\CLAUDE.md" "$Claude\CLAUDE.md" -Force
 Copy-Item "$Repo\dreaming.md" "$Claude\dreaming.md" -Force
 Copy-Item "$Repo\skills\*" "$Claude\skills\" -Recurse -Force
 Copy-Item "$Repo\rules\*" "$Claude\rules\" -Recurse -Force
+# write-time-guard: PostToolUse hook (Claude Code only) — injects the code-quality
+# skills' distilled checklist for the edited file's area at write time. A user-level
+# hook needs an absolute command path, merged into the live settings.json here.
+Copy-Item "$Repo\hooks\write-time-guard.js" "$Claude\hooks\write-time-guard.js" -Force
+node "$Repo\scripts\wire-write-time-guard.mjs" "$Claude\settings.json" "$Claude\hooks\write-time-guard.js"
 
 Write-Host "[2/5] rtk"
 $rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
