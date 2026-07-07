@@ -74,8 +74,8 @@ is used alongside durable `CLAUDE.md`/`AGENTS.md` context).
 
 **Keeping tools current:** run the update script for your agent/platform — it
 refreshes every external tool to its latest release (rtk, no-mistakes,
-agent-browser/gh-axi/portless, code-review-graph + MCP re-registration, plugins).
-Restart the agent afterwards.
+agent-browser/gh-axi/portless, the pi agent when present, code-review-graph +
+MCP re-registration, plugins). Restart the agent afterwards.
 
 ```bash
 pwsh -File scripts/update-claude.ps1    # Claude Code, Windows

@@ -17,6 +17,8 @@ no-mistakes --version
 echo "[3/4] npm globals (agent-browser, portless) + code-review-graph"
 npm install -g agent-browser@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
+# pi agent ("oh my pi") — updated here too since it shares the same tool/skill store
+command -v pi >/dev/null 2>&1 && npm install -g "@earendil-works/pi-coding-agent@latest"
 if [ -x "$crg/bin/pip" ]; then
   "$crg/bin/pip" install -q --upgrade code-review-graph
 else

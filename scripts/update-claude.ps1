@@ -29,9 +29,13 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "
 Remove-Item -Recurse -Force $tmp
 & "$Bin\no-mistakes.exe" --version
 
-Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless)"
+Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless, pi)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
+# pi agent ("oh my pi") — updated here too since it shares the same tool/skill store
+if (Get-Command pi -ErrorAction SilentlyContinue) {
+  npm install -g "@earendil-works/pi-coding-agent@latest"
+}
 
 Write-Host "[4/5] code-review-graph (uv tool) + MCP registration"
 uv tool install --force code-review-graph

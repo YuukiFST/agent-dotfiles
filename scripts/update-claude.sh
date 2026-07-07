@@ -14,9 +14,11 @@ echo "[2/5] no-mistakes"
 curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh
 no-mistakes --version
 
-echo "[3/5] npm globals (agent-browser, gh-axi, portless)"
+echo "[3/5] npm globals (agent-browser, gh-axi, portless, pi)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
+# pi agent ("oh my pi") — updated here too since it shares the same tool/skill store
+command -v pi >/dev/null 2>&1 && npm install -g "@earendil-works/pi-coding-agent@latest"
 
 echo "[4/5] code-review-graph + MCP registration"
 if [ -x "$crg/bin/pip" ]; then
