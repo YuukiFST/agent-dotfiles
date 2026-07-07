@@ -32,9 +32,13 @@ Remove-Item -Recurse -Force $tmp
 Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless, pi)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
-# pi agent ("oh my pi") — updated here too since it shares the same tool/skill store
+# pi agent — shares the ~/.agents/skills store and the same external tools
 if (Get-Command pi -ErrorAction SilentlyContinue) {
   npm install -g "@earendil-works/pi-coding-agent@latest"
+}
+# omp / Oh My Pi (omp.sh) — package update when present (installer alternative: irm https://omp.sh/install.ps1 | iex)
+if (Get-Command omp -ErrorAction SilentlyContinue) {
+  npm install -g "@oh-my-pi/pi-coding-agent@latest"
 }
 
 Write-Host "[4/5] code-review-graph (uv tool) + MCP registration"

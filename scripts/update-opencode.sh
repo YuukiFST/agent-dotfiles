@@ -17,8 +17,10 @@ no-mistakes --version
 echo "[3/4] npm globals (agent-browser, portless) + code-review-graph"
 npm install -g agent-browser@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
-# pi agent ("oh my pi") — updated here too since it shares the same tool/skill store
+# pi agent — shares the ~/.agents/skills store and the same external tools
 command -v pi >/dev/null 2>&1 && npm install -g "@earendil-works/pi-coding-agent@latest"
+# omp / Oh My Pi (omp.sh) — updated via its official installer when present
+command -v omp >/dev/null 2>&1 && curl -fsSL https://omp.sh/install | sh
 if [ -x "$crg/bin/pip" ]; then
   "$crg/bin/pip" install -q --upgrade code-review-graph
 else
