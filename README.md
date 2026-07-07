@@ -72,6 +72,11 @@ an MCP); installs portless; installs the caveman, ponytail, superpowers and
 goal-ledger plugins. Auto-memory is left **on** (the curated per-project memory dir
 is used alongside durable `CLAUDE.md`/`AGENTS.md` context).
 
+**Keeping tools current:** `pwsh -File scripts/update-claude.ps1` refreshes every
+external tool to its latest release — rtk, no-mistakes (checksum-verified binary),
+agent-browser/gh-axi/portless, code-review-graph (+ re-registers its MCP if missing)
+and the caveman/ponytail/superpowers plugins. Restart Claude Code afterwards.
+
 ### OpenCode (Linux / macOS)
 
 ```bash

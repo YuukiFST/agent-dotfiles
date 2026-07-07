@@ -5,7 +5,6 @@ $ErrorActionPreference = "Stop"
 $Repo   = Split-Path $PSScriptRoot -Parent
 $Claude = Join-Path $env:USERPROFILE ".claude"
 $Bin    = Join-Path $env:USERPROFILE ".local\bin"
-$Crg    = Join-Path $env:USERPROFILE ".local\crg-venv"
 New-Item -ItemType Directory -Force -Path $Bin, "$Claude\skills", "$Claude\rules" | Out-Null
 
 Write-Host "[1/5] Config files"
@@ -33,8 +32,7 @@ if ($userPath -notlike "*$Bin*") {
 
 Write-Host "[3/5] no-mistakes + code-review-graph + portless + agent-browser + gh-axi"
 Invoke-RestMethod "https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.ps1" | Invoke-Expression
-python -m venv $Crg
-& "$Crg\Scripts\pip.exe" install -q --upgrade pip code-review-graph
+uv tool install --force code-review-graph   # installs to ~/.local/bin (was: pip venv, drifted from reality)
 npm install -g portless agent-browser gh-axi
 agent-browser install
 
@@ -43,7 +41,7 @@ Write-Host "[4/5] MCP servers"
 # above and called directly. playwright dropped in favor of agent-browser. Both kept in the
 # remove loop only to clear any stale user-scope registration.
 foreach ($n in "code-review-graph", "playwright", "agent-browser") { claude mcp remove $n -s user 2>$null }
-claude mcp add code-review-graph -s user -- "$Crg\Scripts\code-review-graph.exe" serve
+claude mcp add code-review-graph -s user -- "$Bin\code-review-graph.exe" serve
 
 Write-Host "[5/5] Plugins"
 foreach ($m in "JuliusBrussee/caveman", "DietrichGebert/ponytail", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {
