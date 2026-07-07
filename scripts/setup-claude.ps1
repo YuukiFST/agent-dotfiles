@@ -12,6 +12,8 @@ Write-Host "[1/5] Config files"
 Copy-Item "$Repo\CLAUDE.md" "$Claude\CLAUDE.md" -Force
 Copy-Item "$Repo\dreaming.md" "$Claude\dreaming.md" -Force
 Copy-Item "$Repo\skills\*" "$Claude\skills\" -Recurse -Force
+# omarchy is Linux-only (Hyprland/waybar) — dead weight in the prompt on Windows
+Remove-Item "$Claude\skills\omarchy" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item "$Repo\rules\*" "$Claude\rules\" -Recurse -Force
 
 Write-Host "[2/5] rtk"
