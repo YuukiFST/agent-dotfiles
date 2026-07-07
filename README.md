@@ -45,7 +45,7 @@ not by directory.
 |----------|--------|
 | **Code quality** | `thermo-nuclear-code-quality-review` (max-intensity audit), `improve` (advisor audit → read-only plans), `improve-codebase-architecture` (architecture deepening), `autoreview` (review closeout before commit/ship) |
 | **Planning & handoff** | `grill-me` (interrogate a plan), `grill-with-docs` (grill against the domain model + ADRs), `to-prd` (conversation → PRD), `handoff` (compact context for the next agent) |
-| **Context & skill authoring** | `claude-md-auditor` (audit CLAUDE/AGENTS/GEMINI files), `write-a-skill` (author new skills), `skill-cleaner` (audit installed skills + prompt budget), `setup-matt-pocock-skills` (wire an Agent-skills block into AGENTS.md) |
+| **Context & skill authoring** | `claude-md-auditor` (audit CLAUDE/AGENTS/GEMINI files), `write-a-skill` (author new skills), `setup-matt-pocock-skills` (wire an Agent-skills block into AGENTS.md) |
 | **Research & learning** | `storm-research` (Stanford STORM multi-perspective research), `teach` (teach a concept in-workspace), `prototype` (throwaway prototype to flesh out a design) |
 | **System config** | `omarchy` (Linux desktop / window-manager / dotfile customization) |
 

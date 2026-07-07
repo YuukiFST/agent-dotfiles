@@ -21,7 +21,7 @@ Generate design references *before* coding. Skip only for small internal CRUD.
 - `brandkit` — when a brand identity / logo system is needed
 
 ### Phase 2 — Build with taste (ALWAYS)
-- `design-taste-frontend` — anti-slop default; infer direction, avoid templated output (`design-taste-frontend-v1` only if a project pins the old behavior)
+- `design-taste-frontend` — anti-slop default; infer direction, avoid templated output
 - `stitch-design-taste` — when emitting a `DESIGN.md` / design-system semantics
 
 ### Phase 3 — Motion + polish (ALWAYS for interactive UI)

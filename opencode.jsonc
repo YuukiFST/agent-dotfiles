@@ -131,10 +131,6 @@
       "template": "Load the setup-matt-pocock-skills skill via the skill tool and configure the issue tracker, triage vocabulary, and domain docs for other skills to use.",
       "description": "Install issue-tracker/triage/domain skills for the repo"
     },
-    "skill-cleaner": {
-      "template": "Load the skill-cleaner skill via the skill tool and audit loaded skills for duplicates, unused personal skills, and prompt-budget costs.",
-      "description": "Audit skills for duplicates, dead weight, and costs"
-    },
     "teach": {
       "template": "Load the teach skill via the skill tool and teach the user a new skill or concept within this workspace.",
       "description": "Teach a skill or concept within the workspace"
@@ -158,10 +154,6 @@
     "design-taste-frontend": {
       "template": "Load the design-taste-frontend skill via the skill tool for anti-slop frontend design. Read the brief, infer direction, ship non-templated interfaces.",
       "description": "Anti-slop frontend design (v2 experimental)"
-    },
-    "design-taste-frontend-v1": {
-      "template": "Load the design-taste-frontend-v1 skill via the skill tool for original v1 taste frontend design.",
-      "description": "Original v1 frontend design skill"
     },
     "emil-design-eng": {
       "template": "Load the emil-design-eng skill via the skill tool for UI polish, component design, and animation decisions.",
