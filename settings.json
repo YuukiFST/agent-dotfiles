@@ -1,5 +1,21 @@
 {
   "model": "sonnet",
+  "permissions": {
+    "deny": [
+      "NotebookEdit",
+      "DesignSync",
+      "RemoteTrigger",
+      "PushNotification",
+      "mcp__visualize__show_widget",
+      "mcp__visualize__read_me"
+    ]
+  },
+  "disableWorkflows": true,
+  "disableArtifact": true,
+  "skillOverrides": {
+    "dataviz": "off",
+    "artifact-design": "off"
+  },
   "hooks": {
     "PreToolUse": [
       {
