@@ -1,8 +1,8 @@
 # Code quality & project improvement (MANDATORY — skills drive every change)
 
 **Triggers (either one):**
-1. Any request to improve the code or project — "improve my code", "make the project better", audit, refactor, harden, optimize, review, "where to next".
-2. **Closeout of a /goal (or any completed development task):** after finishing what was asked, ALWAYS run this file as the final quality pass before declaring done. For closeout, scope `improve` to the code touched/produced in the task, not the whole codebase; steps 3–4 (security + review gate) always run on the diff.
+1. Any request to improve the code or project — "improve my code", "aprimorar o código", "make the project better", audit, refactor, harden, optimize, review, "where to next".
+2. **/goal building a project from a PRD:** this file governs the whole build, not just the end. During development, route work through the matching skills (design → `codebase-design`; sensitive surface → `security-review`; hard bugs/perf → `diagnosing-bugs`). At closeout — before declaring the /goal done — ALWAYS run the final quality pass: `improve` scoped to the code produced, then steps 3–4 (security + review gate) on the diff.
 
 **Iron rule:** the agent NEVER improves code from its own judgement. Every change originates from a skill below or from a plan a skill produced. No freelance fixes, no "I'll just clean this up" outside a skill. If no skill covers the work, say so — do not improvise. **Exception (overrides iron rule):** a broken lint, typecheck, or test found along the way is always fixed on the spot — that is an obligation from global CLAUDE.md, not a freelance improvement.
 
@@ -22,4 +22,4 @@
 - `security-review` / `security-bounty-hunter` — building the sensitive surface / hunting exploitable vulns.
 - `autoreview` / `thermo-nuclear-code-quality-review` — closeout review / brutal max-scrutiny escalation.
 
-Performance has no dedicated repo skill — `improve` finds perf issues, `thermo-nuclear-code-quality-review` audits them, `diagnosing-bugs` handles regressions.
+Performance has no dedicated global skill — `improve` finds perf issues, `thermo-nuclear-code-quality-review` audits them, `diagnosing-bugs` handles regressions. If the project provides `react-performance` (project-level skill, e.g. SB360), use it for React/Next perf work.

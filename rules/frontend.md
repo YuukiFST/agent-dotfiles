@@ -1,5 +1,7 @@
 # Frontend design — multi-skill pipeline (MANDATORY)
 
+**Trigger:** any frontend/UI work — above all a **/goal building a project from a PRD whose scope includes a front**: the pipeline governs every UI the PRD produces, loaded before the first UI code, not as an afterthought.
+
 **Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **layering skills**, each owning one phase. Every frontend task runs the pipeline below and invokes **at least one skill per applicable phase — normally 3–5 skills total, never fewer than the per-task minimum**. Load each via the Skill tool *before* writing the matching code, not after.
 
 **TRIVIAL-FIX EXCEPTION:** a pointed fix of ~10 lines or less inside an existing UI (typo, spacing tweak, broken class, one-prop change) skips the pipeline — global "judgment over ceremony" applies. Anything that designs or redesigns a component/page runs the full pipeline.
@@ -10,11 +12,11 @@ The skills split into lanes. **Aesthetic-direction skills CONFLICT** — mixing 
 
 ### Phase 0 — Direction: pick exactly ONE aesthetic
 Defines the visual language. Choose by brief; do not combine.
-- `high-end-visual-design` — premium agency look (default for marketing / landing / product)
+- `apple-design` — **PRIORITY DEFAULT**: Apple-style fluid/physical motion, translucent materials, gesture-driven UI. Use unless the brief clearly calls for another direction below (also stacks in Phase 3 when only its motion guidance is needed)
+- `high-end-visual-design` — premium agency look (marketing / landing / product)
 - `minimalist-ui` — clean editorial, warm monochrome
 - `industrial-brutalist-ui` — raw, mechanical, data-heavy dashboards
 - `gpt-taste` — GSAP-driven editorial motion + bento grids
-- `apple-design` — Apple-style fluid/physical motion, translucent materials, gesture-driven UI (also stacks in Phase 3 when only its motion guidance is needed)
 
 ### Phase 1 — Visual reference FIRST (greenfield / high-visual pages)
 Generate design references *before* coding. Skip only for small internal CRUD.

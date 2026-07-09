@@ -4,7 +4,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Output
 
-- Concise output, thorough reasoning. No sycophantic openers/closers, no emojis, no em-dashes. Plain "Done", never "✅ Done".
+- Concise output, thorough reasoning. No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
 - Never guess APIs, versions, flags, SHAs, or package names — verify in code/docs first.
 - Don't print full files back; show diffs with `...` for omitted parts.
 - Long Markdown files: each full sentence on its own line.
@@ -53,8 +53,8 @@ Token cost, tool-call latency, output quality — technical constraints, not sty
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
-- **Frontend/UI work** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code.
-- **Improving the project** (audit, refactor, harden, optimize, review) **or closing out a /goal / finished dev task** → `~/.claude/rules/code-quality.md` (execution flow + skill inventory). MANDATORY — skills drive every change; closeout = final quality pass before declaring done.
+- **Frontend/UI work — above all a /goal building from a PRD that includes a front** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code.
+- **Improving the project** (audit, refactor, harden, optimize, review) **or a /goal building a project from a PRD** → `~/.claude/rules/code-quality.md` (execution flow + skill inventory). MANDATORY — skills drive every change; /goal closeout = final quality pass before declaring done.
 - **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code; `.opencode/memory/` on OpenCode. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls** → `~/.claude/rules/prompt-engineering.md` + `~/.claude/rules/prompting-playbook.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, `no-mistakes` gate, no-AI-attribution). Not committing → skip.
