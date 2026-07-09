@@ -54,7 +54,7 @@ Token cost, tool-call latency, output quality — technical constraints, not sty
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
 - **Frontend/UI work** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code.
-- **Improving the project** (audit, refactor, harden, optimize, review) → `~/.claude/rules/code-quality.md` (execution flow + skill inventory). MANDATORY — skills drive every change.
+- **Improving the project** (audit, refactor, harden, optimize, review) **or closing out a /goal / finished dev task** → `~/.claude/rules/code-quality.md` (execution flow + skill inventory). MANDATORY — skills drive every change; closeout = final quality pass before declaring done.
 - **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code; `.opencode/memory/` on OpenCode. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls** → `~/.claude/rules/prompt-engineering.md` + `~/.claude/rules/prompting-playbook.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, `no-mistakes` gate, no-AI-attribution). Not committing → skip.

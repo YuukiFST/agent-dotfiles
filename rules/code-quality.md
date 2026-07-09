@@ -1,8 +1,10 @@
 # Code quality & project improvement (MANDATORY — skills drive every change)
 
-**Trigger:** any request to improve the code or project — "improve my code", "make the project better", audit, refactor, harden, optimize, review, "where to next".
+**Triggers (either one):**
+1. Any request to improve the code or project — "improve my code", "make the project better", audit, refactor, harden, optimize, review, "where to next".
+2. **Closeout of a /goal (or any completed development task):** after finishing what was asked, ALWAYS run this file as the final quality pass before declaring done. For closeout, scope `improve` to the code touched/produced in the task, not the whole codebase; steps 3–4 (security + review gate) always run on the diff.
 
-**Iron rule:** the agent NEVER improves code from its own judgement. Every change originates from a skill below or from a plan a skill produced. No freelance fixes, no "I'll just clean this up" outside a skill. If no skill covers the work, say so — do not improvise.
+**Iron rule:** the agent NEVER improves code from its own judgement. Every change originates from a skill below or from a plan a skill produced. No freelance fixes, no "I'll just clean this up" outside a skill. If no skill covers the work, say so — do not improvise. **Exception (overrides iron rule):** a broken lint, typecheck, or test found along the way is always fixed on the spot — that is an obligation from global CLAUDE.md, not a freelance improvement.
 
 **Execution flow — run it end to end; do not stop at the plan:**
 
