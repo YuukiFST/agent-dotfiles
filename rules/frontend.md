@@ -32,7 +32,8 @@ Generate design references *before* coding. Skip only for small internal CRUD.
 ### Phase 3 — Motion + polish (ALWAYS for interactive UI)
 - `transitions-dev` — product-motion catalog (badges, dropdowns, modals, page transitions, icon swaps, shimmer, accordions…); run `transitions apply` after components exist
 - `emil-design-eng` — animation + polish philosophy, the invisible details
-- `review-animations` — audit existing motion
+- `review-animations` — audit existing motion on a diff
+- `improve-animations` — codebase-wide motion audit → prioritized plans (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations))
 - `animation-vocabulary` — reverse-lookup: name a motion effect precisely before prompting/specifying it (utility, use as needed)
 
 ### Phase 4 — Review pass (ALWAYS, last)
