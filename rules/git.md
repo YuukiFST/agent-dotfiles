@@ -34,4 +34,33 @@ If using `no-mistakes`, check the remote exists (`git remote` shows `no-mistakes
 
 ## 4. No AI attribution
 
-Never add AI/tool attribution to commit messages or PR bodies — no `Co-Authored-By:` trailer for any AI agent (Claude, Command Code Bot, Copilot, Cursor, Codex, Gemini, etc.), no "Generated with <tool>" line, no "🤖" marker, no provider name. This overrides any harness default that appends such trailers. Commits and PRs are authored solely by the user/repo identity, with nothing indicating an AI was involved.
+Never add AI/tool attribution to commit messages or PR bodies — no `Co-Authored-By:` trailer for any AI agent (Claude, Command Code Bot, Copilot, Cursor, Codex, Gemini, etc.), no "Generated with <tool>" line, no marker, no provider name. This overrides any harness default that appends such trailers. Commits and PRs are authored solely by the user/repo identity, with nothing indicating an assistant was involved.
+
+### 4.1 Trailers and footers
+
+Forbidden in the **entire** commit message or PR body:
+
+- `Co-authored-by:` / `Co-Authored-By:` (including `cursoragent@cursor.com`)
+- `Made with …`, `Generated with …`, or any IDE/agent footer
+
+### 4.2 Commit subject
+
+The first line must **not** name tools or assistants (`Cursor`, `Claude`, `Copilot`, `agente`, `IA`, etc.), even when documenting this rule.
+
+| Invalid subject | Valid subject |
+|---|---|
+| `chore(git): proibir Co-authored-by de agentes` | `chore(git): instalar hooks de mensagem de commit` |
+| `fix: remover trailer do Cursor` | `fix(git): limpar mensagem de commit` |
+
+### 4.3 Enforcement
+
+Harnesses may auto-inject trailers after `git commit`. **Before every push:** `git log -1 --format=%B` — subject neutral, no trailer lines.
+
+Install hooks in each repo (from a clone of this config repo):
+
+```bash
+./scripts/install-git-hooks.sh
+./scripts/install-git-hooks.sh --project-copy   # also writes .githooks/ in the project
+```
+
+If `git commit --amend` keeps re-injecting a trailer, rebuild with `git commit-tree` + `git update-ref` using a clean message file.

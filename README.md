@@ -33,6 +33,7 @@ better code, verify it works.
 | Tool | Why | How |
 |------|-----|-----|
 | [portless](https://portless.sh) | Named `.localhost` URLs — agents reference stable hostnames instead of guessing ports. Auto-HTTPS, git worktree subdomains. | `npm install -g portless`. Prefix any dev command. |
+| `git-hooks/` | Blocks `Co-authored-by` and forbidden subject terms before commits land. | `./scripts/install-git-hooks.sh` inside any git repo. |
 
 ## Skills
 

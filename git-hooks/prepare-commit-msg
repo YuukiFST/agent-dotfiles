@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Remove trailers proibidos injetados na mensagem de commit.
+set -euo pipefail
+
+MSG_FILE="${1:?caminho da mensagem de commit}"
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=forbidden-patterns.sh
+source "$HOOK_DIR/forbidden-patterns.sh"
+
+if [[ ! -f "$MSG_FILE" ]]; then
+  exit 0
+fi
+
+CLEANED=$(grep -viE "$FORBIDDEN_TRAILER" "$MSG_FILE" || true)
+printf '%s\n' "$CLEANED" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' > "$MSG_FILE"

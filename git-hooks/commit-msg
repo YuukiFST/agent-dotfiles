@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Rejeita commit se a mensagem violar regras de autoria.
+set -euo pipefail
+
+MSG_FILE="${1:?caminho da mensagem de commit}"
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=forbidden-patterns.sh
+source "$HOOK_DIR/forbidden-patterns.sh"
+
+if grep -qiE "$FORBIDDEN_TRAILER" "$MSG_FILE"; then
+  echo "ERRO: trailer proibido na mensagem de commit." >&2
+  echo "Ver rules/git.md em my-harness-config." >&2
+  exit 1
+fi
+
+SUBJECT=$(head -n 1 "$MSG_FILE")
+if echo "$SUBJECT" | grep -qiE "$FORBIDDEN_MSG"; then
+  echo "ERRO: assunto do commit menciona termos proibidos." >&2
+  echo "Commits descrevem apenas o codigo; sem referencias a ferramentas ou autoria extra." >&2
+  echo "Ver rules/git.md em my-harness-config." >&2
+  exit 1
+fi
+
+exit 0
