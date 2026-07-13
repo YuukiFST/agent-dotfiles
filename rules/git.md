@@ -26,6 +26,12 @@ Rules:
 - Body: explain what was done and why, not how (the diff shows how)
 - Blank lines separate header from body
 
+### 2.1 Language
+
+- **Your own project (you own the repo / personal project):** commit messages in **English**, always.
+- **Someone else's project (client, employer, third-party repo):** do NOT impose English — follow that repo's existing commit-message convention (match the language of its history).
+- Ownership signal: remote owner is your account, or you started the repo. If unsure, match the language of the existing commit history. (E.g. SB360-IPTU belongs to São Benedito, history is Portuguese → stays Portuguese.)
+
 ## 3. Git push
 
 Always ask before push: `git push no-mistakes` (AI validation gate) or `git push origin <branch>`?
