@@ -5,6 +5,9 @@ $ErrorActionPreference = "Stop"
 
 $Bin = Join-Path $env:USERPROFILE ".local\bin"
 
+Write-Host "[0/5] Config files (skills, rules, CLAUDE.md)"
+& "$PSScriptRoot\sync-config.ps1"
+
 Write-Host "[1/5] rtk"
 $rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
   Where-Object name -EQ "rtk-x86_64-pc-windows-msvc.zip" | ForEach-Object browser_download_url

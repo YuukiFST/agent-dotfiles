@@ -8,12 +8,7 @@ $Bin    = Join-Path $env:USERPROFILE ".local\bin"
 New-Item -ItemType Directory -Force -Path $Bin, "$Claude\skills", "$Claude\rules" | Out-Null
 
 Write-Host "[1/5] Config files"
-Copy-Item "$Repo\CLAUDE.md" "$Claude\CLAUDE.md" -Force
-Copy-Item "$Repo\dreaming.md" "$Claude\dreaming.md" -Force
-Copy-Item "$Repo\skills\*" "$Claude\skills\" -Recurse -Force
-# omarchy is Linux-only (Hyprland/waybar) — dead weight in the prompt on Windows
-Remove-Item "$Claude\skills\omarchy" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item "$Repo\rules\*" "$Claude\rules\" -Recurse -Force
+& "$PSScriptRoot\sync-config.ps1"
 
 Write-Host "[2/5] rtk"
 $rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
@@ -31,7 +26,18 @@ if ($userPath -notlike "*$Bin*") {
 & "$Bin\rtk.exe" init -g | Out-Null
 
 Write-Host "[3/5] no-mistakes + code-review-graph + portless + agent-browser + gh-axi"
-Invoke-RestMethod "https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.ps1" | Invoke-Expression
+# Checksum-verified release binary — keep in sync with update-claude.ps1 (same block)
+$nmRel = Invoke-RestMethod "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest"
+$nmAsset = $nmRel.assets | Where-Object name -Like "*windows-amd64.zip"
+$tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "nm-dl")
+Invoke-WebRequest $nmAsset.browser_download_url -OutFile "$tmp\nm.zip"
+$sums = (Invoke-RestMethod (($nmRel.assets | Where-Object name -EQ "checksums.txt").browser_download_url))
+$expected = ($sums -split "`n" | Select-String $nmAsset.name).ToString().Split(" ")[0].Trim()
+$actual = (Get-FileHash "$tmp\nm.zip" -Algorithm SHA256).Hash.ToLower()
+if ($actual -ne $expected) { throw "no-mistakes checksum mismatch: $actual != $expected" }
+Expand-Archive "$tmp\nm.zip" -DestinationPath $tmp -Force
+Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "$Bin\no-mistakes.exe" -Force
+Remove-Item -Recurse -Force $tmp
 uv tool install --force code-review-graph   # installs to ~/.local/bin (was: pip venv, drifted from reality)
 npm install -g portless agent-browser gh-axi
 agent-browser install

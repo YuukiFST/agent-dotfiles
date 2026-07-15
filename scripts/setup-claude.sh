@@ -9,16 +9,7 @@ crg="$HOME/.local/crg-venv"
 mkdir -p "$claude/skills" "$claude/rules" "$bin"
 
 echo "[1/5] Config files"
-cp "$repo/CLAUDE.md" "$claude/CLAUDE.md"
-cp "$repo/dreaming.md" "$claude/dreaming.md"
-cp -r "$repo/skills/." "$claude/skills/"
-cp -r "$repo/rules/." "$claude/rules/"
-# Also populate OpenCode config with companion files
-cfg="$HOME/.config/opencode"
-mkdir -p "$cfg"
-cp "$repo/CLAUDE.md" "$cfg/CLAUDE.md"
-cp "$repo/dreaming.md" "$cfg/dreaming.md"
-cp -r "$repo/rules/." "$cfg/rules/"
+"$(dirname "$0")/sync-config.sh" claude
 
 echo "[2/5] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh

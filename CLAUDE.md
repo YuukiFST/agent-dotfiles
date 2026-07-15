@@ -21,7 +21,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
 - See a lint/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
-- Prefer quality, simplicity, robustness, and long-term maintainability over development cost.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
 - README leads with the problem it solves (one sentence, top); stack/architecture go in `docs/`.
 
@@ -33,18 +32,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
 - **Tests:** regression test per bugfix. Mock external I/O with named fakes.
 
-## Clean code for agents (the reader is an LLM)
-
-Token cost, tool-call latency, output quality — technical constraints, not style opinions.
-
-- SRP, small functions: three 250-line modules beat one 800-line file doing three things.
-- Flatten control flow: early returns / guard clauses; cap ~2 indent levels.
-- Inject dependencies (constructor/parameter) so a named fake swaps in without infra.
-- Tests run headless, one command — no manual seed, missing config, or secret.
-- Formatter decides style (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`); never spend a turn on formatting.
-- Structured (JSON) logs for debug/observability; plain text only for user-facing CLI output.
-- Defensive code is opt-in: no retry/backoff, timeout, circuit-breaker, rate-limit, or fallback unless the project names the categories it needs.
-
 ## Tools (machine-specific)
 
 - **code-review-graph MCP before Grep/Glob/Read** when the project has it. Explore: `semantic_search_nodes` / `query_graph`. Impact: `get_impact_radius`. Review: `detect_changes` + `get_review_context`. Architecture: `get_architecture_overview`. Fall back when the graph doesn't cover the need.
@@ -54,7 +41,7 @@ Token cost, tool-call latency, output quality — technical constraints, not sty
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
 - **Frontend/UI work — above all a /goal building from a PRD that includes a front** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code.
-- **Improving the project** (audit, refactor, harden, optimize, review) **or a /goal building a project from a PRD** → `~/.claude/rules/code-quality.md` (execution flow + skill inventory). MANDATORY — skills drive every change; /goal closeout = final quality pass before declaring done.
+- **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` §Clean code (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in). **Improving the project** (audit, refactor, harden, optimize, review) **or a /goal building from a PRD** → same file, full execution flow (skills drive every change; /goal closeout = final quality pass).
 - **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code; `.opencode/memory/` on OpenCode. Never dream during active dev; >30 complex turns → suggest fresh session.
-- **Writing prompts for sub-agents/tools/LLM calls** → `~/.claude/rules/prompt-engineering.md` + `~/.claude/rules/prompting-playbook.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
+- **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, `no-mistakes` gate, no-AI-attribution). Not committing → skip.

@@ -10,8 +10,6 @@ Non-obvious patterns for working with code agents (extracted from Anthropic's be
 
 ## During coding
 
-- **Generate-evaluate-repair.** Produce a fix → run lint/tests → repair only failures. Don't critique and generate simultaneously.
-- **Check work before showing.** Run lint/typecheck on your output before presenting it.
 - **Commit after each feature chunk.** Not after hours of work. Review diffs before committing.
 - **Screenshots as spec/feedback for UI.** Paste a mock/screenshot as multimodal input instead of describing UI in prose — both to build and to debug visual issues.
 
@@ -33,6 +31,4 @@ Non-obvious patterns for working with code agents (extracted from Anthropic's be
 
 ## CLAUDE.md maintenance
 
-- Periodically review for stale instructions (prompt hygiene).
-- Test: has every rule been relevant in the last 10 sessions? No → remove or move to conditional sub-file.
-- Use conditional pointers (`Read X before doing Y, otherwise skip`) for domain-specific rules.
+See `prompting.md` §Maintenance (hygiene, staleness test, conditional pointers).

@@ -95,10 +95,6 @@
       "template": "Load the claude-md-auditor skill via the skill tool and audit the CLAUDE.md/AGENTS.md for structure, conciseness, specificity, and hierarchy.",
       "description": "Audit CLAUDE.md/AGENTS.md for conciseness and structure"
     },
-    "discussion-driven-development": {
-      "template": "Load the discussion-driven-development skill via the skill tool and follow its complete workflow for this task. First: detect if this is an existing project or greenfield (no codebase yet, only a spec.md + prototype). Then check if /prototype has already generated HTML UI variations. If prototype files are missing, ask the user to run /prototype first. Then follow the appropriate workflow in the skill for the detected scenario.",
-      "description": "DDD: prototype selection, architecture alignment, ADRs, goal-mode execution"
-    },
     "grill-me": {
       "template": "Load the grill-me skill via the skill tool and interview the user relentlessly about their plan or design until reaching shared understanding.",
       "description": "Stress-test a plan or design through relentless questioning"

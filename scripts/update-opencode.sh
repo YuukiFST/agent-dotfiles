@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 # Update every external tool the OpenCode harness depends on (Linux/macOS).
+# NixOS: curl|sh installers drop dynamically linked binaries — needs nix-ld enabled.
 # Companion to setup-opencode.sh: setup installs, this refreshes to latest.
 set -euo pipefail
 
 bin="$HOME/.local/bin"
 crg="$HOME/.local/crg-venv"
+
+echo "[0/4] Config files (skills, rules, opencode.jsonc)"
+"$(dirname "$0")/sync-config.sh" opencode
 
 echo "[1/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh

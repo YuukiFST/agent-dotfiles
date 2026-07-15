@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # OpenCode harness setup (Linux/macOS). Run from a clone of this repo.
+# NixOS: the curl|sh installers below drop dynamically linked binaries that need
+# nix-ld (or steam-run) to exec — enable programs.nix-ld in the system config first.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,11 +11,7 @@ crg="$HOME/.local/crg-venv"
 mkdir -p "$cfg/skills" "$cfg/rules" "$bin"
 
 echo "[1/4] Config files"
-cp "$repo/opencode.jsonc" "$cfg/opencode.jsonc"
-cp "$repo/CLAUDE.md" "$cfg/CLAUDE.md"
-cp "$repo/dreaming.md" "$cfg/dreaming.md"
-cp -r "$repo/skills/." "$cfg/skills/"
-cp -r "$repo/rules/." "$cfg/rules/"
+"$(dirname "$0")/sync-config.sh" opencode
 
 echo "[2/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh

@@ -6,6 +6,9 @@ set -euo pipefail
 bin="$HOME/.local/bin"
 crg="$HOME/.local/crg-venv"
 
+echo "[0/5] Config files (skills, rules, CLAUDE.md)"
+"$(dirname "$0")/sync-config.sh" claude
+
 echo "[1/5] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
