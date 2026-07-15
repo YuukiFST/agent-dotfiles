@@ -43,6 +43,7 @@ Craft layers that make any direction feel finished; they never conflict with Pha
 - `emil-design-eng` — animation + polish philosophy, the invisible details
 - `review-animations` — audit existing motion on a diff
 - `improve-animations` — codebase-wide motion audit → prioritized plans (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations))
+- `find-animation-opportunities` — sweep a UI for moments that don't animate but should, reject the rest → precise motion recipes (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities))
 - `animation-vocabulary` — reverse-lookup: name a motion effect precisely before prompting/specifying it (utility, use as needed)
 
 ### Phase 4 — Review pass (ALWAYS, last)

@@ -119,6 +119,10 @@
       "template": "Load the improve-animations skill via the skill tool and survey animation/motion code as a senior advisor, producing prioritized audit findings and self-contained implementation plans. Read-only; no code changes.",
       "description": "Read-only motion audit with prioritized animation improvement plans"
     },
+    "find-animation-opportunities": {
+      "template": "Load the find-animation-opportunities skill via the skill tool and sweep the UI for moments that don't animate but should, rejecting everything that shouldn't, and propose precise motion recipes. Read-only; no code changes.",
+      "description": "Read-only sweep for high-leverage animation opportunities with motion recipes"
+    },
     "omarchy": {
       "template": "Load the omarchy skill via the skill tool to configure Hyprland, Waybar, or other Linux desktop/WM settings.",
       "description": "Linux desktop/WM theming (Hyprland, Waybar, etc.)"

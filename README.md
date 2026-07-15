@@ -44,7 +44,7 @@ not by directory.
 
 | Category | Skills |
 |----------|--------|
-| **Code quality** | `thermo-nuclear-code-quality-review` (max-intensity audit), `improve` (advisor audit → read-only plans), `improve-codebase-architecture` (architecture deepening), `improve-animations` (motion audit → read-only plans; [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations)), `autoreview` (review closeout before commit/ship) |
+| **Code quality** | `thermo-nuclear-code-quality-review` (max-intensity audit), `improve` (advisor audit → read-only plans), `improve-codebase-architecture` (architecture deepening), `improve-animations` (motion audit → read-only plans; [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations)), `find-animation-opportunities` (sweep for high-leverage motion opportunities → read-only recipes; [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities)), `autoreview` (review closeout before commit/ship) |
 | **Planning & handoff** | `grill-me` (interrogate a plan), `grill-with-docs` (grill against the domain model + ADRs), `to-prd` (conversation → PRD), `handoff` (compact context for the next agent) |
 | **Context & skill authoring** | `claude-md-auditor` (audit CLAUDE/AGENTS/GEMINI files), `write-a-skill` (author new skills), `setup-matt-pocock-skills` (wire an Agent-skills block into AGENTS.md) |
 | **Research & learning** | `storm-research` (Stanford STORM multi-perspective research), `teach` (teach a concept in-workspace), `prototype` (throwaway prototype to flesh out a design) |
