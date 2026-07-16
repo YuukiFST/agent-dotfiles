@@ -42,14 +42,17 @@ Files stay **flat** in `skills/` — Claude Code discovers a personal skill only
 category subfolders would hide them on install. The grouping below is by purpose,
 not by directory.
 
-| Category | Skills |
-|----------|--------|
-| **Code quality** | `thermo-nuclear-code-quality-review` (max-intensity audit), `improve` (advisor audit → read-only plans), `improve-codebase-architecture` (architecture deepening), `improve-animations` (motion audit → read-only plans; [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations)), `find-animation-opportunities` (sweep for high-leverage motion opportunities → read-only recipes; [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities)), `autoreview` (review closeout before commit/ship) |
-| **Planning & handoff** | `grill-me` (interrogate a plan), `grill-with-docs` (grill against the domain model + ADRs), `to-prd` (conversation → PRD), `handoff` (compact context for the next agent) |
-| **Context & skill authoring** | `claude-md-auditor` (audit CLAUDE/AGENTS/GEMINI files), `write-a-skill` (author new skills), `setup-matt-pocock-skills` (wire an Agent-skills block into AGENTS.md) |
-| **Research & learning** | `storm-research` (Stanford STORM multi-perspective research), `teach` (teach a concept in-workspace), `prototype` (throwaway prototype to flesh out a design) |
-| **Libraries & frameworks** | `effect` (opinionated Effect v4 TypeScript guide: services, layers, schemas, config, schedules, caches, streams, HTTP clients, tests; [kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
-| **System config** | `omarchy` (Linux desktop / window-manager / dotfile customization) |
+57 skills — highlights per category (full list: `ls skills/`):
+
+| Category | Highlights |
+|----------|-----------|
+| **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `code-review`, `react-doctor` |
+| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
+| **Security** | `security-review`, `security-bounty-hunter` |
+| **Planning & handoff** | `grilling`, `grill-for-unknowns`, `to-prd`, `to-spec`, `to-issues`, `handoff`, `triage` |
+| **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+15 more) |
+| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills` |
+| **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)), `omarchy` |
 
 ## Setup
 
