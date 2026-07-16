@@ -42,7 +42,7 @@ Files stay **flat** in `skills/` — Claude Code discovers a personal skill only
 category subfolders would hide them on install. The grouping below is by purpose,
 not by directory.
 
-57 skills — highlights per category (full list: `ls skills/`):
+55 skills — highlights per category (full list: `ls skills/`):
 
 | Category | Highlights |
 |----------|-----------|

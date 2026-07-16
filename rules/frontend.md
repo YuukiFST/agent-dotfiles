@@ -63,10 +63,6 @@ Static review is not proof. In order:
 3. **Browser pass** — harness browser pane, `agent-browser`, or `webapp-testing`: load the real page, screenshot, test interactions, check console errors, verify mobile width + dark mode. Iterate screenshot → fix → screenshot; done only on a clean pass.
 4. **Lighthouse on any page a user actually loads** (landing, marketing, public product page): `npx lighthouse@latest <url> --quiet --chrome-flags="--headless" --output=json --output-path=stdout`. Report the four scores; a red Performance or Accessibility score is a bug, not a nice-to-have. Skip for internal CRUD behind auth.
 
-## On-demand utilities (not part of the flow)
-- `animation-vocabulary` — name a motion effect precisely before specifying it
-- `stitch-design-taste` — only when emitting a `DESIGN.md` for Google Stitch (requires Stitch access)
-
 ## Minimum bar per front (never ship a front from one skill)
 - **Greenfield visual page:** steps 1 + 2 + 3 + 4 + 6 + 7 + 8 → ~6 skills.
 - **Internal / CRUD UI:** steps 1 + 3 + 4 (impeccable) + 8 → 3–4 skills.

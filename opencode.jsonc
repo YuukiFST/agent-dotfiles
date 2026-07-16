@@ -202,10 +202,6 @@
     "redesign-existing-projects": {
       "template": "Load the redesign-existing-projects skill via the skill tool to upgrade existing websites and apps to premium quality.",
       "description": "Upgrade existing projects to premium quality"
-    },
-    "stitch-design-taste": {
-      "template": "Load the stitch-design-taste skill via the skill tool for Google Stitch semantic design system enforcement.",
-      "description": "Google Stitch design system semantics"
     }
   },
   "mcp": {
