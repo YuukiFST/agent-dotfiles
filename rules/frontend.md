@@ -18,7 +18,7 @@ Defines the visual language. Choose by brief; do not combine.
 - `high-end-visual-design` — premium agency look (marketing / landing / product)
 - `minimalist-ui` — clean editorial, warm monochrome
 - `industrial-brutalist-ui` — raw, mechanical, data-heavy dashboards
-- `gpt-taste` — GSAP-driven editorial motion + bento grids
+- `gpt-taste` — GSAP-driven editorial motion + bento grids (requires the real GSAP dependency — `@gsap/react` + ScrollTrigger; only pick when adding it is acceptable)
 
 ### Phase 1 — Visual reference FIRST (greenfield / high-visual pages)
 Generate design references *before* coding. Skip only for small internal CRUD.
@@ -27,8 +27,9 @@ Generate design references *before* coding. Skip only for small internal CRUD.
 - `image-to-code` — generate the design image, then match it in code
 - `brandkit` — when a brand identity / logo system is needed
 
-### Phase 2 — Build with taste (ALWAYS)
-- `design-taste-frontend` — anti-slop default; infer direction, avoid templated output
+### Phase 2 — Build with taste (ALWAYS — pick by UI type)
+- `design-taste-frontend` — anti-slop default for **landing pages, portfolios, marketing sites** ONLY; the skill refuses dashboards, data tables, wizards, editors, and native mobile
+- `impeccable` — build guidance for **product UI** (dashboards, CRUD, forms, app screens) where design-taste-frontend is out of scope; run its `scripts/context.mjs` first (bootstraps PRODUCT.md/DESIGN.md)
 - `stitch-design-taste` — when emitting a `DESIGN.md` / design-system semantics
 - `tailwind-v4-shadcn` — ONLY if the project's stack is Tailwind v4 + shadcn/ui (per PRD or existing code); skip on any other stack
 
@@ -41,7 +42,7 @@ Craft layers that make any direction feel finished; they never conflict with Pha
 ### Phase 3 — Motion + polish (ALWAYS for interactive UI)
 - `transitions-dev` — product-motion catalog (badges, dropdowns, modals, page transitions, icon swaps, shimmer, accordions…); run `transitions apply` after components exist
 - `emil-design-eng` — animation + polish philosophy, the invisible details
-- `review-animations` — audit existing motion on a diff
+- `review-animations` — audit existing motion on a diff (manual-only: `disable-model-invocation`; run when the user asks for a motion review)
 - `improve-animations` — codebase-wide motion audit → prioritized plans (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations))
 - `find-animation-opportunities` — sweep a UI for moments that don't animate but should, reject the rest → precise motion recipes (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities))
 - `animation-vocabulary` — reverse-lookup: name a motion effect precisely before prompting/specifying it (utility, use as needed)
@@ -53,9 +54,9 @@ Craft layers that make any direction feel finished; they never conflict with Pha
 - **Chain into plans:** top suggestion → `improve-animations` plan; don't implement from the sweep directly.
 
 ### Phase 4 — Review pass (ALWAYS, last)
-- `impeccable` — UI/UX audit, polish, 23 commands; run before declaring the front done
+- `impeccable` — UI/UX audit, polish, 23 commands; run before declaring the front done (same `scripts/context.mjs` bootstrap as Phase 2)
 - `react-doctor` — React/Next projects only: lint, accessibility, bundle size, architecture diagnostics (`npx react-doctor@latest --verbose --scope changed`). Nothing to install; `@latest` self-updates on every run
-- `redesign-existing-projects` — when upgrading an existing UI (audit-first; replaces Phase 0–1)
+- `redesign-existing-projects` — when upgrading an existing UI (audit-first; replaces Phase 0–1). This is THE redesign path — do not also run design-taste-frontend's own redesign flow; two audit-first flows fight each other
 
 ### Phase 5 — Visual verification (ALWAYS — no front is "done" untested in a browser)
 Static review is not proof. Open the real page, look at it, fix what the pixels show.
