@@ -48,6 +48,7 @@ not by directory.
 | **Planning & handoff** | `grill-me` (interrogate a plan), `grill-with-docs` (grill against the domain model + ADRs), `to-prd` (conversation → PRD), `handoff` (compact context for the next agent) |
 | **Context & skill authoring** | `claude-md-auditor` (audit CLAUDE/AGENTS/GEMINI files), `write-a-skill` (author new skills), `setup-matt-pocock-skills` (wire an Agent-skills block into AGENTS.md) |
 | **Research & learning** | `storm-research` (Stanford STORM multi-perspective research), `teach` (teach a concept in-workspace), `prototype` (throwaway prototype to flesh out a design) |
+| **Libraries & frameworks** | `effect` (opinionated Effect v4 TypeScript guide: services, layers, schemas, config, schedules, caches, streams, HTTP clients, tests; [kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 | **System config** | `omarchy` (Linux desktop / window-manager / dotfile customization) |
 
 ## Setup
