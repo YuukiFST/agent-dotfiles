@@ -42,7 +42,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
-- **Frontend/UI work — above all a /goal building from a PRD that includes a front** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code.
+- **Frontend/UI work — above all a /goal building from a PRD that includes a front** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). MANDATORY before UI code. SKIP the file entirely when the project has its own Design System (follow the DS exactly) or the change is a trivial fix ≤10 lines.
 - **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` §Clean code (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in). **Improving the project** (audit, refactor, harden, optimize, review) **or a /goal building from a PRD** → same file, full execution flow (skills drive every change; /goal closeout = final quality pass).
 - **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code; `.opencode/memory/` on OpenCode. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
