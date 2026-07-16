@@ -20,6 +20,7 @@ curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/i
 python3 -m venv "$crg"
 "$crg/bin/pip" install -q --upgrade pip code-review-graph
 npm install -g portless agent-browser gh-axi
+agent-browser install   # bundled browser driver — without it every agent-browser call fails
 
 echo "[4/5] MCP servers"
 # agent-browser (agent-browser.dev) is a shell CLI for agents, NOT an MCP server — installed

@@ -23,4 +23,25 @@ Remove-Item "$Claude\skills\omarchy" -Recurse -Force -ErrorAction SilentlyContin
 Remove-Item "$Claude\rules" -Recurse -Force
 Copy-Item "$Repo\rules" "$Claude\rules" -Recurse
 
+# hooks/ — per-file copy, never a mirror: other installers drop their own hooks here
+# (herdr writes herdr-agent-state.ps1) and a mirror would delete them.
+New-Item -ItemType Directory -Force -Path "$Claude\hooks" | Out-Null
+Get-ChildItem "$Repo\hooks" -File | ForEach-Object {
+  Copy-Item $_.FullName (Join-Path "$Claude\hooks" $_.Name) -Force
+}
+
+# settings.json is a SEED, not a mirror. Claude Code rewrites this file itself (model,
+# effortLevel, theme via /config) and other tools merge into it (herdr adds a SessionStart
+# hook), so overwriting a live one silently throws away state this repo does not track.
+$settings = Join-Path $Claude "settings.json"
+if (Test-Path $settings) {
+  Write-Host "  settings.json exists — left alone (repo copy seeds fresh machines only)"
+} else {
+  # The seed hardcodes this author's profile path; rewrite it for whoever is installing.
+  $esc = $env:USERPROFILE.Replace('\', '\\')
+  (Get-Content "$Repo\settings.json" -Raw).Replace('C:\\Users\\tisao', $esc) |
+    Set-Content $settings -NoNewline
+  Write-Host "  seeded settings.json"
+}
+
 Write-Host "Config synced (claude)."

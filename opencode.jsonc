@@ -123,6 +123,10 @@
       "template": "Load the find-animation-opportunities skill via the skill tool and sweep the UI for moments that don't animate but should, rejecting everything that shouldn't, and propose precise motion recipes. Read-only; no code changes.",
       "description": "Read-only sweep for high-leverage animation opportunities with motion recipes"
     },
+    "doctor": {
+      "template": "Load the react-doctor skill via the skill tool and scan, triage and clean up React diagnostics (lint, accessibility, bundle size, architecture). Fix issues by severity, errors before warnings.",
+      "description": "React diagnostics scan and triage (lint, a11y, bundle size, architecture)"
+    },
     "omarchy": {
       "template": "Load the omarchy skill via the skill tool to configure Hyprland, Waybar, or other Linux desktop/WM settings.",
       "description": "Linux desktop/WM theming (Hyprland, Waybar, etc.)"

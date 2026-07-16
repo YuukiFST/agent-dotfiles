@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Copy config (CLAUDE.md, dreaming.md, skills/, rules/) from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
-# Usage: sync-config.sh claude|opencode|cursor
+# Usage: sync-config.sh claude|opencode|cursor|pi
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-target="${1:?usage: sync-config.sh claude|opencode|cursor}"
+target="${1:?usage: sync-config.sh claude|opencode|cursor|pi}"
 
 sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files removed/renamed
   mkdir -p "$1"  # inside a repo skill, but keeps skills that exist only locally
@@ -22,25 +22,23 @@ sync_rules() { # $1 = dest rules dir — full mirror: rules/ is entirely repo-ow
   cp -r "$repo/rules/." "$1/"
 }
 
-# Every harness shares these. Runs for all targets so one machine with several
-# agents converges on the same config no matter which setup script ran.
+# Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi +
+# OpenCode side by side) converges on the same config no matter which script ran.
 sync_shared() {
   # rules/ live at ~/.claude/rules on EVERY harness — CLAUDE.md's conditional pointers
   # hardcode that path, so it must resolve even where Claude Code is not installed.
   sync_rules "$HOME/.claude/rules"
 
-  # ~/.agents/skills is read natively by Cursor, pi and omp — one dir, three agents.
-  # (Cursor: cursor.com/docs/skills · pi: docs/skills.md · omp: `agents` provider.)
+  # ~/.agents/skills is read natively by both Cursor and pi — one dir, two agents.
+  # (Cursor: cursor.com/docs/skills · pi: packages/coding-agent/docs/skills.md)
   sync_skills "$HOME/.agents/skills"
 
-  # pi and omp are different tools (omp is a fork of pi) with separate config roots.
-  # Both take global instructions from <root>/AGENTS.md. Only write when installed.
-  for pair in "pi:$HOME/.pi/agent" "omp:$HOME/.omp/agent"; do
-    cmd="${pair%%:*}"; dir="${pair#*:}"
-    command -v "$cmd" >/dev/null 2>&1 || continue
-    mkdir -p "$dir"
-    cp "$repo/CLAUDE.md" "$dir/AGENTS.md"
-  done
+  # pi takes global instructions from ~/.pi/agent/AGENTS.md. Only write when installed,
+  # so a Claude-Code-only box does not grow a stray ~/.pi.
+  if command -v pi >/dev/null 2>&1; then
+    mkdir -p "$HOME/.pi/agent"
+    cp "$repo/CLAUDE.md" "$HOME/.pi/agent/AGENTS.md"
+  fi
 }
 
 case "$target" in
@@ -68,6 +66,12 @@ case "$target" in
     # ~/.agents/skills natively, so a second copy under ~/.cursor/skills would only
     # duplicate every skill. Global rules are UI-only (Customize → Rules) and cannot
     # be synced at all — see README.
+    sync_shared
+    ;;
+  pi)
+    # Same story: sync_shared already wrote ~/.agents/skills and ~/.pi/agent/AGENTS.md.
+    # pi has no MCP and no hooks (upstream design choice), so there is nothing else.
+    command -v pi >/dev/null 2>&1 || { echo "pi not on PATH — run setup-pi.sh first" >&2; exit 1; }
     sync_shared
     ;;
   *)

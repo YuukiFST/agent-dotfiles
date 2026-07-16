@@ -56,21 +56,28 @@ not by directory.
 
 ## Setup
 
+Two machines, four harnesses:
+
+| Machine | Harnesses | Scripts |
+|---------|-----------|---------|
+| **Windows** | Claude Code, alone | `setup-claude.ps1` / `update-claude.ps1` |
+| **NixOS** | Cursor, pi, OpenCode | `setup-cursor.sh`, `setup-pi.sh`, `setup-opencode.sh` / `update-opencode.sh` |
+
 Claude Code and OpenCode get the **same** toolset (rtk, caveman, superpowers,
 ponytail, code-review-graph, agent-browser, portless, no-mistakes, goal mode);
-only the install mechanism differs per platform. Cursor and pi/omp get the
-skills and rules, not the plugin/hook stack — see their sections. Run the script
-for your agent from a clone of this repo — it installs binaries, registers MCP
-servers, wires plugins, and copies config. Idempotent: safe to re-run.
+only the install mechanism differs per platform. Cursor and pi get the skills and
+rules, not the plugin/hook stack — see their sections. Run the script for your
+agent from a clone of this repo — it installs binaries, registers MCP servers,
+wires plugins, and copies config. Idempotent: safe to re-run.
 
-Every setup/update script also runs a **shared** sync, so a machine with several
-agents converges no matter which script ran:
+Every setup/update script also runs a **shared** sync, so the NixOS box converges
+no matter which of its three scripts ran:
 
 | Destination | Read by | Contents |
 |-------------|---------|----------|
 | `~/.claude/rules/` | all — CLAUDE.md's conditional pointers hardcode this path, so it is created even where Claude Code is absent | `rules/` |
-| `~/.agents/skills/` | Cursor, pi, omp — all three read it natively | `skills/` |
-| `~/.pi/agent/AGENTS.md`, `~/.omp/agent/AGENTS.md` | pi, omp — written only when the binary is on PATH | `CLAUDE.md` |
+| `~/.agents/skills/` | Cursor and pi, both natively | `skills/` |
+| `~/.pi/agent/AGENTS.md` | pi — written only when the binary is on PATH | `CLAUDE.md` |
 
 ### Claude Code
 
@@ -80,22 +87,34 @@ pwsh -File scripts/setup-claude.ps1     # Windows
 bash scripts/setup-claude.sh            # macOS / Linux
 ```
 
-Installs to `~/.claude`: copies `CLAUDE.md` + `dreaming.md` + `skills/` + `rules/`;
-installs rtk (+`rtk init -g` hook), no-mistakes, code-review-graph, the agent-browser
-CLI, gh-axi; registers the code-review-graph MCP server (agent-browser is a CLI, not
-an MCP); installs portless; installs the caveman, ponytail, superpowers and
-goal-ledger plugins. Auto-memory is left **on** (the curated per-project memory dir
-is used alongside durable `CLAUDE.md`/`AGENTS.md` context).
+Installs to `~/.claude`: copies `CLAUDE.md` + `dreaming.md` + `skills/` + `rules/` +
+`hooks/`; installs rtk (+`rtk init -g` hook), no-mistakes, code-review-graph, the
+agent-browser CLI, gh-axi; registers the code-review-graph MCP server (agent-browser
+is a CLI, not an MCP); installs portless; installs the caveman, ponytail, superpowers
+and goal-ledger plugins. Auto-memory is left **on** (the curated per-project memory
+dir is used alongside durable `CLAUDE.md`/`AGENTS.md` context).
+
+> **`settings.json` is a seed, not a mirror.** It is written only when `~/.claude/settings.json`
+> is absent, and the author's profile path in it is rewritten for the installing user.
+> An existing one is never touched: Claude Code rewrites that file itself (`model`,
+> `effortLevel`, `theme` via `/config`) and other installers merge into it — herdr adds a
+> `SessionStart` hook — so mirroring it would silently destroy state this repo does not
+> track. `hooks/` copies per-file for the same reason (herdr's `herdr-agent-state.ps1`
+> lives there and is owned by herdr, not by this repo).
 
 **Keeping tools current:** run the update script for your agent/platform — it
 refreshes every external tool to its latest release (rtk, no-mistakes,
-agent-browser/gh-axi/portless, the pi agent when present, code-review-graph +
-MCP re-registration, plugins). Restart the agent afterwards.
+agent-browser/gh-axi/portless, code-review-graph + MCP re-registration, plugins).
+Restart the agent afterwards. Tools invoked via `npx …@latest` (`react-doctor`,
+`lighthouse`) need no install or update step at all — each run fetches the current
+release.
 
 ```bash
 pwsh -File scripts/update-claude.ps1    # Claude Code, Windows
 bash scripts/update-claude.sh           # Claude Code, macOS / Linux
-bash scripts/update-opencode.sh         # OpenCode, macOS / Linux
+bash scripts/update-opencode.sh         # OpenCode, NixOS
+bash scripts/setup-pi.sh                # pi — re-run to update
+bash scripts/setup-cursor.sh            # Cursor — re-run to re-sync
 ```
 
 ### OpenCode (Linux / macOS)
@@ -137,16 +156,26 @@ On **NixOS**, Cursor comes from the community `code-cursor` package (nixpkgs
 repackages the official AppImage); its built-in auto-update does not work, so the
 editor itself updates on nixpkgs bumps. This script only handles config.
 
-### pi / omp
+### pi (NixOS)
 
-`pi` ([earendil-works/pi](https://github.com/earendil-works/pi)) and `omp`
-([can1357/oh-my-pi](https://github.com/can1357/oh-my-pi)) are **different tools** —
-omp is a fork, with its own binary and version line. Neither has a setup script;
-the update scripts refresh them when present, and the shared sync gives both their
-skills (`~/.agents/skills`) and instructions (`<root>/agent/AGENTS.md`).
+```bash
+bash scripts/setup-pi.sh    # installs or updates — re-runnable
+```
 
-> `pi` has **no MCP support** — a deliberate design choice upstream. code-review-graph
-> is therefore unavailable there; omp does support MCP (`~/.omp/agent/mcp.json`).
+[earendil-works/pi](https://github.com/earendil-works/pi). Installs the agent from npm
+(`--ignore-scripts`, per its own docs), then syncs: skills to `~/.agents/skills` (pi
+reads it natively and recursively) and `CLAUDE.md` to `~/.pi/agent/AGENTS.md` as global
+instructions.
+
+> pi ships **no MCP, no sub-agents and no hooks** — a deliberate upstream design choice
+> ("It intentionally does not include built-in MCP…"). code-review-graph and the rtk hook
+> are therefore unavailable there; skills + AGENTS.md are the entire surface. Don't confuse
+> it with `omp` ([can1357/oh-my-pi](https://github.com/can1357/oh-my-pi)), a separate fork
+> with its own binary and version line — not used here.
+
+On NixOS, `npm install -g` needs a writable prefix (`npm config set prefix ~/.npm-global`,
+with `~/.npm-global/bin` on PATH). Installing pi from nixpkgs instead is fine — then run
+`bash scripts/sync-config.sh pi` alone.
 
 
 ## Install reference
@@ -155,8 +184,10 @@ skills (`~/.agents/skills`) and instructions (`<root>/agent/AGENTS.md`).
 |------|---------|
 | rtk | `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh \| sh` then `rtk init -g` |
 | no-mistakes | `curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh \| sh` — then run `no-mistakes init` **inside each repo** to create the `no-mistakes` push remote (without it `git push no-mistakes` has no remote to hit) |
-| code-review-graph | `python3 -m venv ~/.local/crg-venv && ~/.local/crg-venv/bin/pip install code-review-graph` (expose `code-review-graph` on PATH) |
-| agent-browser | `npm install -g agent-browser && agent-browser install` |
+| code-review-graph | Linux/macOS: `python3 -m venv ~/.local/crg-venv && ~/.local/crg-venv/bin/pip install code-review-graph` (expose `code-review-graph` on PATH). Windows: `uv tool install --force code-review-graph` |
+| agent-browser | `npm install -g agent-browser && agent-browser install` — the second command fetches the browser driver; without it every call fails |
 | portless | `npm install -g portless` |
+| pi | `npm install -g --ignore-scripts @earendil-works/pi-coding-agent` |
+| react-doctor, lighthouse | nothing to install — invoked as `npx react-doctor@latest` / `npx lighthouse@latest`. Lighthouse needs a Chrome/Chromium binary on PATH |
 
 > rtk corrupts `prisma`/`tsc`/`vitest` output — run those raw, never through rtk.

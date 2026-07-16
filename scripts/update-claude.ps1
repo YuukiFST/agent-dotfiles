@@ -32,17 +32,11 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "
 Remove-Item -Recurse -Force $tmp
 & "$Bin\no-mistakes.exe" --version
 
-Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless, pi)"
+Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
-# pi agent — shares the ~/.agents/skills store and the same external tools
-if (Get-Command pi -ErrorAction SilentlyContinue) {
-  npm install -g "@earendil-works/pi-coding-agent@latest"
-}
-# omp / Oh My Pi (omp.sh) — package update when present (installer alternative: irm https://omp.sh/install.ps1 | iex)
-if (Get-Command omp -ErrorAction SilentlyContinue) {
-  npm install -g "@oh-my-pi/pi-coding-agent@latest"
-}
+# Windows runs Claude Code only — pi/Cursor/OpenCode live on the NixOS box and are
+# updated by their own scripts there. Nothing else to refresh here.
 
 Write-Host "[4/5] code-review-graph (uv tool) + MCP registration"
 uv tool install --force code-review-graph

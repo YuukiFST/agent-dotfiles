@@ -48,12 +48,15 @@ Craft layers that make any direction feel finished; they never conflict with Pha
 
 ### Phase 4 — Review pass (ALWAYS, last)
 - `impeccable` — UI/UX audit, polish, 23 commands; run before declaring the front done
+- `react-doctor` — React/Next projects only: lint, accessibility, bundle size, architecture diagnostics (`npx react-doctor@latest --verbose --scope changed`). Nothing to install; `@latest` self-updates on every run
 - `redesign-existing-projects` — when upgrading an existing UI (audit-first; replaces Phase 0–1)
 
 ### Phase 5 — Visual verification (ALWAYS — no front is "done" untested in a browser)
 Static review is not proof. Open the real page, look at it, fix what the pixels show.
 - Harness browser pane (Claude Code) or `webapp-testing` / `agent-browser` — load the page, screenshot, test interactions, check console errors, verify responsive (mobile width) and dark mode
 - Iterate: screenshot → fix visible issue → screenshot again. Declare done only on a clean pass.
+- **Lighthouse on any page a user actually loads** (landing, marketing, public product page): `npx lighthouse@latest <url> --quiet --chrome-flags="--headless" --output=json --output-path=stdout`. Nothing to install — `@latest` fetches the current release per run; it does need a Chrome/Chromium binary on PATH. Skip for internal CRUD behind auth, where the score measures nothing worth fixing.
+- Report the four category scores and fix what regressed. A red Performance or Accessibility score is a bug, not a nice-to-have — the global "fix visible pixel issues along the way" rule applies to it.
 
 ### Minimum bar per front (never ship a front from one skill)
 - **Greenfield visual page:** Phase 0 (1) + Phase 1 (1) + Phase 2 + Phase 2.5 + Phase 3 + Phase 4 + Phase 5 → ~6 skills.
