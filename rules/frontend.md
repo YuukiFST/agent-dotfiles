@@ -46,6 +46,12 @@ Craft layers that make any direction feel finished; they never conflict with Pha
 - `find-animation-opportunities` — sweep a UI for moments that don't animate but should, reject the rest → precise motion recipes (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities))
 - `animation-vocabulary` — reverse-lookup: name a motion effect precisely before prompting/specifying it (utility, use as needed)
 
+**How to drive the animation skills** (patterns from Emil Kowalski):
+- **Shield first, add second:** before adding any motion, ask `find-animation-opportunities` "is there anything here that should animate at all?" — it rejects as much as it proposes. Motion earns its place; a static answer is a valid outcome.
+- **Scope + usage frequency:** run it per view, not per app, and state how often the flow is used ("checkout, a few times per session") — frequency changes what deserves motion.
+- **Right after new UI:** any freshly built page with zero motion gets one `find-animation-opportunities` pass ("what should animate and what shouldn't?") before Phase 4.
+- **Chain into plans:** top suggestion → `improve-animations` plan; don't implement from the sweep directly.
+
 ### Phase 4 — Review pass (ALWAYS, last)
 - `impeccable` — UI/UX audit, polish, 23 commands; run before declaring the front done
 - `react-doctor` — React/Next projects only: lint, accessibility, bundle size, architecture diagnostics (`npx react-doctor@latest --verbose --scope changed`). Nothing to install; `@latest` self-updates on every run
