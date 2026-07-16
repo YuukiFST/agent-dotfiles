@@ -1,71 +1,73 @@
-# Frontend design — multi-skill pipeline (MANDATORY)
+# Frontend design — ordered skill flow (MANDATORY)
 
-**Trigger:** any frontend/UI work — above all a **/goal building a project from a PRD whose scope includes a front**: the pipeline governs every UI the PRD produces, loaded before the first UI code, not as an afterthought.
+**Trigger:** any frontend/UI work — above all a **/goal building a project from a PRD whose scope includes a front**: the flow governs every UI the PRD produces, loaded before the first UI code, not as an afterthought.
 
-**Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **layering skills**, each owning one phase. Every frontend task runs the pipeline below and invokes **at least one skill per applicable phase — normally 3–5 skills total, never fewer than the per-task minimum**. Load each via the Skill tool *before* writing the matching code, not after.
+**Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **running skills in the right order**, each owning one step. Load each via the Skill tool *before* writing the matching code, not after. Normally 4–6 skills per front; never fewer than the minimum bar.
 
-**TRIVIAL-FIX EXCEPTION:** a pointed fix of ~10 lines or less inside an existing UI (typo, spacing tweak, broken class, one-prop change) skips the pipeline — global "judgment over ceremony" applies. Anything that designs or redesigns a component/page runs the full pipeline.
+**TRIVIAL-FIX EXCEPTION:** a pointed fix of ~10 lines or less inside an existing UI (typo, spacing tweak, broken class, one-prop change) skips the flow — global "judgment over ceremony" applies. Anything that designs or redesigns a component/page runs the full flow.
 
-**AUTONOMOUS MODE (/goal from PRD):** the user is NOT in the loop — never pause to ask about design direction, palette, fonts, or layout. Every decision comes from the PRD; where the PRD is silent, this pipeline decides (Phase 0 default = `apple-design`, Phase 2.5 fundamentals fill the gaps). Ambiguity is resolved by the skills, not by a question. The deliverable is a finished, verified front the user sees on waking — Phase 5 evidence (screenshots, clean console, mobile + dark mode pass) replaces user review.
+**HARD EXCEPTION — Design System projects:** if the project already defines its own Design System (tokens, components, style guide set by the user or repo), DO NOT use any skill in this section. Follow the existing Design System exactly. This whole flow applies only to projects with no predefined design language.
 
-**HARD EXCEPTION — Design System projects:** if the project already defines its own Design System (tokens, components, style guide set by the user or repo), DO NOT use any skill in this section. Follow the existing Design System exactly. This whole pipeline applies only to projects with no predefined design language.
+**AUTONOMOUS MODE (/goal from PRD):** the user is NOT in the loop — never pause to ask about design direction, palette, fonts, or layout. Every decision comes from the PRD; where the PRD is silent, this flow decides (step 1 default = `apple-design`, step 3 fundamentals fill the gaps). Ambiguity is resolved by the skills, not by a question. The deliverable is a finished, verified front the user sees on waking — step 8 evidence (screenshots, clean console, mobile + dark mode pass) replaces user review.
 
-The skills split into lanes. **Aesthetic-direction skills CONFLICT** — mixing two visual languages = incoherent UI, so pick **exactly one**. **Craft / motion / review skills STACK** — use every one that applies. The point is not "run all 14"; it is "never build from a single skill" — one direction + several craft layers.
+**Redesign of an existing UI:** `redesign-existing-projects` replaces steps 1–2 (audit-first, don't rewrite from scratch, don't migrate frameworks). Do not also run design-taste-frontend's own redesign flow — two audit-first flows fight each other. Continue from step 3.
 
-### Phase 0 — Direction: pick exactly ONE aesthetic
-Defines the visual language. Choose by brief; do not combine.
-- `apple-design` — **PRIORITY DEFAULT**: Apple-style fluid/physical motion, translucent materials, gesture-driven UI. Use unless the brief clearly calls for another direction below (also stacks in Phase 3 when only its motion guidance is needed)
-- `high-end-visual-design` — premium agency look (marketing / landing / product)
-- `minimalist-ui` — clean editorial, warm monochrome
-- `industrial-brutalist-ui` — raw, mechanical, data-heavy dashboards
-- `gpt-taste` — GSAP-driven editorial motion + bento grids (requires the real GSAP dependency — `@gsap/react` + ScrollTrigger; only pick when adding it is acceptable)
+## The flow — run the steps in this order
 
-### Phase 1 — Visual reference FIRST (greenfield / high-visual pages)
-Generate design references *before* coding. Skip only for small internal CRUD.
+### 1. Direction — pick exactly ONE aesthetic (conflict lane)
+Aesthetic-direction skills define the visual language and CONFLICT with each other — mixing two visual languages = incoherent UI. Choose by brief; do not combine:
+
+| Brief | Skill |
+|---|---|
+| Default — no clear signal otherwise | `apple-design` (fluid/physical motion, translucent materials; its motion guidance also feeds step 6) |
+| Premium marketing / landing / product page | `high-end-visual-design` |
+| Clean editorial, warm monochrome | `minimalist-ui` |
+| Raw, mechanical, data-heavy dashboard | `industrial-brutalist-ui` |
+| Awwwards-style GSAP editorial motion | `gpt-taste` — ONLY if adding the real GSAP dependency (`@gsap/react` + ScrollTrigger) is acceptable |
+
+### 2. Visual reference (greenfield / high-visual pages only)
+Generate design references *before* coding — skip for internal CRUD:
 - `imagegen-frontend-web` — one reference image per landing section
 - `imagegen-frontend-mobile` — mobile app screens / flows
-- `image-to-code` — generate the design image, then match it in code
-- `brandkit` — when a brand identity / logo system is needed
+- `image-to-code` — image-first build: generate the section images, then match them in code (subsumes the imagegen step — use it *instead of*, not after, `imagegen-frontend-web`)
+- `brandkit` — only when a brand identity / logo system is needed
 
-### Phase 2 — Build with taste (ALWAYS — pick by UI type)
-- `design-taste-frontend` — anti-slop default for **landing pages, portfolios, marketing sites** ONLY; the skill refuses dashboards, data tables, wizards, editors, and native mobile
-- `impeccable` — build guidance for **product UI** (dashboards, CRUD, forms, app screens) where design-taste-frontend is out of scope; run its `scripts/context.mjs` first (bootstraps PRODUCT.md/DESIGN.md)
-- `stitch-design-taste` — when emitting a `DESIGN.md` / design-system semantics
-- `tailwind-v4-shadcn` — ONLY if the project's stack is Tailwind v4 + shadcn/ui (per PRD or existing code); skip on any other stack
+### 3. Foundations — tokens BEFORE components (stack lane)
+Define the design tokens before building on them; retrofitting palette/type onto finished components is rework:
+- `better-colors` — OKLCH palette, contrast, dark-mode tokens (any time you define colors — never framework defaults)
+- `better-typography` — font pairing, type scale, line-height (match the project's existing styling system; never introduce a second one)
 
-### Phase 2.5 — Fundamentals (STACK — apply every one the UI touches)
-Craft layers that make any direction feel finished; they never conflict with Phase 0.
-- `better-ui` — polish details: shadows, borders, optical alignment, hover states, micro-interactions
-- `better-typography` — font pairing, type scale, line-height, truncation, variable fonts, text-wrap
-- `better-colors` — OKLCH palettes, contrast, gamut, dark-mode tokens (any time you define colors, not defaults from a framework)
+### 4. Build — pick by UI type
+- **Landing / portfolio / marketing site** → `design-taste-frontend` (the skill refuses dashboards, data tables, wizards, editors, native mobile)
+- **Product UI** (dashboard, CRUD, forms, app screens) → `impeccable` as build guidance; run its `scripts/context.mjs` first (bootstraps PRODUCT.md/DESIGN.md)
+- `tailwind-v4-shadcn` — stack layer, ONLY if the project is Tailwind v4 + shadcn/ui (per PRD or existing code)
 
-### Phase 3 — Motion + polish (ALWAYS for interactive UI)
-- `transitions-dev` — product-motion catalog (badges, dropdowns, modals, page transitions, icon swaps, shimmer, accordions…); run `transitions apply` after components exist
-- `emil-design-eng` — animation + polish philosophy, the invisible details
-- `review-animations` — audit existing motion on a diff (manual-only: `disable-model-invocation`; run when the user asks for a motion review)
-- `improve-animations` — codebase-wide motion audit → prioritized plans (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/improve-animations))
-- `find-animation-opportunities` — sweep a UI for moments that don't animate but should, reject the rest → precise motion recipes (read-only; from [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/find-animation-opportunities))
-- `animation-vocabulary` — reverse-lookup: name a motion effect precisely before prompting/specifying it (utility, use as needed)
+### 5. Component polish (stack lane)
+- `better-ui` — shadows, borders, optical alignment, hit areas, press states, micro-interaction values
+- `emil-design-eng` — the invisible-details philosophy; stack it while polishing, it never conflicts with step 1
 
-**How to drive the animation skills** (patterns from Emil Kowalski):
-- **Shield first, add second:** before adding any motion, ask `find-animation-opportunities` "is there anything here that should animate at all?" — it rejects as much as it proposes. Motion earns its place; a static answer is a valid outcome.
-- **Scope + usage frequency:** run it per view, not per app, and state how often the flow is used ("checkout, a few times per session") — frequency changes what deserves motion.
-- **Right after new UI:** any freshly built page with zero motion gets one `find-animation-opportunities` pass ("what should animate and what shouldn't?") before Phase 4.
-- **Chain into plans:** top suggestion → `improve-animations` plan; don't implement from the sweep directly.
+### 6. Build-time motion
+- `transitions-dev` — the product-motion catalog (modals, dropdowns, accordions, shimmer, icon swaps…); run `transitions apply` after components exist. Every snippet ships reduced-motion; don't pull a motion library for what the catalog covers.
 
-### Phase 4 — Review pass (ALWAYS, last)
-- `impeccable` — UI/UX audit, polish, 23 commands; run before declaring the front done (same `scripts/context.mjs` bootstrap as Phase 2)
-- `react-doctor` — React/Next projects only: lint, accessibility, bundle size, architecture diagnostics (`npx react-doctor@latest --verbose --scope changed`). Nothing to install; `@latest` self-updates on every run
-- `redesign-existing-projects` — when upgrading an existing UI (audit-first; replaces Phase 0–1). This is THE redesign path — do not also run design-taste-frontend's own redesign flow; two audit-first flows fight each other
+### 7. Motion sweep — the Emil loop (SEQUENTIAL, after the UI exists)
+Restraint first: motion earns its place, and a static answer is a valid outcome.
+1. `find-animation-opportunities` — shield framing: "is there anything here that should animate at all?" Scope it per view, not per app, and state usage frequency ("checkout, a few times per session") — frequency changes what deserves motion. Any freshly built page with zero motion gets this pass. Expect rejections; the "Rejected candidates" section is the point.
+2. Top suggestion(s) → `improve-animations` — turns them into self-contained implementation plans (read-only; plans land under `plans/`). Don't implement from the sweep directly.
+3. Implement the plans (step 6 catalog first, custom motion only where the plan demands it).
+4. `review-animations` — diff review of the implemented motion. Manual-only (`disable-model-invocation`); run when the user asks for a motion review.
 
-### Phase 5 — Visual verification (ALWAYS — no front is "done" untested in a browser)
-Static review is not proof. Open the real page, look at it, fix what the pixels show.
-- Harness browser pane (Claude Code) or `webapp-testing` / `agent-browser` — load the page, screenshot, test interactions, check console errors, verify responsive (mobile width) and dark mode
-- Iterate: screenshot → fix visible issue → screenshot again. Declare done only on a clean pass.
-- **Lighthouse on any page a user actually loads** (landing, marketing, public product page): `npx lighthouse@latest <url> --quiet --chrome-flags="--headless" --output=json --output-path=stdout`. Nothing to install — `@latest` fetches the current release per run; it does need a Chrome/Chromium binary on PATH. Skip for internal CRUD behind auth, where the score measures nothing worth fixing.
-- Report the four category scores and fix what regressed. A red Performance or Accessibility score is a bug, not a nice-to-have — the global "fix visible pixel issues along the way" rule applies to it.
+### 8. Review gate + visual verification (ALWAYS, last)
+Static review is not proof. In order:
+1. `impeccable` — UI/UX audit before declaring the front done (same `context.mjs` bootstrap as step 4).
+2. `react-doctor` — React/Next only: `npx react-doctor@latest --verbose --scope changed` (lint, a11y, bundle, architecture; `@latest` self-updates).
+3. **Browser pass** — harness browser pane, `agent-browser`, or `webapp-testing`: load the real page, screenshot, test interactions, check console errors, verify mobile width + dark mode. Iterate screenshot → fix → screenshot; done only on a clean pass.
+4. **Lighthouse on any page a user actually loads** (landing, marketing, public product page): `npx lighthouse@latest <url> --quiet --chrome-flags="--headless" --output=json --output-path=stdout`. Report the four scores; a red Performance or Accessibility score is a bug, not a nice-to-have. Skip for internal CRUD behind auth.
 
-### Minimum bar per front (never ship a front from one skill)
-- **Greenfield visual page:** Phase 0 (1) + Phase 1 (1) + Phase 2 + Phase 2.5 + Phase 3 + Phase 4 + Phase 5 → ~6 skills.
-- **Internal / CRUD UI:** Phase 0 (1) + Phase 2 + Phase 2.5 (as applicable) + Phase 4 + Phase 5 → 3–4 skills.
-- **Redesign:** `redesign-existing-projects` + Phase 2 + Phase 2.5 + Phase 3 + Phase 4 + Phase 5.
+## On-demand utilities (not part of the flow)
+- `animation-vocabulary` — name a motion effect precisely before specifying it
+- `stitch-design-taste` — only when emitting a `DESIGN.md` for Google Stitch (requires Stitch access)
+
+## Minimum bar per front (never ship a front from one skill)
+- **Greenfield visual page:** steps 1 + 2 + 3 + 4 + 6 + 7 + 8 → ~6 skills.
+- **Internal / CRUD UI:** steps 1 + 3 + 4 (impeccable) + 8 → 3–4 skills.
+- **Redesign:** `redesign-existing-projects` + steps 3–8.
