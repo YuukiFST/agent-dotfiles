@@ -56,11 +56,21 @@ not by directory.
 
 ## Setup
 
-Both agents get the **same** toolset (rtk, caveman, superpowers, ponytail,
-code-review-graph, agent-browser, portless, no-mistakes, goal mode); only the
-install mechanism differs per platform. Run the script for your agent from a
-clone of this repo — it installs binaries, registers MCP servers, wires
-plugins, and copies config. Idempotent: safe to re-run.
+Claude Code and OpenCode get the **same** toolset (rtk, caveman, superpowers,
+ponytail, code-review-graph, agent-browser, portless, no-mistakes, goal mode);
+only the install mechanism differs per platform. Cursor and pi/omp get the
+skills and rules, not the plugin/hook stack — see their sections. Run the script
+for your agent from a clone of this repo — it installs binaries, registers MCP
+servers, wires plugins, and copies config. Idempotent: safe to re-run.
+
+Every setup/update script also runs a **shared** sync, so a machine with several
+agents converges no matter which script ran:
+
+| Destination | Read by | Contents |
+|-------------|---------|----------|
+| `~/.claude/rules/` | all — CLAUDE.md's conditional pointers hardcode this path, so it is created even where Claude Code is absent | `rules/` |
+| `~/.agents/skills/` | Cursor, pi, omp — all three read it natively | `skills/` |
+| `~/.pi/agent/AGENTS.md`, `~/.omp/agent/AGENTS.md` | pi, omp — written only when the binary is on PATH | `CLAUDE.md` |
 
 ### Claude Code
 
@@ -96,14 +106,47 @@ bash scripts/setup-opencode.sh
 ```
 
 Installs to `~/.config/opencode`: copies `opencode.jsonc` + `skills/` (auto-
-discovered, no `skills.paths` needed); installs rtk (+`rtk init -g --opencode`),
-no-mistakes, code-review-graph (symlinked onto PATH so the bare MCP command
-resolves), agent-browser, portless; installs the caveman plugin. ponytail
-(`@dietrichgebert/ponytail`) and superpowers are referenced in `opencode.jsonc`
-and resolve on launch.
+discovered, no `skills.paths` needed) + `CLAUDE.md` as **`AGENTS.md`** (OpenCode
+reads `~/.config/opencode/AGENTS.md`; a `CLAUDE.md` at that path is never read —
+its only CLAUDE.md fallback is `~/.claude/CLAUDE.md`); installs rtk (+`rtk init
+-g --opencode`), no-mistakes, code-review-graph (symlinked onto PATH so the bare
+MCP command resolves), agent-browser, portless; installs the caveman plugin.
+ponytail (`@dietrichgebert/ponytail`) and superpowers are referenced in
+`opencode.jsonc` and resolve on launch.
 
 After the script finishes, **restart the agent**. Then, in each repo you push
 from, run `no-mistakes init` once to create the `no-mistakes` push remote.
+
+### Cursor (Linux / macOS)
+
+```bash
+bash scripts/setup-cursor.sh
+```
+
+Syncs skills + rules and registers the code-review-graph MCP server in
+`~/.cursor/mcp.json` (never clobbers an existing file — it prints the snippet to
+merge by hand instead). Cursor reads `~/.agents/skills` natively, so no
+Cursor-specific skill copy exists.
+
+**Manual step, unavoidable:** Cursor has no file-backed global rules — User Rules
+live in **Customize → Rules** in the app, not on disk, so `CLAUDE.md` cannot be
+synced. Paste it there once, and re-paste after editing it. Everything else
+(skills, MCP, hooks) is file-based and scripted.
+
+On **NixOS**, Cursor comes from the community `code-cursor` package (nixpkgs
+repackages the official AppImage); its built-in auto-update does not work, so the
+editor itself updates on nixpkgs bumps. This script only handles config.
+
+### pi / omp
+
+`pi` ([earendil-works/pi](https://github.com/earendil-works/pi)) and `omp`
+([can1357/oh-my-pi](https://github.com/can1357/oh-my-pi)) are **different tools** —
+omp is a fork, with its own binary and version line. Neither has a setup script;
+the update scripts refresh them when present, and the shared sync gives both their
+skills (`~/.agents/skills`) and instructions (`<root>/agent/AGENTS.md`).
+
+> `pi` has **no MCP support** — a deliberate design choice upstream. code-review-graph
+> is therefore unavailable there; omp does support MCP (`~/.omp/agent/mcp.json`).
 
 
 ## Install reference
