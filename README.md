@@ -19,7 +19,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-55 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+53 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -27,7 +27,7 @@ fewer tokens, write better code, verify it works.
 | **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `code-review`, `react-doctor` |
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
-| **Planning & handoff** | `grilling`, `batch-grill-me`, `grill-for-unknowns`, `to-prd`, `to-spec`, `to-issues`, `handoff`, `triage` |
+| **Planning & handoff** | `shape`, `to-prd`, `to-spec`, `to-issues`, `handoff`, `triage` |
 | **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills` |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)), `omarchy` |

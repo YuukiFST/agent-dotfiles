@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "A workflow to design, or nothing to go find one"
 ---
 
-Run a stateful `/grilling` session whose only output is **workflow** specs. Use the grilling discipline — relentless, one question at a time, a recommended answer attached to each — aimed at the vocabulary and goal below. Create, edit, and delete specs as the grilling resolves things.
+Run a stateful `/shape` session whose only output is **workflow** specs. Use the shaping discipline — relentless frontier rounds, a recommended answer attached to every question — aimed at the vocabulary and goal below. Create, edit, and delete specs as the shaping resolves things.
 
 ## The loop lens
 
@@ -15,7 +15,7 @@ A **workflow** is the spec of one loop, made real. You run a workflow on a loop 
 
 ## Vocabulary
 
-A shared language, reached for only when a workflow calls for it — never a checklist. **Mandate nothing structural**: a workflow needs no AI, no checkpoint, and no schedule unless the grilling shows it does.
+A shared language, reached for only when a workflow calls for it — never a checklist. **Mandate nothing structural**: a workflow needs no AI, no checkpoint, and no schedule unless the shaping shows it does.
 
 - **Trigger** — what fires each run: an **event** (a new email, a new issue) or a **schedule** (every morning). Event-triggering is usually the more efficient.
 - **Checkpoint** — a human-in-the-loop point where the user is asked to verify or decide. Some workflows have none and run autonomously; some use no AI at all.
@@ -24,7 +24,7 @@ A shared language, reached for only when a workflow calls for it — never a che
 
 ## Definition of done
 
-A workflow spec is done when an implementer agent could build it without asking a single question. Grill until then; nothing is done while a question remains.
+A workflow spec is done when an implementer agent could build it without asking a single question. Shape until then; nothing is done while a question remains.
 
 ## The workspace
 

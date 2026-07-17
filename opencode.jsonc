@@ -95,13 +95,9 @@
       "template": "Load the claude-md-auditor skill via the skill tool and audit the CLAUDE.md/AGENTS.md for structure, conciseness, specificity, and hierarchy.",
       "description": "Audit CLAUDE.md/AGENTS.md for conciseness and structure"
     },
-    "batch-grill-me": {
-      "template": "Load the batch-grill-me skill via the skill tool and interview the user in rounds, asking every frontier question at once until the design tree is fully settled.",
-      "description": "Stress-test a plan via round-based frontier questioning"
-    },
-    "grill-with-docs": {
-      "template": "Load the grill-with-docs skill via the skill tool and challenge the plan against the existing domain model, sharpening terminology and updating docs.",
-      "description": "Stress-test a plan against the domain model and documentation"
+    "shape": {
+      "template": "Load the shape skill via the skill tool and shape the idea or plan into its destination artifact through routed frontier rounds.",
+      "description": "Shape a raw idea or plan into a buildable artifact (PRD, spec, decision)"
     },
     "handoff": {
       "template": "Load the handoff skill via the skill tool and compact the current conversation into a handoff document for another agent.",

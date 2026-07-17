@@ -1,4 +1,4 @@
-# Subagent / Coding-Agent Launch Packet
+# Implementer Launch Packet
 
 ## Goal
 
@@ -6,7 +6,7 @@
 
 ## Map
 
-<current plan/spec/prototype>
+<the artifact this session produced: PRD/plan/spec>
 
 ## Territory to inspect first
 
@@ -17,7 +17,7 @@
 
 ## Known knowns
 
-- <facts>
+- <facts, with evidence>
 
 ## Known unknowns
 
@@ -27,9 +27,9 @@
 
 - <blindspots to check before editing>
 
-## Unknown knowns to preserve
+## Taste criteria to preserve
 
-- <taste/product criteria extracted from prototypes/references>
+- <criteria extracted from prototypes/reactions>
 
 ## Deviation policy
 
