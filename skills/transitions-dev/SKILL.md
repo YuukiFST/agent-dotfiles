@@ -1,11 +1,11 @@
 ---
 name: transitions-dev
-description: Production-ready CSS transitions for web apps. Use when implementing or animating any UI motion — badges, dropdowns, modals, panel reveals, page transitions, card resizes, number pop-ins, text/icon swaps, success checks, avatar hovers, error shakes, input clear, skeleton/shimmer loaders, sliding tabs, segmented controls, tooltips, staggered reveals, hover tilt, plus-to-menu morph, accordions/collapsibles. Triggers on "add a transition", "animate X", "open/close smoothly", "fade between". Also transitions reveal, review, apply, refine.
+description: Production-ready CSS transitions for web apps. Use when implementing or animating any UI motion — badges, dropdowns, modals, panel reveals, page transitions, card resizes, number pop-ins, text/icon swaps, success checks, avatar hovers, error shakes, input clear, skeleton/shimmer loaders, sliding tabs, segmented controls, tooltips, staggered reveals, hover tilt, plus-to-menu morph, accordions/collapsibles, toasts, like buttons, checkboxes, spinning counters, toggles. Triggers on "add a transition", "animate X", "open/close smoothly", "fade between". Also motion tokens, and transitions reveal, review, apply, refine.
 ---
 
 # Transitions.dev
 
-Twenty-one portable CSS transitions, each namespaced under `t-*` selectors with semantic CSS custom properties. Drop-in: paste the snippet, wire the documented HTML hooks, done. No framework dependencies, no demo-specific markup, and every snippet ships a `prefers-reduced-motion` guard.
+Twenty-seven portable CSS transitions, each namespaced under `t-*` selectors with semantic CSS custom properties. Drop-in: paste the snippet, wire the documented HTML hooks, done. No framework dependencies, no demo-specific markup, and every snippet ships a `prefers-reduced-motion` guard.
 
 ## Quick reference
 
@@ -32,6 +32,12 @@ Twenty-one portable CSS transitions, each namespaced under `t-*` selectors with 
 | **Card hover tilt** | Tilt a card in 3D toward the pointer with a cursor-tracked glare. | [19-card-tilt.md](./19-card-tilt.md) |
 | **Plus to menu morph** | Morph a circular trigger into the menu / panel it opens. | [20-plus-menu-morph.md](./20-plus-menu-morph.md) |
 | **Accordion expand** | Grow / shrink a panel via grid-rows with a chevron flip. | [21-accordion.md](./21-accordion.md) |
+| **Toast open / close** | Rise a toast from below with fade + cross-blur, slower in than out. | [22-toast.md](./22-toast.md) |
+| **Like button** | Fill a heart with a pop + particle burst on like. | [23-like-button.md](./23-like-button.md) |
+| **Learn more hover** | Slide the chevron and spread its arms into an arrow on hover. | [24-learn-more-hover.md](./24-learn-more-hover.md) |
+| **Checkbox check** | Fill the box, then stroke-draw the checkmark. | [25-checkbox-check.md](./25-checkbox-check.md) |
+| **Spinning counter** | Spin slot-machine digit reels with vertical motion blur. | [26-spinning-counter.md](./26-spinning-counter.md) |
+| **Toggle** | Travel the switch thumb with a double-bounce overshoot. | [27-toggle.md](./27-toggle.md) |
 
 ## Decision rules
 
@@ -69,7 +75,7 @@ The skill exposes four namespaced verbs the agent should recognise in addition t
 
 **Trigger phrases:** `transitions reveal`, "reveal the transitions", "list all transitions", "what transitions are in this skill", "show the transitions catalog".
 
-**Behaviour:** print the twenty-one transitions as a numbered plain-text list — name, one-line summary, and the matching reference filename. Reuse the rows in `## Quick reference` above; do not invent new copy. No project access.
+**Behaviour:** print the twenty-seven transitions as a numbered plain-text list — name, one-line summary, and the matching reference filename. Reuse the rows in `## Quick reference` above; do not invent new copy. No project access.
 
 ### transitions review — audit the project for fit
 
@@ -96,75 +102,77 @@ The skill exposes four namespaced verbs the agent should recognise in addition t
 4. On confirmation, follow the existing five-step procedure in `## Output format` verbatim (root block, snippet, hooks, reduced-motion guard, JS orchestration if needed).
 5. If the agent can't pick a single transition with confidence, fall back to `transitions reveal` and ask the user to choose.
 
-### transitions refine — align existing values to the motion tokens
+### transitions refine — replace ad-hoc motion with the motion tokens
 
-**Trigger phrases:** `transitions refine`, "refine my transitions", "improve the animation values", "tune the durations / easing", "make the timing consistent", "align to the motion tokens".
+**Trigger phrases:** `transitions refine`, "refine my transitions", "scan for ad-hoc transitions", "replace hardcoded durations with motion tokens", "tokenize my animations", "tune the durations / easing", "audit my custom keyframes", "make the timing consistent", "align to the motion tokens".
 
 **Behaviour:**
 
-1. Search style files for transition/animation values: `transition` / `animation` shorthands, `@keyframes`, durations (`…ms` / `…s`), easing (`cubic-bezier(...)` or keywords), translate distances (`px`), `scale(...)`, and `blur(...)`.
-2. For each declaration, infer what it does (modal close, dropdown open, tooltip, badge appear, text reveal, page slide, shake, …) from the surrounding selectors plus the `## Decision rules`.
-3. Look the usage up in `## Motion tokens` and read the recommended duration, easing, distance, scale, and blur for it.
-4. Output a numbered list grouped by file of only the values that differ from the token: `path/to/Component.css:L42` — `modal close 300ms → 150ms (Quick)`, `ease → cubic-bezier(0.22, 1, 0.36, 1) (Smooth ease out)`. Note any value with no matching usage and leave it untouched.
+1. **Scan the whole project** (not just dedicated stylesheets — also inline `style=` / CSS-in-JS, styled-components, `<style>` blocks, Tailwind arbitrary values like `duration-[300ms]`) for ad-hoc motion: `transition` / `animation` shorthands and longhands, custom `@keyframes` blocks, hardcoded durations (`…ms` / `…s`), easing (`cubic-bezier(...)` or keywords), translate distances (`px`), `scale(...)`, and `blur(...)`.
+2. For each value, infer **what the motion does** (modal close, dropdown open, tooltip, badge appear, text reveal, page slide, shake, …) from the surrounding selectors / component plus the `## Decision rules`. For a `@keyframes` block, read the `animation` that drives it and judge the keyframes' own duration/easing.
+3. **The key decision point is usage, not the raw number.** Look the inferred usage up in `## Motion tokens` and suggest the token whose documented usage matches — only when the usages line up. A 300ms modal close maps to `--duration-quick` because both are "modal close", even though the numbers differ. If a value's usage matches **no** token's usage, list it as `no matching token usage` and leave it untouched — never force a swap just because a number is close.
+4. Output a numbered list grouped by file, showing only values that should change, each as `path/to/Component.css:L42` — `modal close: 300ms → var(--duration-quick) (150ms)`, `ease → var(--ease-smooth-out)`. For keyframe-driven motion, suggest the token for the driving `animation`'s duration/easing.
 5. Do not edit anything. End with: "Confirm any line to apply the change, or run `transitions apply` to install a full transition instead."
 
 ## Motion tokens
 
-The value vocabulary behind the twenty-one transitions. `transitions refine` maps each existing value to a usage below, then suggests the token whose value differs. Match on **usage**, not on the raw number — a 300ms modal close is still a `Quick` (150ms) close.
+The shared motion scale behind the twenty-seven transitions — the same tokens the [transitions.dev](https://transitions.dev) Motion tokens tab exposes. They ship at the top of [`_root.css`](./_root.css), so once it's imported you can reference any of them as `var(--…)` (e.g. `transition: transform var(--duration-fast) var(--ease-smooth-out)`).
+
+`transitions refine` maps each existing value to a usage below, then suggests the token to reference. Match on **usage**, not on the raw number — a 300ms modal close still maps to `--duration-quick` (150ms).
 
 **Durations**
 
-| Value | Name | Usage |
+| Token | Value | Usage |
 | --- | --- | --- |
-| 40ms | Stagger | per-item stagger offset |
-| 80ms | Micro | tooltip delay, shake segment, large stagger |
-| 150ms | Quick | modal close, dropdown close, text swap, tooltip appear |
-| 250ms | Fast | icon swap, dropdown open, modal open, tabs sliding, page slide |
-| 350ms | Medium | panel close, toast close |
-| 400ms | Slow | panel open, skeleton content reveal, input clear |
-| 500ms | Very slow | emphasis moments, badge appear, text reveal, success check |
+| `--duration-stagger` | `40ms` | per-item stagger offset |
+| `--duration-micro` | `80ms` | tooltip/path delay, shake segment, large stagger |
+| `--duration-quick` | `150ms` | modal/dropdown close, text swap, tooltip appear |
+| `--duration-fast` | `250ms` | icon swap, dropdown/modal open, tabs sliding, page slide |
+| `--duration-medium` | `350ms` | panel close, toast close |
+| `--duration-slow` | `400ms` | panel open, skeleton content reveal, input clear |
+| `--duration-very-slow` | `500ms` | emphasis moments, badge appear, text reveal, success check |
 
 **Easings**
 
-| Value | Name | Usage |
+| Token | Value | Usage |
 | --- | --- | --- |
-| cubic-bezier(0.22, 1, 0.36, 1) | Smooth ease out | modal / dropdown / panel open + close, page slide, resize, position change |
-| ease-in-out | Ease in out | icon swap, text swap, text reveal, skeleton reveal |
-| ease-out | Ease out | tooltip open / close |
-| linear | Linear | shimmer, skeleton pulse, spinner |
-| cubic-bezier(0.34, 1.36, 0.64, 1) | Bouncy overshoot | badge pop open |
-| cubic-bezier(0.34, 3.85, 0.64, 1) | Strong bouncy overshoot | bouncy hover-out (avatar return) |
+| `--ease-smooth-out` | `cubic-bezier(0.22, 1, 0.36, 1)` | modal/dropdown/panel open + close, page slide, resize, position change |
+| `--ease-in-out` | `ease-in-out` | icon swap, text swap, text reveal, skeleton reveal |
+| `--ease-out` | `ease-out` | tooltip open / close |
+| `--ease-linear` | `linear` | shimmer, skeleton pulse, spinner |
+| `--ease-bounce` | `cubic-bezier(0.34, 1.36, 0.64, 1)` | badge pop open |
+| `--ease-bounce-strong` | `cubic-bezier(0.34, 3.85, 0.64, 1)` | bouncy hover-out (avatar return) |
 
 **Distances**
 
-| Value | Name | Usage |
+| Token | Value | Usage |
 | --- | --- | --- |
-| 4px | Micro | text swap |
-| 6px | Small | error shake (small segment) |
-| 8px | Base | badge diagonal reveal, page slide, error shake (large segment) |
-| 12px | Medium | text reveal |
-| 30px | Large | check badge appear |
+| `--distance-micro` | `4px` | text swap |
+| `--distance-small` | `6px` | error shake (small segment) |
+| `--distance-base` | `8px` | badge diagonal reveal, page slide, error shake (large segment) |
+| `--distance-medium` | `12px` | text reveal |
+| `--distance-large` | `30px` | check badge appear |
 
 **Scales**
 
-| Value | Name | Usage |
+| Token | Value | Usage |
 | --- | --- | --- |
-| 0.96 | Large | modal open / close |
-| 0.97 | Medium | dropdown open |
-| 0.98 | Small | tooltip open |
-| 0.99 | Tiny | dropdown close |
+| `--scale-large` | `0.96` | modal open / close |
+| `--scale-medium` | `0.97` | dropdown open |
+| `--scale-small` | `0.98` | tooltip open |
+| `--scale-tiny` | `0.99` | dropdown close |
 
 **Blur**
 
-| Value | Name | Usage |
+| Token | Value | Usage |
 | --- | --- | --- |
-| 2px | Small | panel reveal, icon swap, text swap, skeleton reveal, number pop-in |
-| 3px | Medium | page slide, text reveal |
-| 8px | Large | success check open |
+| `--blur-small` | `2px` | panel reveal, icon swap, text swap, skeleton reveal, number pop-in |
+| `--blur-medium` | `3px` | page slide, text reveal |
+| `--blur-large` | `8px` | success check open |
 
 ## Universal install
 
-Copy [`_root.css`](./_root.css) into your project **once** and import it (or paste its `:root` block into your global stylesheet). It defines the semantic tunable variables for **all twenty-one** transitions. Every snippet reads from these names — `--resize-*`, `--badge-*`, `--dropdown-*`, `--clear-*`, `--shimmer-*`, `--tabs-*`, `--tt-*`, `--stagger-*`, `--tilt-*`, `--morph-*`, `--acc-*`, and the rest.
+Copy [`_root.css`](./_root.css) into your project **once** and import it (or paste its `:root` block into your global stylesheet). It leads with the shared **motion-token scale** (`--duration-*`, `--ease-*`, `--distance-*`, `--scale-*`, `--blur-*` — see `## Motion tokens`), followed by the semantic tunable variables for **all twenty-seven** transitions. Every snippet reads from these names — `--resize-*`, `--badge-*`, `--dropdown-*`, `--clear-*`, `--shimmer-*`, `--tabs-*`, `--tt-*`, `--stagger-*`, `--tilt-*`, `--morph-*`, `--acc-*`, and the rest.
 
 Each reference file also restates just the variables that snippet needs, so you can install a single transition without pulling the whole block. Don't duplicate the block — if `_root.css` is already imported, skip re-pasting any per-snippet `:root`.
 
@@ -220,4 +228,10 @@ Keep the diff small: only edit the files needed to introduce the transition. Don
 - [19-card-tilt.md](./19-card-tilt.md) — Card hover tilt
 - [20-plus-menu-morph.md](./20-plus-menu-morph.md) — Plus to menu morph
 - [21-accordion.md](./21-accordion.md) — Accordion expand
+- [22-toast.md](./22-toast.md) — Toast open / close
+- [23-like-button.md](./23-like-button.md) — Like button
+- [24-learn-more-hover.md](./24-learn-more-hover.md) — Learn more hover
+- [25-checkbox-check.md](./25-checkbox-check.md) — Checkbox check
+- [26-spinning-counter.md](./26-spinning-counter.md) — Spinning counter
+- [27-toggle.md](./27-toggle.md) — Toggle
 - [_root.css](./_root.css) — the universal install block on its own, ready to import directly.

@@ -47,14 +47,16 @@ Define the design tokens before building on them; retrofitting palette/type onto
 - `emil-design-eng` — the invisible-details philosophy; stack it while polishing, it never conflicts with step 1
 
 ### 6. Build-time motion
-- `transitions-dev` — the product-motion catalog (modals, dropdowns, accordions, shimmer, icon swaps…); run `transitions apply` after components exist. Every snippet ships reduced-motion; don't pull a motion library for what the catalog covers.
+- `transitions-dev` — the product-motion catalog, 27 snippets (modals, dropdowns, accordions, shimmer, icon swaps, toasts, like buttons, checkboxes, spinning counters, toggles…); run `transitions apply` after components exist. Every snippet ships reduced-motion; don't pull a motion library for what the catalog covers.
+- **Install its `_root.css` once** when the first snippet lands — it leads with the shared motion-token scale (`--duration-*`, `--ease-*`, `--distance-*`, `--scale-*`, `--blur-*`). Any *custom* motion written outside the catalog references these tokens from the start (`var(--duration-fast) var(--ease-smooth-out)`), never fresh hardcoded values — one motion grid for the whole front, and step 7's polish pass becomes a confirmation instead of a cleanup.
 
 ### 7. Motion sweep — the Emil loop (SEQUENTIAL, after the UI exists)
 Restraint first: motion earns its place, and a static answer is a valid outcome.
 1. `find-animation-opportunities` — shield framing: "is there anything here that should animate at all?" Scope it per view, not per app, and state usage frequency ("checkout, a few times per session") — frequency changes what deserves motion. Any freshly built page with zero motion gets this pass. Expect rejections; the "Rejected candidates" section is the point.
 2. Top suggestion(s) → `improve-animations` — turns them into self-contained implementation plans (read-only; plans land under `plans/`). Don't implement from the sweep directly.
 3. Implement the plans (step 6 catalog first, custom motion only where the plan demands it).
-4. `review-animations` — diff review of the implemented motion. Manual-only (`disable-model-invocation`); run when the user asks for a motion review.
+4. `transitions-polish` — token-grid tuning pass over ALL motion now in the project (catalog, custom, pre-existing): `transitions review` to audit, then `transitions polish` to apply the accepted lines. This is where motion goes from "works" to "feels expensive": open/close asymmetry (close faster than open; overshoot on entrances only, never bounce a close), hover-out softer/springier than hover-in, stagger totals under ~300ms, dismissals never delayed, every duration/easing/distance matched to its usage token. Mandatory whenever motion was written or touched in this front; it tunes values only, never swaps whole recipes (that's step 6).
+5. `review-animations` — diff review of the implemented motion. Manual-only (`disable-model-invocation`); run when the user asks for a motion review.
 
 ### 8. Review gate + visual verification (ALWAYS, last)
 Static review is not proof. In order:
