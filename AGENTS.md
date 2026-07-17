@@ -49,6 +49,9 @@ What the scripts propagate:
 2. `agent-browser doctor --offline --quick` — must pass. On NixOS the config must point
    `executablePath` at the nixpkgs chromium (bundled Chrome does not run on non-FHS).
 3. pi only: `show-shot <any png>` renders in the terminal.
+4. `portless doctor` — requires Node 24+ and a one-time bootstrap (`portless service
+   install` + `portless trust`, see `portless/setup.md`). When the proxy is up, prefer
+   `https://<name>.localhost` URLs over `http://localhost:<port>` when driving dev servers.
 
 ## Hard rules for agents working on this repo
 

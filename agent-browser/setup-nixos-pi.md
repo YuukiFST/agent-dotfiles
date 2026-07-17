@@ -12,7 +12,7 @@ Use o Chromium do nixpkgs e aponte o agent-browser para ele.
 
 ```nix
 environment.systemPackages = with pkgs; [
-  nodejs_22      # ou nodejs mais novo
+  nodejs_24      # 24+ obrigatório para o portless; agent-browser roda em qualquer um
   chromium
   chafa          # render de imagem no terminal (fallback universal)
 ];

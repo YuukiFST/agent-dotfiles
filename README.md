@@ -14,7 +14,7 @@ fewer tokens, write better code, verify it works.
 | [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. |
 | [no-mistakes](https://github.com/kunchenguid/no-mistakes) | Validation gate on push — review/test/lint on a throwaway worktree, opens a PR only when green. |
 | [agent-browser](https://agent-browser.dev) | Real-browser E2E via ref-based snapshots — ~10× fewer tokens than Playwright MCP. Configs + NixOS/pi setup guide in `agent-browser/`. |
-| [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. |
+| [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. Needs Node 24+; bootstrap in `portless/setup.md`. |
 | `git-hooks/` | Blocks `Co-authored-by` and forbidden subject terms before commits land. |
 
 ## Skills
