@@ -44,4 +44,15 @@ if (Test-Path $settings) {
   Write-Host "  seeded settings.json"
 }
 
+# agent-browser config is per-MACHINE (~/.agent-browser), read by the CLI on every
+# invocation regardless of harness. Seed only — the live file may grow local state.
+$abConfig = Join-Path $env:USERPROFILE ".agent-browser\config.json"
+if (-not (Test-Path $abConfig)) {
+  New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE ".agent-browser\screenshots") | Out-Null
+  $esc = $env:USERPROFILE.Replace('\', '\\')
+  (Get-Content "$Repo\agent-browser\config.windows.json" -Raw).Replace('C:\\Users\\tisao', $esc) |
+    Set-Content $abConfig -NoNewline
+  Write-Host "  seeded ~/.agent-browser/config.json"
+}
+
 Write-Host "Config synced (claude)."

@@ -1,0 +1,63 @@
+# Agent bootstrap — reaching config parity
+
+You are an agent (Cursor, pi, OpenCode, Claude Code, or other) that was pointed at this
+repo. This repo is the **canonical source** of the user's harness configuration.
+Your job when asked to "sync", "set up", or "reach parity": make the machine you are
+running on match this repo, for the harness you are running in.
+
+Note: `CLAUDE.md` at the repo root is a **payload** (the user's global instructions,
+copied into harness config dirs by the scripts) — it is not instructions for working on
+this repo. This file is.
+
+## Machines
+
+| Machine | Harnesses |
+|---------|-----------|
+| Windows (work PC) | Claude Code only |
+| NixOS (home PC) | pi, Cursor, OpenCode |
+
+## How to reach parity
+
+Run the setup script for your harness (idempotent — also the updater):
+
+| Harness | Command |
+|---------|---------|
+| Claude Code (Windows) | `pwsh -File scripts/setup-claude.ps1` |
+| Claude Code (Unix) | `bash scripts/setup-claude.sh` |
+| OpenCode | `bash scripts/setup-opencode.sh` |
+| Cursor | `bash scripts/setup-cursor.sh` |
+| pi | `bash scripts/setup-pi.sh` |
+
+If tools are already installed and only config drifted, `scripts/sync-config.sh <harness>`
+(or `sync-config.ps1` on Windows) is enough.
+
+What the scripts propagate:
+
+- `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`,
+  `~/.config/opencode/AGENTS.md`)
+- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi), `~/.config/opencode/skills`
+- `rules/` → `~/.claude/rules` on EVERY harness (CLAUDE.md's conditional pointers hardcode that path)
+- `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
+  exists, base preset otherwise; Windows preset on Windows) and installs
+  `~/.local/bin/show-shot` (inline terminal screenshots)
+- tools (setup scripts only): rtk, no-mistakes, code-review-graph, portless,
+  agent-browser (+ Chrome), gh-axi
+
+## Verify (after syncing)
+
+1. `ls ~/.claude/rules` and the skills dir for your harness — non-empty, matches repo.
+2. `agent-browser doctor --offline --quick` — must pass. On NixOS the config must point
+   `executablePath` at the nixpkgs chromium (bundled Chrome does not run on non-FHS).
+3. pi only: `show-shot <any png>` renders in the terminal.
+
+## Hard rules for agents working on this repo
+
+- Config is edited HERE and propagated by scripts — never patch `~/.claude`,
+  `~/.agents`, or `~/.config/opencode` directly (except files documented as seeds:
+  `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
+- Commits: English, Conventional Commits, no AI attribution of any kind
+  (no `Co-authored-by`, no "Generated with"). See `git-hooks/`.
+- Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
+  Customize → Rules manually after edits.
+- agent-browser deep dive: `agent-browser/setup-nixos-pi.md` (NixOS install, terminal
+  screenshots, token-economy habits, CDP mode).

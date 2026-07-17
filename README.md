@@ -35,6 +35,7 @@ fewer tokens, write better code, verify it works.
 ## Setup
 
 Clone the repo, run your agent's script. Idempotent — re-run to update.
+Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it how.
 
 | Machine | Agent | Script |
 |---------|-------|--------|

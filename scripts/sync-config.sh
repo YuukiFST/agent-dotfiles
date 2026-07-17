@@ -39,6 +39,22 @@ sync_shared() {
     mkdir -p "$HOME/.pi/agent"
     cp "$repo/CLAUDE.md" "$HOME/.pi/agent/AGENTS.md"
   fi
+
+  # agent-browser config is per-MACHINE (~/.agent-browser), shared by every harness that
+  # shells out to the CLI. Seed only — the live file may grow local state (encryption key,
+  # session sidecars) this repo does not track.
+  if [ ! -f "$HOME/.agent-browser/config.json" ]; then
+    mkdir -p "$HOME/.agent-browser/screenshots"
+    if [ -e /etc/NIXOS ]; then src="$repo/agent-browser/config.nixos.json"
+    else src="$repo/agent-browser/config.base.json"; fi
+    sed "s|~/|$HOME/|" "$src" > "$HOME/.agent-browser/config.json"
+    echo "  seeded ~/.agent-browser/config.json ($(basename "$src"))"
+  fi
+
+  # show-shot renders agent screenshots inline in the terminal (kitty/wezterm/chafa).
+  mkdir -p "$HOME/.local/bin"
+  cp "$repo/agent-browser/show-shot" "$HOME/.local/bin/show-shot"
+  chmod +x "$HOME/.local/bin/show-shot"
 }
 
 case "$target" in
