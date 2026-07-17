@@ -1,0 +1,7 @@
+{
+  "executablePath": "/run/current-system/sw/bin/chromium",
+  "colorScheme": "dark",
+  "maxOutput": 30000,
+  "screenshotDir": "~/.agent-browser/screenshots",
+  "idleTimeoutMs": 900000
+}

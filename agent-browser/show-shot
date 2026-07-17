@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# show-shot <image> — display a screenshot in the terminal using the best
+# available graphics protocol (kitty/ghostty > wezterm > chafa fallback).
+# Install: cp to ~/.local/bin/show-shot && chmod +x
+f="${1:?usage: show-shot <image>}"
+if [ -n "${KITTY_WINDOW_ID:-}" ] && command -v kitten >/dev/null; then
+  kitten icat "$f"
+elif command -v wezterm >/dev/null && [ -n "${WEZTERM_PANE:-}" ]; then
+  wezterm imgcat "$f"
+else
+  chafa -s "$(tput cols)x$(($(tput lines)-2))" "$f"
+fi
