@@ -2,7 +2,9 @@
 
 **Trigger:** any frontend/UI work — above all a **/goal building a project from a PRD whose scope includes a front**: the flow governs every UI the PRD produces, loaded before the first UI code, not as an afterthought.
 
-**Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **running skills in the right order**, each owning one step. Load each via the Skill tool *before* writing the matching code, not after. Normally 4–6 skills per front; never fewer than the minimum bar.
+**Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **running skills in the right order**, each owning one step. Load each skill file *before* writing the matching code, not after. Normally 4–6 skills per front; never fewer than the minimum bar.
+
+**How to load a skill (router-only):** frontend pipeline skills are user-invoked (`disable-model-invocation: true`) — they do not appear in the skill catalog. Before each step, read the skill file directly: `~/.agents/skills/<skill-name>/SKILL.md` (or `/skill:<name>`). Load only the skill for the current step; do not preload later steps.
 
 **TRIVIAL-FIX EXCEPTION:** a pointed fix of ~10 lines or less inside an existing UI (typo, spacing tweak, broken class, one-prop change) skips the flow — global "judgment over ceremony" applies. Anything that designs or redesigns a component/page runs the full flow.
 
@@ -62,7 +64,7 @@ Restraint first: motion earns its place, and a static answer is a valid outcome.
 Static review is not proof. In order:
 1. `impeccable` — UI/UX audit before declaring the front done (same `context.mjs` bootstrap as step 4).
 2. `react-doctor` — React/Next only: `npx react-doctor@latest --verbose --scope changed` (lint, a11y, bundle, architecture; `@latest` self-updates).
-3. **Browser pass** — harness browser pane, `agent-browser`, or `webapp-testing`: load the real page, screenshot, test interactions, check console errors, verify mobile width + dark mode. Iterate screenshot → fix → screenshot; done only on a clean pass.
+3. **Browser pass** — harness browser pane, `agent-browser` (`~/.agents/skills/agent-browser/SKILL.md`), or `webapp-testing` (`~/.agents/skills/webapp-testing/SKILL.md`): load the real page, screenshot, test interactions, check console errors, verify mobile width + dark mode. Iterate screenshot → fix → screenshot; done only on a clean pass.
 4. **Lighthouse on any page a user actually loads** (landing, marketing, public product page): `npx lighthouse@latest <url> --quiet --chrome-flags="--headless" --output=json --output-path=stdout`. Report the four scores; a red Performance or Accessibility score is a bug, not a nice-to-have. Skip for internal CRUD behind auth.
 
 ## Minimum bar per front (never ship a front from one skill)

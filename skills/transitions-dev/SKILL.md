@@ -1,6 +1,7 @@
 ---
 name: transitions-dev
 description: Production-ready CSS transitions for web apps. Use when implementing or animating any UI motion — badges, dropdowns, modals, panel reveals, page transitions, card resizes, number pop-ins, text/icon swaps, success checks, avatar hovers, error shakes, input clear, skeleton/shimmer loaders, sliding tabs, segmented controls, tooltips, staggered reveals, hover tilt, plus-to-menu morph, accordions/collapsibles, toasts, like buttons, checkboxes, spinning counters, toggles. Triggers on "add a transition", "animate X", "open/close smoothly", "fade between". Also motion tokens, and transitions reveal, review, apply, refine.
+disable-model-invocation: true
 ---
 
 # Transitions.dev

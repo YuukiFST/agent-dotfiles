@@ -1,6 +1,7 @@
 ---
 name: impeccable
 description: Use when the user wants to design, redesign, critique, audit, polish, animate, or otherwise improve any frontend interface — websites, landing pages, dashboards, product UI, components, forms, onboarding, empty states. Covers UX review, hierarchy, accessibility, performance, responsiveness, theming, typography, spacing, layout, color, motion, micro-interactions, UX copy, error states, i18n, and design systems/tokens. Also for making bland designs bolder or loud designs quieter, and live browser iteration on UI. Not for backend-only or non-UI tasks.
+disable-model-invocation: true
 ---
 
 Designs and iterates production-grade frontend interfaces. Real working code, committed design choices, exceptional craft.

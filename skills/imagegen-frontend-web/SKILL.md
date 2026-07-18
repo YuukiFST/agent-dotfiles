@@ -1,6 +1,7 @@
 ---
 name: imagegen-frontend-web
 description: Generates premium website design reference images. CRITICAL RULE — one separate horizontal image per section (8 sections = 8 images; never compress sections into one image). Enforces composition variety, varied hero scales and CTAs, one consistent palette. For landing pages, marketing sites, and product comps that coding models recreate.
+disable-model-invocation: true
 ---
 
 # HARD OUTPUT RULE — READ FIRST

@@ -25,6 +25,7 @@ metadata:
     - "@tailwindcss/forms"
 
 license: MIT
+disable-model-invocation: true
 ---
 # Tailwind v4 + shadcn/ui Production Stack
 

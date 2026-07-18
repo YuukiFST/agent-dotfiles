@@ -1,6 +1,7 @@
 ---
 name: imagegen-frontend-mobile
 description: Generates premium mobile app screen concepts and flows (iOS, Android, cross-platform). Clean hierarchy, readable text, multi-screen consistency, controlled palettes; screens framed in a subtle phone mockup by default. Images only — writes no code.
+disable-model-invocation: true
 ---
 
 # CORE DIRECTIVE: PREMIUM MOBILE APP IMAGE DIRECTION

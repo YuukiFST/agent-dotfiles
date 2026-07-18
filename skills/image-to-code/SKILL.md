@@ -1,6 +1,7 @@
 ---
 name: image-to-code
 description: Website image-to-code. For visually important web tasks — first generate the design image(s), analyze them deeply, then implement the site to match as closely as possible. Prefers large section-specific images and fresh images over crops; keeps the hero clean, spacious, and visible on a small laptop.
+disable-model-invocation: true
 ---
 
 # CORE DIRECTIVE: IMAGE-FIRST WEBSITE DESIGN TO CODE

@@ -1,6 +1,7 @@
 ---
 name: brandkit
 description: Brand-kit image generation — brand-guidelines boards, logo systems, identity decks, visual-world presentations. Styles span minimalist, cinematic, editorial, dark-tech, luxury, gaming, developer-tool, and consumer-app brand systems.
+disable-model-invocation: true
 ---
 
 # BRANDKIT IMAGE GENERATION SKILL

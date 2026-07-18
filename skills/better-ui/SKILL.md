@@ -1,6 +1,7 @@
 ---
 name: better-ui
 description: Design engineering principles for making interfaces feel polished. Use when building UI components, reviewing frontend code, implementing animations, hover states, shadows, borders, micro-interactions, enter/exit animations, or any visual detail work. Triggers on UI polish, design details, "make it feel better", "feels off", stagger animations, border radius, optical alignment, image outlines, box shadows.
+disable-model-invocation: true
 ---
 
 # Details that make interfaces feel better
