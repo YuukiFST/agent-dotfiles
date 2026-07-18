@@ -123,10 +123,6 @@
       "template": "Load the react-doctor skill via the skill tool and scan, triage and clean up React diagnostics (lint, accessibility, bundle size, architecture). Fix issues by severity, errors before warnings.",
       "description": "React diagnostics scan and triage (lint, a11y, bundle size, architecture)"
     },
-    "omarchy": {
-      "template": "Load the omarchy skill via the skill tool to configure Hyprland, Waybar, or other Linux desktop/WM settings.",
-      "description": "Linux desktop/WM theming (Hyprland, Waybar, etc.)"
-    },
     "prototype": {
       "template": "Load the prototype skill via the skill tool and build a throwaway prototype to flesh out a design before committing to it.",
       "description": "Throwaway prototype to explore a design"

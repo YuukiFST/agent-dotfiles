@@ -16,8 +16,6 @@ Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
   if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
   Copy-Item $_.FullName $dest -Recurse
 }
-# omarchy is Linux-only (Hyprland/waybar) — dead weight in the prompt on Windows
-Remove-Item "$Claude\skills\omarchy" -Recurse -Force -ErrorAction SilentlyContinue
 
 # rules/ is entirely repo-owned — full mirror so deleted rules don't linger
 Remove-Item "$Claude\rules" -Recurse -Force
