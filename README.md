@@ -45,7 +45,8 @@ Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it
 | **NixOS** | Cursor | `bash scripts/setup-cursor.sh` |
 | **NixOS** | pi | `bash scripts/setup-pi.sh` |
 
-Claude Code and OpenCode get the full stack; Cursor and pi get skills + rules only.
+Claude Code and OpenCode get the full stack; Cursor gets skills + rules + MCP;
+pi gets skills + rules + a code-review-graph extension (no native MCP).
 Restart the agent afterwards.
 
 ## Gotchas
@@ -54,4 +55,5 @@ Restart the agent afterwards.
 - **`no-mistakes init` once per repo**, or `git push no-mistakes` has no remote to hit.
 - **Cursor User Rules are not file-backed** — paste `CLAUDE.md` into Customize → Rules by hand, and re-paste after editing it.
 - **`settings.json` is a seed, not a mirror** — written only when absent. Claude Code and other installers own that file; mirroring it would destroy state this repo doesn't track.
-- **pi ships no MCP, hooks or sub-agents** (upstream design choice) — skills + AGENTS.md are its entire surface.
+- **pi ships no MCP** (upstream design choice) — graph review is a TypeScript extension
+  (`pi-extensions/code-review-graph`) installed by `setup-pi.sh`.

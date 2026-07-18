@@ -86,9 +86,14 @@ case "$target" in
     ;;
   pi)
     # Same story: sync_shared already wrote ~/.agents/skills and ~/.pi/agent/AGENTS.md.
-    # pi has no MCP and no hooks (upstream design choice), so there is nothing else.
     command -v pi >/dev/null 2>&1 || { echo "pi not on PATH — run setup-pi.sh first" >&2; exit 1; }
     sync_shared
+    ext_src="$repo/pi-extensions/code-review-graph/index.ts"
+    if [ -f "$ext_src" ]; then
+      ext_dest="$HOME/.pi/agent/extensions/code-review-graph"
+      mkdir -p "$ext_dest"
+      cp "$ext_src" "$ext_dest/index.ts"
+    fi
     ;;
   *)
     echo "unknown target: $target" >&2; exit 1 ;;
