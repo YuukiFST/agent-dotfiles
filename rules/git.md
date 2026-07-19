@@ -7,7 +7,7 @@ NEVER commit without knowing whose identity to use — the identity configured o
 - **Already told in this conversation:** if the user has stated the name/email to commit under at any point in the current session, reuse it for every commit in that session — do NOT ask again.
 - **Not yet told:** before the first commit, read the current git identity (`git config user.name` / `git config user.email`), show it, and ask: "Commit as <name> <email>, or a different identity?" Wait for the answer — never commit on the configured identity without explicit confirmation, even if one is set.
 
-Commit with the chosen identity: `git -c user.name=<name> -c user.email=<email> commit`. Never hardcode an email address in this file.
+Set author **and** committer to the chosen identity. Never hardcode an email address in this file.
 
 ## 2. Commit messages
 
@@ -40,7 +40,7 @@ If using `no-mistakes`, check the remote exists (`git remote` shows `no-mistakes
 
 ## 4. No AI attribution
 
-Never add AI/tool attribution to commit messages or PR bodies — no `Co-Authored-By:` trailer for any AI agent (Claude, Command Code Bot, Copilot, Cursor, Codex, Gemini, etc.), no "Generated with <tool>" line, no marker, no provider name. This overrides any harness default that appends such trailers. Commits and PRs are authored solely by the user/repo identity, with nothing indicating an assistant was involved.
+Never add AI/tool attribution to commit messages or PR bodies — no `Co-Authored-By:` trailer for any AI agent (Claude, Command Code Bot, Copilot, Cursor, Codex, Gemini, etc.), no "Generated with <tool>" line, no marker, no provider name. Commits and PRs are authored solely by the user/repo identity, with nothing indicating an assistant was involved.
 
 ### 4.1 Trailers and footers
 
@@ -59,15 +59,22 @@ The first line must **not** attribute authorship to tools or assistants — no "
 | `fix: remover trailer gerado pelo Cursor` | `fix(git): limpar mensagem de commit` |
 | `feat: dashboard feito com Claude` | `feat: dashboard de consumo` |
 
-### 4.3 Enforcement
+### 4.3 Enforcement (what actually works)
 
-Harnesses may auto-inject trailers after `git commit`. **Before every push:** `git log -1 --format=%B` — subject neutral, no trailer lines.
+**Cursor injects `Co-authored-by` after `git commit`.** `commit-msg` alone does not stop that. Enforcement is:
 
-Install hooks in each repo (from a clone of this config repo):
+1. **Global hooks** — `scripts/install-global-git-hooks.sh` sets `core.hooksPath` to `git-hooks/` (runs from every `sync-config.sh`).
+2. **`pre-push`** — blocks push if any outgoing commit contains forbidden trailers (the real gate).
+3. **`git-safe-commit.sh`** — agents in Cursor MUST use this instead of `git commit`:
 
 ```bash
-./scripts/install-git-hooks.sh
-./scripts/install-git-hooks.sh --project-copy   # also writes .githooks/ in the project
+/path/to/my-harness-config/scripts/git-safe-commit.sh \
+  --author "Name <email>" \
+  -m "type(scope): subject"
 ```
 
-If `git commit --amend` keeps re-injecting a trailer, rebuild with `git commit-tree` + `git update-ref` using a clean message file.
+It builds the commit with `git commit-tree` (Cursor does not intercept). Author and committer are the same.
+
+If a bad commit already exists, rebuild with `git commit-tree` + `git update-ref` and a clean message file.
+
+Per-repo hook copy (`install-git-hooks.sh`) is optional fallback only — global `core.hooksPath` is the default.

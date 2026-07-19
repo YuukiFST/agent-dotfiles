@@ -4,6 +4,7 @@ description: Hunt for exploitable, bounty-worthy security issues in repositories
 metadata:
   origin: ECC direct-port adaptation
 version: "1.0.0"
+disable-model-invocation: true
 ---
 
 # Security Bounty Hunter

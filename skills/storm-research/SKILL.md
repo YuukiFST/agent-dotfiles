@@ -1,6 +1,7 @@
 ---
 name: storm-research
 description: Use when the user wants deep multi-angle research on a topic, a briefing before a decision/interview/investment/negotiation/presentation, to map where experts disagree, or says "research X", "STORM this", "give me the full picture on X". Not for quick factual lookups.
+disable-model-invocation: true
 ---
 
 # STORM Research

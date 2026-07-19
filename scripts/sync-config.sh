@@ -22,6 +22,69 @@ sync_rules() { # $1 = dest rules dir — full mirror: rules/ is entirely repo-ow
   cp -r "$repo/rules/." "$1/"
 }
 
+sync_pi_agent() {
+  local pi_src="$repo/pi"
+  local agent="$HOME/.pi/agent"
+  [ -d "$pi_src" ] || return 0
+
+  mkdir -p "$agent/extensions"
+  for f in cloak.json cursor-sdk.json package.json tsconfig.json models.json .gitignore; do
+    if [ -f "$pi_src/$f" ]; then
+      cp "$pi_src/$f" "$agent/$f"
+    fi
+  done
+
+  python3 - "$pi_src/settings.json" "$agent/settings.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+seed_path = Path(sys.argv[1])
+live_path = Path(sys.argv[2])
+seed = json.loads(seed_path.read_text())
+live: dict = {}
+if live_path.exists():
+    live = json.loads(live_path.read_text())
+
+for key in ("theme", "defaultProvider", "defaultModel", "enabledModels", "defaultThinkingLevel"):
+    if key in seed:
+        live[key] = seed[key]
+
+packages: list = []
+seen: set[str] = set()
+for pkg in seed.get("packages", []):
+    key = pkg if isinstance(pkg, str) else pkg["source"]
+    if key in seen:
+        continue
+    seen.add(key)
+    packages.append(pkg)
+live["packages"] = packages
+
+live_path.write_text(json.dumps(live, indent=2) + "\n")
+PY
+
+  for ext in "$pi_src"/extensions/*/; do
+    [ -d "$ext" ] || continue
+    name="$(basename "$ext")"
+    mkdir -p "$agent/extensions/$name"
+    cp -r "$ext/." "$agent/extensions/$name/"
+  done
+
+  if command -v pi >/dev/null 2>&1; then
+    for pkg in $(python3 - "$pi_src/settings.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+for pkg in json.loads(Path(sys.argv[1]).read_text()).get("packages", []):
+    print(pkg if isinstance(pkg, str) else pkg["source"])
+PY
+); do
+      pi install "$pkg" >/dev/null 2>&1 || pi install "$pkg" || true
+    done
+  fi
+}
+
 # Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi +
 # OpenCode side by side) converges on the same config no matter which script ran.
 sync_shared() {
@@ -55,6 +118,10 @@ sync_shared() {
   mkdir -p "$HOME/.local/bin"
   cp "$repo/agent-browser/show-shot" "$HOME/.local/bin/show-shot"
   chmod +x "$HOME/.local/bin/show-shot"
+
+  # Global git hooks (pre-push blocks AI attribution trailers; commit-msg is early feedback).
+  bash "$repo/scripts/install-global-git-hooks.sh" >/dev/null
+  install -m 755 "$repo/scripts/git-safe-commit.sh" "$HOME/.local/bin/git-safe-commit"
 }
 
 case "$target" in
@@ -88,12 +155,7 @@ case "$target" in
     # Same story: sync_shared already wrote ~/.agents/skills and ~/.pi/agent/AGENTS.md.
     command -v pi >/dev/null 2>&1 || { echo "pi not on PATH — run setup-pi.sh first" >&2; exit 1; }
     sync_shared
-    ext_src="$repo/pi-extensions/code-review-graph/index.ts"
-    if [ -f "$ext_src" ]; then
-      ext_dest="$HOME/.pi/agent/extensions/code-review-graph"
-      mkdir -p "$ext_dest"
-      cp "$ext_src" "$ext_dest/index.ts"
-    fi
+    sync_pi_agent
     ;;
   *)
     echo "unknown target: $target" >&2; exit 1 ;;

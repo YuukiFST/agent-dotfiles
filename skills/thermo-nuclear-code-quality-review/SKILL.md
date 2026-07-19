@@ -8,6 +8,7 @@ description: >
   fix. Use when user says "thermo-nuclear review", "nuke this code",
   "destroy this PR", "brutal code review", "maximum scrutiny", or demands
   the most thorough review possible.
+disable-model-invocation: true
 ---
 
 # Thermo-Nuclear Code Quality Review 🔥☢️

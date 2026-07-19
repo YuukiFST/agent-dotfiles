@@ -10,12 +10,13 @@ fewer tokens, write better code, verify it works.
 | [rtk](https://github.com/rtk-ai/rtk) | Compresses shell output 60–90% before the model sees it. |
 | [caveman](https://github.com/JuliusBrussee/caveman) | Compresses agent replies ~75%. |
 | [code-review-graph](https://github.com/tirth8205/code-review-graph) | Feeds the agent only the blast-radius of a change — ~82× fewer tokens. |
+| [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) | Codex-style `/goal` tracking with `get_goal` / `create_goal` / `update_goal` tools. |
 | [ponytail](https://github.com/DietrichGebert/ponytail) | Stdlib/native first → 80–94% less code. |
 | [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. |
 | [no-mistakes](https://github.com/kunchenguid/no-mistakes) | Validation gate on push — review/test/lint on a throwaway worktree, opens a PR only when green. |
 | [agent-browser](https://agent-browser.dev) | Real-browser E2E via ref-based snapshots — ~10× fewer tokens than Playwright MCP. Configs + NixOS/pi setup guide in `agent-browser/`. |
 | [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. Needs Node 24+; bootstrap in `portless/setup.md`. |
-| `git-hooks/` | Blocks `Co-authored-by` and forbidden subject terms before commits land. |
+| `git-hooks/` | `pre-push` blocks AI attribution on push; `git-safe-commit` bypasses Cursor injection. |
 
 ## Skills
 
@@ -46,7 +47,7 @@ Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it
 | **NixOS** | pi | `bash scripts/setup-pi.sh` |
 
 Claude Code and OpenCode get the full stack; Cursor gets skills + rules + MCP;
-pi gets skills + rules + a code-review-graph extension (no native MCP).
+pi gets skills + rules + agent config from `pi/` (extensions, packages, cloak) — no native MCP.
 Restart the agent afterwards.
 
 ## Gotchas
@@ -56,4 +57,5 @@ Restart the agent afterwards.
 - **Cursor User Rules are not file-backed** — paste `CLAUDE.md` into Customize → Rules by hand, and re-paste after editing it.
 - **`settings.json` is a seed, not a mirror** — written only when absent. Claude Code and other installers own that file; mirroring it would destroy state this repo doesn't track.
 - **pi ships no MCP** (upstream design choice) — graph review is a TypeScript extension
-  (`pi-extensions/code-review-graph`) installed by `setup-pi.sh`.
+  (`pi/extensions/code-review-graph`) installed by `setup-pi.sh`. Goal tracking comes from
+  `npm:pi-codex-goal` in `pi/settings.json`.

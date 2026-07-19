@@ -31,10 +31,8 @@ fi
 ln -sf "$crg/bin/code-review-graph" "$bin/code-review-graph"
 "$bin/code-review-graph" --version
 
-echo "[3/4] pi extension (code-review-graph tools)"
-ext_dest="$HOME/.pi/agent/extensions/code-review-graph"
-mkdir -p "$ext_dest"
-cp "$repo/pi-extensions/code-review-graph/index.ts" "$ext_dest/index.ts"
+echo "[3/4] pi agent config (extensions + packages from pi/)"
+"$(dirname "$0")/sync-config.sh" pi
 
 # Cursor SDK provider can also use configured MCP servers.
 mcp="$HOME/.cursor/mcp.json"
@@ -57,14 +55,15 @@ else
   echo "  NOTE: $mcp exists; add code-review-graph server by hand (see setup-cursor.sh)"
 fi
 
-echo "[4/4] Config files (skills, rules, AGENTS.md)"
-"$(dirname "$0")/sync-config.sh" pi
+echo "[4/4] done"
 
 cat <<'EOF'
 
 Done. Restart pi.
 
+- Agent config: ~/.pi/agent (synced from pi/)
 - Skills: ~/.agents/skills · global instructions: ~/.pi/agent/AGENTS.md
+- Goal tracking: /goal, /create-goal (pi-codex-goal)
 - Graph tools: crg_detect_changes, crg_impact_radius, crg_query_graph,
   crg_semantic_search, crg_architecture_overview, crg_status
 - Build a graph per repo: /crg-build or `code-review-graph build`

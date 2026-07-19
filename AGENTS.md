@@ -40,6 +40,7 @@ What the scripts propagate:
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
+- `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk)
 - tools (setup scripts only): rtk, no-mistakes, code-review-graph, portless,
   agent-browser (+ Chrome), gh-axi
 
@@ -59,7 +60,8 @@ What the scripts propagate:
   `~/.agents`, or `~/.config/opencode` directly (except files documented as seeds:
   `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
 - Commits: English, Conventional Commits, no AI attribution of any kind
-  (no `Co-authored-by`, no "Generated with"). See `git-hooks/`.
+  (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
+  See `rules/git.md` and `git-hooks/`.
 - Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
   Customize → Rules manually after edits.
 - agent-browser deep dive: `agent-browser/setup-nixos-pi.md` (NixOS install, terminal

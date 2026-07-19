@@ -1,6 +1,7 @@
 ---
 name: autoreview
 description: "Use when running a closeout code review before commit/ship — after non-trivial edits, or when the user asks for a code review, second-model review, or autoreview of a local branch or PR. Works on Claude Code, OpenCode, Cursor, and Pi."
+disable-model-invocation: true
 ---
 
 # Auto Review

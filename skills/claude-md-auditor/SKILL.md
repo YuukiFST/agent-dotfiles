@@ -7,6 +7,7 @@ description: >-
   like "review my CLAUDE.md", "is my AGENTS.md any good", "my context file is too
   long", "clean up my CLAUDE.md", "audit the project instructions", "is this well
   structured".
+disable-model-invocation: true
 ---
 
 # CLAUDE.md / AGENTS.md Auditor

@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-# Instala git-hooks versionados do my-harness-config no repositorio atual.
-# Uso:
-#   ./scripts/install-git-hooks.sh
-#   ./scripts/install-git-hooks.sh /caminho/para/outro/repo
-#   ./scripts/install-git-hooks.sh --project-copy   # tambem copia para .githooks/ no projeto
+# Optional: copy hooks into one repo's .git/hooks (for machines without global hooksPath).
+# Prefer: scripts/install-global-git-hooks.sh
 set -euo pipefail
 
 CONFIG_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -22,7 +19,7 @@ if [[ -z "$TARGET_REPO" || ! -d "$TARGET_REPO/.git" ]]; then
 fi
 
 HOOKS_DST="$TARGET_REPO/.git/hooks"
-for hook in commit-msg prepare-commit-msg forbidden-patterns.sh; do
+for hook in commit-msg pre-push validate-commit-message.sh; do
   if [[ ! -f "$HOOKS_SRC/$hook" ]]; then
     echo "ERRO: hook ausente: $HOOKS_SRC/$hook" >&2
     exit 1
@@ -37,7 +34,7 @@ done
 if $PROJECT_COPY; then
   PROJECT_HOOKS="$TARGET_REPO/.githooks"
   mkdir -p "$PROJECT_HOOKS"
-  for hook in commit-msg prepare-commit-msg forbidden-patterns.sh; do
+  for hook in commit-msg pre-push validate-commit-message.sh; do
     cp "$HOOKS_SRC/$hook" "$PROJECT_HOOKS/$hook"
     chmod 755 "$PROJECT_HOOKS/$hook"
   done
@@ -45,3 +42,4 @@ if $PROJECT_COPY; then
 fi
 
 echo "Hooks instalados em $TARGET_REPO"
+echo "Dica: use scripts/install-global-git-hooks.sh para cobrir todos os repos."
