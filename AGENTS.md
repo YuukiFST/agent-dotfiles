@@ -41,7 +41,7 @@ What the scripts propagate:
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk)
-- tools (setup scripts only): rtk, no-mistakes, code-review-graph, portless,
+- tools (setup scripts only): rtk, no-mistakes, portless,
   agent-browser (+ Chrome), gh-axi
 
 ## Verify (after syncing)

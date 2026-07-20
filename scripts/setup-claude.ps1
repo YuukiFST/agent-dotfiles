@@ -25,7 +25,7 @@ if ($userPath -notlike "*$Bin*") {
 }
 & "$Bin\rtk.exe" init -g | Out-Null
 
-Write-Host "[3/5] no-mistakes + code-review-graph + portless + agent-browser + gh-axi"
+Write-Host "[3/5] no-mistakes + portless + agent-browser + gh-axi"
 # Checksum-verified release binary — keep in sync with update-claude.ps1 (same block)
 $nmRel = Invoke-RestMethod "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest"
 $nmAsset = $nmRel.assets | Where-Object name -Like "*windows-amd64.zip"
@@ -38,16 +38,11 @@ if ($actual -ne $expected) { throw "no-mistakes checksum mismatch: $actual != $e
 Expand-Archive "$tmp\nm.zip" -DestinationPath $tmp -Force
 Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "$Bin\no-mistakes.exe" -Force
 Remove-Item -Recurse -Force $tmp
-uv tool install --force code-review-graph   # installs to ~/.local/bin (was: pip venv, drifted from reality)
 npm install -g portless agent-browser gh-axi
 agent-browser install
 
-Write-Host "[4/5] MCP servers"
-# agent-browser (agent-browser.dev) is a shell CLI for agents, NOT an MCP server — installed
-# above and called directly. playwright dropped in favor of agent-browser. Both kept in the
-# remove loop only to clear any stale user-scope registration.
+Write-Host "[4/5] MCP cleanup (remove stale code-review-graph)"
 foreach ($n in "code-review-graph", "playwright", "agent-browser") { claude mcp remove $n -s user 2>$null }
-claude mcp add code-review-graph -s user -- "$Bin\code-review-graph.exe" serve
 
 Write-Host "[5/5] Plugins"
 foreach ($m in "JuliusBrussee/caveman", "DietrichGebert/ponytail", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {

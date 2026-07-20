@@ -5,10 +5,10 @@ $ErrorActionPreference = "Stop"
 
 $Bin = Join-Path $env:USERPROFILE ".local\bin"
 
-Write-Host "[0/5] Config files (skills, rules, CLAUDE.md)"
+Write-Host "[0/4] Config files (skills, rules, CLAUDE.md)"
 & "$PSScriptRoot\sync-config.ps1"
 
-Write-Host "[1/5] rtk"
+Write-Host "[1/4] rtk"
 $rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
   Where-Object name -EQ "rtk-x86_64-pc-windows-msvc.zip" | ForEach-Object browser_download_url
 $tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "rtk-up")
@@ -18,7 +18,7 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.ex
 Remove-Item -Recurse -Force $tmp
 & "$Bin\rtk.exe" --version
 
-Write-Host "[2/5] no-mistakes (checksum-verified release binary)"
+Write-Host "[2/4] no-mistakes (checksum-verified release binary)"
 $nmRel = Invoke-RestMethod "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest"
 $nmAsset = $nmRel.assets | Where-Object name -Like "*windows-amd64.zip"
 $tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "nm-up")
@@ -32,20 +32,14 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "
 Remove-Item -Recurse -Force $tmp
 & "$Bin\no-mistakes.exe" --version
 
-Write-Host "[3/5] npm globals (agent-browser, gh-axi, portless)"
+Write-Host "[3/4] npm globals (agent-browser, gh-axi, portless)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
 # Windows runs Claude Code only — pi/Cursor/OpenCode live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 
-Write-Host "[4/5] code-review-graph (uv tool) + MCP registration"
-uv tool install --force code-review-graph
-$mcpList = claude mcp list 2>$null | Out-String
-if ($mcpList -notmatch "code-review-graph") {
-  claude mcp add code-review-graph -s user -- "$Bin\code-review-graph.exe" serve
-}
-
-Write-Host "[5/5] Claude Code plugins"
+Write-Host "[4/4] Claude Code plugins"
+claude mcp remove code-review-graph -s user 2>$null
 foreach ($p in "caveman@caveman", "ponytail@ponytail", "superpowers@claude-plugins-official") {
   claude plugin update $p
 }

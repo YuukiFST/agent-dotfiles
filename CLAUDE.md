@@ -36,7 +36,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Tools (machine-specific)
 
-- **code-review-graph MCP before Grep/Glob/Read** when the project has it. Explore: `semantic_search_nodes` / `query_graph`. Impact: `get_impact_radius`. Review: `detect_changes` + `get_review_context`. Architecture: `get_architecture_overview`. Fall back when the graph doesn't cover the need.
 - **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh` — ~50% fewer tokens. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
 - **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
 

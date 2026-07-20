@@ -4,37 +4,26 @@
 set -euo pipefail
 
 bin="$HOME/.local/bin"
-crg="$HOME/.local/crg-venv"
 
-echo "[0/5] Config files (skills, rules, CLAUDE.md)"
+echo "[0/4] Config files (skills, rules, CLAUDE.md)"
 "$(dirname "$0")/sync-config.sh" claude
 
-echo "[1/5] rtk"
+echo "[1/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
 
-echo "[2/5] no-mistakes"
+echo "[2/4] no-mistakes"
 curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh
 no-mistakes --version
 
-echo "[3/5] npm globals (agent-browser, gh-axi, portless)"
+echo "[3/4] npm globals (agent-browser, gh-axi, portless)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 
-echo "[4/5] code-review-graph + MCP registration"
-if [ -x "$crg/bin/pip" ]; then
-  "$crg/bin/pip" install -q --upgrade code-review-graph
-else
-  python3 -m venv "$crg"
-  "$crg/bin/pip" install -q --upgrade pip code-review-graph
-fi
-if ! claude mcp list 2>/dev/null | grep -q code-review-graph; then
-  claude mcp add code-review-graph -s user -- "$crg/bin/code-review-graph" serve
-fi
-
-echo "[5/5] Claude Code plugins"
+echo "[4/4] Claude Code plugins"
+claude mcp remove code-review-graph -s user 2>/dev/null || true
 for p in caveman@caveman ponytail@ponytail superpowers@claude-plugins-official; do
   claude plugin update "$p" || true
 done
