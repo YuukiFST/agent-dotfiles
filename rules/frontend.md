@@ -1,6 +1,6 @@
-# Frontend design — ordered skill flow (MANDATORY)
+# Frontend design — ordered skill flow (OPT-IN)
 
-**Trigger:** any frontend/UI work — above all a **/goal building a project from a PRD whose scope includes a front**: the flow governs every UI the PRD produces, loaded before the first UI code, not as an afterthought.
+**Trigger:** explicit user request only — the user names this file or the frontend pipeline. Once invoked, the flow governs every UI in that task, loaded before the first UI code, not as an afterthought.
 
 **Premise:** one skill alone produces a templated, mediocre front. A magnificent front comes from **running skills in the right order**, each owning one step. Load each skill file *before* writing the matching code, not after. Normally 4–6 skills per front; never fewer than the minimum bar.
 

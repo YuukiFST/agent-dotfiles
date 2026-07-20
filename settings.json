@@ -26,17 +26,6 @@
             "timeout": 5
           }
         ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "grep -qE \"\\\"file_path\\\":\\\"[^\\\"]*\\.(tsx|jsx|css)\\\"\" && printf \"%s\" \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"additionalContext\\\":\\\"Frontend file: ~/.claude/rules/frontend.md (multi-skill pipeline) is MANDATORY before UI code - unless the project defines its own Design System (then follow it exactly). Trivial fixes (~10 lines) exempt.\\\"}}\" || true",
-            "shell": "bash",
-            "timeout": 5
-          }
-        ]
       }
     ]
   },
