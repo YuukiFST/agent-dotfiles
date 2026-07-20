@@ -10,7 +10,10 @@
       ]
     },
     "npm:pi-codex-goal",
-    "git:github.com/obra/superpowers",
+    {
+      "source": "git:github.com/obra/superpowers",
+      "skills": ["!test-driven-development"]
+    },
     "git:github.com/DietrichGebert/ponytail"
   ],
   "theme": "github-dark-default",
