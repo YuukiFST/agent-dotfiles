@@ -23,7 +23,6 @@ agent-browser install   # refresh the bundled browser driver
 # not a Claude Code dependency.
 
 echo "[4/4] Claude Code plugins"
-claude mcp remove code-review-graph -s user 2>/dev/null || true
 for p in caveman@caveman ponytail@ponytail superpowers@claude-plugins-official; do
   claude plugin update "$p" || true
 done

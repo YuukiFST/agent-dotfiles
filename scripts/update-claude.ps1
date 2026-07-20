@@ -39,7 +39,6 @@ agent-browser install   # refresh the bundled browser driver
 # updated by their own scripts there. Nothing else to refresh here.
 
 Write-Host "[4/4] Claude Code plugins"
-claude mcp remove code-review-graph -s user 2>$null
 foreach ($p in "caveman@caveman", "ponytail@ponytail", "superpowers@claude-plugins-official") {
   claude plugin update $p
 }

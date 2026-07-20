@@ -4,13 +4,8 @@ node_modules/
 # Downloaded/generated executables
 bin/
 
-# Pi runtime and private state
-sessions/
-/workflows/
+# Pi runtime and private state (live agent dir only — seed settings.json is tracked)
 auth.json
-settings.json
-trust.json
-models-store.json
 
 # Environment variables and secrets
 .env

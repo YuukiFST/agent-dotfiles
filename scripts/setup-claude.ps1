@@ -7,10 +7,10 @@ $Claude = Join-Path $env:USERPROFILE ".claude"
 $Bin    = Join-Path $env:USERPROFILE ".local\bin"
 New-Item -ItemType Directory -Force -Path $Bin, "$Claude\skills", "$Claude\rules" | Out-Null
 
-Write-Host "[1/5] Config files"
+Write-Host "[1/4] Config files"
 & "$PSScriptRoot\sync-config.ps1"
 
-Write-Host "[2/5] rtk"
+Write-Host "[2/4] rtk"
 $rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
   Where-Object name -EQ "rtk-x86_64-pc-windows-msvc.zip" | ForEach-Object browser_download_url
 $tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "rtk-dl")
@@ -25,7 +25,7 @@ if ($userPath -notlike "*$Bin*") {
 }
 & "$Bin\rtk.exe" init -g | Out-Null
 
-Write-Host "[3/5] no-mistakes + portless + agent-browser + gh-axi"
+Write-Host "[3/4] no-mistakes + portless + agent-browser + gh-axi"
 # Checksum-verified release binary — keep in sync with update-claude.ps1 (same block)
 $nmRel = Invoke-RestMethod "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest"
 $nmAsset = $nmRel.assets | Where-Object name -Like "*windows-amd64.zip"
@@ -41,10 +41,7 @@ Remove-Item -Recurse -Force $tmp
 npm install -g portless agent-browser gh-axi
 agent-browser install
 
-Write-Host "[4/5] MCP cleanup (remove stale code-review-graph)"
-foreach ($n in "code-review-graph", "playwright", "agent-browser") { claude mcp remove $n -s user 2>$null }
-
-Write-Host "[5/5] Plugins"
+Write-Host "[4/4] Plugins"
 foreach ($m in "JuliusBrussee/caveman", "DietrichGebert/ponytail", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {
   claude plugin marketplace add $m
 }

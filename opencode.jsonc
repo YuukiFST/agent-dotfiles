@@ -195,12 +195,5 @@
       "template": "Load the redesign-existing-projects skill via the skill tool to upgrade existing websites and apps to premium quality.",
       "description": "Upgrade existing projects to premium quality"
     }
-  },
-  "mcp": {
-    "agent-browser": {
-      "type": "local",
-      "command": ["agent-browser", "mcp"],
-      "enabled": true
-    }
   }
 }

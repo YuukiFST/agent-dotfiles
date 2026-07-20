@@ -1,0 +1,25 @@
+{
+  "packages": [
+    "npm:@ff-labs/pi-fff",
+    "npm:pi-cursor-sdk",
+    "npm:@howaboua/pi-cache-hit-predictor",
+    {
+      "source": "npm:pine-of-glass",
+      "extensions": [
+        "+extensions/pi-contextimate"
+      ]
+    },
+    "npm:pi-codex-goal",
+    "git:github.com/obra/superpowers",
+    "git:github.com/DietrichGebert/ponytail"
+  ],
+  "theme": "github-dark-default",
+  "defaultProvider": "cursor",
+  "defaultModel": "composer-2.5",
+  "enabledModels": [
+    "composer-2.5",
+    "deepseek-v4-flash-free",
+    "mimo-v2.5-free"
+  ],
+  "defaultThinkingLevel": "high"
+}

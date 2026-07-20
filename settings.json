@@ -4,9 +4,7 @@
       "NotebookEdit",
       "DesignSync",
       "RemoteTrigger",
-      "PushNotification",
-      "mcp__visualize__show_widget",
-      "mcp__visualize__read_me"
+      "PushNotification"
     ]
   },
   "disableWorkflows": true,
