@@ -25,5 +25,7 @@ Rules while compiling:
 
 - **Do not restate standing rules.** Security/quality closeout comes from `code-quality.md`, UI flow from `frontend.md` (opt-in), commit rules from `git.md`. A prompt that repeats them adds noise; a contract that repeats them drifts when the rules change. Reference, never copy.
 - **Ambiguity:** autonomous run (user away) → resolve it yourself and record the decision in the ledger/notes; interactive session → at most one round of clarifying questions, then compile and go.
-- **Ledger coupling:** where the harness has a goal ledger (goal-ledger plugin on Claude Code, pi-codex-goal on pi), the compiled contract IS the `GOAL.md` objective + finishing criteria. Write it there; the raw prompt is not stored as the goal anywhere.
+- **Ledger coupling:** the compiled contract IS the stored goal; the raw prompt is not stored as the goal anywhere.
+  - Claude Code (goal-ledger plugin): contract becomes the `GOAL.md` objective + finishing criteria.
+  - pi (pi-codex-goal, github.com/fitchmultz/pi-codex-goal): its `/create-goal` already compiles a contract (outcome, verification, constraints, audit) — route the raw task through it, or call `create_goal` with the Phase 0 contract as the objective. Native goal state lives in the pi session; for multi-session work also keep the file ledger and reference its path in the objective.
 - Show the compiled contract to the user in the first reply (a few lines, not a document) so a wrong compilation dies early.
