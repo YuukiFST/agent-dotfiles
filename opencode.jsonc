@@ -127,10 +127,6 @@
       "template": "Load the prototype skill via the skill tool and build a throwaway prototype to flesh out a design before committing to it.",
       "description": "Throwaway prototype to explore a design"
     },
-    "setup-matt-pocock-skills": {
-      "template": "Load the setup-matt-pocock-skills skill via the skill tool and configure the issue tracker, triage vocabulary, and domain docs for other skills to use.",
-      "description": "Install issue-tracker/triage/domain skills for the repo"
-    },
     "teach": {
       "template": "Load the teach skill via the skill tool and teach the user a new skill or concept within this workspace.",
       "description": "Teach a skill or concept within the workspace"
@@ -138,10 +134,6 @@
     "thermo-nuclear-code-quality-review": {
       "template": "Load the thermo-nuclear-code-quality-review skill via the skill tool and perform a maximum-intensity code quality review on the current codebase.",
       "description": "Maximum-intensity code quality review"
-    },
-    "to-prd": {
-      "template": "Load the to-prd skill via the skill tool and turn the current conversation context into a PRD, publishing it to the project issue tracker.",
-      "description": "Turn conversation context into a PRD and publish it"
     },
     "writing-great-skills": {
       "template": "Load the writing-great-skills skill via the skill tool for writing and editing skills well — vocabulary and principles that make a skill predictable.",
