@@ -43,6 +43,7 @@ Define the design tokens before building on them; retrofitting palette/type onto
 - **Landing / portfolio / marketing site** → `design-taste-frontend` (the skill refuses dashboards, data tables, wizards, editors, native mobile)
 - **Product UI** (dashboard, CRUD, forms, app screens) → `impeccable` as build guidance; run its `scripts/context.mjs` first (bootstraps PRODUCT.md/DESIGN.md)
 - `tailwind-v4-shadcn` — stack layer, ONLY if the project is Tailwind v4 + shadcn/ui (per PRD or existing code)
+- `pick-ui-library` — MANDATORY before adding any frontend dependency or hand-rolling a solved widget (toasts, dialogs/popovers/menus, ⌘K palette, OTP input, charts, drag and drop, virtualization, animated numbers, state, conditional classNames, dark mode). Curated list decides; check `package.json` first and reuse what the project already has instead of churning deps. Task not on the list → say so before picking from general knowledge. Also applies outside this pipeline: any time UI work needs a library, consult it rather than defaulting to habit.
 
 ### 5. Component polish (stack lane)
 - `better-ui` — shadows, borders, optical alignment, hit areas, press states, micro-interaction values
