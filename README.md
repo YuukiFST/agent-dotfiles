@@ -19,7 +19,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-52 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+53 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -29,7 +29,7 @@ fewer tokens, write better code, verify it works.
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & handoff** | `shape`, `handoff`, `triage` |
 | **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
-| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills` |
+| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
 ## Setup
