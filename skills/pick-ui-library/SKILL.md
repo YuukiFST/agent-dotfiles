@@ -37,8 +37,17 @@ A lookup skill. When invoked with a task ("I need toasts", "what should I use fo
 | 3D globes | [Cobe](https://cobe.vercel.app) |
 | Dynamic OG images (HTML/CSS → SVG/PNG) | [Satori](https://github.com/vercel/satori) |
 | Syntax highlighting | [shiki](https://shiki.style) |
+| Glowing animated borders (cards, CTAs, inputs, search bars) | [border-beam](https://beam.jakubantalik.com) |
+| Liquid-metal WebGL rings on buttons / chips / icons | [metal-fx](https://metal.jakubantalik.com) |
+| Dotted "thinking" / loading orbs for AI & agent UIs | [thinking-orbs](https://orbs.jakubantalik.com) |
 
 Reach for motion when you need springs, layout animations, exit animations, or gesture-driven values. A simple hover or fade doesn't need it — plain CSS transitions are the right tool there.
+
+**Decorative effects (Jakub Antalik set).** Three real, published, zero-to-few-dep React packages — install them, don't hand-roll or paste frozen shader/CSS. They are *flourish*, not structure: one hero moment per view, never a page full of glowing metal. The reusable product-motion catalog (modals, dropdowns, toasts, accordions, 27 snippets) lives in the separate `transitions-dev` skill — reach there first for functional motion, here only for decorative shine.
+
+- **[border-beam](https://beam.jakubantalik.com)** — `npm i border-beam`. Traveling / breathing glow around any element; auto-detects the child's border-radius; React 18+. Sizes `md | sm | line | pulse-inner | pulse-outside`; `colorVariant "colorful" | "mono" | "ocean" | "sunset"`; `theme`, `strength`, `active`, `duration`. Decorative layers are `pointer-events: none` (no a11y impact).
+- **[metal-fx](https://metal.jakubantalik.com)** — `npm i metal-fx`. Animated WebGL liquid-metal ring painted over a single interactive child (child stays clickable). `variant "button" | "circle"`; `preset "chromatic" | "silver" | "gold"`; `theme`, `strength`, `paused`, `borderRadius`, `reflectionTargets`. One shared WebGL canvas drives every instance on the page; needs WebGL support.
+- **[thinking-orbs](https://orbs.jakubantalik.com)** — `npm i thinking-orbs`, zero deps. Dotted thought-orb loading indicators for AI / agent UIs. States `working | searching | solving | listening | composing | shaping`; `size={64}` (avatar) or `size={20}` (inline).
 
 ### Charts
 
@@ -75,3 +84,4 @@ The styling split: clsx for ad-hoc conditional classes; cva when a component has
 - **Rendering a 1,000+ row list directly** → Virtuoso before reaching for pagination hacks.
 - **A `useState`-per-component web of props for shared state** → zustand.
 - **Template-literal className ternaries three conditions deep** → clsx (or cva if it's variant-shaped).
+- **A hand-CSS glowing/animated border, a bespoke shiny CTA, or a custom AI "thinking" spinner** → border-beam / metal-fx / thinking-orbs already do these (Decorative effects above).
