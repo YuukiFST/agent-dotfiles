@@ -48,7 +48,7 @@ Define the design tokens before building on them; retrofitting palette/type onto
 ### 5. Component polish (stack lane)
 - `better-ui` — shadows, borders, optical alignment, hit areas, press states, micro-interaction values
 - `emil-design-eng` — the invisible-details philosophy; stack it while polishing, it never conflicts with step 1
-- **Decorative flourish (opt-in, React only, ONE hero moment per view — never a page of it)** — glowing animated borders, liquid-metal CTAs, or an AI/agent "thinking" loader → `pick-ui-library` §Decorative effects (`border-beam`, `metal-fx`, `thinking-orbs`; real npm packages, don't hand-roll). All three are React components — skip them on a non-React project (the skill guards this). Restraint first: a flourish earns its place the same way motion does — step 7's shield framing ("should this exist at all?") applies to it too.
+- **Decorative flourish (opt-in, React only, ONE hero moment per view — never a page of it)** — glowing animated borders or an AI/agent "thinking" loader → `pick-ui-library` §Decorative effects (`border-beam`, `thinking-orbs`; real npm packages, don't hand-roll). Both are React components — skip them on a non-React project (the skill guards this). Restraint first: a flourish earns its place the same way motion does — step 7's shield framing ("should this exist at all?") applies to it too.
 
 ### 6. Build-time motion
 - `transitions-dev` — the product-motion catalog, 27 snippets (modals, dropdowns, accordions, shimmer, icon swaps, toasts, like buttons, checkboxes, spinning counters, toggles…); run `transitions apply` after components exist. Every snippet ships reduced-motion; don't pull a motion library for what the catalog covers.
