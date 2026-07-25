@@ -14,8 +14,7 @@ echo "[2/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk init -g
 
-echo "[3/4] no-mistakes + portless + agent-browser + gh-axi"
-curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh
+echo "[3/4] portless + agent-browser + gh-axi"
 npm install -g portless agent-browser gh-axi
 agent-browser install   # bundled browser driver — without it every agent-browser call fails
 

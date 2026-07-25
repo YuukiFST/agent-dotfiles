@@ -1,6 +1,6 @@
 # my-harness-config
 
-My global config for **Claude Code**, **OpenCode**, **Cursor** and **pi** — spend
+My global config for **Claude Code**, **Cursor** and **pi** — spend
 fewer tokens, write better code, verify it works.
 
 ## Tools
@@ -12,7 +12,6 @@ fewer tokens, write better code, verify it works.
 | [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) | Codex-style `/goal` tracking with `get_goal` / `create_goal` / `update_goal` tools. |
 | [ponytail](https://github.com/DietrichGebert/ponytail) | Stdlib/native first → 80–94% less code. |
 | [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. |
-| [no-mistakes](https://github.com/kunchenguid/no-mistakes) | Validation gate on push — review/test/lint on a throwaway worktree, opens a PR only when green. |
 | [agent-browser](https://agent-browser.dev) | Real-browser E2E via ref-based snapshots. Configs + NixOS/pi setup guide in `agent-browser/`. |
 | [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. Needs Node 24+; bootstrap in `portless/setup.md`. |
 | `git-hooks/` | `pre-push` blocks AI attribution on push; `git-safe-commit` bypasses Cursor injection. |
@@ -41,18 +40,16 @@ Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it
 |---------|-------|--------|
 | **Windows** | Claude Code | `pwsh -File scripts/setup-claude.ps1` · update: `scripts/update-claude.ps1` |
 | **macOS / Linux** | Claude Code | `bash scripts/setup-claude.sh` · update: `scripts/update-claude.sh` |
-| **NixOS** | OpenCode | `bash scripts/setup-opencode.sh` · update: `scripts/update-opencode.sh` |
 | **NixOS** | Cursor | `bash scripts/setup-cursor.sh` |
 | **NixOS** | pi | `bash scripts/setup-pi.sh` |
 
-Claude Code and OpenCode get the full stack; Cursor gets skills + rules;
+Claude Code gets the full stack; Cursor gets skills + rules;
 pi gets skills + rules + agent config from `pi/` (extensions, packages, cloak).
 Restart the agent afterwards.
 
 ## Gotchas
 
 - **rtk corrupts `prisma`/`tsc`/`vitest` output** — run those raw, never through rtk.
-- **`no-mistakes init` once per repo**, or `git push no-mistakes` has no remote to hit.
 - **Cursor User Rules are not file-backed** — paste `CLAUDE.md` into Customize → Rules by hand, and re-paste after editing it.
 - **`settings.json` is a seed, not a mirror** — written only when absent. Claude Code and other installers own that file; mirroring it would destroy state this repo doesn't track.
 - **pi ships no MCP** (upstream design choice). Goal tracking comes from

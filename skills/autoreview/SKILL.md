@@ -151,6 +151,5 @@ Canonical copy lives in the config repo: `my-harness-config/skills/autoreview/SK
 | Harness | Installed to | Propagated by |
 |---|---|---|
 | Claude Code | `~/.claude/skills/autoreview/SKILL.md` | `scripts/setup-claude.ps1` / `.sh` (or `update-claude.*`) |
-| OpenCode | `~/.config/opencode/skills/autoreview/SKILL.md` | `scripts/setup-opencode.sh` (or `update-opencode.sh`) |
 | Cursor | `~/.cursor/rules/autoreview.mdc` (same body; `.mdc` frontmatter with `description` and `alwaysApply: false`) | no repo script yet — copy manually or add one |
 | Pi | Pi's skills directory (confirm via `pi --help` / Pi docs on the machine) | no repo script yet — copy manually or add one |

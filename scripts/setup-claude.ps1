@@ -25,19 +25,7 @@ if ($userPath -notlike "*$Bin*") {
 }
 & "$Bin\rtk.exe" init -g | Out-Null
 
-Write-Host "[3/4] no-mistakes + portless + agent-browser + gh-axi"
-# Checksum-verified release binary — keep in sync with update-claude.ps1 (same block)
-$nmRel = Invoke-RestMethod "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest"
-$nmAsset = $nmRel.assets | Where-Object name -Like "*windows-amd64.zip"
-$tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "nm-dl")
-Invoke-WebRequest $nmAsset.browser_download_url -OutFile "$tmp\nm.zip"
-$sums = (Invoke-RestMethod (($nmRel.assets | Where-Object name -EQ "checksums.txt").browser_download_url))
-$expected = ($sums -split "`n" | Select-String $nmAsset.name).ToString().Split(" ")[0].Trim()
-$actual = (Get-FileHash "$tmp\nm.zip" -Algorithm SHA256).Hash.ToLower()
-if ($actual -ne $expected) { throw "no-mistakes checksum mismatch: $actual != $expected" }
-Expand-Archive "$tmp\nm.zip" -DestinationPath $tmp -Force
-Copy-Item (Get-ChildItem $tmp -Recurse -Filter "no-mistakes*.exe")[0].FullName "$Bin\no-mistakes.exe" -Force
-Remove-Item -Recurse -Force $tmp
+Write-Host "[3/4] portless + agent-browser + gh-axi"
 npm install -g portless agent-browser gh-axi
 agent-browser install
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Copy config (CLAUDE.md, dreaming.md, skills/, rules/) from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
-# Usage: sync-config.sh claude|opencode|cursor|pi
+# Usage: sync-config.sh claude|cursor|pi
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-target="${1:?usage: sync-config.sh claude|opencode|cursor|pi}"
+target="${1:?usage: sync-config.sh claude|cursor|pi}"
 
 sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files removed/renamed
   mkdir -p "$1"  # inside a repo skill, but keeps skills that exist only locally
@@ -85,8 +85,8 @@ PY
   fi
 }
 
-# Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi +
-# OpenCode side by side) converges on the same config no matter which script ran.
+# Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi
+# side by side) converges on the same config no matter which script ran.
 sync_shared() {
   # rules/ live at ~/.claude/rules on EVERY harness — CLAUDE.md's conditional pointers
   # hardcode that path, so it must resolve even where Claude Code is not installed.
@@ -131,17 +131,6 @@ case "$target" in
     cp "$repo/CLAUDE.md" "$claude/CLAUDE.md"
     cp "$repo/dreaming.md" "$claude/dreaming.md"
     sync_skills "$claude/skills"
-    sync_shared
-    ;;
-  opencode)
-    cfg="$HOME/.config/opencode"
-    mkdir -p "$cfg"
-    cp "$repo/opencode.jsonc" "$cfg/opencode.jsonc"
-    # OpenCode reads ~/.config/opencode/AGENTS.md; a CLAUDE.md here is never read
-    # (its only CLAUDE.md fallback is ~/.claude/CLAUDE.md). opencode.ai/docs/rules
-    cp "$repo/CLAUDE.md" "$cfg/AGENTS.md"
-    cp "$repo/dreaming.md" "$cfg/dreaming.md"
-    sync_skills "$cfg/skills"
     sync_shared
     ;;
   cursor)

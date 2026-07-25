@@ -5,24 +5,20 @@ set -euo pipefail
 
 bin="$HOME/.local/bin"
 
-echo "[0/4] Config files (skills, rules, CLAUDE.md)"
+echo "[0/3] Config files (skills, rules, CLAUDE.md)"
 "$(dirname "$0")/sync-config.sh" claude
 
-echo "[1/4] rtk"
+echo "[1/3] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
 
-echo "[2/4] no-mistakes"
-curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh
-no-mistakes --version
-
-echo "[3/4] npm globals (agent-browser, gh-axi, portless)"
+echo "[2/3] npm globals (agent-browser, gh-axi, portless)"
 npm install -g agent-browser@latest gh-axi@latest portless@latest
 agent-browser install   # refresh the bundled browser driver
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 
-echo "[4/4] Claude Code plugins"
+echo "[3/3] Claude Code plugins"
 for p in caveman@caveman ponytail@ponytail superpowers@claude-plugins-official; do
   claude plugin update "$p" || true
 done

@@ -34,9 +34,7 @@ Rules:
 
 ## 3. Git push
 
-Always ask before push: `git push no-mistakes` (AI validation gate) or `git push origin <branch>`?
-
-If using `no-mistakes`, check the remote exists (`git remote` shows `no-mistakes`). If missing, run `no-mistakes init` in the repo. The remote is per-repo — a freshly cloned project won't have it until `init` runs.
+Always ask before push: `git push origin <branch>`.
 
 ## 4. No AI attribution
 

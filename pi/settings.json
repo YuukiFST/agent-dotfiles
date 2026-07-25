@@ -12,14 +12,17 @@
     "npm:pi-codex-goal",
     {
       "source": "git:github.com/obra/superpowers",
-      "skills": ["!test-driven-development"]
+      "skills": [
+        "!test-driven-development"
+      ]
     },
     "git:github.com/DietrichGebert/ponytail"
   ],
   "theme": "github-dark-default",
   "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5",
+  "defaultModel": "grok-4.5",
   "enabledModels": [
+    "grok-4.5",
     "composer-2.5",
     "deepseek-v4-flash-free",
     "mimo-v2.5-free"

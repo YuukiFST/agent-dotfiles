@@ -7,7 +7,6 @@ How agents read, write, and maintain persistent memory across sessions.
 | Harness | Location | Layout |
 |---|---|---|
 | Claude Code | `~/.claude/projects/<project-slug>/memory/` | `MEMORY.md` = index (one line per memory, loaded every session); one file per fact with frontmatter (`name`, `description`, `metadata.type`) |
-| OpenCode | `.opencode/memory/` in the project | `INDEX.md` = index; `codebase.md` (verified architecture facts), `patterns.md` (proven workflows/command sequences), `errors.md` (root cause + fix, not "I got an error") |
 
 Read the index first every session; update it after every write. Multiple sessions may share the same store — no other coordination needed.
 
@@ -34,7 +33,7 @@ Never write: fixes already in docs or code comments; trivial one-liners with obv
 
 ## Dreaming (memory consolidation)
 
-Full procedure lives in `dreaming.md` (deployed to `~/.claude/dreaming.md` and `~/.config/opencode/dreaming.md`). Trigger after 5+ sessions or when the error log has 20+ entries; run as a separate session, never during active dev; output is a diff for human review, not auto-applied.
+Full procedure lives in `dreaming.md` (deployed to `~/.claude/dreaming.md`). Trigger after 5+ sessions or when the error log has 20+ entries; run as a separate session, never during active dev; output is a diff for human review, not auto-applied.
 
 ## Permission model (implicit)
 

@@ -1,6 +1,6 @@
 # Agent bootstrap — reaching config parity
 
-You are an agent (Cursor, pi, OpenCode, Claude Code, or other) that was pointed at this
+You are an agent (Cursor, pi, Claude Code, or other) that was pointed at this
 repo. This repo is the **canonical source** of the user's harness configuration.
 Your job when asked to "sync", "set up", or "reach parity": make the machine you are
 running on match this repo, for the harness you are running in.
@@ -14,7 +14,7 @@ this repo. This file is.
 | Machine | Harnesses |
 |---------|-----------|
 | Windows (work PC) | Claude Code only |
-| NixOS (home PC) | pi, Cursor, OpenCode |
+| NixOS (home PC) | pi, Cursor |
 
 ## How to reach parity
 
@@ -24,7 +24,6 @@ Run the setup script for your harness (idempotent — also the updater):
 |---------|---------|
 | Claude Code (Windows) | `pwsh -File scripts/setup-claude.ps1` |
 | Claude Code (Unix) | `bash scripts/setup-claude.sh` |
-| OpenCode | `bash scripts/setup-opencode.sh` |
 | Cursor | `bash scripts/setup-cursor.sh` |
 | pi | `bash scripts/setup-pi.sh` |
 
@@ -33,15 +32,14 @@ If tools are already installed and only config drifted, `scripts/sync-config.sh 
 
 What the scripts propagate:
 
-- `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`,
-  `~/.config/opencode/AGENTS.md`)
-- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi), `~/.config/opencode/skills`
+- `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
+- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi)
 - `rules/` → `~/.claude/rules` on EVERY harness (CLAUDE.md's conditional pointers hardcode that path)
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk)
-- tools (setup scripts only): rtk, no-mistakes, portless,
+- tools (setup scripts only): rtk, portless,
   agent-browser (+ Chrome), gh-axi
 
 ## Verify (after syncing)
@@ -57,7 +55,7 @@ What the scripts propagate:
 ## Hard rules for agents working on this repo
 
 - Config is edited HERE and propagated by scripts — never patch `~/.claude`,
-  `~/.agents`, or `~/.config/opencode` directly (except files documented as seeds:
+  `~/.agents` directly (except files documented as seeds:
   `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
 - Commits: English, Conventional Commits, no AI attribution of any kind
   (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
