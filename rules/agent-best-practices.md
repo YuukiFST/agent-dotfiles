@@ -26,7 +26,7 @@ Non-obvious patterns for working with code agents (extracted from Anthropic's be
 
 ## Multiple agents
 
-- **Shared state via `.opencode/memory/`.** Multiple sessions read/write the same memory files. No other coordination needed.
+- **Shared state via Claude Code project memory.** Multiple sessions read/write the same store under `~/.claude/projects/<slug>/memory/`. No other coordination needed.
 - **Independent tasks = parallel sessions.** Use `dispatching-parallel-agents` skill or separate terminals.
 
 ## CLAUDE.md maintenance

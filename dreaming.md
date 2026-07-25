@@ -1,32 +1,26 @@
 # Dreaming — Memory Consolidation Prompt
 
-Use this as the opening prompt for a **separate, dedicated consolidation session** (Claude Code or OpenCode). Do NOT run this during active development — dreaming is out-of-band, just like Anthropic's async dreaming jobs.
+Use this as the opening prompt for a **separate, dedicated consolidation session** (Claude Code). Do NOT run this during active development — dreaming is out-of-band, just like Anthropic's async dreaming jobs.
 
-## Harness — pick your store before running
+## Store
 
-The two harnesses keep memory in different places and formats. Read the row for the harness you're on; everything below adapts to it.
-
-| | **Claude Code** | **OpenCode** |
-|---|---|---|
-| Store path | `~/.claude/projects/<project-slug>/memory/` (the harness tells you the exact dir) | `.opencode/memory/` in the project root |
-| Index file | `MEMORY.md` (one line per memory: `- [Title](file.md) — hook`) | `INDEX.md` (table: summary + last-modified) |
-| Memory unit | one file per fact, frontmatter `name` / `description` / `metadata.type` = `user`/`feedback`/`project`/`reference` | topical files: `codebase.md`, `patterns.md`, `errors.md` |
-| Start command | `claude "You are running a memory consolidation..."` | `opencode "You are running a memory consolidation..."` |
-
-Where a phase below names a specific file (`errors.md`, `patterns.md`), that's the OpenCode taxonomy. On Claude Code the same step applies to the individual frontmatter files grouped by `metadata.type` instead. The index is `MEMORY.md` on Claude Code, `INDEX.md` on OpenCode — "the index" below means whichever applies.
+| | **Claude Code** |
+|---|---|
+| Store path | `~/.claude/projects/<project-slug>/memory/` (the harness tells you the exact dir) |
+| Index file | `MEMORY.md` (one line per memory: `- [Title](file.md) — hook`) |
+| Memory unit | one file per fact, frontmatter `name` / `description` / `metadata.type` = `user`/`feedback`/`project`/`reference` |
+| Start command | `claude "You are running a memory consolidation..."` |
 
 ## Prompt
 
 ```
-You are running a memory consolidation ("dreaming") session. Your job is to review, clean, and improve the agent memory system. Detect your harness first (Claude Code → ~/.claude/projects/<slug>/memory/ + MEMORY.md; OpenCode → .opencode/memory/ + INDEX.md) and adapt every path/index reference below to it.
+You are running a memory consolidation ("dreaming") session. Your job is to review, clean, and improve the agent memory system. Store: ~/.claude/projects/<slug>/memory/ with MEMORY.md as the index.
 
 ## Phase 1 — Audit
 
-Read the index first (MEMORY.md on Claude Code, INDEX.md on OpenCode) to understand what exists and when each entry was last touched.
+Read MEMORY.md first to understand what exists and when each entry was last touched.
 
-Then read every memory file:
-- Claude Code: every memory file in the project memory dir, grouped by metadata.type (user / feedback / project / reference).
-- OpenCode: INDEX.md, codebase.md, patterns.md, errors.md.
+Then read every memory file in the project memory dir, grouped by metadata.type (user / feedback / project / reference).
 
 Also read ~/.claude/rules/memory-system.md for the memory philosophy.
 
@@ -40,7 +34,7 @@ Within each file and across files:
 ## Phase 3 — Extract patterns
 
 Look across ALL memory entries for recurring themes:
-- Same root cause appearing in multiple error entries → promote the fix to a reusable pattern (patterns.md on OpenCode; a `project`/`reference` memory on Claude Code)
+- Same root cause appearing in multiple error entries → promote the fix to a reusable `project`/`reference` memory
 - Same tool/command used successfully 3+ times → record it as a pattern
 - Architecture facts scattered across error entries → consolidate into the codebase/architecture memory
 
@@ -71,7 +65,7 @@ Output the changes as a clear list for HUMAN REVIEW before applying:
 
 ## Phase 7 — Rebuild the index
 
-Update the index (MEMORY.md or INDEX.md) to reflect all changes: new entries, removed entries, updated one-line summaries/hooks, last-modified dates.
+Update MEMORY.md to reflect all changes: new entries, removed entries, updated one-line summaries/hooks, last-modified dates.
 
 ## Phase 8 — Apply
 
@@ -116,11 +110,7 @@ Anthropic's dreaming harness spawns one sub-agent per input session for exhausti
 Open a new terminal, navigate to the project, then:
 
 ```
-# Claude Code
 claude "You are running a memory consolidation..."
-
-# OpenCode
-opencode "You are running a memory consolidation..."
 ```
 
-Or paste the full prompt above. The agent detects its harness, reads the memory files, analyzes them, and proposes changes.
+Or paste the full prompt above. The agent reads the memory files, analyzes them, and proposes changes.

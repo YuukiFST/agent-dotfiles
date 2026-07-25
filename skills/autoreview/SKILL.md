@@ -1,6 +1,6 @@
 ---
 name: autoreview
-description: "Use when running a closeout code review before commit/ship — after non-trivial edits, or when the user asks for a code review, second-model review, or autoreview of a local branch or PR. Works on Claude Code, OpenCode, Cursor, and Pi."
+description: "Use when running a closeout code review before commit/ship — after non-trivial edits, or when the user asks for a code review, second-model review, or autoreview of a local branch or PR. Works on Claude Code, Cursor, and Pi."
 disable-model-invocation: true
 ---
 
@@ -107,15 +107,13 @@ Same recipe in every harness: (1) build the diff bundle, (2) hand bundle + this 
 
 2. Dispatch a reviewer subagent (Task tool) with the diff bundle + this Contract as the brief. If available, `caveman:cavecrew-reviewer` (terse, severity-tagged) or `thermo-nuclear-code-quality-review` (deep quality audit) are good choices; otherwise a general-purpose subagent with the Contract as brief.
 
-**OpenCode** — dispatch a reviewer subagent (or its review command, if configured) against the same git diff bundle, with this Contract as the brief.
-
 **Cursor** — run a fresh agent/Composer conversation as the reviewer: paste or attach the diff bundle + this Contract, instruct it to only report findings (no edits). The main conversation verifies and applies accepted fixes.
 
 **Pi** — dispatch a subagent, or start a fresh session with the diff bundle + this Contract as the prompt, output restricted to findings only.
 
 If the harness has no subagent mechanism available, do the review inline in a dedicated pass: re-read the full diff with fresh adversarial eyes, assume the code is wrong, and apply the Contract — but prefer a separate context whenever one exists, since same-context review inherits the implementer's bias.
 
-Note: upstream autoreview refuses Cursor/OpenCode as isolated *reviewer engines* (their CLIs can't sandbox the review). That doesn't apply here — in this skill they act as the *host harness* running the review, a different role.
+Note: upstream autoreview refuses Cursor as an isolated *reviewer engine* (its CLI can't sandbox the review). That doesn't apply here — in this skill Cursor acts as the *host harness* running the review, a different role.
 
 Keep target selection, the review call, and the accept/reject decision in one path. If output is noisy, summarize it after it returns; don't ask another agent to rerun the whole review.
 
