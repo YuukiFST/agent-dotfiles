@@ -17,7 +17,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
 - Turn tasks into verifiable goals; refactors keep existing tests green before and after.
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
-- **No TDD.** Do not use test-driven development or test-first workflows.
+- **Test-first is allowed; the `prove` skill owns it.** Verification design comes from `prove` (tiers, oracles, gates) — the superpowers `tdd` / `test-driven-development` skills stay off (`skillOverrides` in `settings.json`, `pi/settings.json`).
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
 - See a lint/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.

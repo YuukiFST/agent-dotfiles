@@ -11,7 +11,9 @@
   "disableArtifact": true,
   "skillOverrides": {
     "dataviz": "off",
-    "artifact-design": "off"
+    "artifact-design": "off",
+    "superpowers:tdd": "off",
+    "superpowers:test-driven-development": "off"
   },
   "hooks": {
     "PreToolUse": [
