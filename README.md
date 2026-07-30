@@ -22,26 +22,31 @@ fewer tokens, write better code, verify it works.
 
 | Category | Highlights |
 |----------|-----------|
-| **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `code-review`, `react-doctor` |
+| **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `react-doctor` |
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
-| **Planning & handoff** | `shape`, `handoff`, `triage` |
+| **Planning & handoff** | `shape`, `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
 | **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
 **Vendored upstream skills.** Many of these are unmodified copies from
-[mattpocock/skills](https://github.com/mattpocock/skills) (`code-review`, `codebase-design`,
-`diagnosing-bugs`, `domain-modeling`, `handoff`, `improve-codebase-architecture`, `loop-me`,
-`prototype`, `research`, `teach`, `triage`, `wayfinder`, `writing-great-skills`), plus
+[mattpocock/skills](https://github.com/mattpocock/skills) — `codebase-design`, `diagnosing-bugs`,
+`domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `loop-me`, `prototype`,
+`research`, `setup-matt-pocock-skills`, `teach`, `wayfinder`, `writing-great-skills` — plus
 `find-skills` (vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton).
-This repo is the only source of Matt's skills on this machine — anything of his that is not
+This repo is the only source of Matt's skills on this machine: anything of his that is not
 vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
-Refresh them with
-`npx skills update -g -y` (updates `~/.agents/skills`), then copy the updated folders back into
-`skills/` — dropping each upstream `agents/` dir and `openai.yaml`, which this repo does not
-vendor. Local frontmatter tweaks survive only if re-applied: `find-skills` carries
-`disable-model-invocation: true`.
+`wayfinder` sets the floor for which of his skills stay — it dispatches to `research`,
+`prototype`, `grilling` and `domain-modeling`, and points at `setup-matt-pocock-skills` for the
+per-repo issue-tracker config.
+
+Refresh the ones the skills CLI still tracks with `npx skills update -g -y` (writes
+`~/.agents/skills`), then copy the updated folders back into `skills/`. `grilling`,
+`setup-matt-pocock-skills` and `wayfinder` are no longer in `~/.agents/.skill-lock.json`, so they
+refresh by hand from a clone of the upstream repo. Either way, drop each upstream `agents/` dir
+and `openai.yaml` — this repo does not vendor them — and re-apply local frontmatter tweaks:
+`find-skills` carries `disable-model-invocation: true`.
 
 ## Setup
 
