@@ -17,7 +17,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-51 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+52 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -33,8 +33,11 @@ fewer tokens, write better code, verify it works.
 **Vendored upstream skills.** Many of these are unmodified copies from
 [mattpocock/skills](https://github.com/mattpocock/skills) (`code-review`, `codebase-design`,
 `diagnosing-bugs`, `domain-modeling`, `handoff`, `improve-codebase-architecture`, `loop-me`,
-`prototype`, `research`, `teach`, `triage`, `writing-great-skills`), plus `find-skills`
-(vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton). Refresh them with
+`prototype`, `research`, `teach`, `triage`, `wayfinder`, `writing-great-skills`), plus
+`find-skills` (vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton).
+This repo is the only source of Matt's skills on this machine — anything of his that is not
+vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
+Refresh them with
 `npx skills update -g -y` (updates `~/.agents/skills`), then copy the updated folders back into
 `skills/` — dropping each upstream `agents/` dir and `openai.yaml`, which this repo does not
 vendor. Local frontmatter tweaks survive only if re-applied: `find-skills` carries
