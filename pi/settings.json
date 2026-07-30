@@ -15,8 +15,7 @@
       "skills": [
         "!test-driven-development"
       ]
-    },
-    "git:github.com/DietrichGebert/ponytail"
+    }
   ],
   "theme": "github-dark-default",
   "defaultProvider": "cursor",

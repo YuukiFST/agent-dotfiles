@@ -25,7 +25,7 @@ agent-browser install   # refresh the bundled browser driver
 # updated by their own scripts there. Nothing else to refresh here.
 
 Write-Host "[3/3] Claude Code plugins"
-foreach ($p in "caveman@caveman", "ponytail@ponytail", "superpowers@claude-plugins-official") {
+foreach ($p in "caveman@caveman", "superpowers@claude-plugins-official") {
   claude plugin update $p
 }
 # Re-apply the writing-skills disable (plugin updates restore the file)

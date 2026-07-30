@@ -19,11 +19,10 @@ npm install -g portless agent-browser gh-axi
 agent-browser install   # bundled browser driver — without it every agent-browser call fails
 
 echo "[4/4] Plugins"
-for m in JuliusBrussee/caveman DietrichGebert/ponytail anthropics/claude-plugins-official kingbootoshi/goal-ledger; do
+for m in JuliusBrussee/caveman anthropics/claude-plugins-official kingbootoshi/goal-ledger; do
   claude plugin marketplace add "$m" || true
 done
 claude plugin install caveman@caveman || true
-claude plugin install ponytail@ponytail || true
 claude plugin install superpowers@claude-plugins-official || true
 claude plugin install goal-ledger@goal-ledger || true
 

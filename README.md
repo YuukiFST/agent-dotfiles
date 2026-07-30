@@ -10,7 +10,6 @@ fewer tokens, write better code, verify it works.
 | [rtk](https://github.com/rtk-ai/rtk) | Compresses shell output 60–90% before the model sees it. |
 | [caveman](https://github.com/JuliusBrussee/caveman) | Compresses agent replies ~75%. |
 | [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) | Codex-style `/goal` tracking with `get_goal` / `create_goal` / `update_goal` tools. |
-| [ponytail](https://github.com/DietrichGebert/ponytail) | Stdlib/native first → 80–94% less code. |
 | [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. |
 | [agent-browser](https://agent-browser.dev) | Real-browser E2E via ref-based snapshots. Configs + NixOS/pi setup guide in `agent-browser/`. |
 | [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. Needs Node 24+; bootstrap in `portless/setup.md`. |
@@ -18,7 +17,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-53 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+51 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -30,6 +29,16 @@ fewer tokens, write better code, verify it works.
 | **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
+
+**Vendored upstream skills.** Many of these are unmodified copies from
+[mattpocock/skills](https://github.com/mattpocock/skills) (`code-review`, `codebase-design`,
+`diagnosing-bugs`, `domain-modeling`, `handoff`, `improve-codebase-architecture`, `loop-me`,
+`prototype`, `research`, `teach`, `triage`, `writing-great-skills`), plus `find-skills`
+(vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton). Refresh them with
+`npx skills update -g -y` (updates `~/.agents/skills`), then copy the updated folders back into
+`skills/` — dropping each upstream `agents/` dir and `openai.yaml`, which this repo does not
+vendor. Local frontmatter tweaks survive only if re-applied: `find-skills` carries
+`disable-model-invocation: true`.
 
 ## Setup
 

@@ -30,11 +30,10 @@ npm install -g portless agent-browser gh-axi
 agent-browser install
 
 Write-Host "[4/4] Plugins"
-foreach ($m in "JuliusBrussee/caveman", "DietrichGebert/ponytail", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {
+foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {
   claude plugin marketplace add $m
 }
 claude plugin install caveman@caveman
-claude plugin install ponytail@ponytail
 claude plugin install superpowers@claude-plugins-official
 claude plugin install goal-ledger@goal-ledger
 
