@@ -26,7 +26,21 @@ Proves an invariant across generated inputs, catching the cases nobody thought t
 
 Tool: `fast-check`. Reach for it where a law exists: round-trip (`parse(print(x)) === x`), idempotence, commutativity, ordering preserved, output always in range, never throws on valid input, conservation (money in equals money out).
 
-Done when each named invariant runs against generated input and the shrinker's counterexample for a deliberately broken implementation is readable.
+Done when each named invariant runs against generated input and the shrinker's counterexample for a deliberately broken implementation is readable. A law that only holds across a *sequence* of calls belongs to the simulation layer below, not here.
+
+## Simulation and Monte-Carlo — T2 stateful: state machines, workflows, job queues, schedulers, orchestrators, anything that retries
+
+Proves the invariants hold across *sequences* of operations under failure. Every layer above judges one call; the bugs that survive them are the ones needing step 7 to follow step 3 after a retry that arrived late. This is the layer nobody reaches for unprompted, and the one that finds the edge case a production run would otherwise find first.
+
+Two shapes, by size of the thing under test:
+
+**Model-based tests**, for a stateful unit — a reducer, a state machine, a cache, a connection pool. Tool: `fast-check` commands (`fc.commands` + `fc.modelRun`; on other stacks, `hypothesis` `RuleBasedStateMachine`, `rapid`'s state machine, `proptest-state-machine`): one command class per operation, a simplified model of the expected state kept beside the real one, invariants asserted after every step. The generator produces the operation orders nobody enumerates by hand.
+
+**A simulator**, for a system of participants — a worker pool, an orchestration, a queue with consumers. Build fakes that answer like the real participants, drive them through the same state machine the production code drives, and assert the invariants that must hold at every step. Then jitter it: inject delay, timeout, out-of-order completion, duplicate delivery, a participant that fails, a crash and restart between steps. Run thousands of randomized runs (Monte Carlo). The jitter distribution is part of the oracle — a profile that never produces the slow case proves only the fast one.
+
+Invariants worth asserting in either shape: no transition the diagram forbids, no work lost, no work done twice, every started job reaches a terminal state, no interleaving that leaves the store inconsistent, and a replayed or duplicated message changing nothing.
+
+Done when a randomized run under failure injection holds every invariant, and each counterexample found is committed as a fixed-seed regression test that fails against the unfixed code.
 
 ## Torture / fuzz — T2 parsers, protocols, uploads, anything eating untrusted bytes
 
@@ -49,6 +63,8 @@ Done when every survivor is killed or annotated as equivalent. A score alone pro
 Proves reach, not correctness. Its only honest use is a ratchet that blocks regression.
 
 Tool: `vitest --coverage` with `thresholds.autoUpdate` off and per-file thresholds on the T2 paths. Set the floor at what the suite already achieves, then raise it deliberately.
+
+Weight the raise by complexity, not by file order. The dangerous file is the one that is both branchy and thinly covered — the pairing the CRAP metric names. Get the ranking from ESLint's `complexity` rule against the per-file coverage report, and spend the next tests at the top of that list; a 60% branchy state machine is a worse hole than a 60% mapper, and the global percentage hides which one you fixed.
 
 Done when the threshold fails the build on a drop. Chasing a percentage by writing assertion-free tests is the failure this layer invites — mutation testing is the check against it.
 
