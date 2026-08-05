@@ -12,8 +12,8 @@
   "skillOverrides": {
     "dataviz": "off",
     "artifact-design": "off",
-    "superpowers:tdd": "off",
-    "superpowers:test-driven-development": "off"
+    "superpowers:test-driven-development": "off",
+    "superpowers:writing-skills": "off"
   },
   "hooks": {
     "PreToolUse": [

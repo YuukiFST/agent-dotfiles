@@ -13,7 +13,8 @@
     {
       "source": "git:github.com/obra/superpowers",
       "skills": [
-        "!test-driven-development"
+        "!test-driven-development",
+        "!writing-skills"
       ]
     }
   ],

@@ -26,10 +26,8 @@ claude plugin install caveman@caveman || true
 claude plugin install superpowers@claude-plugins-official || true
 claude plugin install goal-ledger@goal-ledger || true
 
-# Disable superpowers:writing-skills — superseded by personal writing-great-skills (duplicate trigger)
-for d in "$HOME"/.claude/plugins/cache/claude-plugins-official/superpowers/*/skills/writing-skills; do
-  [ -f "$d/SKILL.md" ] && mv "$d/SKILL.md" "$d/SKILL.md.disabled"
-done
+# superpowers:writing-skills and :test-driven-development are turned off in settings.json
+# (skillOverrides). Renaming SKILL.md in the plugin cache does not survive a plugin update.
 
 case ":$PATH:" in *":$bin:"*) ;; *) echo "Note: add $bin to PATH";; esac
 echo "Done. Restart Claude Code."
