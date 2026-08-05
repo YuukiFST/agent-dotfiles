@@ -17,7 +17,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-52 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+54 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -26,14 +26,18 @@ fewer tokens, write better code, verify it works.
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & handoff** | `shape`, `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
-| **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
-| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-great-skills`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
+| **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
+| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
 **Vendored upstream skills.** Many of these are unmodified copies from
 [mattpocock/skills](https://github.com/mattpocock/skills) — `codebase-design`, `diagnosing-bugs`,
 `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `loop-me`, `prototype`,
-`research`, `setup-matt-pocock-skills`, `teach`, `wayfinder`, `writing-great-skills` — plus
+`research`, `setup-matt-pocock-skills`, `teach`, `wayfinder`, `writing-for-agents` (all at upstream
+`v1.2.0`, which renamed `writing-great-skills` → `writing-for-agents`) — plus the Emil Kowalski set
+from [emilkowalski/skills](https://github.com/emilkowalski/skills) (`animate`, `animation-vocabulary`,
+`apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`,
+`pick-ui-library`, `review-animations`), and
 `find-skills` (vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton).
 This repo is the only source of Matt's skills on this machine: anything of his that is not
 vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
@@ -46,7 +50,12 @@ Refresh the ones the skills CLI still tracks with `npx skills update -g -y` (wri
 `setup-matt-pocock-skills` and `wayfinder` are no longer in `~/.agents/.skill-lock.json`, so they
 refresh by hand from a clone of the upstream repo. Either way, drop each upstream `agents/` dir
 and `openai.yaml` — this repo does not vendor them — and re-apply local frontmatter tweaks:
-`find-skills` carries `disable-model-invocation: true`.
+`find-skills` carries `disable-model-invocation: true`, and so does every Emil skill in the frontend
+pipeline (`animate`, `apple-design`, `emil-design-eng`, `find-animation-opportunities`,
+`improve-animations`) — that pipeline is opt-in per `rules/frontend.md`, so the model must not
+self-trigger it. `pick-ui-library` also carries a local Decorative-effects section (`border-beam`,
+`thinking-orbs`) and `emil-design-eng` keeps the Radix `transform-origin` variants upstream dropped;
+both survive a refresh only if re-applied by hand.
 
 ## Setup
 
