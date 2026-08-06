@@ -18,9 +18,11 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   fi
 
   if [ "${remote_sha:-}" = "$zero" ] || [ -z "${remote_sha:-}" ]; then
-    range="$local_sha"
+    # Branch nova no remoto: sem `--not --remotes` o rev-list devolve a história
+    # inteira e o hook culpa commits antigos que já estão em origin/main.
+    range=("$local_sha" --not --remotes=origin)
   else
-    range="${remote_sha}..${local_sha}"
+    range=("${remote_sha}..${local_sha}")
   fi
 
   while read -r commit; do
@@ -28,7 +30,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     if ! validate_commit_object "$commit"; then
       failed=1
     fi
-  done < <(git rev-list "$range" 2>/dev/null || true)
+  done < <(git rev-list "${range[@]}" 2>/dev/null || true)
 done
 
 if [ "$failed" -ne 0 ]; then
