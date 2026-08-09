@@ -25,7 +25,7 @@ fewer tokens, write better code, verify it works.
 | **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `react-doctor` |
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
-| **Planning & handoff** | `shape`, `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
+| **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
 | **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
