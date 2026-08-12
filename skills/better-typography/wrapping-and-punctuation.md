@@ -6,7 +6,7 @@ Where lines start, where they end, where they break and which characters they us
 
 Long lines make it harder for the eye to find the start of the next line. For long-form text, aim for 60–75 characters per line.
 
-Any unit works. `65ch` measures characters directly (one `ch` is the width of the `0` in the current font), but a pixel or rem cap is just as good: at a `16px` body size the 60–75 character range lands roughly between `560px` and `680px` depending on the font, so Tailwind's `max-w-xl` (`576px`) or `max-w-2xl` (`672px`) fit. What matters is that a cap exists and the resulting line length sits in range — recheck it if the body font size changes.
+Any unit works. `65ch` measures characters directly (one `ch` is the width of the `0` in the current font), but a pixel or rem cap is just as good: at a `16px` body size the 60–75 character range lands roughly between `560px` and `680px` depending on the font, so Tailwind's `max-w-xl` (`576px`) or `max-w-2xl` (`672px`) fit. What matters is that a cap exists and the resulting line length sits in range; recheck it if the body font size changes.
 
 ## Alignment
 
@@ -50,21 +50,9 @@ Keyboard characters are not always the best characters:
 ## Internationalization
 
 - Set the `lang` attribute so browsers choose the right quotes, hyphenation and pronunciation.
-- Use `dir="rtl"` for right-to-left content.
-- To support both directions, use logical properties everywhere a directional one exists:
+- Set `dir` at the document or content boundary where direction changes. Spatial mirroring and the logical-property table live in `better-layout`.
 
-```css
-/* Good */
-p {
-  margin-inline-start: 8px;
-  text-align: start;
-}
+Two refinements for mixed-direction text:
 
-/* Bad: breaks in RTL */
-p {
-  margin-left: 8px;
-  text-align: left;
-}
-```
-
-The same applies to `padding` and every other directional property.
+- **Long paragraphs align by their own language.** A one- or two-line snippet follows the surrounding UI's direction, but a paragraph of three or more lines aligns to its own script's direction: an English paragraph stays start-aligned LTR even inside an RTL interface. `text-align: start` with the correct `lang`/`dir` on the paragraph element handles this.
+- **Never reverse digits.** Numbers keep their digit order in every direction: a phone number or "541" reads identically in RTL. Browsers handle this via the Unicode bidi algorithm; don't fight it with manual reordering, and wrap mixed number/text values in `<bdi>` if adjacent RTL text disturbs them.

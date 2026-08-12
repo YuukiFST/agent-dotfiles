@@ -17,7 +17,7 @@ fewer tokens, write better code, verify it works.
 
 ## Skills
 
-54 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
+58 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
 — one level, so subfolders would hide them). Full list: `ls skills/`.
 
 | Category | Highlights |
@@ -26,7 +26,7 @@ fewer tokens, write better code, verify it works.
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
-| **Frontend & design** | `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
+| **Frontend & design** | `impeccable`, `interface-review`/`better-interface` + the six `better-*` domain skills (`accessibility`/`layout`/`writing`/`typography`/`colors`/`ui`), `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
@@ -37,7 +37,10 @@ fewer tokens, write better code, verify it works.
 `v1.2.0`, which renamed `writing-great-skills` → `writing-for-agents`) — plus the Emil Kowalski set
 from [emilkowalski/skills](https://github.com/emilkowalski/skills) (`animate`, `animation-vocabulary`,
 `apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`,
-`pick-ui-library`, `review-animations`), and
+`pick-ui-library`, `review-animations`), the Jakub Krehel set from
+[jakubkrehel/skills](https://github.com/jakubkrehel/skills) (`interface-review`, `better-interface`,
+`better-accessibility`, `better-layout`, `better-writing`, `better-typography`, `better-colors`,
+`better-ui` — `agents/openai.yaml` dropped, `disable-model-invocation: true` added), and
 `find-skills` (vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton).
 This repo is the only source of Matt's skills on this machine: anything of his that is not
 vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
