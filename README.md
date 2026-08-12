@@ -3,67 +3,19 @@
 My global config for **Claude Code**, **Cursor** and **pi** — spend
 fewer tokens, write better code, verify it works.
 
-## Tools
+| Path | What |
+|------|------|
+| `CLAUDE.md` | Global instructions, loaded every session |
+| `rules/` | Conditional rule files the instructions point at (frontend, git, code quality, memory, prompting) |
+| `skills/` | 58 skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
+| `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
+| `scripts/` | Install and sync, one script per harness |
+| `pi/`, `agent-browser/`, `portless/` | Per-tool config |
 
-| Tool | Why |
-|------|-----|
-| [rtk](https://github.com/rtk-ai/rtk) | Compresses shell output 60–90% before the model sees it. |
-| [caveman](https://github.com/JuliusBrussee/caveman) | Compresses agent replies ~75%. |
-| [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) | Codex-style `/goal` tracking with `get_goal` / `create_goal` / `update_goal` tools. |
-| [superpowers](https://github.com/obra/superpowers) | Discipline skills (brainstorming, debugging, planning, verification) that gate *how* the agent works. |
-| [agent-browser](https://agent-browser.dev) | Real-browser E2E via ref-based snapshots. Configs + NixOS/pi setup guide in `agent-browser/`. |
-| [portless](https://portless.sh) | Named `.localhost` URLs — stable hostnames instead of guessed ports. Needs Node 24+; bootstrap in `portless/setup.md`. |
-| `git-hooks/` | `pre-push` blocks AI attribution on push; `git-safe-commit` bypasses Cursor injection. |
-
-## Skills
-
-58 skills, flat in `skills/` (Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`
-— one level, so subfolders would hide them). Full list: `ls skills/`.
-
-| Category | Highlights |
-|----------|-----------|
-| **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview`, `react-doctor` |
-| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
-| **Security** | `security-review`, `security-bounty-hunter` |
-| **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
-| **Frontend & design** | `impeccable`, `interface-review`/`better-interface` + the six `better-*` domain skills (`accessibility`/`layout`/`writing`/`typography`/`colors`/`ui`), `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
-| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
-| **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
-
-**Vendored upstream skills.** Many of these are unmodified copies from
-[mattpocock/skills](https://github.com/mattpocock/skills) — `codebase-design`, `diagnosing-bugs`,
-`domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `loop-me`, `prototype`,
-`research`, `setup-matt-pocock-skills`, `teach`, `wayfinder`, `writing-for-agents` (all at upstream
-`v1.2.0`, which renamed `writing-great-skills` → `writing-for-agents`) — plus the Emil Kowalski set
-from [emilkowalski/skills](https://github.com/emilkowalski/skills) (`animate`, `animation-vocabulary`,
-`apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`,
-`pick-ui-library`, `review-animations`), the Jakub Krehel set from
-[jakubkrehel/skills](https://github.com/jakubkrehel/skills) (`interface-review`, `better-interface`,
-`better-accessibility`, `better-layout`, `better-writing`, `better-typography`, `better-colors`,
-`better-ui` — `agents/openai.yaml` dropped, `disable-model-invocation: true` added), and
-`find-skills` (vercel-labs), `tailwind-v4-shadcn` (secondsky) and `effect` (kitlangton).
-This repo is the only source of Matt's skills on this machine: anything of his that is not
-vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
-`wayfinder` sets the floor for which of his skills stay — it dispatches to `research`,
-`prototype`, `grilling` and `domain-modeling`, and points at `setup-matt-pocock-skills` for the
-per-repo issue-tracker config.
-
-Refresh the ones the skills CLI still tracks with `npx skills update -g -y` (writes
-`~/.agents/skills`), then copy the updated folders back into `skills/`. `grilling`,
-`setup-matt-pocock-skills` and `wayfinder` are no longer in `~/.agents/.skill-lock.json`, so they
-refresh by hand from a clone of the upstream repo. Either way, drop each upstream `agents/` dir
-and `openai.yaml` — this repo does not vendor them — and re-apply local frontmatter tweaks:
-`find-skills` carries `disable-model-invocation: true`, and so does every Emil skill in the frontend
-pipeline (`animate`, `apple-design`, `emil-design-eng`, `find-animation-opportunities`,
-`improve-animations`) — that pipeline is opt-in per `rules/frontend.md`, so the model must not
-self-trigger it. `pick-ui-library` also carries a local Decorative-effects section (`border-beam`,
-`thinking-orbs`) and `emil-design-eng` keeps the Radix `transform-origin` variants upstream dropped;
-both survive a refresh only if re-applied by hand.
-
-## Setup
+## Install
 
 Clone the repo, run your agent's script. Idempotent — re-run to update.
-Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it how.
+Or open the repo with any agent and ask it to sync — `AGENTS.md` tells it how.
 
 | Machine | Agent | Script |
 |---------|-------|--------|
@@ -73,13 +25,22 @@ Or just open the repo with any agent and ask it to sync — `AGENTS.md` tells it
 | **NixOS** | pi | `bash scripts/setup-pi.sh` |
 
 Claude Code gets the full stack; Cursor gets skills + rules;
-pi gets skills + rules + agent config from `pi/` (extensions, packages, cloak).
-Restart the agent afterwards.
+pi gets skills + rules + agent config from `pi/`. Restart the agent afterwards.
+
+Installed separately, not by these scripts:
+[rtk](https://github.com/rtk-ai/rtk),
+[caveman](https://github.com/JuliusBrussee/caveman),
+[superpowers](https://github.com/obra/superpowers),
+[agent-browser](https://agent-browser.dev) (configs in `agent-browser/`),
+[portless](https://portless.sh) (Node 24+, `portless/setup.md`),
+[pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) (pi only).
 
 ## Gotchas
 
 - **rtk corrupts `prisma`/`tsc`/`vitest` output** — run those raw, never through rtk.
 - **Cursor User Rules are not file-backed** — paste `CLAUDE.md` into Customize → Rules by hand, and re-paste after editing it.
 - **`settings.json` is a seed, not a mirror** — written only when absent. Claude Code and other installers own that file; mirroring it would destroy state this repo doesn't track.
-- **pi ships no MCP** (upstream design choice). Goal tracking comes from
-  `npm:pi-codex-goal` in `pi/settings.json`.
+- **pi ships no MCP** (upstream design choice). Goal tracking comes from `npm:pi-codex-goal` in `pi/settings.json`.
+
+Most skills are vendored from upstream repos — provenance, refresh procedure and the local
+tweaks a refresh must re-apply live in [`docs/vendored-skills.md`](docs/vendored-skills.md).
