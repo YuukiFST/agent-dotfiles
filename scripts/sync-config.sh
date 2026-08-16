@@ -22,6 +22,8 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
       rm -rf "${1:?}/$name"
     done
   fi
+  # Plugin/extension-only skills — not vendored in skills/
+  rm -rf "${1:?}/caveman"
 }
 
 sync_rules() { # $1 = dest rules dir — full mirror: rules/ is entirely repo-owned

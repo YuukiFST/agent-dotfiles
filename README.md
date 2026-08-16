@@ -30,7 +30,7 @@ pi gets skills + rules + agent config from `pi/`. Restart the agent afterwards.
 
 Installed separately, not by these scripts:
 [rtk](https://github.com/rtk-ai/rtk),
-[caveman](https://github.com/JuliusBrussee/caveman),
+[caveman](https://github.com/JuliusBrussee/caveman) (Claude plugin + pi extension — not vendored as a skill),
 [agent-browser](https://agent-browser.dev) (configs in `agent-browser/`),
 [portless](https://portless.sh) (Node 24+, `portless/setup.md`),
 [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) (pi only).

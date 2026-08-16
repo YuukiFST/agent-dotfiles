@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,14 +11,8 @@ const FALLBACK =
   "Preserve the user's language. Code/commits/PRs: write normal.";
 
 function resolveSkillPath() {
-  const candidates = [
-    path.join(os.homedir(), ".agents", "skills", "caveman", "SKILL.md"),
-    path.join(__dirname, "skills", "caveman", "SKILL.md"),
-  ];
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) return candidate;
-  }
-  return null;
+  const bundled = path.join(__dirname, "caveman-instructions.md");
+  return fs.existsSync(bundled) ? bundled : null;
 }
 
 function filterSkillBodyForMode(body, mode) {
