@@ -1,0 +1,19 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --reporter=verbose",
+    "dev": "node --watch --loader ts-node/esm src/server.ts"
+  },
+  "dependencies": {
+    "hono": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

@@ -41,8 +41,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
-- **Frontend/UI work — ON EXPLICIT REQUEST ONLY** → `~/.claude/rules/frontend.md` (skill pipeline, phases, minimum bar). Read it only when the user names it ("siga o frontend.md", "use o pipeline de frontend", "/goal com o fluxo de front"). Otherwise SKIP — do UI work with normal judgement and the project's own Design System.
-- **Choosing a frontend library** (toasts, dialogs/menus/popovers, ⌘K palette, OTP input, charts, drag and drop, virtualization, animated numbers, state, className helpers, dark mode) — or about to hand-roll one of those → read `~/.claude/skills/pick-ui-library/SKILL.md` first (user-invoked skill, not in the catalog), even outside the frontend pipeline. Reuse what `package.json` already has before adding a dependency.
 - **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` §Clean code (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in). **Improving the project** (audit, refactor, harden, optimize, review) **or a /goal building from a PRD** → same file, full execution flow (skills drive every change; /goal closeout = final quality pass).
 - **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.

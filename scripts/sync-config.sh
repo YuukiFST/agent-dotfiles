@@ -14,6 +14,14 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
     rm -rf "${1:?}/$name"
     cp -r "$s" "$1/$name"
   done
+  # Prune archived stacks (e.g. frontend) so they do not stay in the live harness.
+  if [ -d "$repo/stacks/frontend/skills" ]; then
+    for s in "$repo"/stacks/frontend/skills/*/; do
+      [ -d "$s" ] || continue
+      name="$(basename "$s")"
+      rm -rf "${1:?}/$name"
+    done
+  fi
 }
 
 sync_rules() { # $1 = dest rules dir — full mirror: rules/ is entirely repo-owned

@@ -1,7 +1,7 @@
 ---
 name: transitions-polish
-description: >-
-  Polish existing motion against the transitions.dev motion-token scale — duration, distance, scale, blur, easing — plus the rules for WHEN each token applies (open/close asymmetry, hover in/out, stagger, intent delays). Add-on to transitions-dev tunes what already animates instead of adding new transitions. Use when asked to polish/refine motion, tune timing or easing, fix a stagger, tokenize ad-hoc durations, or when motion feels off, too slow, or too fast. Also transitions review, transitions polish.
+description: Polish existing motion against transitions.dev tokens. User invokes after motion exists.
+disable-model-invocation: true
 ---
 
 # Transitions Polish

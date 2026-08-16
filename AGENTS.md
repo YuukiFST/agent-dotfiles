@@ -33,8 +33,8 @@ If tools are already installed and only config drifted, `scripts/sync-config.sh 
 What the scripts propagate:
 
 - `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
-- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi)
-- `rules/` → `~/.claude/rules` on EVERY harness (CLAUDE.md's conditional pointers hardcode that path)
+- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs
+- `rules/` → `~/.claude/rules` on EVERY harness (frontend rule archived in `stacks/frontend/`)
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
