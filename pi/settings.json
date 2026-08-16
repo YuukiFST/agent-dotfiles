@@ -9,14 +9,7 @@
         "+extensions/pi-contextimate"
       ]
     },
-    "npm:pi-codex-goal",
-    {
-      "source": "git:github.com/obra/superpowers",
-      "skills": [
-        "!test-driven-development",
-        "!writing-skills"
-      ]
-    }
+    "npm:pi-codex-goal"
   ],
   "theme": "github-dark-default",
   "defaultProvider": "cursor",

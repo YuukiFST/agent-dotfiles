@@ -11,9 +11,7 @@
   "disableArtifact": true,
   "skillOverrides": {
     "dataviz": "off",
-    "artifact-design": "off",
-    "superpowers:test-driven-development": "off",
-    "superpowers:writing-skills": "off"
+    "artifact-design": "off"
   },
   "hooks": {
     "PreToolUse": [
@@ -34,8 +32,7 @@
     "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\tisao\\.claude\\hooks\\caveman-statusline.ps1\""
   },
   "enabledPlugins": {
-    "caveman@caveman": true,
-    "superpowers@claude-plugins-official": true
+    "caveman@caveman": true
   },
   "extraKnownMarketplaces": {
     "caveman": {

@@ -34,10 +34,6 @@ foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official", "k
   claude plugin marketplace add $m
 }
 claude plugin install caveman@caveman
-claude plugin install superpowers@claude-plugins-official
 claude plugin install goal-ledger@goal-ledger
-
-# superpowers:writing-skills and :test-driven-development are turned off in settings.json
-# (skillOverrides). Renaming SKILL.md in the plugin cache does not survive a plugin update.
 
 Write-Host "Done. Restart Claude Code."

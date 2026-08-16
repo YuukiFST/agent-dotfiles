@@ -19,12 +19,8 @@ agent-browser install   # refresh the bundled browser driver
 # not a Claude Code dependency.
 
 echo "[3/3] Claude Code plugins"
-for p in caveman@caveman superpowers@claude-plugins-official; do
+for p in caveman@caveman; do
   claude plugin update "$p" || true
-done
-# Re-apply the writing-skills disable (plugin updates restore the file)
-for d in "$HOME"/.claude/plugins/cache/claude-plugins-official/superpowers/*/skills/writing-skills; do
-  [ -f "$d/SKILL.md" ] && mv "$d/SKILL.md" "$d/SKILL.md.disabled"
 done
 
 echo "Done. Restart Claude Code to load updated plugins."

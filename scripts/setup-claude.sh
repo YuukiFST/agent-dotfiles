@@ -23,11 +23,7 @@ for m in JuliusBrussee/caveman anthropics/claude-plugins-official kingbootoshi/g
   claude plugin marketplace add "$m" || true
 done
 claude plugin install caveman@caveman || true
-claude plugin install superpowers@claude-plugins-official || true
 claude plugin install goal-ledger@goal-ledger || true
-
-# superpowers:writing-skills and :test-driven-development are turned off in settings.json
-# (skillOverrides). Renaming SKILL.md in the plugin cache does not survive a plugin update.
 
 case ":$PATH:" in *":$bin:"*) ;; *) echo "Note: add $bin to PATH";; esac
 echo "Done. Restart Claude Code."

@@ -25,12 +25,8 @@ agent-browser install   # refresh the bundled browser driver
 # updated by their own scripts there. Nothing else to refresh here.
 
 Write-Host "[3/3] Claude Code plugins"
-foreach ($p in "caveman@caveman", "superpowers@claude-plugins-official") {
+foreach ($p in "caveman@caveman") {
   claude plugin update $p
 }
-# Re-apply the writing-skills disable (plugin updates restore the file)
-$Claude = Join-Path $env:USERPROFILE ".claude"
-Get-ChildItem "$Claude\plugins\cache\claude-plugins-official\superpowers\*\skills\writing-skills\SKILL.md" -ErrorAction SilentlyContinue |
-  ForEach-Object { Move-Item $_.FullName "$($_.FullName).disabled" -Force }
 
 Write-Host "Done. Restart Claude Code to load updated plugins."

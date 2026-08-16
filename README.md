@@ -31,7 +31,6 @@ pi gets skills + rules + agent config from `pi/`. Restart the agent afterwards.
 Installed separately, not by these scripts:
 [rtk](https://github.com/rtk-ai/rtk),
 [caveman](https://github.com/JuliusBrussee/caveman),
-[superpowers](https://github.com/obra/superpowers),
 [agent-browser](https://agent-browser.dev) (configs in `agent-browser/`),
 [portless](https://portless.sh) (Node 24+, `portless/setup.md`),
 [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) (pi only).
@@ -45,6 +44,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (26 skill
 | **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview` |
 | **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
 | **Security** | `security-review`, `security-bounty-hunter` |
+| **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
 | **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |

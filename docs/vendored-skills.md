@@ -12,6 +12,7 @@ This file records where each set came from and what a refresh has to re-apply.
 | [jakubkrehel/skills](https://github.com/jakubkrehel/skills) | `interface-review`, `better-interface`, `better-accessibility`, `better-layout`, `better-writing`, `better-typography`, `better-colors`, `better-ui` |
 | [kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect) | `effect` |
 | [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) | `no-ai-slop` |
+| [obra/superpowers](https://github.com/obra/superpowers) | `brainstorming`, `systematic-debugging`, `writing-plans`, `executing-plans`, `verification-before-completion` (five skills only; plugin/package removed) |
 | vercel-labs | `find-skills` |
 | secondsky | `tailwind-v4-shadcn` |
 
