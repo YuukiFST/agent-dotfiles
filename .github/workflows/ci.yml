@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  commit-message-rules:
+    name: Commit message regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # rules/git.md 4.2 requires these tests after any change to the trailer
+      # patterns. Running them here is what makes that requirement real.
+      - name: Run validate-commit-message regression tests
+        run: bash git-hooks/test-validate-commit-message.sh
+
+  shell:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shellcheck hooks and scripts
+        # commit-msg and pre-push have no .sh extension, so a *.sh glob misses
+        # exactly the two files that gate every commit and push.
+        run: shellcheck git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push
