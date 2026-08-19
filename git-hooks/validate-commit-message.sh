@@ -1,4 +1,7 @@
 # Shared commit-message validation for commit-msg and pre-push hooks.
+# Sourced, never executed, so it carries a shell directive instead of a
+# shebang — shellcheck needs one or the other to analyse the file at all.
+# shellcheck shell=bash
 FORBIDDEN_TRAILER='(Co-authored-by:|Co-Authored-By:|Made-with:|Made with |Generated with |cursoragent@cursor\.com)'
 # Blocks tool/AI authorship attribution in subject. Tool as object is OK — see rules/git.md §4.2.
 # A named tool after an authorship preposition is always attribution.
