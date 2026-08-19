@@ -15,6 +15,7 @@ This file records where each set came from and what a refresh has to re-apply.
 | [obra/superpowers](https://github.com/obra/superpowers) | `brainstorming`, `systematic-debugging`, `writing-plans`, `executing-plans`, `verification-before-completion` (five skills only; plugin/package removed) |
 | vercel-labs | `find-skills` |
 | secondsky | `tailwind-v4-shadcn` |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `impeccable` (archived in `stacks/frontend/`; live pi install uses `.pi/skills/impeccable`) |
 
 This repo is the only source of Matt's skills on this machine: anything of his that is not
 vendored here is uninstalled from the harnesses, not left floating in `~/.claude/skills`.
@@ -30,6 +31,17 @@ Refresh the ones the skills CLI still tracks with `npx skills update -g -y` (wri
 refresh by hand from a clone of the upstream repo.
 
 Either way, drop each upstream `agents/` dir and `openai.yaml` — this repo does not vendor them.
+
+`impeccable` refreshes from upstream `.pi/skills/impeccable` (not `.agents/skills/impeccable`).
+After cloning the repo at the tag or commit you want:
+
+```bash
+rm -rf stacks/frontend/skills/impeccable
+cp -r /path/to/impeccable/.pi/skills/impeccable stacks/frontend/skills/impeccable
+```
+
+Live pi harness: from `~/.pi/agent`, run
+`npx impeccable skills install -y --providers=pi --scope=project`.
 
 ## Local tweaks a refresh must re-apply
 
