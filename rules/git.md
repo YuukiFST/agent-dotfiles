@@ -34,7 +34,18 @@ Rules:
 
 ## 3. Git push
 
-Always ask before push: `git push origin <branch>`.
+Scope the confirmation to what is actually risky — who else is standing on the branch.
+
+**Push without asking** — a personal feature branch (`<type>/<issue>-<slug>`) that nobody else has pulled. It cannot reach `main` without a PR (§5), the PR is the review gate, and stopping to confirm every branch push turns a one-line fix into several round trips.
+
+**Ask first** — anything landing on or rewriting a branch other people or other agent sessions build on:
+
+- `main`/`master` or any shared/long-lived branch, including a fast-forward
+- any force-push, on any branch, even your own (§5.2)
+- pushing tags, or anything that triggers a release or deploy
+- the first push of a branch to a repo you do not own
+
+Uncertain whether a branch is shared? Ask. The rule narrows the confirmation, it does not remove it: no path exists where an agent writes to `main` unattended.
 
 ## 4. No AI attribution
 
