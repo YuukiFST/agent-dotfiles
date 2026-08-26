@@ -26,11 +26,14 @@ Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
   Copy-Item $_.FullName $dest -Recurse
 }
 
-# Prune archived stacks (e.g. frontend) so they do not stay in the live harness. Without
-# this, react-doctor survived every sync on Windows while sync-config.sh pruned it on pi.
-$archived = Join-Path $Repo "stacks\frontend\skills"
-if (Test-Path $archived) {
+# Prune every archived stack so it does not stay in the live harness. Without this,
+# react-doctor survived every sync on Windows while sync-config.sh pruned it on pi.
+# A stack that is enabled also has its skills in skills/ above, so it is skipped here.
+Get-ChildItem (Join-Path $Repo "stacks") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+  $archived = Join-Path $_.FullName "skills"
+  if (-not (Test-Path $archived)) { return }
   Get-ChildItem $archived -Directory | ForEach-Object {
+    if (Test-Path (Join-Path "$Repo\skills" $_.Name)) { return }
     $stale = Join-Path "$Claude\skills" $_.Name
     if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
   }
