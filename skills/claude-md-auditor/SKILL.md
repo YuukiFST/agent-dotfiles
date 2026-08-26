@@ -57,6 +57,13 @@ matter more. Weigh "the model already knows this" against the repo's stack.
 The skill's own output should model what it preaches: terse, concrete, no
 ceremony.
 
+## When `backpass` fits better
+
+This skill judges a file against the rubric, and needs nothing but the file — right for a new,
+history-less, or freshly restructured one. When the repo already has session transcripts, the
+`backpass` skill judges the same file against what the agents actually did, with a verbatim quote
+per edit. Audit shapes the file; backpass keeps it honest.
+
 ## Step 1 — Ask scope (always, before reading anything)
 
 Ask the user which file(s) to audit. Do not assume.
