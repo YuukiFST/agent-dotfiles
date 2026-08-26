@@ -33,7 +33,9 @@ If tools are already installed and only config drifted, `scripts/sync-config.sh 
 What the scripts propagate:
 
 - `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
-- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs
+- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs.
+  The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
+  skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
 - `rules/` → `~/.claude/rules` on EVERY harness (frontend rule archived in `stacks/frontend/`)
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs

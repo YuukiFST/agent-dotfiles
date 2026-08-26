@@ -17,6 +17,32 @@ Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
   Copy-Item $_.FullName $dest -Recurse
 }
 
+# Prune archived stacks (e.g. frontend) so they do not stay in the live harness. Without
+# this, react-doctor survived every sync on Windows while sync-config.sh pruned it on pi.
+$archived = Join-Path $Repo "stacks\frontend\skills"
+if (Test-Path $archived) {
+  Get-ChildItem $archived -Directory | ForEach-Object {
+    $stale = Join-Path "$Claude\skills" $_.Name
+    if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
+  }
+}
+
+# Skills deleted from the repo — see skills/REMOVED.txt for why the list has to exist.
+$removedList = Join-Path $Repo "skills\REMOVED.txt"
+if (Test-Path $removedList) {
+  Get-Content $removedList | ForEach-Object {
+    $name = ($_ -split "#")[0].Trim()
+    if ($name) {
+      $stale = Join-Path "$Claude\skills" $name
+      if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
+    }
+  }
+}
+
+# caveman is pruned by sync-config.sh but NOT here: on the pi/Cursor boxes it arrives from
+# skills/, while on Windows the Claude Code plugin owns ~/.claude/skills/caveman and this
+# script would delete a skill it never installed.
+
 # rules/ is entirely repo-owned — full mirror so deleted rules don't linger
 Remove-Item "$Claude\rules" -Recurse -Force
 Copy-Item "$Repo\rules" "$Claude\rules" -Recurse
