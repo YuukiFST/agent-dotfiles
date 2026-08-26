@@ -47,7 +47,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (26 skill
 | **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
 | **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
-| **Research & authoring** | `storm-research`, `research`, `teach`, `claude-md-auditor`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
+| **Research & authoring** | `storm-research`, `research`, `teach`, `backpass`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
 Most skills are vendored from upstream repos — provenance, refresh procedure and the local

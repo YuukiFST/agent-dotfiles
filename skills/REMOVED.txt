@@ -1,0 +1,12 @@
+# Skills deleted from this repo that must also be deleted from live harness dirs.
+#
+# sync-config copies skills one directory at a time and never mirrors, on purpose, so a
+# skill that exists only locally (plugin-provided, symlinked) survives a sync. The cost is
+# that a skill *deleted* from skills/ also survives, on every machine that ever synced it.
+# This list is the only thing that reaches those machines.
+#
+# One skill name per line. Everything after # is a comment. Drop a name once every machine
+# has synced past its removal.
+
+claude-md-auditor
+prove

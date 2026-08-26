@@ -68,4 +68,4 @@ Rules:
 
 The backward pass on a project file: evidence comes from session transcripts with a verbatim quote per edit, never from recollection; batch before updating (a new rule needs ≥2 independent sessions); ~5 edits per pass, not a rewrite; at budget every addition names the removal or extraction that pays for it. Broad or safety-critical instructions stay in the file, narrow ones with a detectable trigger become a skill, narrow ones with no trigger are deletion candidates.
 
-Run it with the `backpass` skill (transcript evidence, needs session history) or the `claude-md-auditor` skill (research rubric, needs only the file).
+Run it with the `backpass` skill.

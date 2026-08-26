@@ -22,6 +22,17 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
       rm -rf "${1:?}/$name"
     done
   fi
+  # Skills deleted from the repo — see skills/REMOVED.txt for why the list has to exist.
+  if [ -f "$repo/skills/REMOVED.txt" ]; then
+    while IFS= read -r line; do
+      name="${line%%#*}"
+      name="${name// /}"
+      name="${name//$'\t'/}"
+      name="${name//$'\r'/}"
+      [ -n "$name" ] || continue
+      rm -rf "${1:?}/$name"
+    done < "$repo/skills/REMOVED.txt"
+  fi
   # Plugin/extension-only skills — not vendored in skills/
   rm -rf "${1:?}/caveman"
 }

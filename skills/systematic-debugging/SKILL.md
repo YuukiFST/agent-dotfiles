@@ -174,7 +174,6 @@ You MUST complete each phase before proceeding to the next.
    - Automated test if possible
    - One-off test script if no framework
    - MUST have before fixing
-   - Use the `prove` skill for writing proper failing tests when test design matters
 
 2. **Implement Single Fix**
    - Address the root cause identified

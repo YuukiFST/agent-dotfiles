@@ -27,16 +27,9 @@ Method write-up: <https://blog.kunchenguid.com/p/your-agentsmd-is-a-neural-net>.
 Never point `backpass` at the global file: it would optimise your preferences against sessions
 that happened to run last month.
 
-## Pick the right tool
-
-- **`backpass`** — the repo has real session history and you want evidence: which instruction
-  earned its keep, which one was violated, which one was wrong, what the agent kept
-  rediscovering. Needs transcripts.
-- **`claude-md-auditor`** — a new or history-less file, or you want the file judged against the
-  research rubric (conciseness, specificity, hierarchy, mechanical validity) rather than against
-  sessions. Needs nothing but the file.
-
-They compose: audit shapes the file, backpass keeps it honest.
+Evidence is the whole point: which instruction earned its keep, which one was violated, which one
+turned out wrong, what the agent kept rediscovering. A repo with no session history has nothing to
+train on — write the first version by hand and come back once it has been used.
 
 ## Prerequisites
 
