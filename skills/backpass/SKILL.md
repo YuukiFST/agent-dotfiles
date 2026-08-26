@@ -65,6 +65,16 @@ After `init`, set `skillsDir` in `.backpassrc.json` to where the repo actually k
 the default is `.agents/skills`, and a Claude Code repo uses `.claude/skills`. Getting this wrong
 makes every "extract to a skill" proposal land in a directory nothing reads.
 
+Pin the agent on Windows: `--analysis-agent claude --synthesis-agent claude`. Left unpinned,
+backpass walks its model ladder and each candidate gets a 20 s probe — and a cold ACP adapter
+takes longer than that to download, so every candidate fails and the run dies with `no available
+agent for the analysis pass`. Warm the adapter once with `acpx claude sessions new --name warmup`
+(then `sessions close warmup`) and the probe passes from then on.
+
+Budget the run, not just the file: one analysis call costs roughly 65k tokens of a Max
+subscription, so the default sample of 100 transcripts is a ~6M-token run. Evidence is cached per
+transcript in `.backpass/evidence/`, so a second run the same week only pays for what is new.
+
 Nothing is written until `apply`, and `apply` writes only what you accept. Rejections are
 remembered in `.backpass/rejections.json`, so a rejected edit does not come back without new
 evidence.
