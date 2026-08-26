@@ -34,3 +34,4 @@ bash scripts/sync-config.sh claude     # or cursor / pi — propagates either di
 |---|---|---|
 | `frontend/` | 26-skill premium UI pipeline + `rules/frontend.md` | Only pays off on design-heavy work; ~3k tokens of frontmatter per turn otherwise |
 | `memory/` | `rules/memory-system.md` + `dreaming.md` | Cross-session memory store is not in use; the harness memory dir handles what is needed |
+| `effect/` | `effect` skill (Effect v4 guide, 8 branch references) | No project on this machine depends on `effect` |
