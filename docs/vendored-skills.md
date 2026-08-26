@@ -9,7 +9,7 @@ This file records where each set came from and what a refresh has to re-apply.
 |---|---|
 | [mattpocock/skills](https://github.com/mattpocock/skills) (at `v1.2.0`, which renamed `writing-great-skills` → `writing-for-agents`) | `codebase-design`, `diagnosing-bugs`, `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `loop-me`, `prototype`, `research`, `setup-matt-pocock-skills`, `teach`, `wayfinder`, `writing-for-agents` |
 | [emilkowalski/skills](https://github.com/emilkowalski/skills) | `animate`, `animation-vocabulary`, `apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`, `pick-ui-library`, `review-animations` |
-| [jakubkrehel/skills](https://github.com/jakubkrehel/skills) | `interface-review` (live); `better-interface`, `better-accessibility`, `better-layout`, `better-writing`, `better-typography`, `better-colors`, `better-ui` (archived in `stacks/frontend/`) |
+| [jakubkrehel/skills](https://github.com/jakubkrehel/skills) | `interface-review`, `better-interface`, `better-accessibility`, `better-layout`, `better-writing`, `better-typography`, `better-colors`, `better-ui` (whole set archived in `stacks/frontend/`) |
 | [kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect) | `effect` (archived in `stacks/effect/`) |
 | [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) | `no-ai-slop` |
 | [obra/superpowers](https://github.com/obra/superpowers) | `brainstorming`, `systematic-debugging`, `writing-plans`, `executing-plans`, `verification-before-completion` (five skills only; plugin/package removed) |
