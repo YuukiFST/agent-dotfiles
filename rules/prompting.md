@@ -60,3 +60,12 @@ Rules:
 - **Version control for defensive rules.** Every "never X" or "always Y" needs a git commit explaining WHY. Re-check during dreaming — model improvements may make the rule counterproductive.
 - Staleness test: has every rule been relevant in the last 10 sessions? No → remove or move to a conditional sub-file. If an instruction is ignored 3 times in a row, it's either unclear or out of date.
 - Use conditional pointers (`Read X before doing Y, otherwise skip`) for domain-specific rules.
+
+### Two levels, opposite treatment
+
+- **User level** (`~/.claude/CLAUDE.md` + `rules/`, the payload of this repo) is **handwritten**. It holds preferences you own; it changes rarely and no tool optimises it.
+- **Project level** (a repo's own `CLAUDE.md` / `AGENTS.md`) is **trained**: give it a token budget, treat each list item or paragraph as one addressable unit, and update it from what the sessions actually did — not from the last time an agent annoyed you.
+
+The backward pass on a project file: evidence comes from session transcripts with a verbatim quote per edit, never from recollection; batch before updating (a new rule needs ≥2 independent sessions); ~5 edits per pass, not a rewrite; at budget every addition names the removal or extraction that pays for it. Broad or safety-critical instructions stay in the file, narrow ones with a detectable trigger become a skill, narrow ones with no trigger are deletion candidates.
+
+Run it with the `backpass` skill (transcript evidence, needs session history) or the `claude-md-auditor` skill (research rubric, needs only the file).
