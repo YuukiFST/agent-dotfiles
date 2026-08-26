@@ -42,5 +42,4 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 - **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in).
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
-- **Effect-TS code** (project depends on `effect`; writing/refactoring workflows, services, layers, schemas, `Config`, `Schedule`, `Cache`, `Stream`, `HttpClient`, or Effect tests) → load the `effect` skill BEFORE writing code, and read only the branch references the task matches. Requires Effect v4 — on v3 or older, skip it and follow the project's own conventions.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.

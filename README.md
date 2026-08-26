@@ -8,7 +8,7 @@ fewer tokens, write better code, verify it works.
 | `CLAUDE.md` | Global instructions, loaded every session |
 | `rules/` | Conditional rule files the instructions point at (git, code quality, prompting, agent workflow) |
 | `skills/` | Active skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
-| `stacks/` | Archived config, kept but not loaded: `frontend/` (26-skill UI pipeline), `memory/` (memory system + dreaming). See [`stacks/README.md`](stacks/README.md) |
+| `stacks/` | Archived config, kept but not loaded: `frontend/` (26-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill). See [`stacks/README.md`](stacks/README.md) |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one script per harness |
 | `pi/`, `agent-browser/`, `portless/` | Per-tool config |
@@ -48,7 +48,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (26 skill
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
 | **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `backpass`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
-| **Libraries & system** | `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
+| **Libraries & system** | archived in `stacks/effect/` — `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
 Most skills are vendored from upstream repos — provenance, refresh procedure and the local
 tweaks a refresh must re-apply live in [`docs/vendored-skills.md`](docs/vendored-skills.md).
