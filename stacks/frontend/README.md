@@ -6,12 +6,14 @@ Not loaded into harness by default — saves ~3k+ tokens of skill frontmatter pe
 ## Contents
 
 - `rules/frontend.md` — pipeline router (steps 1–8, minimum bar, autonomous `/goal` mode)
-- `skills/` — 26 skills referenced by the pipeline (design direction, tokens, build, motion, review)
+- `skills/` — 30 skills referenced by the pipeline (design direction, tokens, build, motion, review), including the whole jakubkrehel `better-*` set
 - `CLAUDE-snippet.md` — conditional rules to paste back into `CLAUDE.md` when re-enabling
 
 ## Still active without this stack
 
 `agent-browser` and `webapp-testing` stay in top-level `skills/` for E2E and Playwright testing outside the full design pipeline.
+
+`interface-review` also stays live, but it owns change scope only and hands every review to `better-interface` for severity and the verdict — with this stack archived it reports the missing skill and stops, by its own design. Enable the stack to use it.
 
 ## Re-enable
 
