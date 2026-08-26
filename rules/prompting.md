@@ -57,7 +57,7 @@ Remove on sight:
 
 Rules:
 - Separate concerns: `## Output` = format policies, `## Working method` = decision rules, `## Architecture` = project data, `## Code rules` = hard constraints.
-- **Version control for defensive rules.** Every "never X" or "always Y" needs a git commit explaining WHY. Re-check during dreaming — model improvements may make the rule counterproductive.
+- **Version control for defensive rules.** Every "never X" or "always Y" needs a git commit explaining WHY. Re-check on every backward pass — model improvements may make the rule counterproductive.
 - Staleness test: has every rule been relevant in the last 10 sessions? No → remove or move to a conditional sub-file. If an instruction is ignored 3 times in a row, it's either unclear or out of date.
 - Use conditional pointers (`Read X before doing Y, otherwise skip`) for domain-specific rules.
 

@@ -20,8 +20,8 @@ Not loaded into harness by default — saves ~3k+ tokens of skill frontmatter pe
 3. Paste `CLAUDE-snippet.md` lines into `CLAUDE.md` under `## Conditional rules`
 4. Sync: `bash scripts/sync-config.sh pi` (or `claude` / `cursor`)
 
-Or run: `bash scripts/enable-frontend-stack.sh`
+Or run: `bash scripts/stack.sh enable frontend`
 
 ## Disable again
 
-`bash scripts/disable-frontend-stack.sh` then sync.
+`bash scripts/stack.sh disable frontend` then sync.

@@ -27,7 +27,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Code rules (override model defaults)
 
-- **Before a helper:** grep for the canonical one. Duplicating an existing helper is a failure, not a nit.
+- **Before a helper:** grep for the canonical one, reuse it.
 - **File > 500 lines = decompose first**, don't append.
 - **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
 - **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
@@ -35,13 +35,12 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Tools (machine-specific)
 
-- **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh` — ~50% fewer tokens. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
+- **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh`. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
 - **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
 - **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in).
-- **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Effect-TS code** (project depends on `effect`; writing/refactoring workflows, services, layers, schemas, `Config`, `Schedule`, `Cache`, `Stream`, `HttpClient`, or Effect tests) → load the `effect` skill BEFORE writing code, and read only the branch references the task matches. Requires Effect v4 — on v3 or older, skip it and follow the project's own conventions.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
