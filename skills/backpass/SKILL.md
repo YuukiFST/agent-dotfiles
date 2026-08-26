@@ -42,8 +42,14 @@ They compose: audit shapes the file, backpass keeps it honest.
 
 1. `acpx` on PATH (`npm i -g acpx`) — backpass drives the model through your existing harness
    login, not an API key. Without it the run exits with `error acpx not found on PATH`.
-2. Node 22+.
-3. Sessions on disk for this repo. `npx -y backpass scan` prints how many; under ~10 the batch
+2. Node 22.5+ (`engines: >=22.5.0`).
+3. **Windows:** backpass 0.1.4 spawns `acpx` with no `shell`, and Node 22 refuses to spawn an
+   npm `.cmd` shim. A bare name gives `error acpx not found on PATH`; pointing
+   `BACKPASS_ACPX_BIN` at `acpx.cmd` gives `spawn EINVAL`. Until upstream passes `shell` on
+   win32, the run needs a local patch to `node_modules/backpass/src/subprocess.js` adding
+   `shell: process.platform === "win32"` to the `spawn` call, plus `BACKPASS_ACPX_BIN=acpx.cmd`.
+   Re-apply after every upgrade until the fix lands. Unix needs none of this.
+4. Sessions on disk for this repo. `npx -y backpass scan` prints how many; under ~10 the batch
    is too small to separate pattern from noise — wait and run later.
 
 ## Run a gradient step
