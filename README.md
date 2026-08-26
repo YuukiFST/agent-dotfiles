@@ -6,9 +6,9 @@ fewer tokens, write better code, verify it works.
 | Path | What |
 |------|------|
 | `CLAUDE.md` | Global instructions, loaded every session |
-| `rules/` | Conditional rule files the instructions point at (git, code quality, memory, prompting) |
+| `rules/` | Conditional rule files the instructions point at (git, code quality, prompting, agent workflow) |
 | `skills/` | Active skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
-| `stacks/frontend/` | Archived frontend design pipeline (26 skills + `frontend.md` rule) — not loaded by default |
+| `stacks/` | Archived config, kept but not loaded: `frontend/` (26-skill UI pipeline), `memory/` (memory system + dreaming). See [`stacks/README.md`](stacks/README.md) |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one script per harness |
 | `pi/`, `agent-browser/`, `portless/` | Per-tool config |
@@ -37,7 +37,7 @@ Installed separately, not by these scripts:
 
 ## Skills
 
-Active skills live flat in `skills/`. The **frontend design pipeline** (26 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI. `agent-browser` and `webapp-testing` stay active. Re-enable: `bash scripts/enable-frontend-stack.sh` + paste `stacks/frontend/CLAUDE-snippet.md` into `CLAUDE.md`.
+Active skills live flat in `skills/`. The **frontend design pipeline** (26 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI; `agent-browser` and `webapp-testing` stay active. Re-enable any stack with `bash scripts/stack.sh enable <name>` + paste its `CLAUDE-snippet.md` into `CLAUDE.md`.
 
 | Category | Highlights |
 |----------|-----------|

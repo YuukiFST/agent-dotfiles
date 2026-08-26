@@ -41,7 +41,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
 - **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in).
-- **Cross-session memory, or 5+ sessions deep** → `~/.claude/rules/memory-system.md` (file taxonomy, write threshold, dreaming). Store: harness memory dir (`MEMORY.md` index) on Claude Code. Never dream during active dev; >30 complex turns → suggest fresh session.
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Effect-TS code** (project depends on `effect`; writing/refactoring workflows, services, layers, schemas, `Config`, `Schedule`, `Cache`, `Stream`, `HttpClient`, or Effect tests) → load the `effect` skill BEFORE writing code, and read only the branch references the task matches. Requires Effect v4 — on v3 or older, skip it and follow the project's own conventions.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.

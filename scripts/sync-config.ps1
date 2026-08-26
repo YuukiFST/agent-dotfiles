@@ -1,5 +1,6 @@
 #!/usr/bin/env pwsh
-# Copy config (CLAUDE.md, dreaming.md, skills/, rules/) from this repo into ~/.claude.
+# Copy config (CLAUDE.md, skills/, rules/, plus any root payload an active stack adds)
+# from this repo into ~/.claude.
 # Shared by setup-claude.ps1 and update-claude.ps1 so "git pull + update" always propagates config.
 $ErrorActionPreference = "Stop"
 
@@ -8,7 +9,15 @@ $Claude = Join-Path $env:USERPROFILE ".claude"
 New-Item -ItemType Directory -Force -Path "$Claude\skills", "$Claude\rules" | Out-Null
 
 Copy-Item "$Repo\CLAUDE.md" "$Claude\CLAUDE.md" -Force
-Copy-Item "$Repo\dreaming.md" "$Claude\dreaming.md" -Force
+
+# dreaming.md ships with the memory stack (stacks/memory/root/) - present only while
+# that stack is enabled, so a stale copy has to go when it is not.
+$dreaming = Join-Path $Repo "dreaming.md"
+if (Test-Path $dreaming) {
+  Copy-Item $dreaming "$Claude\dreaming.md" -Force
+} elseif (Test-Path "$Claude\dreaming.md") {
+  Remove-Item "$Claude\dreaming.md" -Force
+}
 
 # Per-skill replace: prunes files removed/renamed inside a repo skill, keeps local-only skills
 Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Copy config (CLAUDE.md, dreaming.md, skills/, rules/) from this repo into harness dirs.
+# Copy config (CLAUDE.md, skills/, rules/, plus any root payload an active stack adds)
+# from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
 # Usage: sync-config.sh claude|cursor|pi
 set -euo pipefail
@@ -14,14 +15,15 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
     rm -rf "${1:?}/$name"
     cp -r "$s" "$1/$name"
   done
-  # Prune archived stacks (e.g. frontend) so they do not stay in the live harness.
-  if [ -d "$repo/stacks/frontend/skills" ]; then
-    for s in "$repo"/stacks/frontend/skills/*/; do
-      [ -d "$s" ] || continue
-      name="$(basename "$s")"
+  # Prune every archived stack so it does not stay in the live harness. A stack that
+  # is enabled also has its skills in skills/ above, so it is skipped here.
+  for archived in "$repo"/stacks/*/skills/*/; do
+    [ -d "$archived" ] || continue
+    name="$(basename "$archived")"
+    if [ ! -d "$repo/skills/$name" ]; then
       rm -rf "${1:?}/$name"
-    done
-  fi
+    fi
+  done
   # Skills deleted from the repo — see skills/REMOVED.txt for why the list has to exist.
   if [ -f "$repo/skills/REMOVED.txt" ]; then
     while IFS= read -r line; do
@@ -150,7 +152,13 @@ case "$target" in
     claude="$HOME/.claude"
     mkdir -p "$claude"
     cp "$repo/CLAUDE.md" "$claude/CLAUDE.md"
-    cp "$repo/dreaming.md" "$claude/dreaming.md"
+    # dreaming.md ships with the memory stack (stacks/memory/root/): present only
+    # while that stack is enabled, so a stale copy has to go when it is not.
+    if [ -f "$repo/dreaming.md" ]; then
+      cp "$repo/dreaming.md" "$claude/dreaming.md"
+    else
+      rm -f "$claude/dreaming.md"
+    fi
     sync_skills "$claude/skills"
     sync_shared
     ;;
