@@ -27,7 +27,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Code rules (override model defaults)
 
-- **Before a helper:** grep for the canonical one. Duplicating an existing helper is a failure, not a nit.
+- **Before a helper:** grep for the canonical one, reuse it.
 - **File > 500 lines = decompose first**, don't append.
 - **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
 - **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
@@ -35,7 +35,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Tools (machine-specific)
 
-- **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh` — ~50% fewer tokens. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
+- **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh`. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
 - **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
