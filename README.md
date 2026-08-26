@@ -8,7 +8,7 @@ fewer tokens, write better code, verify it works.
 | `CLAUDE.md` | Global instructions, loaded every session |
 | `rules/` | Conditional rule files the instructions point at (git, code quality, prompting, agent workflow) |
 | `skills/` | Active skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
-| `stacks/` | Archived config, kept but not loaded: `frontend/` (26-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill). See [`stacks/README.md`](stacks/README.md) |
+| `stacks/` | Archived config, kept but not loaded: `frontend/` (30-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill). See [`stacks/README.md`](stacks/README.md) |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one script per harness |
 | `pi/`, `agent-browser/`, `portless/` | Per-tool config |
@@ -37,7 +37,7 @@ Installed separately, not by these scripts:
 
 ## Skills
 
-Active skills live flat in `skills/`. The **frontend design pipeline** (26 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI; `agent-browser` and `webapp-testing` stay active. Re-enable any stack with `bash scripts/stack.sh enable <name>` + paste its `CLAUDE-snippet.md` into `CLAUDE.md`.
+Active skills live flat in `skills/`. The **frontend design pipeline** (30 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI; `agent-browser` and `webapp-testing` stay active. Re-enable any stack with `bash scripts/stack.sh enable <name>` + paste its `CLAUDE-snippet.md` into `CLAUDE.md`.
 
 | Category | Highlights |
 |----------|-----------|
@@ -46,7 +46,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (26 skill
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
-| **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, `better-ui`/`better-colors`/`better-typography`, `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
+| **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, the `better-*` set (`ui`, `colors`, `typography`, `accessibility`, `interface`, `layout`, `writing`), `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `backpass`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | archived in `stacks/effect/` — `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
 
