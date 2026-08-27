@@ -31,8 +31,5 @@ jobs:
       # exactly the two files that gate every commit and push.
       # -x follows the sourced validate-commit-message.sh instead of reporting
       # SC1091 at every call site.
-      # --severity=error is a floor, not the target: the warning-level findings
-      # this repo already carries are catalogued in #11 and severity is raised
-      # back to the default once they are cleared.
       - name: Shellcheck hooks and scripts
-        run: shellcheck -x --severity=error git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push
+        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push

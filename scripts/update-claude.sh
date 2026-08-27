@@ -3,8 +3,6 @@
 # Companion to setup-claude.sh: setup installs, this refreshes to latest.
 set -euo pipefail
 
-bin="$HOME/.local/bin"
-
 echo "[0/3] Config files (skills, rules, CLAUDE.md)"
 "$(dirname "$0")/sync-config.sh" claude
 
@@ -19,6 +17,8 @@ agent-browser install   # refresh the bundled browser driver
 # not a Claude Code dependency.
 
 echo "[3/3] Claude Code plugins"
+# SC2043: single-element loop is intentional extension point (more plugins may be added)
+# shellcheck disable=SC2043
 for p in caveman@caveman; do
   claude plugin update "$p" || true
 done

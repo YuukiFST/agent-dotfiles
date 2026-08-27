@@ -3,7 +3,6 @@
 # Idempotent, and doubles as the updater: re-run it to pull the latest pi.
 set -euo pipefail
 
-repo="$(cd "$(dirname "$0")/.." && pwd)"
 bin="$HOME/.local/bin"
 mkdir -p "$bin"
 
