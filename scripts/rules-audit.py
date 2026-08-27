@@ -115,15 +115,23 @@ def audit(root, since):
                 continue
 
             for line in iter_lines(path):
-                if MCP_CALL.search(line):
-                    stats["mcp_calls"] += 1
-                if '"name":"Bash"' not in line and '"name": "Bash"' not in line:
+                # Substring pre-filter first: JSON-parsing every line of a 595 MB
+                # corpus to reach the few that carry a tool call is the slow path.
+                has_mcp = bool(MCP_CALL.search(line))
+                has_bash = '"name":"Bash"' in line or '"name": "Bash"' in line
+                if not has_mcp and not has_bash:
                     continue
                 try:
                     rec = json.loads(line)
                 except ValueError:
                     continue
+                # --since gates every counter, MCP included: a count that ignored the
+                # window would not be comparable to the rest of the run.
                 if (rec.get("timestamp") or "") < since:
+                    continue
+                if has_mcp:
+                    stats["mcp_calls"] += 1
+                if not has_bash:
                     continue
                 sessions.add(rec.get("sessionId"))
                 content = rec.get("message", {}).get("content")
