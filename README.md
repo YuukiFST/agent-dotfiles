@@ -20,13 +20,15 @@ Or open the repo with any agent and ask it to sync — `AGENTS.md` tells it how.
 
 | Machine | Agent | Script |
 |---------|-------|--------|
-| **Windows** | Claude Code | `pwsh -File scripts/setup-claude.ps1` · update: `scripts/update-claude.ps1` |
+| **Windows** (work PC) | Claude Code | `pwsh -File scripts/setup-claude.ps1` · update: `scripts/update-claude.ps1` |
+| **Windows / NixOS** (home) | pi | `bash scripts/setup-pi.sh` |
 | **macOS / Linux** | Claude Code | `bash scripts/setup-claude.sh` · update: `scripts/update-claude.sh` |
-| **NixOS** | Cursor | `bash scripts/setup-cursor.sh` |
-| **NixOS** | pi | `bash scripts/setup-pi.sh` |
+| — | Cursor | `bash scripts/setup-cursor.sh` (no machine uses Cursor today) |
 
-Claude Code gets the full stack; Cursor gets skills + rules;
-pi gets skills + rules + agent config from `pi/`. Restart the agent afterwards.
+Claude Code gets the full stack; pi gets skills + rules + agent config from `pi/`;
+Cursor would get skills + rules. Restart the agent afterwards.
+OpenCode also runs on the home machines and is **not** covered by these scripts —
+its config is maintained by hand. `AGENTS.md` holds the machine-by-machine table.
 
 Installed separately, not by these scripts:
 [rtk](https://github.com/rtk-ai/rtk),

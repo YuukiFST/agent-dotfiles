@@ -11,10 +11,21 @@ this repo. This file is.
 
 ## Machines
 
-| Machine | Harnesses |
-|---------|-----------|
-| Windows (work PC) | Claude Code only |
-| NixOS (home PC) | pi, Cursor |
+| Machine | Harnesses in use | Sync command |
+|---------|------------------|--------------|
+| Windows, work PC | Claude Code CLI | `pwsh -File scripts/sync-config.ps1` |
+| Windows, home PC | pi, OpenCode | `bash scripts/sync-config.sh pi` |
+| NixOS, home PC | pi, OpenCode | `bash scripts/sync-config.sh pi` |
+
+Run only the command for the machine you are on. `sync-config.ps1` writes `~/.claude`;
+`sync-config.sh` writes `~/.agents/skills` and `~/.pi/agent`. A machine that runs the wrong
+one grows a config dir nobody keeps current — that is how the work PC ended up carrying a pi
+install for a harness it never runs (removed 2026-08-26, issue #29).
+
+**Cursor** is no longer used on any machine. `scripts/setup-cursor.sh` and the Cursor notes
+stay because the config is still correct, not because a machine consumes them.
+**OpenCode** runs on both home machines and this repo has no sync path for it: its config is
+maintained by hand, outside here.
 
 ## How to reach parity
 
