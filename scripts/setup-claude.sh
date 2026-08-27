@@ -2,7 +2,6 @@
 # Claude Code harness setup (Linux/macOS). Run from a clone of this repo.
 set -euo pipefail
 
-repo="$(cd "$(dirname "$0")/.." && pwd)"
 claude="$HOME/.claude"
 bin="$HOME/.local/bin"
 mkdir -p "$claude/skills" "$claude/rules" "$bin"

@@ -4,8 +4,6 @@
 # official AppImage, so install it declaratively and run this for config only.
 set -euo pipefail
 
-repo="$(cd "$(dirname "$0")/.." && pwd)"
-
 echo "[1/2] Config files (skills, rules)"
 "$(dirname "$0")/sync-config.sh" cursor
 

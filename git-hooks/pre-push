@@ -10,6 +10,8 @@ source "$HOOK_DIR/validate-commit-message.sh"
 zero="0000000000000000000000000000000000000000"
 failed=0
 
+# SC2034: local_ref/remote_ref are positional fields of git pre-push protocol (local_ref local_sha remote_ref remote_sha), intentionally unused
+# shellcheck disable=SC2034
 while read -r local_ref local_sha remote_ref remote_sha; do
   [ -n "${local_sha:-}" ] || continue
 
