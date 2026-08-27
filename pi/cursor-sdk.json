@@ -1,6 +1,14 @@
 {
   "fastDefaults": {
     "composer-2.5": false,
-    "composer-2-5": false
+    "composer-2-5": false,
+    "composer-2": false,
+    "composer": false,
+    "composer-latest": false,
+    "grok-4.6": false,
+    "grok-4-6": false,
+    "grok-4.5": false,
+    "grok-4-5": false,
+    "grok": false
   }
 }

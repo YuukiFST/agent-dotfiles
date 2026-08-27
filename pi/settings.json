@@ -5,19 +5,17 @@
     "npm:@howaboua/pi-cache-hit-predictor",
     {
       "source": "npm:pine-of-glass",
-      "extensions": [
-        "+extensions/pi-contextimate"
-      ]
+      "extensions": ["+extensions/pi-contextimate"]
     },
     "npm:pi-codex-goal"
   ],
   "theme": "github-dark-default",
-  "defaultProvider": "cursor",
-  "defaultModel": "grok-4.6",
+  "defaultProvider": "opencode",
+  "defaultModel": "muse-spark-1.2-contributor-free",
   "enabledModels": [
+    "muse-spark-1.2-contributor-free",
     "grok-4.6",
-    "composer-2.5",
-    "muse-spark-1.2-contributor-free"
+    "composer-2.5"
   ],
   "defaultThinkingLevel": "high"
 }
