@@ -26,7 +26,7 @@ bash scripts/sync-config.sh claude     # or cursor / pi — propagates either di
 ```
 
 `enable` copies, so the archive stays the inventory of what belongs to the stack; `disable` moves, so edits made while the stack was live come back with it.
-`CLAUDE-snippet.md` is the one manual step in both directions: paste it under `## Conditional rules` when enabling, delete those lines when disabling.
+`CLAUDE-snippet.md` is the one manual step in both directions: paste it under `## Rule files` when enabling, delete those lines when disabling.
 
 ## Current stacks
 
