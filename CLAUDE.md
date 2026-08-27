@@ -14,13 +14,12 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 ## Working method
 
 - State assumptions; if ambiguous, ask before coding. Surface tradeoffs, don't pick silently.
-- **Skills:** a skill fits the task at hand (`ls ~/.claude/skills`, `~/.agents/skills` on pi) → invoke it by judgement, one at a time. There is no mandated chain to run through.
 - Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
 - Turn tasks into verifiable goals; refactors keep existing tests green before and after.
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
-- See a lint/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
+- See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
 - **Repeat issue → automate, don't re-fix:** same class of problem seen twice (style, API misuse, missing check) → propose a lint rule, CI step, or hook that kills the class forever; never rely on fixing it per-occurrence.
 - **Review rejection = missing rule:** a PR rejected for an unwritten convention means the convention gets encoded (CLAUDE.md, lint, skill) as part of resolving the rejection.
@@ -28,11 +27,18 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Code rules (override model defaults)
 
+The reader is an LLM: token cost, tool-call latency and output quality are technical constraints here, not style opinions.
+
 - **Before a helper:** grep for the canonical one, reuse it.
-- **File > 500 lines = decompose first**, don't append.
+- **File > 500 lines = decompose first**, don't append. SRP, small functions: three 250-line modules beat one 800-line file doing three things.
+- **Flatten control flow:** early returns / guard clauses; cap ~2 indent levels.
 - **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
 - **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
-- **Tests:** regression test per bugfix. Mock external I/O with named fakes.
+- **Inject dependencies** (constructor/parameter) so a named fake swaps in without infra.
+- **Tests:** regression test per bugfix. Mock external I/O with named fakes. Headless, one command — no manual seed, missing config, or secret.
+- **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`); never spend a turn on formatting.
+- **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
+- **Defensive code is opt-in:** no retry/backoff, timeout, circuit-breaker, rate-limit, or fallback unless the project names the categories it needs.
 
 ## Tools (machine-specific)
 
@@ -41,6 +47,5 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
-- **Writing or refactoring code beyond a trivial fix** → `~/.claude/rules/code-quality.md` (SRP, flat control flow, DI, headless tests, formatter, structured logs, defensive-code-opt-in).
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
