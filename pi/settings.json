@@ -13,12 +13,11 @@
   ],
   "theme": "github-dark-default",
   "defaultProvider": "cursor",
-  "defaultModel": "grok-4.5",
+  "defaultModel": "grok-4.6",
   "enabledModels": [
-    "grok-4.5",
+    "grok-4.6",
     "composer-2.5",
-    "deepseek-v4-flash-free",
-    "mimo-v2.5-free"
+    "muse-spark-1.2-contributor-free"
   ],
   "defaultThinkingLevel": "high"
 }
