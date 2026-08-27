@@ -107,7 +107,7 @@ Per-repo hook copy (`install-git-hooks.sh`) is optional fallback only — global
 4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified. Open it as a draft if the work spans sessions.
 5. **Review before merge — always.** Run `autoreview` on the diff and post the findings **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CLAUDE.md: a lint/test failure found along the way gets fixed).
-7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (`agent-best-practices.md` §Before coding). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
+7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
 8. **Delete the branch after merge.** The issue closes itself via `Closes #`.
 
 ### 5.2 Practices that apply regardless of any metric
