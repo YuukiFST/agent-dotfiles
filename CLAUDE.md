@@ -14,6 +14,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 ## Working method
 
 - State assumptions; if ambiguous, ask before coding. Surface tradeoffs, don't pick silently.
+- **Skills:** a skill fits the task at hand (`ls ~/.claude/skills`, `~/.agents/skills` on pi) → invoke it by judgement, one at a time. There is no mandated chain to run through.
 - Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
 - Turn tasks into verifiable goals; refactors keep existing tests green before and after.
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
