@@ -73,7 +73,8 @@ What the scripts propagate:
   `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
 - Commits: English, Conventional Commits, no AI attribution of any kind
   (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
-  See `rules/git.md` and `git-hooks/`.
+  See `rules/git.md` and `git-hooks/`. The issue → branch → PR → review → merge flow
+  lives in the `git-workflow` skill, not in the rule file.
 - Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
   Customize → Rules manually after edits.
 - agent-browser deep dive: `agent-browser/setup-nixos-pi.md` (NixOS install, terminal

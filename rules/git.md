@@ -36,16 +36,21 @@ Rules:
 
 Scope the confirmation to what is actually risky — who else is standing on the branch.
 
-**Push without asking** — a personal feature branch (`<type>/<issue>-<slug>`) that nobody else has pulled. It cannot reach `main` without a PR (§5), the PR is the review gate, and stopping to confirm every branch push turns a one-line fix into several round trips.
+**Push without asking** — a personal feature branch (`<type>/<issue>-<slug>`) that nobody else has pulled. It cannot reach `main` without a PR, the PR is the review gate, and stopping to confirm every branch push turns a one-line fix into several round trips.
 
 **Ask first** — anything landing on or rewriting a branch other people or other agent sessions build on:
 
 - `main`/`master` or any shared/long-lived branch, including a fast-forward
-- any force-push, on any branch, even your own (§5.2)
+- any force-push, on any branch, even your own
 - pushing tags, or anything that triggers a release or deploy
 - the first push of a branch to a repo you do not own
 
 Uncertain whether a branch is shared? Ask. The rule narrows the confirmation, it does not remove it: no path exists where an agent writes to `main` unattended.
+
+Two prohibitions that hold regardless:
+
+- **Never force-push a shared branch.** Rewriting a branch someone else (or another agent session) has pulled destroys their work. `--force-with-lease` on your own unmerged branch only.
+- **Undo a merged mistake with `git revert`, never by rewriting `main`.** The bad commit stays in history; that is the point.
 
 ## 4. No AI attribution
 
@@ -74,61 +79,12 @@ The generic terms `IA`, `AI`, `agente` and `LLM` are **subjects, not attribution
 
 Regression tests for these cases live in `git-hooks/test-validate-commit-message.sh`; run it after touching the patterns.
 
-### 4.3 Enforcement (what actually works)
+### 4.3 Enforcement
 
-**Cursor injects `Co-authored-by` after `git commit`.** `commit-msg` alone does not stop that. Enforcement is:
+The `commit-msg` hook alone does not stop it: Cursor injects `Co-authored-by` *after* `git commit`, so in Cursor commit with `scripts/git-safe-commit.sh`, never `git commit`. The real gate is `pre-push`, which blocks any push carrying a forbidden trailer. Hook installation, the `git-safe-commit` invocation, and how to rebuild a commit that already went bad: the `git-workflow` skill.
 
-1. **Global hooks** — `scripts/install-global-git-hooks.sh` sets `core.hooksPath` to `git-hooks/` (runs from every `sync-config.sh`).
-2. **`pre-push`** — blocks push if any outgoing commit contains forbidden trailers (the real gate).
-3. **`git-safe-commit.sh`** — agents in Cursor MUST use this instead of `git commit`:
+## 5. Shipping a change
 
-```bash
-/path/to/my-harness-config/scripts/git-safe-commit.sh \
-  --author "Name <email>" \
-  -m "type(scope): subject"
-```
+The issue → branch → PR → review → merge flow, squash-vs-merge, forks vs standalone repos, and the GitHub contribution conditions live in the **`git-workflow` skill**. Load it before the first commit of a change, not at merge time.
 
-It builds the commit with `git commit-tree` (Cursor does not intercept). Author and committer are the same.
-
-If a bad commit already exists, rebuild with `git commit-tree` + `git update-ref` and a clean message file.
-
-Per-repo hook copy (`install-git-hooks.sh`) is optional fallback only — global `core.hooksPath` is the default.
-
-
-## 5. Development workflow — issue → branch → PR → review → merge
-
-**Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
-
-### 5.1 The flow
-
-1. **Issue first.** Before writing code, open an issue stating the problem and the acceptance criteria — not the solution. `gh-axi issue create`. Label it (`bug`, `feat`, `chore`). Skip only for pure formatting runs.
-2. **Branch per issue.** `<type>/<issue-number>-<slug>` — `feat/42-dashboard-consumo`, `fix/57-token-expiry`. Types match Conventional Commits (§2).
-3. **Atomic commits.** One logical change per commit, Conventional Commits format (§2). Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected. Read the diff before committing it, not after.
-4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified. Open it as a draft if the work spans sessions.
-5. **Review before merge — always.** Run `autoreview` on the diff and post the findings **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
-6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CLAUDE.md: a lint/test failure found along the way gets fixed).
-7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
-8. **Delete the branch after merge.** The issue closes itself via `Closes #`.
-
-### 5.2 Practices that apply regardless of any metric
-
-- **Never force-push a shared branch.** Rewriting a branch someone else (or another agent session) has pulled destroys their work. `--force-with-lease` on your own unmerged branch only.
-- **Undo a merged mistake with `git revert`, never by rewriting `main`.** The bad commit stays in history; that is the point.
-- **Small PRs.** One issue, one concern. A 40-file PR gets rubber-stamped, which is the same as no review.
-- **Own work lives in standalone repos.** Fork only to contribute upstream.
-- **Upstream contributions are the highest-value work here** — PRs and reviews on other people's repos get real review from someone who is not you.
-
-### 5.3 Documented GitHub conditions the flow has to respect
-
-Verified against [Profile contributions reference](https://docs.github.com/en/account-and-profile/reference/profile-contributions-reference). These are constraints on the repo setup, not reasons to do extra work:
-
-- Issues, pull requests and discussions register only when opened **in a standalone repository, not a fork**.
-- Commits register only when **all** of: the author e-mail is associated with the GitHub account; the repo is standalone, not a fork; the commit is on the **default branch or `gh-pages`**; and you are a collaborator/org member, forked it, or opened a PR or issue in it.
-
-The e-mail condition binds directly to §1: committing under an identity that is not linked to the account silently detaches every commit from it. Verify the identity before the first commit in a repo.
-
-Not documented either way: whether a review you submit on **your own** PR registers. Do not build any assumption on it — §5.1 step 5 stands on the review being recorded where a human can read it, not on what it registers as.
-
-### 5.4 Why this shape
-
-Traceability from issue to commit, a reviewable unit before code reaches `main`, a bisectable history. A legible public record is a by-product, never a goal: it does not justify splitting one change across five PRs, opening issues nobody will act on, or padding commit counts. If a step stops serving the code, drop the step.
+Sections 1-4 above are not in that skill and are not optional: they apply to every commit, whether or not the flow is being followed.
