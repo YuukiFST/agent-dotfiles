@@ -49,6 +49,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (31 skill
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder` (+ `setup-matt-pocock-skills`, its per-repo bootstrap), `handoff` |
+| **Git** | `git-workflow` — the issue → branch → PR → review → merge flow. The safety half (identity, push confirmation, no-AI-attribution) stays always-loaded in `rules/git.md` |
 | **Frontend & design** | archived in `stacks/frontend/` — `impeccable`, the jakubkrehel set (`interface-review` + `better-ui`/`colors`/`typography`/`accessibility`/`interface`/`layout`/`writing`), `apple-design`, `animate`/`improve-animations`, `transitions-dev`, `tailwind-v4-shadcn`, image-gen skills (+13 more) |
 | **Research & authoring** | `storm-research`, `research`, `teach`, `backpass`, `writing-for-agents`, [`no-ai-slop`](https://github.com/petergyang/no-ai-slop) |
 | **Libraries & system** | archived in `stacks/effect/` — `effect` ([kitlangton/skills](https://github.com/kitlangton/skills/tree/main/skills/effect)) |
