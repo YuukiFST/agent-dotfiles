@@ -91,6 +91,8 @@ The map is an **index**, not a store. It lists the decisions made and points at 
 
 **Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Consult the tracker doc's **"Wayfinding operations"** section for how _this_ repo expresses them, substituting the `helmsman:` label prefix for `wayfinder:` throughout — the mechanics are identical. If no tracker has been provided, run `/setup-matt-pocock-skills`, or default to the local-markdown tracker.
 
+Take the **mechanics** from that section and nothing else. The labels are this skill's: the tracker doc predates helmsman, so it knows neither the audience label nor `decision`, and [Ticket methods](#ticket-methods) below is the authoritative set.
+
 ### The map body
 
 The whole map at low resolution, loaded once per session. Open `dev` tickets are **not** listed — they are open child issues, found by query.
