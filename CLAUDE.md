@@ -19,7 +19,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
-- See a lint/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
+- See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
 - **Repeat issue → automate, don't re-fix:** same class of problem seen twice (style, API misuse, missing check) → propose a lint rule, CI step, or hook that kills the class forever; never rely on fixing it per-occurrence.
 - **Review rejection = missing rule:** a PR rejected for an unwritten convention means the convention gets encoded (CLAUDE.md, lint, skill) as part of resolving the rejection.
