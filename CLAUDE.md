@@ -19,10 +19,12 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
+- **Git history is an investigation tool:** unfamiliar code, or "why is this like this" → `git log`/`blame` before theorizing; the history tells the story the current state can't.
 - See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
 - **Repeat issue → automate, don't re-fix:** same class of problem seen twice (style, API misuse, missing check) → propose a lint rule, CI step, or hook that kills the class forever; never rely on fixing it per-occurrence.
 - **Review rejection = missing rule:** a PR rejected for an unwritten convention means the convention gets encoded (CLAUDE.md, lint, skill) as part of resolving the rejection.
+- **Paragraph-long comment = code is wrong:** an agent writing a long comment to justify a stub or a shortcut is hiding incorrect code. Flag the comment; don't accept the explanation.
 - README leads with the problem it solves (one sentence, top); stack/architecture go in `docs/`.
 
 ## Code rules (override model defaults)
@@ -47,5 +49,5 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 
 ## Conditional rules (read the file only when the task matches, otherwise skip)
 
-- **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`. Agent workflow strategies: `~/.claude/rules/agent-best-practices.md`.
+- **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.

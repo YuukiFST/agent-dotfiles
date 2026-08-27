@@ -31,6 +31,11 @@ Good: "Read `calculateTotal` in `src/billing.ts`. Trace negative quantity throug
 
 Specify: exact format (JSON schema / XML tags), required vs optional fields, error format, stop conditions.
 
+## Building an agentic task
+
+- **Split the monolith.** A complex agentic task runs better as isolated specialized prompts (generate → evaluate → repair) than one prompt doing everything — fewer tokens, lower latency, each step repeatable.
+- **Three levers, not one.** When prompting stops improving the result, adjust the *model* (bigger/reasoning), *thinking* (adaptive/extended), or *harness* (give a tool, split the loop) — not just the prompt text.
+
 ## Debugging prompts
 
 - **Extended thinking transcript:** read the model's reasoning to find where it went wrong. Bake the correct path into the prompt.

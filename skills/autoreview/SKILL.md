@@ -111,7 +111,7 @@ Same recipe in every harness: (1) build the diff bundle, (2) hand bundle + this 
 
 **Pi** — dispatch a subagent, or start a fresh session with the diff bundle + this Contract as the prompt, output restricted to findings only.
 
-If the harness has no subagent mechanism available, do the review inline in a dedicated pass: re-read the full diff with fresh adversarial eyes, assume the code is wrong, and apply the Contract — but prefer a separate context whenever one exists, since same-context review inherits the implementer's bias.
+If the harness has no subagent mechanism available, do the review inline in a dedicated pass: re-read the full diff with fresh adversarial eyes, assume the code is wrong, and apply the Contract — but prefer a separate context whenever one exists, since same-context review inherits the implementer's bias (source: the Bun Zig→Rust rewrite, https://bun.com/blog/bun-in-rust).
 
 Note: upstream autoreview refuses Cursor as an isolated *reviewer engine* (its CLI can't sandbox the review). That doesn't apply here — in this skill Cursor acts as the *host harness* running the review, a different role.
 
