@@ -19,7 +19,7 @@ Interface review is not one of them: `interface-review` and `better-interface` a
 
 1. Copy skills: `cp -r stacks/frontend/skills/* skills/`
 2. Copy rule: `cp stacks/frontend/rules/frontend.md rules/`
-3. Paste `CLAUDE-snippet.md` lines into `CLAUDE.md` under `## Conditional rules`
+3. Paste `CLAUDE-snippet.md` lines into `CLAUDE.md` under `## Rule files`
 4. Sync: `bash scripts/sync-config.sh pi` (or `claude` / `cursor`)
 
 Or run: `bash scripts/stack.sh enable frontend`

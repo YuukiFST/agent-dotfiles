@@ -16,7 +16,7 @@ No project on this machine depends on `effect`. Until one does, the skill frontm
 
 ```bash
 bash scripts/stack.sh enable effect
-# paste stacks/effect/CLAUDE-snippet.md into CLAUDE.md under ## Conditional rules
+# paste stacks/effect/CLAUDE-snippet.md into CLAUDE.md under ## Rule files
 bash scripts/sync-config.sh claude
 ```
 

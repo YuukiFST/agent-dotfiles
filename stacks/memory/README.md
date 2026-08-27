@@ -18,7 +18,7 @@ What is archived is the curation discipline layered on top of it.
 
 ```bash
 bash scripts/stack.sh enable memory
-# paste stacks/memory/CLAUDE-snippet.md into CLAUDE.md under ## Conditional rules
+# paste stacks/memory/CLAUDE-snippet.md into CLAUDE.md under ## Rule files
 bash scripts/sync-config.sh claude
 ```
 

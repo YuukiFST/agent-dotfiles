@@ -6,12 +6,12 @@ fewer tokens, write better code, verify it works.
 | Path | What |
 |------|------|
 | `CLAUDE.md` | Global instructions, loaded every session |
-| `rules/` | Conditional rule files the instructions point at (git, prompting) |
+| `rules/` | Rule files (git, prompting). Claude Code loads every `.md` here at launch unless it carries `paths:` frontmatter — they are not lazy |
 | `skills/` | Active skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
 | `stacks/` | Archived config, kept but not loaded: `frontend/` (31-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill). See [`stacks/README.md`](stacks/README.md) |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one script per harness |
-| `docs/` | Reference notes, never loaded into a session: [vendored skills](docs/vendored-skills.md), [agent workflow notes](docs/agent-workflow-notes.md) |
+| `docs/` | Reference notes, never loaded into a session: [vendored skills](docs/vendored-skills.md), [agent workflow notes](docs/agent-workflow-notes.md), [rules adherence baseline](docs/rules-audit-baseline.md) |
 | `pi/`, `agent-browser/`, `portless/` | Per-tool config |
 
 ## Install
