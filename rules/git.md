@@ -103,7 +103,7 @@ Per-repo hook copy (`install-git-hooks.sh`) is optional fallback only — global
 
 1. **Issue first.** Before writing code, open an issue stating the problem and the acceptance criteria — not the solution. `gh-axi issue create`. Label it (`bug`, `feat`, `chore`). Skip only for pure formatting runs.
 2. **Branch per issue.** `<type>/<issue-number>-<slug>` — `feat/42-dashboard-consumo`, `fix/57-token-expiry`. Types match Conventional Commits (§2).
-3. **Atomic commits.** One logical change per commit, Conventional Commits format (§2). Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected.
+3. **Atomic commits.** One logical change per commit, Conventional Commits format (§2). Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected. Read the diff before committing it, not after.
 4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified. Open it as a draft if the work spans sessions.
 5. **Review before merge — always.** Run `autoreview` on the diff and post the findings **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CLAUDE.md: a lint/test failure found along the way gets fixed).

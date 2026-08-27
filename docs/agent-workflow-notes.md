@@ -18,7 +18,7 @@ The bullets that were genuinely agent-facing moved into `CLAUDE.md` and `rules/p
 ## Running several at once
 
 - **Shared state is already there.** Multiple sessions read and write the same store under `~/.claude/projects/<slug>/memory/`. No other coordination mechanism is needed for agents to hand facts to each other.
-- **Independent tasks run in parallel.** Separate terminals, or the `dispatching-parallel-agents` skill.
+- **Independent tasks run in parallel.** Separate terminals, or the `superpowers:dispatching-parallel-agents` skill — it ships with the `superpowers` plugin, not with this repo's `skills/`, so the bare name does not resolve.
 
 ## One dropped on purpose
 
