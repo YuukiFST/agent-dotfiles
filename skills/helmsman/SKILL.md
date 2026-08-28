@@ -231,6 +231,28 @@ Ruling something out of scope is a scoping act, not a step on the route. When an
 
 Three modes.
 
+### The next command
+
+**Every session ends by handing the human the exact next command**, in a fenced block they can copy without editing a character:
+
+```
+/helmsman https://github.com/<owner>/<repo>/issues/42
+```
+
+The map goes in as its **URL**, not its name — this one block is the exception to [Refer by name](#refer-by-name), because a prompt that has to be edited before it runs is a prompt that doesn't get run. Name the map in the sentence above the block instead.
+
+One line above it says what that session will do; one line below says how much of _their_ time it costs. One command, never a menu — choosing it is your job, not theirs.
+
+Pick it from the frontier **as it stands after this session's writes**, not as you found it:
+
+| Frontier | Next command | Their time |
+|---|---|---|
+| an unclaimed `dev` ticket exists | `/helmsman <map url>` | none — start it and walk away |
+| only `po` tickets left | `/helmsman <map url> --review` | ~<n> min, one answer per open question |
+| both empty, fog clear | `/writing-plans` against the map | see [Handing off](#handing-off) |
+
+`dev` work goes first whenever any exists: it costs the human nothing, and it usually shrinks the review that follows by graduating fog into questions worth batching. If you stopped on context rather than on an empty frontier, the next command is still `/helmsman <map url>` — say that it resumes the cascade, and name the ticket it will pick up.
+
 ### 1. Chart the map — `/helmsman <loose idea>`
 
 The one session where the human talks a lot. **Ask them no technical question here** — not one, not as a warm-up, not "just so I know". Every technical question this session raises becomes a ticket you will answer yourself.
@@ -240,7 +262,7 @@ The one session where the human talks a lot. **Ask them no technical question he
 3. **Create the map** (label `helmsman:map`): Destination and Notes filled in, both decision sections empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues — every question the grilling raised, sorted by the product-owner test, plus the technical questions you already know you owe yourself. Then wire blocking edges in a **second pass** (issues need ids before they can reference each other).
 5. **Fire the research subagents.** For each `research` ticket, spin up a `/research` subagent to resolve it in parallel, capturing findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
-6. **Refresh "Waiting on you"** and tell the human, in their language: what the map says, how many questions are theirs, how many are yours, and what to run next.
+6. **Refresh "Waiting on you"** and tell the human, in their language: what the map says, how many questions are theirs, how many are yours. Close with [the next command](#the-next-command) — after charting that is almost always `/helmsman <map url>`, since the technical tickets you just wrote yourself are the frontier.
 
 Charting hand-resolves nothing.
 
@@ -265,7 +287,9 @@ Stop when one of these is true, and only then:
 
 Then refresh **Waiting on you** and report — in the human's language, not the tracker's:
 
-> Decided <n> things this session: <one line each, plain>. <n> questions are waiting on you: <names>. Run `/helmsman <map> --review` when you have <rough time>.
+> Decided <n> things this session: <one line each, plain>. <n> questions are waiting on you: <names>.
+
+Then [the next command](#the-next-command). A cascade that stopped on context resumes with the same command, so the human's part is to paste it again — that is what keeps a multi-session map moving without them steering it.
 
 ### 3. Review with the human — `/helmsman <map> --review`
 
@@ -274,10 +298,14 @@ Drains **every** open `po` ticket in one conversation, so the human answers a ba
 1. Load the map and query all open `po` tickets. Order them: blockers first, then whatever unblocks the most `dev` tickets.
 2. Work them one at a time in conversation, resolving each per [Resolving a `po` ticket](#resolving-a-po-ticket) before moving to the next. Recording as you go means an interrupted session still banks its answers.
 3. If an answer graduates product fog, ticket it and add it to this session's queue rather than deferring it.
-4. When the queue is empty, refresh **Waiting on you** to empty and tell them what just unblocked: "that unblocks <n> technical questions — run `/helmsman <map>` and I'll work through them."
+4. When the queue is empty, refresh **Waiting on you** to empty and tell them what just unblocked — "that unblocks <n> technical questions, and I'll work through them alone" — then [the next command](#the-next-command). This is the hand-back the whole split exists for: they answered what the system should do, and the block they copy sends the how to a session that doesn't need them.
 
 The human may run modes 2 and 3 in any order, and other sessions may be editing the tracker concurrently.
 
 ## Handing off
 
-When the frontier is empty in both audiences and **Not yet specified** is clear, the way to the destination is visible: every decision is made and recorded. Say so, and invoke `/writing-plans` against the map. The map is the input to the plan, and both decision sections are the constraints the plan must satisfy.
+When the frontier is empty in both audiences and **Not yet specified** is clear, the way to the destination is visible: every decision is made and recorded. Say so, and close with [the next command](#the-next-command) one last time — the map is the input to the plan, and both decision sections are the constraints the plan must satisfy:
+
+```
+/writing-plans https://github.com/<owner>/<repo>/issues/42
+```
