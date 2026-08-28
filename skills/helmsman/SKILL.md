@@ -253,6 +253,8 @@ Pick it from the frontier **as it stands after this session's writes**, not as y
 
 `dev` work goes first whenever any exists: it costs the human nothing, and it usually shrinks the review that follows by graduating fog into questions worth batching. If you stopped on context rather than on an empty frontier, the next command is still `/helmsman <map url>` — say that it resumes the cascade, and name the ticket it will pick up.
 
+One case overrides the table: a session that stopped because a resolution **contradicts a product decision** hands over `--review` even with `dev` tickets left on the frontier. Only the human can lift that contradiction, and pointing them back at the cascade would walk it straight into the same wall.
+
 ### 1. Chart the map — `/helmsman <loose idea>`
 
 The one session where the human talks a lot. **Ask them no technical question here** — not one, not as a warm-up, not "just so I know". Every technical question this session raises becomes a ticket you will answer yourself.
