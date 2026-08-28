@@ -52,7 +52,10 @@ What the scripts propagate:
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
-- `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk)
+- `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk).
+  `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel`
+  apply on first install only — sync never overwrites a live choice. `enabledModels`, `theme`,
+  and `packages` always converge from the repo.
 - tools (setup scripts only): rtk, portless,
   agent-browser (+ Chrome), gh-axi
 
@@ -71,6 +74,8 @@ What the scripts propagate:
 - Config is edited HERE and propagated by scripts — never patch `~/.claude`,
   `~/.agents` directly (except files documented as seeds:
   `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
+  For pi, `defaultProvider` / `defaultModel` / `defaultThinkingLevel` in the live
+  `~/.pi/agent/settings.json` are also machine-owned after the first sync.
 - Commits: English, Conventional Commits, no AI attribution of any kind
   (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
   See `rules/git.md` and `git-hooks/`. The issue → branch → PR → review → merge flow

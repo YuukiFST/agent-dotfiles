@@ -65,12 +65,19 @@ from pathlib import Path
 seed_path = Path(sys.argv[1])
 live_path = Path(sys.argv[2])
 seed = json.loads(seed_path.read_text())
+fresh = not live_path.exists()
 live: dict = {}
 if live_path.exists():
     live = json.loads(live_path.read_text())
 
-for key in ("theme", "defaultProvider", "defaultModel", "enabledModels", "defaultThinkingLevel"):
+# Repo-owned keys — always converge on sync.
+for key in ("theme", "enabledModels"):
     if key in seed:
+        live[key] = seed[key]
+
+# Machine-specific keys — seed a fresh install only; never overwrite a live choice.
+for key in ("defaultProvider", "defaultModel", "defaultThinkingLevel"):
+    if key in seed and (fresh or key not in live):
         live[key] = seed[key]
 
 packages: list = []
@@ -93,6 +100,7 @@ PY
     cp -r "$ext/." "$agent/extensions/$name/"
   done
 
+  # settings.json packages only — never installs archived stacks/ (see stacks/README.md).
   if command -v pi >/dev/null 2>&1; then
     for pkg in $(python3 - "$pi_src/settings.json" <<'PY'
 import json
