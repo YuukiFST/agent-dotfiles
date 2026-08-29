@@ -9,4 +9,5 @@
 # has synced past its removal.
 
 claude-md-auditor
+effect
 prove
