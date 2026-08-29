@@ -46,6 +46,7 @@ What the scripts propagate:
 - `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
 - `stacks/` → nothing: archived config, pruned from live dirs. Enable with `scripts/stack.sh enable <name>` (see `stacks/README.md`)
 - `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs.
+  `sync-config.sh pi` and `cursor` also prune stale copies under `~/.claude/skills` when that dir exists.
   The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
   skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
