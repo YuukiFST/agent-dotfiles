@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -17,8 +17,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 const PROVIDER_ID = "opencode";
 const AGENT = "build";
 
-// All free models exposed via `opencode models` + legacy deepseek alias.
-// Keep metadata in sync with ~/.pi/agent/models-store.json where possible.
+// Keep in sync with `opencode models` — stale IDs fail with exit code 1.
 const OPENCODE_MODELS: Array<{
   id: string;
   name: string;
@@ -28,22 +27,6 @@ const OPENCODE_MODELS: Array<{
   maxTokens: number;
 }> = [
   {
-    id: "deepseek-v4-flash-free",
-    name: "DeepSeek V4 Flash Free",
-    reasoning: true,
-    input: ["text"],
-    contextWindow: 300000,
-    maxTokens: 16384,
-  },
-  {
-    id: "muse-spark-1.2-contributor-free",
-    name: "Muse Spark 1.2 Free",
-    reasoning: true,
-    input: ["text", "image"],
-    contextWindow: 1048576,
-    maxTokens: 131072,
-  },
-  {
     id: "big-pickle",
     name: "Big Pickle",
     reasoning: true,
@@ -52,36 +35,36 @@ const OPENCODE_MODELS: Array<{
     maxTokens: 32000,
   },
   {
-    id: "hy3-free",
-    name: "Hy3 Free",
+    id: "deepseek-v4-flash-free",
+    name: "DeepSeek V4 Flash Free",
     reasoning: true,
     input: ["text"],
-    contextWindow: 190000,
-    maxTokens: 64000,
+    contextWindow: 300000,
+    maxTokens: 16384,
   },
   {
-    id: "mimo-v2.5-free",
-    name: "MiMo V2.5 Free",
+    id: "minimax-m2.5-free",
+    name: "MiniMax M2.5 Free",
     reasoning: true,
-    input: ["text", "image"],
+    input: ["text"],
     contextWindow: 200000,
     maxTokens: 32000,
   },
   {
-    id: "nemotron-3-ultra-free",
-    name: "Nemotron 3 Ultra Free",
+    id: "nemotron-3-super-free",
+    name: "Nemotron 3 Super Free",
     reasoning: true,
     input: ["text"],
     contextWindow: 1000000,
     maxTokens: 128000,
   },
   {
-    id: "nemotron-3.5-lightning-free",
-    name: "Nemotron 3.5 Lightning Free",
+    id: "qwen3.6-plus-free",
+    name: "Qwen 3.6 Plus Free",
     reasoning: true,
-    input: ["text"],
-    contextWindow: 262144,
-    maxTokens: 262144,
+    input: ["text", "image"],
+    contextWindow: 200000,
+    maxTokens: 32000,
   },
 ];
 const SESSION_FILE = path.join(
@@ -155,7 +138,7 @@ function clearSessionID(modelId: string): void {
     if (!data.sessions) return;
     const oldSession = data.sessions[modelId];
     delete data.sessions[modelId];
-    // also clear legacy field if it pointed to the cleared session
+    // also clear stale field if it pointed to the cleared session
     if (data.sessionID && data.sessionID === oldSession) {
       const remaining = Object.values(data.sessions);
       if (remaining.length > 0) {
@@ -184,6 +167,43 @@ function formatContent(
     )
     .filter(Boolean)
     .join("\n");
+}
+
+function waitForSpawn(proc: ChildProcessWithoutNullStreams): Promise<void> {
+  return new Promise((resolve, reject) => {
+    proc.once("error", (error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") {
+        reject(
+          new Error(
+            "opencode CLI not found on PATH. On NixOS: nix profile install nixpkgs#opencode. Else: https://opencode.ai/docs",
+          ),
+        );
+        return;
+      }
+      reject(error);
+    });
+    proc.once("spawn", () => resolve());
+  });
+}
+
+function extractOpenCodeError(stdout: string, stderr: string): string | undefined {
+  for (const line of `${stdout}\n${stderr}`.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      const event = JSON.parse(trimmed) as {
+        type?: string;
+        error?: { data?: { message?: string }; message?: string };
+      };
+      if (event.type !== "error") continue;
+      const message =
+        event.error?.data?.message ?? event.error?.message ?? undefined;
+      if (message) return message;
+    } catch {
+      if (trimmed) return trimmed;
+    }
+  }
+  return undefined;
 }
 
 function mapStopReason(reason: string | undefined): StopReason {
@@ -236,6 +256,8 @@ function streamOpenCode(
       { index: number; thinking: string }
     >();
     let spawnedSessionID: string | undefined;
+    let stdout = "";
+    let stderr = "";
 
     try {
       const lastUser = [...context.messages]
@@ -272,14 +294,19 @@ function streamOpenCode(
         signal: options?.signal,
         stdio: ["pipe", "pipe", "pipe"],
         windowsHide: true,
+        shell: process.platform === "win32",
       });
+
+      await waitForSpawn(proc);
 
       proc.stdin.write(prompt);
       proc.stdin.end();
 
       let buffer = "";
       proc.stdout.on("data", (chunk: Buffer) => {
-        buffer += chunk.toString("utf8");
+        const text = chunk.toString("utf8");
+        stdout += text;
+        buffer += text;
         let newline: number;
         while ((newline = buffer.indexOf("\n")) >= 0) {
           const line = buffer.slice(0, newline).trim();
@@ -287,6 +314,7 @@ function streamOpenCode(
           if (!line) continue;
           let event: {
             type?: string;
+            sessionID?: string;
             part?: Record<string, unknown> & {
               type?: string;
               text?: string;
@@ -364,8 +392,8 @@ function streamOpenCode(
         }
       });
 
-      proc.stderr.on("data", () => {
-        /* stderr of `opencode run` is informational only */
+      proc.stderr.on("data", (chunk: Buffer) => {
+        stderr += chunk.toString("utf8");
       });
 
       const exitCode = await new Promise<number | null>((resolve) =>
@@ -393,7 +421,10 @@ function streamOpenCode(
         throw new Error("Request was aborted");
       }
       if (exitCode !== 0 && output.stopReason === "pending") {
-        throw new Error(`opencode run exited with code ${exitCode}`);
+        const detail = extractOpenCodeError(stdout, stderr);
+        throw new Error(
+          detail ?? `opencode run exited with code ${exitCode}`,
+        );
       }
       if (output.stopReason === "pending") {
         output.stopReason = "stop";

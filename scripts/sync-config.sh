@@ -8,13 +8,8 @@ set -euo pipefail
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 target="${1:?usage: sync-config.sh claude|cursor|pi|opencode}"
 
-sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files removed/renamed
-  mkdir -p "$1"  # inside a repo skill, but keeps skills that exist only locally
-  for s in "$repo"/skills/*/; do
-    name="$(basename "$s")"
-    rm -rf "${1:?}/$name"
-    cp -r "$s" "$1/$name"
-  done
+prune_stale_skills() { # $1 = dest skills dir — archived stacks + REMOVED.txt, no copy
+  mkdir -p "$1"
   # Prune every archived stack so it does not stay in the live harness. A stack that
   # is enabled also has its skills in skills/ above, so it is skipped here.
   for archived in "$repo"/stacks/*/skills/*/; do
@@ -35,6 +30,16 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
       rm -rf "${1:?}/$name"
     done < "$repo/skills/REMOVED.txt"
   fi
+}
+
+sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files removed/renamed
+  mkdir -p "$1"  # inside a repo skill, but keeps skills that exist only locally
+  for s in "$repo"/skills/*/; do
+    name="$(basename "$s")"
+    rm -rf "${1:?}/$name"
+    cp -r "$s" "$1/$name"
+  done
+  prune_stale_skills "$1"
   # Plugin/extension-only skills — not vendored in skills/
   rm -rf "${1:?}/caveman"
 }
@@ -65,12 +70,19 @@ from pathlib import Path
 seed_path = Path(sys.argv[1])
 live_path = Path(sys.argv[2])
 seed = json.loads(seed_path.read_text())
+fresh = not live_path.exists()
 live: dict = {}
 if live_path.exists():
     live = json.loads(live_path.read_text())
 
-for key in ("theme", "defaultProvider", "defaultModel", "enabledModels", "defaultThinkingLevel"):
+# Repo-owned keys — always converge on sync.
+for key in ("theme", "enabledModels"):
     if key in seed:
+        live[key] = seed[key]
+
+# Machine-specific keys — seed a fresh install only; never overwrite a live choice.
+for key in ("defaultProvider", "defaultModel", "defaultThinkingLevel"):
+    if key in seed and (fresh or key not in live):
         live[key] = seed[key]
 
 packages: list = []
@@ -93,6 +105,7 @@ PY
     cp -r "$ext/." "$agent/extensions/$name/"
   done
 
+  # settings.json packages only — never installs archived stacks/ (see stacks/README.md).
   if command -v pi >/dev/null 2>&1; then
     for pkg in $(python3 - "$pi_src/settings.json" <<'PY'
 import json
@@ -134,6 +147,12 @@ sync_shared() {
   # ~/.agents/skills is read natively by both Cursor and pi — one dir, two agents.
   # (Cursor: cursor.com/docs/skills · pi: packages/coding-agent/docs/skills.md)
   sync_skills "$HOME/.agents/skills"
+
+  # pi/Cursor boxes often never run sync-config claude; ~/.claude/skills can still hold
+  # archived stack copies (effect, frontend pipeline, prove). Prune only — no mirror.
+  if [ -d "$HOME/.claude/skills" ]; then
+    prune_stale_skills "$HOME/.claude/skills"
+  fi
 
   # pi takes global instructions from ~/.pi/agent/AGENTS.md. Only write when installed,
   # so a Claude-Code-only box does not grow a stray ~/.pi.

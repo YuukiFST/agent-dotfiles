@@ -52,6 +52,7 @@ What the scripts propagate:
 - `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
 - `stacks/` → nothing: archived config, pruned from live dirs. Enable with `scripts/stack.sh enable <name>` (see `stacks/README.md`)
 - `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs.
+  `sync-config.sh pi` and `cursor` also prune stale copies under `~/.claude/skills` when that dir exists.
   The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
   skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
@@ -59,7 +60,10 @@ What the scripts propagate:
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk).
-  `settings.json` there is a MERGE, not a mirror: pi owns keys like `lastChangelogVersion`
+  `settings.json` there is a MERGE, not a mirror: pi owns keys like `lastChangelogVersion`.
+  `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel`
+  apply on first install only — sync never overwrites a live choice. `enabledModels`, `theme`,
+  and `packages` always converge from the repo.
 - `CLAUDE.md` → `~/.config/opencode/AGENTS.md` (OpenCode global instructions). Its skills come
   from `~/.agents/skills`, which OpenCode loads natively; `opencode.json` is never written
 - tools (setup scripts only): rtk, portless,
@@ -80,6 +84,8 @@ What the scripts propagate:
 - Config is edited HERE and propagated by scripts — never patch `~/.claude`,
   `~/.agents` directly (except files documented as seeds:
   `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
+  For pi, `defaultProvider` / `defaultModel` / `defaultThinkingLevel` in the live
+  `~/.pi/agent/settings.json` are also machine-owned after the first sync.
 - Commits: English, Conventional Commits, no AI attribution of any kind
   (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
   See `rules/git.md` and `git-hooks/`. The issue → branch → PR → review → merge flow

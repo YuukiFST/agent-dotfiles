@@ -13,12 +13,16 @@
     "npm:@monotykamary/pi-vcc"
   ],
   "theme": "github-dark-default",
-  "defaultProvider": "opencode",
-  "defaultModel": "muse-spark-1.2-contributor-free",
+  "defaultProvider": "cursor",
+  "defaultModel": "composer-2.5",
   "enabledModels": [
-    "muse-spark-1.2-contributor-free",
+    "big-pickle",
+    "composer-2.5",
+    "deepseek-v4-flash-free",
     "grok-4.6",
-    "composer-2.5"
+    "minimax-m2.5-free",
+    "nemotron-3-super-free",
+    "qwen3.6-plus-free"
   ],
-  "defaultThinkingLevel": "high"
+  "defaultThinkingLevel": "medium"
 }

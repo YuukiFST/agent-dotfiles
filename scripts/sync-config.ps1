@@ -14,16 +14,9 @@ $UserHome = $env:USERPROFILE   # $HOME is a read-only automatic variable in Powe
 
 function Test-Cmd($name) { $null -ne (Get-Command $name -ErrorAction SilentlyContinue) }
 
-# Per-skill replace: prunes files removed/renamed inside a repo skill, keeps local-only skills.
-# Mirrors sync_skills() in sync-config.sh.
-function Sync-Skills($Dest) {
+# Archived stacks + REMOVED.txt, no copy. Mirrors prune_stale_skills() in sync-config.sh.
+function Remove-StaleSkills($Dest) {
   New-Item -ItemType Directory -Force -Path $Dest | Out-Null
-
-  Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
-    $d = Join-Path $Dest $_.Name
-    if (Test-Path $d) { Remove-Item $d -Recurse -Force }
-    Copy-Item $_.FullName $d -Recurse
-  }
 
   # Prune every archived stack so it does not stay in the live harness. Without this,
   # react-doctor survived every sync on Windows while sync-config.sh pruned it on pi.
@@ -56,6 +49,18 @@ function Sync-Skills($Dest) {
   # would delete skills it never installed.
 }
 
+# Per-skill replace: prunes files removed/renamed inside a repo skill, keeps local-only skills.
+# Mirrors sync_skills() in sync-config.sh.
+function Sync-Skills($Dest) {
+  New-Item -ItemType Directory -Force -Path $Dest | Out-Null
+  Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
+    $d = Join-Path $Dest $_.Name
+    if (Test-Path $d) { Remove-Item $d -Recurse -Force }
+    Copy-Item $_.FullName $d -Recurse
+  }
+  Remove-StaleSkills $Dest
+}
+
 # rules/ is entirely repo-owned — full mirror so deleted rules don't linger.
 function Sync-Rules($Dest) {
   if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
@@ -71,6 +76,12 @@ function Sync-Shared {
   # ~/.agents/skills is read natively by pi AND OpenCode (opencode.ai/docs/skills) — one dir,
   # two agents, no second copy.
   Sync-Skills "$UserHome\.agents\skills"
+
+  # A pi/OpenCode-only sync still has to clean ~/.claude/skills: it can hold archived stack
+  # copies from an earlier claude sync. Prune only — no mirror, no copy.
+  if (Test-Path "$UserHome\.claude\skills") {
+    Remove-StaleSkills "$UserHome\.claude\skills"
+  }
 
   # agent-browser config is per-MACHINE (~/.agent-browser), read by the CLI on every
   # invocation regardless of harness. Seed only — the live file may grow local state.
@@ -140,14 +151,23 @@ function Sync-Pi {
 
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.
+  # Same split as sync_pi_agent() in sync-config.sh - keep the two in step.
   $seed = Get-Content (Join-Path $piSrc "settings.json") -Raw | ConvertFrom-Json -AsHashtable
   $livePath = Join-Path $agent "settings.json"
+  $fresh = -not (Test-Path $livePath)
   $live = @{}
-  if (Test-Path $livePath) {
+  if (-not $fresh) {
     $live = Get-Content $livePath -Raw | ConvertFrom-Json -AsHashtable
   }
-  foreach ($key in "theme", "defaultProvider", "defaultModel", "enabledModels", "defaultThinkingLevel") {
+  # Repo-owned keys - always converge on sync.
+  foreach ($key in "theme", "enabledModels") {
     if ($seed.ContainsKey($key)) { $live[$key] = $seed[$key] }
+  }
+  # Machine-specific keys - seed a fresh install only; never overwrite a live choice.
+  foreach ($key in "defaultProvider", "defaultModel", "defaultThinkingLevel") {
+    if ($seed.ContainsKey($key) -and ($fresh -or -not $live.ContainsKey($key))) {
+      $live[$key] = $seed[$key]
+    }
   }
   $packages = @()
   $seen = @{}
