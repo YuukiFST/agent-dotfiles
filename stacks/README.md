@@ -35,3 +35,4 @@ bash scripts/sync-config.sh claude     # or cursor / pi — propagates either di
 | `frontend/` | 31-skill premium UI pipeline + `rules/frontend.md` | Only pays off on design-heavy work; ~3k tokens of frontmatter per turn otherwise |
 | `memory/` | `rules/memory-system.md` + `dreaming.md` | Cross-session memory store is not in use; the harness memory dir handles what is needed |
 | `effect/` | `effect` skill (Effect v4 guide, 8 branch references) | No project on this machine depends on `effect` |
+| `webapp-testing/` | `webapp-testing` skill (Playwright toolkit + helper scripts) | `agent-browser` already covers driving a local web app; two Playwright skills split the harness's choice |
