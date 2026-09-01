@@ -2,11 +2,11 @@
 # Copy config (CLAUDE.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
-# Usage: sync-config.sh claude|cursor|pi
+# Usage: sync-config.sh claude|cursor|pi|opencode
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-target="${1:?usage: sync-config.sh claude|cursor|pi}"
+target="${1:?usage: sync-config.sh claude|cursor|pi|opencode}"
 
 prune_stale_skills() { # $1 = dest skills dir — archived stacks + REMOVED.txt, no copy
   mkdir -p "$1"
@@ -121,6 +121,22 @@ PY
   fi
 }
 
+# ~/.config/opencode — OpenCode reads AGENTS.md there globally (opencode.ai/docs/rules).
+# Skills need no copy: OpenCode already loads ~/.agents/skills, written by sync_shared.
+# opencode.json is left alone — it holds per-machine MCP/provider state this repo does not track.
+sync_opencode() {
+  local oc="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+  mkdir -p "$oc"
+  # A hand-maintained AGENTS.md predates this sync path on machines configured by hand —
+  # keep one copy of it instead of dropping it silently.
+  if [ -f "$oc/AGENTS.md" ] && [ ! -f "$oc/AGENTS.local.md.bak" ] &&
+     ! cmp -s "$oc/AGENTS.md" "$repo/CLAUDE.md"; then
+    cp "$oc/AGENTS.md" "$oc/AGENTS.local.md.bak"
+    echo "  kept the previous hand-written AGENTS.md as AGENTS.local.md.bak"
+  fi
+  cp "$repo/CLAUDE.md" "$oc/AGENTS.md"
+}
+
 # Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi
 # side by side) converges on the same config no matter which script ran.
 sync_shared() {
@@ -193,6 +209,11 @@ case "$target" in
     command -v pi >/dev/null 2>&1 || { echo "pi not on PATH — run setup-pi.sh first" >&2; exit 1; }
     sync_shared
     sync_pi_agent
+    ;;
+  opencode)
+    # Same story: sync_shared already wrote ~/.agents/skills, which OpenCode reads natively.
+    sync_shared
+    sync_opencode
     ;;
   *)
     echo "unknown target: $target" >&2; exit 1 ;;

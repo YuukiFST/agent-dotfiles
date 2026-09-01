@@ -5,9 +5,12 @@
     "npm:@howaboua/pi-cache-hit-predictor",
     {
       "source": "npm:pine-of-glass",
-      "extensions": ["+extensions/pi-contextimate"]
+      "extensions": [
+        "+extensions/pi-contextimate"
+      ]
     },
-    "npm:pi-codex-goal"
+    "npm:pi-codex-goal",
+    "npm:@monotykamary/pi-vcc"
   ],
   "theme": "github-dark-default",
   "defaultProvider": "cursor",

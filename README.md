@@ -16,20 +16,49 @@ fewer tokens, write better code, verify it works.
 
 ## Install
 
-Clone the repo, run your agent's script. Idempotent — re-run to update.
+One command on a fresh machine — clones the repo and sets up every harness it finds on PATH:
+
+```powershell
+# Windows
+irm https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.ps1 | iex
+```
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.sh | bash
+```
+
+Nothing on PATH yet? Name the harness — `claude`, `pi`, `opencode`, or `all`:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.ps1))) -Target pi
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.sh | bash -s -- pi
+```
+
+The bootstrap clones into `~/agent-dotfiles` with a **non-cone sparse checkout that excludes
+`stacks/`**, so the archived config never reaches the disk. Pass `-Full` / `--full` to get it
+(only `scripts/stack.sh enable <name>` needs it).
+
+Already cloned? Run your harness's script directly. Idempotent — re-run to update.
 Or open the repo with any agent and ask it to sync — `AGENTS.md` tells it how.
 
-| Machine | Agent | Script |
-|---------|-------|--------|
-| **Windows** (work PC) | Claude Code | `pwsh -File scripts/setup-claude.ps1` · update: `scripts/update-claude.ps1` |
-| **Windows / NixOS** (home) | pi | `bash scripts/setup-pi.sh` |
-| **macOS / Linux** | Claude Code | `bash scripts/setup-claude.sh` · update: `scripts/update-claude.sh` |
-| — | Cursor | `bash scripts/setup-cursor.sh` (no machine uses Cursor today) |
+| Harness | Windows | Linux / macOS |
+|---------|---------|---------------|
+| **Claude Code** | `pwsh -File scripts/setup-claude.ps1` · update: `scripts/update-claude.ps1` | `bash scripts/setup-claude.sh` · update: `scripts/update-claude.sh` |
+| **pi** | `pwsh -File scripts/setup-pi.ps1` | `bash scripts/setup-pi.sh` |
+| **OpenCode** | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
+| **Cursor** | — | `bash scripts/setup-cursor.sh` (no machine uses Cursor today) |
+
+Config only, tools already installed: `scripts/sync-config.ps1 <harness>` or
+`scripts/sync-config.sh <harness>`; `sync-config.ps1 all` covers every harness on PATH.
 
 Claude Code gets the full stack; pi gets skills + rules + agent config from `pi/`;
-Cursor would get skills + rules. Restart the agent afterwards.
-OpenCode also runs on the home machines and is **not** covered by these scripts —
-its config is maintained by hand. `AGENTS.md` holds the machine-by-machine table.
+OpenCode gets skills + rules + `~/.config/opencode/AGENTS.md` (its `opencode.json` is never
+touched — it holds per-machine MCP and provider state); Cursor would get skills + rules.
+Restart the agent afterwards.
 
 Installed separately, not by these scripts:
 [rtk](https://github.com/rtk-ai/rtk),
@@ -63,4 +92,5 @@ The frontend stack is opt-in via `stacks/frontend/`; `animation-vocabulary` and 
 - **rtk corrupts `prisma`/`tsc`/`vitest` output** — run those raw, never through rtk.
 - **Cursor User Rules are not file-backed** — paste `CLAUDE.md` into Customize → Rules by hand, and re-paste after editing it.
 - **`settings.json` is a seed, not a mirror** — written only when absent. Claude Code and other installers own that file; mirroring it would destroy state this repo doesn't track.
-- **pi ships no MCP** (upstream design choice). Goal tracking comes from `npm:pi-codex-goal` in `pi/settings.json`.
+- **pi ships no MCP** (upstream design choice). Goal tracking comes from `npm:pi-codex-goal` in `pi/settings.json`; context compaction from [`npm:@monotykamary/pi-vcc`](https://pi.dev/packages/@monotykamary/pi-vcc) (algorithmic, no LLM call — tune it in `~/.pi/agent/pi-vcc-config.json`).
+- **OpenCode reads `~/.agents/skills` natively**, the same dir pi uses — the sync writes it once and both harnesses see it. Only `AGENTS.md` is OpenCode-specific. A hand-written one is kept as `AGENTS.local.md.bak` on first sync.
