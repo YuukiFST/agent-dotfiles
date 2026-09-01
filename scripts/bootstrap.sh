@@ -20,13 +20,15 @@ dest="$HOME/agent-dotfiles"
 ref="main"
 full=0
 
+usage() { echo "usage: bootstrap.sh [auto|all|claude|pi|opencode] [--full] [--dest DIR] [--ref REF]" >&2; exit 2; }
+
 while [ $# -gt 0 ]; do
   case "$1" in
     auto|all|claude|pi|opencode) target="$1"; shift ;;
     --full) full=1; shift ;;
-    --dest) dest="$2"; shift 2 ;;
-    --ref) ref="$2"; shift 2 ;;
-    *) echo "unknown argument: $1" >&2; exit 2 ;;
+    --dest) [ $# -ge 2 ] || usage; dest="$2"; shift 2 ;;
+    --ref) [ $# -ge 2 ] || usage; ref="$2"; shift 2 ;;
+    *) echo "unknown argument: $1" >&2; usage ;;
   esac
 done
 
@@ -34,8 +36,27 @@ for dep in git npm; do
   command -v "$dep" >/dev/null 2>&1 || { echo "$dep is required and not on PATH" >&2; exit 1; }
 done
 
+# Bring the sparse config in line with --full, on a fresh clone AND on an existing one: the
+# patterns persist in .git/info/sparse-checkout, so re-running with --full has to actively
+# turn them off or stacks/ stays missing with no explanation.
+set_sparse_state() {
+  if [ "$full" -eq 1 ]; then
+    if [ "$(git -C "$dest" config --get core.sparseCheckout || true)" = "true" ]; then
+      git -C "$dest" sparse-checkout disable
+    fi
+    return
+  fi
+  # Non-cone mode is the only one that can express an exclusion. Patterns go through --stdin
+  # because Git Bash on Windows rewrites a bare `!/stacks/` argument into
+  # `!C:/Program Files/Git/stacks/` (MSYS path conversion) and the exclusion then silently
+  # matches nothing.
+  printf '/*\n!/stacks/\n' | git -C "$dest" sparse-checkout set --no-cone --stdin
+}
+
 # Running from inside an existing clone (scripts/bootstrap.sh) — use it, don't re-clone.
-self_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd || true)"
+# ${BASH_SOURCE[0]:-$0}: on the documented `curl … | bash` path BASH_SOURCE is unset and
+# set -u would abort before anything ran.
+self_repo="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." 2>/dev/null && pwd || true)"
 if [ -n "$self_repo" ] && [ -f "$self_repo/CLAUDE.md" ]; then
   dest="$self_repo"
   echo "Using the clone this script lives in: $dest"
@@ -44,16 +65,11 @@ elif [ -d "$dest/.git" ]; then
   git -C "$dest" fetch origin "$ref" --quiet
   git -C "$dest" checkout "$ref" --quiet
   git -C "$dest" pull --ff-only origin "$ref" --quiet
+  set_sparse_state
 else
   echo "Cloning $repo_url -> $dest"
   git clone --filter=blob:none --no-checkout --branch "$ref" "$repo_url" "$dest"
-  if [ "$full" -eq 0 ]; then
-    # Non-cone mode is the only one that can express an exclusion. Persists across git pull.
-    # Patterns go through --stdin because Git Bash on Windows rewrites a bare `!/stacks/`
-    # argument into `!C:/Program Files/Git/stacks/` (MSYS path conversion) and the exclusion
-    # then silently matches nothing.
-    printf '/*\n!/stacks/\n' | git -C "$dest" sparse-checkout set --no-cone --stdin
-  fi
+  set_sparse_state
   git -C "$dest" checkout "$ref" --quiet
 fi
 
