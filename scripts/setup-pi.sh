@@ -10,7 +10,21 @@ echo "[1/4] pi (npm, latest)"
 # Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
 # script is documented as the updater. Skipping it when pi is on PATH would never update.
 # --ignore-scripts per pi's own install docs.
-npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
+#
+# The pi.dev installer ships pi inside its own Node runtime (its own node + npm, prefix set to
+# that dir). A plain `npm install -g` then updates a DIFFERENT copy that PATH never resolves,
+# and `pi update --self` refuses with "pi cannot self-update this installation" — which is how
+# the Windows box sat on 0.80.10 while its packages expected 0.84 and crashed on startup.
+# Install through whichever npm owns the pi on PATH.
+npm_bin="npm"
+if command -v pi >/dev/null 2>&1; then
+  pi_dir="$(dirname "$(command -v pi)")"
+  if [ -x "$pi_dir/npm" ] && [ -x "$pi_dir/node" ]; then
+    npm_bin="$pi_dir/npm"
+    echo "  pi is bundled-runtime managed — updating through $npm_bin"
+  fi
+fi
+"$npm_bin" install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
 pi --version
 
 echo "[2/4] rtk"
