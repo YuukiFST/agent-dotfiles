@@ -5,7 +5,10 @@
     {
       "source": "npm:pine-of-glass",
       "extensions": [
-        "+extensions/pi-contextimate"
+        "+extensions/pi-contextimate",
+        "+extensions/pi-traceline",
+        "-extensions/pi-cachemire",
+        "-extensions/pi-meantime"
       ]
     },
     "npm:pi-codex-goal",
