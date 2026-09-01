@@ -1,7 +1,6 @@
 {
   "packages": [
     "npm:@ff-labs/pi-fff",
-    "npm:pi-cursor-sdk",
     "npm:@howaboua/pi-cache-hit-predictor",
     {
       "source": "npm:pine-of-glass",
@@ -12,14 +11,12 @@
     "npm:pi-codex-goal",
     "npm:@monotykamary/pi-vcc"
   ],
-  "theme": "github-dark-default",
-  "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5",
+  "theme": "dark",
+  "defaultProvider": "opencode",
+  "defaultModel": "big-pickle",
   "enabledModels": [
     "big-pickle",
-    "composer-2.5",
     "deepseek-v4-flash-free",
-    "grok-4.6",
     "minimax-m2.5-free",
     "nemotron-3-super-free",
     "qwen3.6-plus-free"
