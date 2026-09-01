@@ -5,12 +5,10 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "[1/3] pi (npm, latest)"
-if (Get-Command pi -ErrorAction SilentlyContinue) {
-  Write-Host "  pi already on PATH: $((Get-Command pi).Source)"
-} else {
-  # --ignore-scripts per pi's own install docs.
-  npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
-}
+# Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
+# script is documented as the updater. Skipping it when pi is on PATH would never update.
+# --ignore-scripts per pi's own install docs.
+npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
 pi --version
 
 Write-Host "[2/3] rtk"

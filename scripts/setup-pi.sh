@@ -7,14 +7,11 @@ bin="$HOME/.local/bin"
 mkdir -p "$bin"
 
 echo "[1/4] pi (npm, latest)"
-if command -v pi >/dev/null 2>&1; then
-  echo "  pi already on PATH: $(command -v pi)"
-  pi --version
-else
-  # --ignore-scripts per pi's own install docs.
-  npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
-  pi --version
-fi
+# Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
+# script is documented as the updater. Skipping it when pi is on PATH would never update.
+# --ignore-scripts per pi's own install docs.
+npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
+pi --version
 
 echo "[2/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh

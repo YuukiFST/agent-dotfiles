@@ -5,11 +5,9 @@
 set -euo pipefail
 
 echo "[1/2] opencode (npm, latest)"
-if command -v opencode >/dev/null 2>&1; then
-  echo "  opencode already on PATH: $(command -v opencode)"
-else
-  npm install -g opencode-ai@latest
-fi
+# Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
+# script is documented as the updater. Skipping it when opencode is on PATH would never update.
+npm install -g opencode-ai@latest
 opencode --version
 
 echo "[2/2] Config (AGENTS.md + skills + rules)"

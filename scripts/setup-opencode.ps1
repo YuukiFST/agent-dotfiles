@@ -5,11 +5,9 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "[1/2] opencode (npm, latest)"
-if (Get-Command opencode -ErrorAction SilentlyContinue) {
-  Write-Host "  opencode already on PATH: $((Get-Command opencode).Source)"
-} else {
-  npm install -g opencode-ai@latest
-}
+# Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
+# script is documented as the updater. Skipping it when opencode is on PATH would never update.
+npm install -g opencode-ai@latest
 opencode --version
 
 Write-Host "[2/2] Config (AGENTS.md + skills + rules)"
