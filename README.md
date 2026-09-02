@@ -74,7 +74,7 @@ Active skills live flat in `skills/`. The **frontend design pipeline** (31 skill
 | Category | Highlights |
 |----------|-----------|
 | **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview` |
-| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing` |
+| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing`, `optimizing-startup` (desktop launch time in Dock bounces) |
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder`, `helmsman` (wayfinder's autonomous sibling — the agent makes the technical calls; `helmsman-explain` renders it as an HTML page) (+ `setup-matt-pocock-skills`, their per-repo bootstrap), `handoff` |
