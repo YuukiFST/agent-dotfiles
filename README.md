@@ -8,7 +8,7 @@ fewer tokens, write better code, verify it works.
 | `CLAUDE.md` | Global instructions, loaded every session |
 | `rules/` | Rule files (git, prompting). Claude Code loads every `.md` here at launch unless it carries `paths:` frontmatter — they are not lazy |
 | `skills/` | Active skills, flat — Claude Code only discovers `~/.claude/skills/<name>/SKILL.md`, so subfolders would hide them. List: `ls skills/` |
-| `stacks/` | Archived config, kept but not loaded: `frontend/` (31-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill). See [`stacks/README.md`](stacks/README.md) |
+| `stacks/` | Archived config, kept but not loaded: `frontend/` (31-skill UI pipeline), `memory/` (memory system + dreaming), `effect/` (Effect-TS skill), `webapp-testing/` (Playwright toolkit). See [`stacks/README.md`](stacks/README.md) |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` attribution gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one script per harness |
 | `docs/` | Reference notes, never loaded into a session: [vendored skills](docs/vendored-skills.md), [agent workflow notes](docs/agent-workflow-notes.md), [rules adherence baseline](docs/rules-audit-baseline.md) |
@@ -69,12 +69,12 @@ Installed separately, not by these scripts:
 
 ## Skills
 
-Active skills live flat in `skills/`. The **frontend design pipeline** (31 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI; `agent-browser` and `webapp-testing` stay active. Re-enable any stack with `bash scripts/stack.sh enable <name>` + paste its `CLAUDE-snippet.md` into `CLAUDE.md`.
+Active skills live flat in `skills/`. The **frontend design pipeline** (31 skills + `rules/frontend.md`) is archived in `stacks/frontend/` to save harness tokens when not building premium UI; `agent-browser` stays active and covers browser work (`webapp-testing` is archived in `stacks/webapp-testing/`). Re-enable any stack with `bash scripts/stack.sh enable <name>` + paste its `CLAUDE-snippet.md` into `CLAUDE.md`.
 
 | Category | Highlights |
 |----------|-----------|
 | **Code quality & review** | `thermo-nuclear-code-quality-review`, `improve`, `improve-codebase-architecture`, `autoreview` |
-| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `webapp-testing`, `optimizing-startup` (desktop launch time in Dock bounces) |
+| **Debugging & design** | `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `prototype`, `optimizing-startup` (desktop launch time in Dock bounces) (browser work: `agent-browser`; `webapp-testing` archived in `stacks/webapp-testing/`) |
 | **Security** | `security-review`, `security-bounty-hunter` |
 | **Planning & workflow** | `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `verification-before-completion` (vendored from [obra/superpowers](https://github.com/obra/superpowers)) |
 | **Planning & handoff** | `grilling`, `wayfinder`, `helmsman` (wayfinder's autonomous sibling — the agent makes the technical calls; `helmsman-explain` renders it as an HTML page) (+ `setup-matt-pocock-skills`, their per-repo bootstrap), `handoff` |
