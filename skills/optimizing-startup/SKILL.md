@@ -5,7 +5,7 @@ description: Use when a desktop app's launch or startup feels slow, when asked t
 
 # Optimizing startup to half a bounce
 
-Unit: one macOS Dock bounce ≈ **500 ms** (mitchellh, 2026-08-29). Half a bounce = **250 ms**.
+Unit: one macOS Dock bounce ≈ **500 ms**. Half a bounce = **250 ms**.
 Platform floor (loader + toolkit + first window) ≈ 150 ms on fast hardware, so the app's own budget is ~100 ms.
 Windows and Linux have no Dock; the unit is the same 500 ms measured from the launch instant.
 
@@ -21,7 +21,7 @@ Window shown, first pixel, skeleton painted, "loading" gone: none of these end t
 4. **Fix the biggest phase** with [`techniques.md`](techniques.md). One change, re-record, keep or revert.
 5. **Done** when a cold recording shows settled + interactive ≤ 0.5 bounce with at most 2 frame changes after the window appears, and the sheet is in the report or PR. If the floor recording alone is above 0.5 bounce, done is app − floor ≤ 100 ms with the same frame-change bound, and the report states both numbers.
 
-## Rules from mitchellh's startup reviews
+## Rules startup reviews
 
 - **The first rendered frame shows the final UI.** Empty window, splash, skeleton, spinner: each one is an unsettled frame. Keep the window hidden until the final frame is ready, or make the frame ready earlier. Two frames of waiting beat one frame of flash. The hidden wait is bounded by one bounce; past it, show the window with the delayed loading state.
 - **A loading state appears only past a delay threshold** (work already running longer than ~300 ms). On a normal launch it never appears.
