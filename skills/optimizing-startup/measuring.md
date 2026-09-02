@@ -15,7 +15,7 @@ Read `b.mp4`'s sheet with the Read tool and find the first frame showing the typ
 
 **Benchmark = max(settled from A, interactive from B).** Report both, in ms and bounces, with the frame-change count from A.
 
-Scripts live in `scripts/` next to this file. `bounce-record.ps1` needs ffmpeg on PATH; `bounce-frames.py` needs numpy and Pillow. Both scripts work on Windows PowerShell 5.1.
+Scripts live in `scripts/` next to this file. `bounce-record.ps1` needs ffmpeg on PATH; `bounce-frames.py` needs numpy and Pillow. `bounce-record.ps1` runs on Windows PowerShell 5.1 and pwsh 7.
 
 ## Cold means cold
 

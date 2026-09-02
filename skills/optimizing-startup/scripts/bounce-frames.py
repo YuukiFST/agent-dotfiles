@@ -156,6 +156,9 @@ def main() -> int:
 
     scaled_rect = tuple(v // args.downscale for v in rect) if rect else None
     mask = region_mask(frames[0].shape, marker, scaled_rect)
+    if not mask.any():
+        print(f"window rect {rect} covers no captured pixels (off-screen or inverted); pass --rect or re-record", file=sys.stderr)
+        return 1
     diffs = [0.0] * len(frames)
     for i in range(t0 + 1, len(frames)):
         diffs[i] = changed_fraction(frames[i], frames[i - 1], mask, args.pixel_delta)
