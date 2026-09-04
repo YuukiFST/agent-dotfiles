@@ -144,7 +144,7 @@ function Sync-Pi {
   # pi takes global instructions from ~/.pi/agent/AGENTS.md.
   Copy-Item "$Repo\CLAUDE.md" "$agent\AGENTS.md" -Force
 
-  foreach ($f in "cloak.json", "cursor-sdk.json", "package.json", "tsconfig.json", "models.json", ".gitignore") {
+  foreach ($f in "cloak.json", "package.json", "tsconfig.json", "models.json", ".gitignore") {
     $src = Join-Path $piSrc $f
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }

@@ -59,7 +59,7 @@ What the scripts propagate:
 - `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
   exists, base preset otherwise; Windows preset on Windows) and installs
   `~/.local/bin/show-shot` (inline terminal screenshots)
-- `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak, cursor-sdk).
+- `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak).
   `settings.json` there is a MERGE, not a mirror: pi owns keys like `lastChangelogVersion`.
   `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel`
   apply on first install only — sync never overwrites a live choice. `enabledModels`, `theme`,

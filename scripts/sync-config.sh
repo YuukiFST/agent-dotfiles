@@ -56,7 +56,7 @@ sync_pi_agent() {
   [ -d "$pi_src" ] || return 0
 
   mkdir -p "$agent/extensions"
-  for f in cloak.json cursor-sdk.json package.json tsconfig.json models.json .gitignore; do
+  for f in cloak.json package.json tsconfig.json models.json .gitignore; do
     if [ -f "$pi_src/$f" ]; then
       cp "$pi_src/$f" "$agent/$f"
     fi
