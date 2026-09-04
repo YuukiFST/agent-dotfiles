@@ -12,7 +12,8 @@
       ]
     },
     "npm:pi-codex-goal",
-    "npm:@monotykamary/pi-vcc"
+    "npm:@monotykamary/pi-vcc",
+    "npm:pi-web-access"
   ],
   "theme": "dark",
   "defaultProvider": "opencode",
