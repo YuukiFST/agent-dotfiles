@@ -27,44 +27,12 @@ const OPENCODE_MODELS: Array<{
   maxTokens: number;
 }> = [
   {
-    id: "big-pickle",
-    name: "Big Pickle",
-    reasoning: true,
-    input: ["text"],
-    contextWindow: 200000,
-    maxTokens: 32000,
-  },
-  {
-    id: "deepseek-v4-flash-free",
-    name: "DeepSeek V4 Flash Free",
-    reasoning: true,
-    input: ["text"],
-    contextWindow: 300000,
-    maxTokens: 16384,
-  },
-  {
-    id: "minimax-m2.5-free",
-    name: "MiniMax M2.5 Free",
-    reasoning: true,
-    input: ["text"],
-    contextWindow: 200000,
-    maxTokens: 32000,
-  },
-  {
-    id: "nemotron-3-super-free",
-    name: "Nemotron 3 Super Free",
-    reasoning: true,
-    input: ["text"],
-    contextWindow: 1000000,
-    maxTokens: 128000,
-  },
-  {
-    id: "qwen3.6-plus-free",
-    name: "Qwen 3.6 Plus Free",
+    id: "muse-spark-1.3-contributor-free",
+    name: "Muse Spark 1.3 Free",
     reasoning: true,
     input: ["text", "image"],
-    contextWindow: 200000,
-    maxTokens: 32000,
+    contextWindow: 1048576,
+    maxTokens: 131072,
   },
 ];
 const SESSION_FILE = path.join(
@@ -186,7 +154,10 @@ function waitForSpawn(proc: ChildProcessWithoutNullStreams): Promise<void> {
   });
 }
 
-function extractOpenCodeError(stdout: string, stderr: string): string | undefined {
+function extractOpenCodeError(
+  stdout: string,
+  stderr: string,
+): string | undefined {
   for (const line of `${stdout}\n${stderr}`.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
@@ -422,9 +393,7 @@ function streamOpenCode(
       }
       if (exitCode !== 0 && output.stopReason === "pending") {
         const detail = extractOpenCodeError(stdout, stderr);
-        throw new Error(
-          detail ?? `opencode run exited with code ${exitCode}`,
-        );
+        throw new Error(detail ?? `opencode run exited with code ${exitCode}`);
       }
       if (output.stopReason === "pending") {
         output.stopReason = "stop";
