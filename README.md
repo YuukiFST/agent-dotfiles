@@ -62,14 +62,13 @@ Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scr
 | `stacks/` | Archived config, not loaded — enable with `bash scripts/stack.sh enable <name>` |
 | `hooks/`, `git-hooks/` | Session hooks; `pre-push` gate and `git-safe-commit` |
 | `scripts/` | Install and sync, one per harness |
-| `pi/`, `agent-browser/`, `portless/` | Per-tool config |
+| `pi/`, `portless/` | Per-tool config |
 | `docs/` | Reference notes, never loaded into a session |
 
 ## Not installed by these scripts
 
 [rtk](https://github.com/rtk-ai/rtk) ·
 [caveman](https://github.com/JuliusBrussee/caveman) ·
-[agent-browser](https://agent-browser.dev) ·
 [portless](https://portless.sh) (Node 24+) ·
 [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) (pi only)
 
