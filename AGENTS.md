@@ -69,9 +69,9 @@ What the scripts propagate:
 ## Verify (after syncing)
 
 1. `ls ~/.claude/rules` and the skills dir for your harness — non-empty, matches repo.
-2. `npx -y chrome-devtools-axi open https://example.com && npx -y chrome-devtools-axi snapshot`
-   — returns a page snapshot. It drives an installed Chrome and keeps no per-machine config,
-   so a failure here means Chrome is missing, not that the repo drifted.
+2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` — returns a
+   page snapshot. It drives an installed Chrome and keeps no per-machine config, so a failure
+   here means Chrome is missing, not that the repo drifted.
 3. pi only: `show-shot <any png>` renders in the terminal.
 4. `portless doctor` — requires Node 24+ and a one-time bootstrap (`portless service
    install` + `portless trust`, see `portless/setup.md`). When the proxy is up, prefer
