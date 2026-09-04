@@ -18,9 +18,8 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.ex
 Remove-Item -Recurse -Force $tmp
 & "$Bin\rtk.exe" --version
 
-Write-Host "[2/3] npm globals (agent-browser, gh-axi, portless)"
-npm install -g agent-browser@latest gh-axi@latest portless@latest
-agent-browser install   # refresh the bundled browser driver
+Write-Host "[2/3] npm globals (chrome-devtools-axi, gh-axi, portless)"
+npm install -g chrome-devtools-axi@latest gh-axi@latest portless@latest
 # Windows runs Claude Code only — pi/Cursor live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 
