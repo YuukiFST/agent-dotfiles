@@ -3,7 +3,7 @@
 Named `.localhost` URLs em vez de portas. Proxy HTTPS local na 443; cada dev server
 ganha URL estável (`https://iptu.localhost`) e porta aleatória via env `PORT`.
 
-**Por que no meu fluxo:** agentes (agent-browser, webapp-testing) abrem URL fixa em vez
+**Por que no meu fluxo:** agentes (chrome-devtools-axi, webapp-testing) abrem URL fixa em vez
 de adivinhar porta; worktrees ganham subdomínio por branch (`fix-ui.iptu.localhost`) com
 cookies/storage isolados — dois agentes em worktrees paralelos não se pisam.
 

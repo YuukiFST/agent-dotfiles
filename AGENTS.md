@@ -20,7 +20,7 @@ this repo. This file is.
 Use the PowerShell script on Windows and the bash one on Unix; both take a harness
 (`claude` / `pi` / `opencode`, plus `cursor` on bash), and `sync-config.ps1 all` covers every
 harness found on PATH. Whichever you run, the shared payload (`~/.claude/rules`,
-`~/.agents/skills`, `~/.agent-browser`) is written first, then the harness-specific dir.
+`~/.agents/skills`) is written first, then the harness-specific dir.
 
 Do not sync a harness the machine does not run: it grows a config dir nobody keeps current —
 that is how the work PC ended up carrying a pi install for a harness it never ran
@@ -56,9 +56,7 @@ What the scripts propagate:
   The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
   skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
-- `agent-browser/` → seeds `~/.agent-browser/config.json` (NixOS preset when `/etc/NIXOS`
-  exists, base preset otherwise; Windows preset on Windows) and installs
-  `~/.local/bin/show-shot` (inline terminal screenshots)
+- `scripts/show-shot` → `~/.local/bin/show-shot` (inline terminal screenshots, any PNG)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak).
   `settings.json` there is a MERGE, not a mirror: pi owns keys like `lastChangelogVersion`.
   `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel`
@@ -66,14 +64,14 @@ What the scripts propagate:
   and `packages` always converge from the repo.
 - `CLAUDE.md` → `~/.config/opencode/AGENTS.md` (OpenCode global instructions). Its skills come
   from `~/.agents/skills`, which OpenCode loads natively; `opencode.json` is never written
-- tools (setup scripts only): rtk, portless,
-  agent-browser (+ Chrome), gh-axi
+- tools (setup scripts only): rtk, portless, gh-axi, chrome-devtools-axi
 
 ## Verify (after syncing)
 
 1. `ls ~/.claude/rules` and the skills dir for your harness — non-empty, matches repo.
-2. `agent-browser doctor --offline --quick` — must pass. On NixOS the config must point
-   `executablePath` at the nixpkgs chromium (bundled Chrome does not run on non-FHS).
+2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` — returns a
+   page snapshot. It drives an installed Chrome and keeps no per-machine config, so a failure
+   here means Chrome is missing, not that the repo drifted.
 3. pi only: `show-shot <any png>` renders in the terminal.
 4. `portless doctor` — requires Node 24+ and a one-time bootstrap (`portless service
    install` + `portless trust`, see `portless/setup.md`). When the proxy is up, prefer
@@ -83,7 +81,7 @@ What the scripts propagate:
 
 - Config is edited HERE and propagated by scripts — never patch `~/.claude`,
   `~/.agents` directly (except files documented as seeds:
-  `settings.json`, `~/.agent-browser/config.json`, which the scripts never overwrite).
+  `settings.json`, which the scripts never overwrite).
   For pi, `defaultProvider` / `defaultModel` / `defaultThinkingLevel` in the live
   `~/.pi/agent/settings.json` are also machine-owned after the first sync.
 - Commits: English, Conventional Commits, no AI attribution of any kind
@@ -92,5 +90,6 @@ What the scripts propagate:
   lives in the `git-workflow` skill, not in the rule file.
 - Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
   Customize → Rules manually after edits.
-- agent-browser deep dive: `agent-browser/setup-nixos-pi.md` (NixOS install, terminal
-  screenshots, token-economy habits, CDP mode).
+- Browser automation: `chrome-devtools-axi`, installed by the setup scripts and documented
+  by its own `--help`. Nothing about it is configured in this repo — it needs no per-machine
+  file and launches an already-installed Chrome, which is why it replaced `agent-browser`.
