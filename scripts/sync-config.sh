@@ -27,6 +27,8 @@ prune_stale_skills() { # $1 = dest skills dir — archived stacks + REMOVED.txt,
       name="${name//$'\t'/}"
       name="${name//$'\r'/}"
       [ -n "$name" ] || continue
+      # A name back in skills/ (re-enabled stack, e.g. effect) wins over the list.
+      [ -d "$repo/skills/$name" ] && continue
       rm -rf "${1:?}/$name"
     done < "$repo/skills/REMOVED.txt"
   fi
