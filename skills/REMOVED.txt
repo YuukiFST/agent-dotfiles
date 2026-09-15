@@ -12,3 +12,5 @@ claude-md-auditor
 effect
 prove
 agent-browser
+loop-me
+autoreview
