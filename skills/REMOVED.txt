@@ -14,3 +14,4 @@ prove
 agent-browser
 loop-me
 autoreview
+wayfinder
