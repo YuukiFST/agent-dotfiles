@@ -8,8 +8,6 @@ A loose idea has arrived — too big for one agent session, and wrapped in fog. 
 
 The split is the whole point: **the human is the product owner, the agent is the developer.** The passenger names the port; the helmsman picks the route. The human answers what the system should do for the people who use it. Every question about how that gets built belongs to the agent — it is written down as a ticket, and the agent resolves it in a later session, alone, choosing the smartest option available rather than handing the human a menu.
 
-This is the sibling of `/wayfinder`, which asks the human everything. Reach for wayfinder when the human wants to make the technical calls; reach for helmsman when they are acting purely as a product owner.
-
 ## Plan, don't do
 
 Helmsman is **planning**. Each ticket resolves a decision. The map is done when the way is clear — nothing left to decide before someone goes and builds the thing. The pull to just do the work is the signal you've reached the edge of the map: stop and hand off to `/writing-plans`. An effort can override this in its **Notes**, but absent that, produce decisions, not deliverables.
@@ -89,7 +87,7 @@ The map is an **index**, not a store. It lists the decisions made and points at 
 
 **The map is the human's only surface.** They will not open tickets. Everything in **Product decisions** and **Waiting on you** is written in their language — no jargon, no library names, no acronyms. **Technical decisions** is for you and may be as technical as it needs to be.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Consult the tracker doc's **"Wayfinding operations"** section for how _this_ repo expresses them, substituting the `helmsman:` label prefix for `wayfinder:` throughout — the mechanics are identical. If no tracker has been provided, run `/setup-matt-pocock-skills`, or default to the local-markdown tracker.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Consult the tracker doc's **"Wayfinding operations"** section for how _this_ repo expresses them. If no tracker has been provided, run `/setup-matt-pocock-skills`, or default to the local-markdown tracker.
 
 Take the **mechanics** from that section and nothing else. The labels are this skill's: the tracker doc predates helmsman, so it knows neither the audience label nor `decision`, and [Ticket methods](#ticket-methods) below is the authoritative set.
 
