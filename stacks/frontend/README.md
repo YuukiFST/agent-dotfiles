@@ -13,7 +13,7 @@ Not loaded into harness by default — saves ~3k+ tokens of skill frontmatter pe
 
 `agent-browser` stays in top-level `skills/` for E2E and browser testing outside the full design pipeline (`webapp-testing` is archived in `stacks/webapp-testing/`).
 
-Interface review is not one of them: `interface-review` and `better-interface` are both in this stack, so a design review of a diff needs the stack enabled. Code review without it is `autoreview` (correctness) and `security-review`.
+Interface review is not one of them: `interface-review` and `better-interface` are both in this stack, so a design review of a diff needs the stack enabled. Code review without it is `/code-review` (correctness) and `security-review`.
 
 ## Re-enable
 
