@@ -37,10 +37,11 @@ function Remove-StaleSkills($Dest) {
   if (Test-Path $removedList) {
     Get-Content $removedList | ForEach-Object {
       $name = ($_ -split "#")[0].Trim()
-      if ($name) {
-        $stale = Join-Path $Dest $name
-        if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
-      }
+      if (-not $name) { return }
+      # A name back in skills/ (re-enabled stack, e.g. effect) wins over the list.
+      if (Test-Path (Join-Path "$Repo\skills" $name)) { return }
+      $stale = Join-Path $Dest $name
+      if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
     }
   }
 
