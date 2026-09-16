@@ -15,3 +15,37 @@ agent-browser
 loop-me
 autoreview
 wayfinder
+
+# stacks/frontend deleted in #78 (replaced by ui-craft). A machine that once ran
+# `stack.sh enable frontend` still holds these; the stack prune no longer reaches them.
+animate
+animation-vocabulary
+apple-design
+better-accessibility
+better-colors
+better-interface
+better-layout
+better-typography
+better-ui
+better-writing
+brandkit
+design-taste-frontend
+emil-design-eng
+find-animation-opportunities
+gpt-taste
+high-end-visual-design
+image-to-code
+imagegen-frontend-mobile
+imagegen-frontend-web
+impeccable
+improve-animations
+industrial-brutalist-ui
+interface-review
+minimalist-ui
+pick-ui-library
+react-doctor
+redesign-existing-projects
+review-animations
+tailwind-v4-shadcn
+transitions-dev
+transitions-polish

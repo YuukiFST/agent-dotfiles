@@ -151,7 +151,7 @@ sync_shared() {
   sync_skills "$HOME/.agents/skills"
 
   # pi/Cursor boxes often never run sync-config claude; ~/.claude/skills can still hold
-  # archived stack copies (effect, frontend pipeline, prove). Prune only — no mirror.
+  # archived stack copies (effect, prove). Prune only — no mirror.
   if [ -d "$HOME/.claude/skills" ]; then
     prune_stale_skills "$HOME/.claude/skills"
   fi
