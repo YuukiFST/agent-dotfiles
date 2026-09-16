@@ -66,7 +66,7 @@ A review of a screen runs one read-only subagent per domain, in parallel, each h
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
 - Default set: accessibility, layout, writing, typography, colors, polish+motion (six). `quick` scope: accessibility and polish+motion only.
-- Subagent type `general-purpose`. Reviewers return findings only, no edits.
+- Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - Consolidation stays in the main thread: read `better-interface/SKILL.md` sections 6 to 9 and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). Re-read the cited line of every finding before keeping it.
 
 ## Evidence
