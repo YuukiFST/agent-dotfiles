@@ -1,6 +1,6 @@
 ---
 name: ui-craft
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen from scratch, improve/polish/redesign an existing page ("melhorar a UI", "deixar mais bonito", "feels off"), review UI or motion quality, add or fix animations, or pick a UI library. Skip for pure logic, data or backend work.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, or pick a UI library. Skip for pure logic, data or backend work.
 ---
 
 # UI craft
