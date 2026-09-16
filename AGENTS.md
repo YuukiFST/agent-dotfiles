@@ -55,6 +55,9 @@ What the scripts propagate:
   `sync-config.sh pi` and `cursor` also prune stale copies under `~/.claude/skills` when that dir exists.
   The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
   skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
+- `skills/ui-craft/update-refs.sh` → `~/.claude/ui-refs/` (design reference repos the `ui-craft` skill reads).
+  Not run by sync: run it once by hand after the first sync, and again to refresh. The clones sit
+  outside every skills dir so none of their frontmatter reaches a session.
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
 - `scripts/show-shot` → `~/.local/bin/show-shot` (inline terminal screenshots, any PNG)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak).
