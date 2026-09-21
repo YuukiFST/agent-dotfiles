@@ -27,6 +27,8 @@ prune_stale_skills() { # $1 = dest skills dir — archived stacks + REMOVED.txt,
       name="${name//$'\t'/}"
       name="${name//$'\r'/}"
       [ -n "$name" ] || continue
+      # A name back in skills/ (re-enabled stack, e.g. effect) wins over the list.
+      [ -d "$repo/skills/$name" ] && continue
       rm -rf "${1:?}/$name"
     done < "$repo/skills/REMOVED.txt"
   fi
@@ -56,7 +58,7 @@ sync_pi_agent() {
   [ -d "$pi_src" ] || return 0
 
   mkdir -p "$agent/extensions"
-  for f in cloak.json cursor-sdk.json package.json tsconfig.json models.json .gitignore; do
+  for f in cloak.json package.json tsconfig.json models.json .gitignore; do
     if [ -f "$pi_src/$f" ]; then
       cp "$pi_src/$f" "$agent/$f"
     fi
@@ -149,7 +151,7 @@ sync_shared() {
   sync_skills "$HOME/.agents/skills"
 
   # pi/Cursor boxes often never run sync-config claude; ~/.claude/skills can still hold
-  # archived stack copies (effect, frontend pipeline, prove). Prune only — no mirror.
+  # archived stack copies (effect, prove). Prune only — no mirror.
   if [ -d "$HOME/.claude/skills" ]; then
     prune_stale_skills "$HOME/.claude/skills"
   fi
@@ -161,20 +163,10 @@ sync_shared() {
     cp "$repo/CLAUDE.md" "$HOME/.pi/agent/AGENTS.md"
   fi
 
-  # agent-browser config is per-MACHINE (~/.agent-browser), shared by every harness that
-  # shells out to the CLI. Seed only — the live file may grow local state (encryption key,
-  # session sidecars) this repo does not track.
-  if [ ! -f "$HOME/.agent-browser/config.json" ]; then
-    mkdir -p "$HOME/.agent-browser/screenshots"
-    if [ -e /etc/NIXOS ]; then src="$repo/agent-browser/config.nixos.json"
-    else src="$repo/agent-browser/config.base.json"; fi
-    sed "s|~/|$HOME/|" "$src" > "$HOME/.agent-browser/config.json"
-    echo "  seeded ~/.agent-browser/config.json ($(basename "$src"))"
-  fi
-
   # show-shot renders agent screenshots inline in the terminal (kitty/wezterm/chafa).
+  # Not tied to any browser tool — it displays any PNG an agent writes to disk.
   mkdir -p "$HOME/.local/bin"
-  cp "$repo/agent-browser/show-shot" "$HOME/.local/bin/show-shot"
+  cp "$repo/scripts/show-shot" "$HOME/.local/bin/show-shot"
   chmod +x "$HOME/.local/bin/show-shot"
 
   # Global git hooks (pre-push blocks AI attribution trailers; commit-msg is early feedback).

@@ -13,9 +13,8 @@ Write-Host "[1/4] Config files"
 Write-Host "[2/4] rtk"
 & "$PSScriptRoot\install-rtk.ps1"
 
-Write-Host "[3/4] portless + agent-browser + gh-axi"
-npm install -g portless agent-browser gh-axi
-agent-browser install
+Write-Host "[3/4] portless + gh-axi + chrome-devtools-axi"
+npm install -g portless gh-axi chrome-devtools-axi
 
 Write-Host "[4/4] Plugins"
 foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {

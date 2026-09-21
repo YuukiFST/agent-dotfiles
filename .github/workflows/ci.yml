@@ -32,4 +32,4 @@ jobs:
       # -x follows the sourced validate-commit-message.sh instead of reporting
       # SC1091 at every call site.
       - name: Shellcheck hooks and scripts
-        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push
+        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot

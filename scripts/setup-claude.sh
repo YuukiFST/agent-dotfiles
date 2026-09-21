@@ -13,9 +13,8 @@ echo "[2/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk init -g
 
-echo "[3/4] portless + agent-browser + gh-axi"
-npm install -g portless agent-browser gh-axi
-agent-browser install   # bundled browser driver — without it every agent-browser call fails
+echo "[3/4] portless + gh-axi + chrome-devtools-axi"
+npm install -g portless gh-axi chrome-devtools-axi
 
 echo "[4/4] Plugins"
 for m in JuliusBrussee/caveman anthropics/claude-plugins-official kingbootoshi/goal-ledger; do

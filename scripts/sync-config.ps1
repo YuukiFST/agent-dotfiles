@@ -37,10 +37,11 @@ function Remove-StaleSkills($Dest) {
   if (Test-Path $removedList) {
     Get-Content $removedList | ForEach-Object {
       $name = ($_ -split "#")[0].Trim()
-      if ($name) {
-        $stale = Join-Path $Dest $name
-        if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
-      }
+      if (-not $name) { return }
+      # A name back in skills/ (re-enabled stack, e.g. effect) wins over the list.
+      if (Test-Path (Join-Path "$Repo\skills" $name)) { return }
+      $stale = Join-Path $Dest $name
+      if (Test-Path $stale) { Remove-Item $stale -Recurse -Force }
     }
   }
 
@@ -81,17 +82,6 @@ function Sync-Shared {
   # copies from an earlier claude sync. Prune only — no mirror, no copy.
   if (Test-Path "$UserHome\.claude\skills") {
     Remove-StaleSkills "$UserHome\.claude\skills"
-  }
-
-  # agent-browser config is per-MACHINE (~/.agent-browser), read by the CLI on every
-  # invocation regardless of harness. Seed only — the live file may grow local state.
-  $abConfig = Join-Path $UserHome ".agent-browser\config.json"
-  if (-not (Test-Path $abConfig)) {
-    New-Item -ItemType Directory -Force -Path (Join-Path $UserHome ".agent-browser\screenshots") | Out-Null
-    $esc = $UserHome.Replace('\', '\\')
-    (Get-Content "$Repo\agent-browser\config.windows.json" -Raw).Replace('C:\\Users\\tisao', $esc) |
-      Set-Content $abConfig -NoNewline
-    Write-Host "  seeded ~/.agent-browser/config.json"
   }
 }
 
@@ -144,7 +134,7 @@ function Sync-Pi {
   # pi takes global instructions from ~/.pi/agent/AGENTS.md.
   Copy-Item "$Repo\CLAUDE.md" "$agent\AGENTS.md" -Force
 
-  foreach ($f in "cloak.json", "cursor-sdk.json", "package.json", "tsconfig.json", "models.json", ".gitignore") {
+  foreach ($f in "cloak.json", "package.json", "tsconfig.json", "models.json", ".gitignore") {
     $src = Join-Path $piSrc $f
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }

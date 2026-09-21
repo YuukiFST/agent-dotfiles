@@ -10,9 +10,8 @@ echo "[1/3] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
 
-echo "[2/3] npm globals (agent-browser, gh-axi, portless)"
-npm install -g agent-browser@latest gh-axi@latest portless@latest
-agent-browser install   # refresh the bundled browser driver
+echo "[2/3] npm globals (chrome-devtools-axi, gh-axi, portless)"
+npm install -g chrome-devtools-axi@latest gh-axi@latest portless@latest
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 

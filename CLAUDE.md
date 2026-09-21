@@ -44,10 +44,13 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 
 ## Tools (machine-specific)
 
+- **[AXI](https://github.com/kunchenguid/axi) CLIs first** — `{domain}-axi` tools are built for agents: fewer tokens and higher task accuracy than the equivalent MCP server or plain CLI. Prefer one over an MCP server or a hand-rolled script whenever it covers the domain.
 - **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh`. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
+- **chrome-devtools-axi for anything needing a real browser** (`open`/`snapshot`/`click`/`fill`/`eval`/`console`/`network`/`screenshot`/`lighthouse`) — the only browser automation on this machine. Skip it when `curl` is enough. Read `chrome-devtools-axi <command> --help` for current usage; never trust a remembered flag.
 - **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
 
 ## Rule files (already loaded — this maps a task to the block that governs it)
 
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
+- **Building a screen/component or improving how an existing one looks and feels** → skill `ui-craft` (router over the design references in `~/.claude/ui-refs/`; never read those references directly).
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
