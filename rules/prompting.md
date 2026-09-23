@@ -7,7 +7,7 @@ Apply when writing prompts for sub-agents, tools, or LLM calls, and when maintai
 ```
 1. TASK — What to do. Be explicit: "Fix calculateTotal() returning NaN for negative inputs."
 2. CONTEXT — Dynamic data to analyze (code, logs, specs).
-3. INSTRUCTIONS — Reasoning steps + output format.
+3. INSTRUCTIONS — Definition of done ("tests pass"), when to stop and ask, output format. No "think step by step": the model already reasons before replying.
 ```
 
 Bad: "Fix this bug."
@@ -25,6 +25,7 @@ Good: "Read `calculateTotal` in `src/billing.ts`. Trace negative quantity throug
 8. **Balanced instructions.** Give both sides of every tradeoff. "Never install packages to fix errors. If a new dependency is genuinely needed, confirm with the user."
 9. **Instructions don't add capability.** If the task needs something the model is bad at (precise calculation, factual lookup, deterministic parsing), give it an executable *tool* (function calling) — don't restate the instruction. "It's critical to calculate correctly" doesn't improve the arithmetic; a calculate tool does. Distinct from #7 (process vs verbal): here the capability is absent, not the phrasing.
 10. **Positive framing.** "Use const objects, use named exports" beats "Don't use enums, don't use default exports." Ban lists force navigation around forbidden territory; positive instructions give a clear target.
+    Exception, visual design: "avoid generic" has no target, so list the exact patterns to exclude ("No cream backgrounds, italic headings, monospace labels, pill buttons").
 11. **Concrete over vague.** "Wrap in try/except with specific types, log the traceback" beats "Handle errors properly."
 
 ## Output contracts
