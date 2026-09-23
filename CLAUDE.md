@@ -4,7 +4,7 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Output
 
-- Concise output, thorough reasoning. No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
+- Concise output. No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
 - Never guess APIs, versions, flags, SHAs, or package names — verify in code/docs first.
 - Don't print full files back; show diffs with `...` for omitted parts.
 - Long Markdown files: each full sentence on its own line.
@@ -13,7 +13,8 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 
 ## Working method
 
-- State assumptions; if ambiguous, ask before coding. Surface tradeoffs, don't pick silently.
+- State assumptions; ask before coding only when the ambiguity would change the result. Surface tradeoffs, don't pick silently.
+- **Autonomy:** when a step doesn't need my input, keep going; put status notes in the same message as the next action. Stop and ask only when you can't continue without me, or before anything destructive.
 - Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
 - Turn tasks into verifiable goals; refactors keep existing tests green before and after.
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
