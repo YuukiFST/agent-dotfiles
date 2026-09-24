@@ -19,7 +19,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - Turn tasks into verifiable goals; refactors keep existing tests green before and after.
 - **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
-- **Bug fixes:** reproduce E2E first, as the end user experiences it — find the real problem, not a symptom.
 - **Git history is an investigation tool:** unfamiliar code, or "why is this like this" → `git log`/`blame` before theorizing; the history tells the story the current state can't.
 - See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
@@ -38,10 +37,18 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
 - **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
 - **Inject dependencies** (constructor/parameter) so a named fake swaps in without infra.
-- **Tests:** regression test per bugfix. Mock external I/O with named fakes. Headless, one command — no manual seed, missing config, or secret.
 - **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`); never spend a turn on formatting.
 - **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
 - **Defensive code is opt-in:** no retry/backoff, timeout, circuit-breaker, rate-limit, or fallback unless the project names the categories it needs.
+
+## Testing
+
+- **Black-box first.** Test through the outermost interface the caller touches: browser flow, HTTP request, CLI run, a library's public API. E2E is the default; go lower only when the outer layer can't reach the failure.
+- **Failure list before code.** When something needs isolated tests, first write every way it can fail as test cases, watch them go red, then write the code. A test written after the code restates it and passes by construction.
+- **Artifact per E2E run:** each run leaves a checkable artifact (golden file, HTTP transcript, screenshot, log) that the same one command regenerates. Diff against it; don't eyeball.
+- **Bug fixes:** reproduce E2E as the end user experiences it; that red test becomes the regression test once green.
+- **Legacy code:** pin current behavior with characterization (golden master) tests before changing it.
+- Mock only external I/O, with named fakes. Headless, one command — no manual seed, missing config, or secret.
 
 ## Tools (machine-specific)
 
