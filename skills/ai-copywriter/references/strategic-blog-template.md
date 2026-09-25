@@ -250,7 +250,7 @@ Separate verified facts from interpretation. When uncertain, qualify the stateme
 5. **Extract the ground rules.** Identify the one product principle and one distribution principle underneath the examples.
 6. **Convert observations into tactics.** Group the examples into four to seven repeatable strategies. Each tactic must include a mechanism and an implication.
 7. **Compress the conclusion.** Summarize the thesis using a simple formula. Turn that formula into one sentence of direct advice.
-8. **Edit for rhythm, then run the humanizer.** Break long paragraphs. Remove redundant context. Replace abstract statements with specific examples. Add short concluding sentences after dense explanations. Ensure every section advances the central thesis. Then run the full draft, audit, final loop from Process and Output over the whole post before delivering it.
+8. **Edit for rhythm, then run the humanize loop.** Break long paragraphs. Remove redundant context. Replace abstract statements with specific examples. Add short concluding sentences after dense explanations. Ensure every section advances the central thesis. Then run the full draft, audit, final loop from Process and Output over the whole post before delivering it.
 
 ## Input template
 
