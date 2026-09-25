@@ -6,6 +6,7 @@ NEVER commit without knowing whose identity to use — the identity configured o
 
 - **Already told in this conversation:** if the user has stated the name/email to commit under at any point in the current session, reuse it for every commit in that session — do NOT ask again.
 - **Not yet told:** before the first commit, read the current git identity (`git config user.name` / `git config user.email`), show it, and ask: "Commit as <name> <email>, or a different identity?" Wait for the answer — never commit on the configured identity without explicit confirmation, even if one is set.
+- **Harness account ≠ user:** the email of the account logged into the harness (e.g. a `userEmail` context entry) belongs to whoever owns the subscription, not to the user at the keyboard. Identity comes only from git config and the user's answer; never show, suggest, or attribute work to the harness account email.
 
 Set author **and** committer to the chosen identity. Never hardcode an email address in this file.
 
