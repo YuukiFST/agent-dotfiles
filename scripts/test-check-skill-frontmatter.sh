@@ -30,6 +30,9 @@ check() {
 }
 
 long_desc="$(printf 'a%.0s' $(seq 1 1025))"
+# 1000 two-byte chars = 2000 bytes: within the spec's 1024-char limit (PR #99 review).
+accented_desc="$(printf 'é%.0s' $(seq 1 1000))"
+long_accented_desc="$(printf 'é%.0s' $(seq 1 1025))"
 
 # --- Valid frontmatter must pass ---
 check allow valid my-skill <<'EOF'
@@ -51,6 +54,12 @@ name: my-skill
 description: Do one thing.
 user-invocable: false
 author: Someone
+---
+EOF
+check allow accented-description my-skill <<EOF
+---
+name: my-skill
+description: $accented_desc
 ---
 EOF
 check allow crlf my-skill < <(printf -- '---\r\nname: my-skill\r\ndescription: Do one thing.\r\n---\r\n')
@@ -93,6 +102,12 @@ check block long-description my-skill <<EOF
 ---
 name: my-skill
 description: $long_desc
+---
+EOF
+check block long-accented-description my-skill <<EOF
+---
+name: my-skill
+description: $long_accented_desc
 ---
 EOF
 check block missing-name my-skill <<'EOF'
