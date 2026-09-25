@@ -1,13 +1,13 @@
 ---
 name: ui-craft
-description: Create a web UI (page, screen, component, flow) from scratch to a design-engineer craft bar, with Libraries.dev AI-era effects applied under the full jakubkrehel and emilkowalski rules. Use when asked to create or build a new screen, flow or component, pick a UI library for a new primitive, or add or find an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Improving an existing UI without new effects goes to ui-polish.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar with Libraries.dev AI-era effects built in: everything ui-polish does, plus the effects applied under the full jakubkrehel and emilkowalski rules. Use when asked for a screen or component in a project that uses or should use Libraries.dev, or for an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Without the library, ui-polish.
 ---
 
 # UI craft
 
-Build from scratch, with Libraries.dev in the toolbox. This skill stands on `ui-polish`: read `../ui-polish/SKILL.md` (the sibling skill directory) in full first. Its reference library, design-system rule, recon, domain reviewers, evidence and finish checklist all apply here unchanged; this file adds the Libraries.dev reference, the effects gate, and the Build, Library and Effects modes.
+`ui-polish` plus Libraries.dev. This skill stands on `ui-polish`: read `../ui-polish/SKILL.md` (the sibling skill directory) in full first. Its reference library, design-system rule, recon, modes, domain reviewers, evidence and finish checklist all apply here unchanged; this file adds the Libraries.dev reference, recon step 7, the combined gate, and the effects layer on each mode.
 
-The references are **one body of knowledge**, never alternatives. Every new screen is held to all of them at once: a Libraries.dev effect is motion and surface, so it passes Emil's gate and Jakub's layout, writing, color and accessibility rules like any other element, and Emil's motion rules hold wherever an effect is absent. The **combined gate** below is where they meet.
+The references are **one body of knowledge**, never alternatives. Every screen is held to all of them at once: a Libraries.dev effect is motion and surface, so it passes Emil's gate and Jakub's layout, writing, color and accessibility rules like any other element, and Emil's motion rules hold wherever an effect is absent. The **combined gate** below is where they meet.
 
 ## Libraries.dev reference
 
@@ -23,15 +23,16 @@ React or not, SSR, WebGL allowed, package manager (lockfile), Libraries.dev pack
 
 ## Modes
 
-Pick one from the request. State it in one line before starting.
+Every `ui-polish` mode exists here, with the effects layer on top. Pick one from the request and state it in one line before starting.
 
 | Request shape | Mode | Procedure |
 | --- | --- | --- |
-| "Create / build this screen, flow or component" | **Build** | [build.md](build.md) |
-| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. An AI-era effect (thinking state, glowing border, metal, voice, bot, image reveal, gooey) is picked by Libraries.dev's decision rules instead, through **Effects**. |
+| "Create / build this screen, flow or component" | **Build** | [build.md](build.md): `ui-polish`'s `build.md` with the effect additions per step |
+| "Improve / polish / redesign / review this page or component" | **Audit** | `../ui-polish/audit.md`, with the effects reviewer in step 3's fan-out, effects rows fixed through `effects.md` apply steps 2 to 6 in step 5, and the effect browser pass from **Evidence** plus the library's Common mistakes re-read against the diff in step 6 |
+| "Animate X" / "add motion" / "this feels static" | **Motion** | `ui-polish` Motion. A wait indicator or an effect-shaped request (glow, shimmer, blob, metal) runs the combined gate first |
+| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | `ui-polish` Library. An AI-era effect (thinking state, glowing border, metal, voice, bot, image reveal, gooey) is picked by Libraries.dev's decision rules instead, through **Effects** |
+| "Show me options for this UI" / "Stress-test this component" | **Variant** / **Break** | `ui-polish` as written; an effect inside a variant or a state passes the combined gate |
 | "Add a thinking orb / beam / metal CTA here", "where could effects fit", `libraries reveal`, `libraries review`, `libraries apply` | **Effects** | [effects.md](effects.md) |
-
-Improving an existing screen with no new effect is `ui-polish`'s: say so in one line and hand over.
 
 ## The combined gate
 

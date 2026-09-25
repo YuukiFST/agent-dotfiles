@@ -60,5 +60,5 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 ## Rule files (already loaded — this maps a task to the block that governs it)
 
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
-- **Building a screen/component from scratch, or adding a Libraries.dev effect** → skill `ui-craft`; **improving how an existing one looks and feels, any stack** → skill `ui-polish` (both route over the design references in `~/.claude/ui-refs/`; never read those references directly).
+- **Building a screen/component or improving how an existing one looks and feels** → skill `ui-polish` (any stack, no package); the same with Libraries.dev effects, or in a project that uses them → skill `ui-craft` (both route over the design references in `~/.claude/ui-refs/`; never read those references directly).
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
