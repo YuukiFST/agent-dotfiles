@@ -9,6 +9,7 @@
 # non-empty string of at most 1024 chars. Extra fields (user-invocable, author) are allowed.
 # Needs mikefarah yq v4, preinstalled on GitHub's ubuntu runners.
 set -uo pipefail
+export LC_ALL=C.UTF-8
 
 failed=0
 report() {
@@ -17,7 +18,7 @@ report() {
 }
 
 check_skill() {
-  local file="$1" dir err name desc_tag desc_len
+  local file="$1" dir err name desc_tag desc desc_len
   dir="$(basename "$(dirname "$file")")"
 
   if [ "$(head -n 1 "$file" | tr -d '\r')" != "---" ]; then
@@ -40,8 +41,11 @@ check_skill() {
     report "$file" "name '$name' does not match directory '$dir'"
   fi
 
+  # yq's length counts bytes; the spec's limit counts characters, so count in bash
+  # under the UTF-8 locale set below (PR #99 review).
   desc_tag="$(yq --front-matter=extract '.description | tag' "$file")"
-  desc_len="$(yq --front-matter=extract '.description | length' "$file")"
+  desc="$(yq --front-matter=extract '.description' "$file")"
+  desc_len="${#desc}"
   if [ "$desc_tag" != "!!str" ] || [ "$desc_len" -eq 0 ]; then
     report "$file" "description must be a non-empty string"
   elif [ "$desc_len" -gt 1024 ]; then
