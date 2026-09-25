@@ -10,7 +10,7 @@ List the source files the scope renders: the route, its components, the shared p
 
 ## 2. Capture the baseline
 
-Open the route in the browser. Save a desktop and a 320px screenshot to a scratch folder the project ignores (`.scratch/ui-craft/<route>/before-*.png`, or the project's own evidence folder when one exists). Take a `snapshot` for names and roles. Note console errors.
+Open the route in the browser. Save a desktop and a 320px screenshot to a scratch folder the project ignores (`.scratch/ui-polish/<route>/before-*.png`, or the project's own evidence folder when one exists). Take a `snapshot` for names and roles. Note console errors.
 
 Done when: two screenshots exist and the accessibility snapshot is saved as text.
 
