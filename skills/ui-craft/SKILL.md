@@ -1,87 +1,69 @@
 ---
 name: ui-craft
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, or pick a UI library. Skip for pure logic, data or backend work.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar with Libraries.dev AI-era effects built in, doing everything ui-polish does plus applying the effects under the full jakubkrehel and emilkowalski rules. Use when asked for a screen or component in a project that uses or should use Libraries.dev, or for an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Without the library, ui-polish.
 ---
 
 # UI craft
 
-One router. The taste lives in the reference library; this file decides which reference to read, when, and how the work is verified. Reading a reference means loading the whole file, not a grep.
+`ui-polish` plus Libraries.dev. This skill stands on `ui-polish`: read `../ui-polish/SKILL.md` (the sibling skill directory) in full first. Its reference library, design-system rule, recon, modes, domain reviewers, evidence and finish checklist all apply here unchanged; this file adds the Libraries.dev reference, recon step 7, the combined gate, and the effects layer on each mode.
 
-The **project's design system is the direction**. Tokens, component library, density and motion language already in the repo win over anything a reference proposes. A reference supplies the rule and the exact value; the project supplies the idiom the fix is written in. Never introduce a second styling system, a parallel token set, or a new aesthetic to apply a rule.
+The references are **one body of knowledge**, never alternatives. Every screen is held to all of them at once: a Libraries.dev effect is motion and surface, so it passes Emil's gate and Jakub's layout, writing, color and accessibility rules like any other element, and Emil's motion rules hold wherever an effect is absent. The **combined gate** below is where they meet.
 
-## Reference library
+## Libraries.dev reference
 
-`REFS` = `~/.claude/ui-refs` (Windows: `C:\Users\<user>\.claude\ui-refs`). Missing or stale → run `bash ~/.claude/skills/ui-craft/update-refs.sh` (clone-or-pull, idempotent). Every reference is a whole directory: `SKILL.md` is the rule set, sibling `.md` files hold the exact values.
+`LIB` = `REFS/libraries-dev/skills/libraries-dev/`, cloned by `ui-polish`'s `update-refs.sh`. `LIB/SKILL.md` holds the decision rules; `LIB/references/0N-<library>.md` holds install, props, recipes, accessibility and cost for one package, read in full before any code for it. The packages are React only.
 
-| Domain | Owner (read `SKILL.md` + siblings) |
-| --- | --- |
-| Accessibility: names, focus, keyboard, hit areas, reduced motion | `REFS/jakubkrehel-skills/skills/better-accessibility/` |
-| Layout: grouping, alignment, reading order, breakpoints, growth | `REFS/jakubkrehel-skills/skills/better-layout/` |
-| Writing: labels, errors, empty states, one voice | `REFS/jakubkrehel-skills/skills/better-writing/` |
-| Typography: scale, wrapping, tabular nums, truncation | `REFS/jakubkrehel-skills/skills/better-typography/` |
-| Colors: tokens, ramps, measured contrast | `REFS/jakubkrehel-skills/skills/better-colors/` |
-| Polish: concentric radius, optical alignment, surfaces, icons, enter/exit | `REFS/jakubkrehel-skills/skills/better-ui/` |
-| Motion bar: ten standards, escalation triggers, exact curves and durations | `REFS/emilkowalski-skills/skills/review-animations/` (`STANDARDS.md` has the values) |
-| Motion build: the gate, then the decision order | `REFS/emilkowalski-skills/skills/animate/` (`RECIPES.md` has code) |
-| Motion opportunities: where motion is missing, with restraint | `REFS/emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` |
-| Mobile feel: viewport, tap, safe areas, sticky hover | `REFS/emilkowalski-skills/skills/mobile-native/SKILL.md` |
-| Library pick: curated list per task | `REFS/emilkowalski-skills/skills/pick-ui-library/SKILL.md` |
-| Consolidation: severity scale, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
-| Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
-| Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
+In `LIB/SKILL.md`, the Commands section runs through **Effects** mode here, its Safety section binds as written, and its Free and Pro section allows one mention of the Studio or Pro skill when a free option cannot do the job.
 
-Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it.
+## Recon step 7: waits and effect fit
 
-## Step 0: Recon (every mode)
+Run after `ui-polish` recon steps 1 to 6, in every mode of this skill.
 
-Before any reference is read, establish the project facts. They go into every subagent prompt and every fix.
-
-1. **Stack and styling system**: framework, CSS approach, component library, motion library, from `package.json` and the root layout.
-2. **Tokens**: the global stylesheet (`globals.css`, theme file, Tailwind config). Note radius, spacing, easing and duration tokens by name.
-3. **Shared components**: the project's own primitives (buttons, dialogs, tables, filters, empty/error/loading states). A fix reuses them before adding markup.
-4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
-5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
-6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse).
-
-Write recon as a short block. It is the CONTEXT section of every reviewer prompt.
+React or not, SSR, WebGL allowed, package manager (lockfile), Libraries.dev packages already installed. Then every wait in scope with its estimated duration (under 2 s, 2 to 3 s, over 3 s), and every voice, agent-avatar, generated-image, key-headline, badge and upsell-CTA surface. Estimate a wait from the call type: model replies, agent runs, uploads and image generation are long; small fetches, toggles and route changes are short; anything else is "unknown". Find surfaces by grepping the signal table under "Detecting a fit in a codebase" at the end of each `LIB` reference; that section alone is the one partial read allowed.
 
 ## Modes
 
-Pick one from the request. State it in one line before starting.
+Every `ui-polish` mode exists here, with the effects layer on top. Pick one from the request and state it in one line before starting.
 
 | Request shape | Mode | Procedure |
 | --- | --- | --- |
-| "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
-| "Create / build this screen, flow or component" | **Build** | [build.md](build.md) |
-| "Animate X" / "add motion" / "this feels static" | **Motion** | Read `animate/SKILL.md`. Run its gate first: frequency and purpose decide whether anything animates at all. Zero lines is a valid outcome. |
-| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. |
-| "Show me options for this UI" | **Variant** | Read `REFS/jakubkrehel-skills/skills/variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
-| "Stress-test this component" | **Break** | Read `REFS/jakubkrehel-skills/skills/break/SKILL.md` + `scenarios.md`: every state on one temporary page. |
+| "Create / build this screen, flow or component" | **Build** | [build.md](build.md): `ui-polish`'s `build.md` with the effect additions per step |
+| "Improve / polish / redesign / review this page or component" | **Audit** | `../ui-polish/audit.md`, with the effects reviewer in step 3's fan-out, effects rows fixed through `effects.md` apply steps 2 to 6 in step 5, and the effect browser pass from **Evidence** plus the library's Common mistakes re-read against the diff in step 6 |
+| "Animate X" / "add motion" / "this feels static" | **Motion** | `ui-polish` Motion. A wait indicator or an effect-shaped request (glow, shimmer, blob, metal) runs the combined gate first |
+| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | `ui-polish` Library. An AI-era effect (thinking state, glowing border, metal, voice, bot, image reveal, gooey) is picked by Libraries.dev's decision rules instead, through **Effects** |
+| "Show me options for this UI" / "Stress-test this component" | **Variant** / **Break** | `ui-polish` as written; an effect inside a variant or a state passes the combined gate |
+| "Add a thinking orb / beam / metal CTA here", "where could effects fit", `libraries reveal`, `libraries review`, `libraries apply` | **Effects** | [effects.md](effects.md) |
 
-Audit and Build both end with the **review gate** in [audit.md](audit.md); Build reaches it after the screen exists.
+## The combined gate
 
-## Domain reviewers (fan-out)
+Every effect candidate, in any mode, clears these in order. A candidate that fails a step is dropped and reported with the step that dropped it.
 
-A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
+1. **Frequency and purpose** (`animate/SKILL.md` gate). A wait indicator is *state indication*; an attention effect (Liquid metal, a Pulse beam on a CTA) is *delight* and lives on marketing, upgrade, onboarding and rare surfaces, or where the recon personality is playful. Keyboard and 100+/day paths get nothing. Data the user is reading never moves for style.
+2. **Pick** (`LIB/SKILL.md` decision rules). Wait under 2 s: nothing. 2 s or more: Thinking orbs beside a label. Over 3 s: add Border beam on the working element. Unknown wait: no effect, listed under Not verified with the call that needs timing. Element rules next, then the cheaper effect when two fit. One effect per UI area, never on neighbours, one Liquid metal preset per page. No clear match: offer `libraries reveal`, force nothing.
+3. **Replace**. The effect supersedes the spinner, typing dots or hand-rolled glow at that spot; the old indicator goes in the same change. Non-React stack or a no-WebGL target: the package is out, the thresholds and placement still hold, built with the project's own motion from `animate/RECIPES.md`.
+4. **Design system**. Theme prop driven by the project's theme state, explicit rather than `auto` under SSR. Colours, radius and size from recon tokens: a beam follows the element's radius (`better-ui` concentric radius), an orb sits on the text line optically aligned with its label, metal and image fill a box of explicit size.
+5. **Words** (`better-writing`). The label beside an orb names the real activity in the project's voice ("Searching docs…"), and the orb state matches it.
+6. **Accessibility** (`better-accessibility` plus the reference's own section). Status lives in text on the real control (`role="status"`, `aria-busy`); a canvas whose text neighbour already says it is `aria-hidden`. Each reference states which reduced-motion cases the package handles; wire the rest yourself, and give a Pulse beam a non-motion cue when its glow carries meaning.
+7. **Motion around it** (`review-animations/STANDARDS.md`). The effect's entrance and exit (orb appearing at the threshold, beam ending when the flag clears) use the project's duration and easing tokens and stay interruptible.
+8. **Cost**. WebGL (Liquid metal, Image) and SVG filters (Gooey) stay out of dense lists and repeated rows. Mobile viewports: read `mobile-native/SKILL.md` once.
 
-- Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
-- Default set: accessibility, layout, writing, typography, colors, polish+motion (six). `quick` scope: accessibility and polish+motion only.
-- Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
-- Consolidation stays in the main thread: read `better-interface/SKILL.md` sections 6 to 9 and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). Re-read the cited line of every finding before keeping it.
+Install is always shown first and run only on the user's go-ahead (Libraries.dev Safety).
+
+## Effects reviewer
+
+A seventh domain added to `ui-polish`'s fan-out, dispatched in the same message, whenever recon step 7 found a React stack with a wait of 2 s or more, an effect surface, or an installed Libraries.dev package. It runs in the `quick` scope too. Prompt: [effects-reviewer.md](effects-reviewer.md).
 
 ## Evidence
 
-Every finding and every claim of improvement cites `path:line` and, where rendering decides it, a browser observation. The browser on this machine is `chrome-devtools-axi` (`open`, `snapshot`, `screenshot`, `eval`, `console`); read `chrome-devtools-axi <command> --help` before use.
-
-Minimum browser pass for a screen: screenshot at desktop width and at 320px, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. A check that cannot run is reported as **Not verified**, never inferred.
+`ui-polish`'s minimum browser pass, plus for every effect: a screenshot with it active and one after its state ends, light and dark when the project has both, and a `console` read clean of hydration and WebGL warnings.
 
 ## Before you finish
 
+`ui-polish`'s checklist, plus:
+
 | Mistake | Fix |
 | --- | --- |
-| A fix written in a new styling idiom or a new token | Rewrite it with the project's tokens and components from recon |
-| Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
-| Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
-| Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
-| "Improved" claimed from source alone | Before/after screenshot, or mark Not verified |
-| Project gates skipped after edits | Run the recon step 6 commands and report their output |
+| Effect added because the package exists | Run the combined gate; a wait under 2 s or a 100+/day path gets nothing |
+| Two effects on one element or on neighbours | One per UI area; keep the cheaper one |
+| Effect prop written from memory, or a dark-tuned effect on a light page | Re-read the library's reference; drive `theme` from the project's theme state |
+| Package installed without the user's go-ahead | Show the command and wait (Libraries.dev Safety) |
