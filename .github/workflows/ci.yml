@@ -33,3 +33,17 @@ jobs:
       # SC1091 at every call site.
       - name: Shellcheck hooks and scripts
         run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot
+
+  skill-frontmatter:
+    name: Skill frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A SKILL.md whose frontmatter does not parse loads with no description and
+      # silently loses its triggers (PR #97). yq comes preinstalled on the runner.
+      - name: Run check-skill-frontmatter regression tests
+        run: bash scripts/test-check-skill-frontmatter.sh
+
+      - name: Validate every SKILL.md frontmatter
+        run: bash scripts/check-skill-frontmatter.sh
