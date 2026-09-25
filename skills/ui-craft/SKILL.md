@@ -1,6 +1,6 @@
 ---
 name: ui-craft
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar with Libraries.dev AI-era effects built in: everything ui-polish does, plus the effects applied under the full jakubkrehel and emilkowalski rules. Use when asked for a screen or component in a project that uses or should use Libraries.dev, or for an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Without the library, ui-polish.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar with Libraries.dev AI-era effects built in, doing everything ui-polish does plus applying the effects under the full jakubkrehel and emilkowalski rules. Use when asked for a screen or component in a project that uses or should use Libraries.dev, or for an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Without the library, ui-polish.
 ---
 
 # UI craft
