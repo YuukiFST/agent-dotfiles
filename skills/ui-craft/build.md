@@ -19,7 +19,7 @@ Greenfield repo with no tokens and no neighbours → this is the one case a dire
 
 For each non-trivial primitive the brief needs (dialog, menu, table, toast, chart, date, drag, virtual list), check `package.json` and the shared components first. Only for a gap, read `pick-ui-library/SKILL.md` and take its pick. Hand-rolling one of those is a defect.
 
-For each wait and effect surface in the brief, run the combined gate in `SKILL.md` **Effects**. Each survivor gets its Libraries.dev reference read in full now, so the markup is written around it; its install follows `effects.md` apply step 3.
+For each wait and effect surface in the brief, run the **combined gate** in `SKILL.md`. Each survivor gets its Libraries.dev reference read in full now, so the markup is written around it; its install follows `effects.md` apply step 3.
 
 ## 3. Structure
 
@@ -45,4 +45,4 @@ Mobile in the viewports → read `mobile-native/SKILL.md` once and apply its pla
 
 ## 7. Review gate
 
-Run the **Audit** procedure from step 3 onward (`audit.md`) on the new screen: fan-out reviewers, consolidate, fix, gates, screenshots, report. A new screen ships only after its own audit returns no HIGH finding.
+Run the **Audit** procedure in `../ui-polish/audit.md` from step 3 onward on the new screen: fan-out reviewers (plus the effects reviewer when `SKILL.md` qualifies it), consolidate, fix, gates, screenshots, report. Effects rows are fixed through `effects.md` apply steps 2 to 6, and a changed effect gets the `SKILL.md` **Evidence** pass and its library's Common mistakes re-read against the diff. A new screen ships only after its own audit returns no HIGH finding.

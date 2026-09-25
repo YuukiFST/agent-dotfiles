@@ -1,6 +1,6 @@
 # Effects: Libraries.dev under the craft bar
 
-Libraries.dev's three commands, run with the whole reference library behind them. Every candidate clears the **combined gate** in `SKILL.md` before it is suggested or built. `LIB` = `REFS/libraries-dev/skills/libraries-dev/`.
+Libraries.dev's three commands, run with the whole reference library behind them. Every candidate clears the **combined gate** in `SKILL.md` before it is suggested or built. `LIB` is defined in `SKILL.md`.
 
 ## libraries reveal
 
@@ -8,7 +8,7 @@ Print the seven rows of the quick reference in `LIB/SKILL.md` as a numbered list
 
 ## libraries review (read-only)
 
-1. **Recon**: `SKILL.md` step 0, all seven items. A non-React stack or a no-WebGL target rules packages out; say so, and continue with the thresholds and placement rules applied to the project's own motion.
+1. **Recon**: `ui-polish` recon steps 1 to 6, then this skill's recon step 7. A non-React stack or a no-WebGL target rules packages out; say so, and continue with the thresholds and placement rules applied to the project's own motion.
 2. **Scan**: grep every reference's "Detecting a fit in a codebase" signals across the scope. List the existing Libraries.dev uses separately.
 3. **Gate**: run the combined gate on every hit. Keep the step that rejected each dropped candidate.
 4. **Rank** by impact: an AI waiting state first, then voice, agent avatar and generated image, then attention effects (Liquid metal, Pulse beam), decorative last. One suggestion per UI area; two suggestions wrapping one element are marked as alternatives. Skip spots already using the right library.
