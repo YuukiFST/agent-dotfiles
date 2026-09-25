@@ -1,11 +1,13 @@
 ---
 name: ui-craft
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, or pick a UI library. Skip for pure logic, data or backend work.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar, routing to the jakubkrehel, emilkowalski and Libraries.dev reference skills. Use when asked to create a screen from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, pick a UI library, or add an AI-era effect (thinking or loading state, border beam, liquid metal, gooey, voice glow, bot avatar, image-generation reveal; libraries.dev, "libraries reveal/review/apply"). Skip for pure logic, data or backend work.
 ---
 
 # UI craft
 
 One router. The taste lives in the reference library; this file decides which reference to read, when, and how the work is verified. Reading a reference means loading the whole file, not a grep.
+
+The references are **one body of knowledge**, never alternatives. Every screen is held to all of them at once: a Libraries.dev effect is motion and surface, so it passes Emil's gate and Jakub's layout, writing, color and accessibility rules like any other element, and Emil's motion rules hold wherever an effect is absent. The **Effects** section below is where they meet.
 
 The **project's design system is the direction**. Tokens, component library, density and motion language already in the repo win over anything a reference proposes. A reference supplies the rule and the exact value; the project supplies the idiom the fix is written in. Never introduce a second styling system, a parallel token set, or a new aesthetic to apply a rule.
 
@@ -29,8 +31,9 @@ The **project's design system is the direction**. Tokens, component library, den
 | Consolidation: severity scale, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
 | Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
+| Effects: which AI-era effect fits which wait or element, install, props, per-package accessibility and cost (React only) | `REFS/libraries-dev/skills/libraries-dev/` (`SKILL.md` = decision rules; `references/0N-<library>.md` = the one library in play, read in full before any code) |
 
-Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it.
+Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it. In Libraries.dev's `SKILL.md`, the Commands section is run through **Effects** mode here, its Safety section binds as written, and its Free and Pro section allows one mention of the Studio or Pro skill when a free option cannot do the job.
 
 ## Step 0: Recon (every mode)
 
@@ -42,6 +45,7 @@ Before any reference is read, establish the project facts. They go into every su
 4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
 5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
 6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse).
+7. **Waits and effect fit**: React or not, SSR, WebGL allowed, package manager (lockfile), Libraries.dev packages already installed. Then every wait in scope with its estimated duration (under 2 s, 2 to 3 s, over 3 s; "unknown" when the code does not tell), and every voice, agent-avatar, generated-image, key-headline, badge and upsell-CTA surface. Find them by grepping the signal table under "Detecting a fit in a codebase" at the end of each Libraries.dev reference; that section alone is the one partial read allowed.
 
 Write recon as a short block. It is the CONTEXT section of every reviewer prompt.
 
@@ -54,18 +58,34 @@ Pick one from the request. State it in one line before starting.
 | "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
 | "Create / build this screen, flow or component" | **Build** | [build.md](build.md) |
 | "Animate X" / "add motion" / "this feels static" | **Motion** | Read `animate/SKILL.md`. Run its gate first: frequency and purpose decide whether anything animates at all. Zero lines is a valid outcome. |
-| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. |
+| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. An AI-era effect (thinking state, glowing border, metal, voice, bot, image reveal, gooey) is picked by Libraries.dev's decision rules instead, through **Effects**. |
+| "Add a thinking orb / beam / metal CTA here", "where could effects fit", `libraries reveal`, `libraries review`, `libraries apply` | **Effects** | [effects.md](effects.md) |
 | "Show me options for this UI" | **Variant** | Read `REFS/jakubkrehel-skills/skills/variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
 | "Stress-test this component" | **Break** | Read `REFS/jakubkrehel-skills/skills/break/SKILL.md` + `scenarios.md`: every state on one temporary page. |
 
 Audit and Build both end with the **review gate** in [audit.md](audit.md); Build reaches it after the screen exists.
+
+## Effects: the combined gate
+
+Every effect candidate, in any mode, clears these in order. A candidate that fails a step is dropped and reported with the step that dropped it.
+
+1. **Frequency and purpose** (`animate/SKILL.md` gate). A wait indicator is *state indication*; an attention effect (Liquid metal, a Pulse beam on a CTA) is *delight* and lives on marketing, upgrade, onboarding and rare surfaces, or where the recon personality is playful. Keyboard and 100+/day paths get nothing. Data the user is reading never moves for style.
+2. **Pick** (Libraries.dev decision rules). Wait under 2 s: nothing. 2 s or more: Thinking orbs beside a label. Over 3 s: add Border beam on the working element. Element rules next, then the cheaper effect when two fit. One effect per UI area, never on neighbours, one Liquid metal preset per page. No clear match: offer `libraries reveal`, force nothing.
+3. **Replace**. The effect supersedes the spinner, typing dots or hand-rolled glow at that spot; the old indicator goes in the same change. Non-React stack or a no-WebGL target: the package is out, the thresholds and placement still hold, built with the project's own motion from `animate/RECIPES.md`.
+4. **Design system**. Theme prop driven by the project's theme state, explicit rather than `auto` under SSR. Colours, radius and size from recon tokens: a beam follows the element's radius (`better-ui` concentric radius), an orb sits on the text line optically aligned with its label, metal and image fill a box of explicit size.
+5. **Words** (`better-writing`). The label beside an orb names the real activity in the project's voice ("Searching docs…"), and the orb state matches it.
+6. **Accessibility** (`better-accessibility` plus the reference's own section). Status lives in text on the real control (`role="status"`, `aria-busy`); a canvas whose text neighbour already says it is `aria-hidden`. Each reference states which reduced-motion cases the package handles; wire the rest yourself, and give a Pulse beam a non-motion cue when its glow carries meaning.
+7. **Motion around it** (`review-animations/STANDARDS.md`). The effect's entrance and exit (orb appearing at the threshold, beam ending when the flag clears) use the project's duration and easing tokens and stay interruptible.
+8. **Cost**. WebGL (Liquid metal, Image) and SVG filters (Gooey) stay out of dense lists and repeated rows. Mobile viewports: read `mobile-native/SKILL.md` once.
+
+Install is always shown first and run only on the user's go-ahead (Libraries.dev Safety).
 
 ## Domain reviewers (fan-out)
 
 A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
-- Default set: accessibility, layout, writing, typography, colors, polish+motion (six). `quick` scope: accessibility and polish+motion only.
+- Default set: accessibility, layout, writing, typography, colors, polish+motion (six), plus effects (seventh) when recon step 7 found a React stack with a wait of 2 s or more (or unknown), an effect surface, or an installed Libraries.dev package. `quick` scope: accessibility and polish+motion only.
 - Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - Consolidation stays in the main thread: read `better-interface/SKILL.md` sections 6 to 9 and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). Re-read the cited line of every finding before keeping it.
 
@@ -73,7 +93,7 @@ A review of a screen runs one read-only subagent per domain, in parallel, each h
 
 Every finding and every claim of improvement cites `path:line` and, where rendering decides it, a browser observation. The browser on this machine is `chrome-devtools-axi` (`open`, `snapshot`, `screenshot`, `eval`, `console`); read `chrome-devtools-axi <command> --help` before use.
 
-Minimum browser pass for a screen: screenshot at desktop width and at 320px, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. A check that cannot run is reported as **Not verified**, never inferred.
+Minimum browser pass for a screen: screenshot at desktop width and at 320px, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. An effect adds: a screenshot with it active and one after its state ends, light and dark when the project has both, and a `console` read clean of hydration and WebGL warnings. A check that cannot run is reported as **Not verified**, never inferred.
 
 ## Before you finish
 
@@ -83,5 +103,9 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
+| Effect added because the package exists | Run the combined gate; a wait under 2 s or a 100+/day path gets nothing |
+| Two effects on one element or on neighbours | One per UI area; keep the cheaper one |
+| Effect prop written from memory, or a dark-tuned effect on a light page | Re-read the library's reference; drive `theme` from the project's theme state |
+| Package installed without the user's go-ahead | Show the command and wait (Libraries.dev Safety) |
 | "Improved" claimed from source alone | Before/after screenshot, or mark Not verified |
 | Project gates skipped after edits | Run the recon step 6 commands and report their output |

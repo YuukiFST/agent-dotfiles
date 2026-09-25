@@ -16,7 +16,7 @@ Done when: two screenshots exist and the accessibility snapshot is saved as text
 
 ## 3. Fan out the domain reviewers
 
-Dispatch the reviewers per `SKILL.md` **Domain reviewers**, in a single message so they run in parallel. Each prompt carries the recon block, the scope files, the preview URL, the before screenshots' paths and its own reference paths.
+Dispatch the reviewers per `SKILL.md` **Domain reviewers**, in a single message so they run in parallel. Each prompt carries the recon block, the scope files, the preview URL, the before screenshots' paths and its own reference paths. The effects reviewer runs only when recon step 7 qualifies it.
 
 Done when: every reviewer returned a findings table or an explicit "No actionable findings".
 
@@ -32,7 +32,7 @@ Present the table. If the user is present and the fixes are many or invasive, st
 
 ## 5. Apply
 
-Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes take their exact values from `review-animations/STANDARDS.md`; polish values from `better-ui` siblings. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
+Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes take their exact values from `review-animations/STANDARDS.md`; polish values from `better-ui` siblings. Effects rows run `effects.md` apply steps 2 to 6; a new package waits for the user's go-ahead. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
 
 Done when: every applied row is checked off in the table with the file touched.
 
@@ -41,6 +41,7 @@ Done when: every applied row is checked off in the table with the file touched.
 1. Run the project gates from recon step 6 (typecheck, lint, tests). Fix what your change broke.
 2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Reduced-motion emulated once if motion changed.
 3. Motion changed → re-read the ten standards in `review-animations/SKILL.md` against the diff. Any escalation trigger left = not done.
+4. Effect changed → the effect browser pass from `SKILL.md` **Evidence**, and the library's Common mistakes re-read against the diff.
 
 Done when: gates pass, both after-screenshots exist, and no HIGH finding remains open.
 

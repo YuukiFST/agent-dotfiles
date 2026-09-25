@@ -12,6 +12,9 @@ Domain → reference paths (all under `REFS`, resolve `~` to the absolute home d
 | typography | `jakubkrehel-skills/skills/better-typography/SKILL.md`, `spacing-and-sizing.md`, `wrapping-and-punctuation.md`, `details-and-accessibility.md` |
 | colors | `jakubkrehel-skills/skills/better-colors/SKILL.md`, `contrast.md`, `color-usage.md` |
 | polish+motion | `jakubkrehel-skills/skills/better-ui/SKILL.md`, `surfaces.md`, `animations.md`, `enter-exit.md`; `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md` |
+| effects | `libraries-dev/skills/libraries-dev/SKILL.md`; the `references/0N-<library>.md` of every library installed or hit by a signal in scope; `emilkowalski-skills/skills/animate/SKILL.md`; this skill's own `SKILL.md`, section "Effects: the combined gate" |
+
+Boundary between the two motion domains, pasted into both prompts: **effects** owns wait indicators on AI flows (spinners, typing dots, "Thinking…" copy) and every Libraries.dev component, used or missing; **polish+motion** owns all other motion. The effects reviewer runs the combined gate on each candidate and ends its output with one extra line, `Rejected: {candidate at path:line, gate step}` (or `Rejected: none`), after the Not verified line.
 
 ## Template
 
