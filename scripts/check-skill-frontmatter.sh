@@ -42,7 +42,7 @@ check_skill() {
   fi
 
   # yq's length counts bytes; the spec's limit counts characters, so count in bash
-  # under the UTF-8 locale set below (PR #99 review).
+  # under the UTF-8 locale set at the top (PR #99 review).
   desc_tag="$(yq --front-matter=extract '.description | tag' "$file")"
   desc="$(yq --front-matter=extract '.description' "$file")"
   desc_len="${#desc}"
