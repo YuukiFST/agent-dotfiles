@@ -44,9 +44,10 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 ## Testing
 
 - **Black-box first.** Test through the outermost interface the caller touches: browser flow, HTTP request, CLI run, a library's public API. E2E is the default; go lower only when the outer layer can't reach the failure.
-- **Failure list before code.** When something needs isolated tests, first write every way it can fail as test cases, watch them go red, then write the code. A test written after the code restates it and passes by construction.
+- **A test earns its maintenance cost.** Add one only when you can name the observable behavior it protects and the credible regression that turns it red; a change with no such regression ships without a new test. When existing coverage already catches that regression, add nothing; when a nearby test shares its setup, extend it (a table row, a shared fixture) instead of writing a near-duplicate. Assert behavior at the public boundary, so a behavior-preserving refactor keeps the test green. Full authoring gate and pruning workflow: skill `test-audit`.
+- **Failure list before code.** When something needs isolated tests, first list the distinct regressions as test cases, one case per regression (table-driven when setup is shared), watch them go red, then write the code. A test written after the code restates it and passes by construction.
 - **Artifact per E2E run:** each run leaves a checkable artifact (golden file, HTTP transcript, screenshot, log) that the same one command regenerates. Diff against it; don't eyeball.
-- **Bug fixes:** reproduce E2E as the end user experiences it; that red test becomes the regression test once green.
+- **Bug fixes:** reproduce E2E as the end user experiences it; that red test becomes the regression test once green, and the only one: no copies at the inner layers the bug crosses.
 - **Legacy code:** pin current behavior with characterization (golden master) tests before changing it.
 - Mock only external I/O, with named fakes. Headless, one command — no manual seed, missing config, or secret.
 
