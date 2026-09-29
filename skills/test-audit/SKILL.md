@@ -90,11 +90,13 @@ in-scope test count, test and test-support LOC, and coverage from the project's
 coverage command. With no coverage command, say so and hold the target on test
 count, with the [retention bar](#retention-bar) as the only guard.
 
-The target drives discovery; the [candidate evidence](#candidate-evidence) bar
-still gates every deletion. Done when the target is met, or when every in-scope
-test file has been read and each surviving test holds a retention reason;
-report which one ended the audit and the final coverage delta. Campaign mode
-replaces this target with its per-declaration ledger.
+The target sets how far discovery reaches, not a deletion quota: the
+[candidate evidence](#candidate-evidence) bar still gates every deletion, and a
+healthy suite that falls short of the target is a valid result. Done when the
+target is met, or when every in-scope test file has been read and each
+surviving test holds a retention reason; report which one ended the audit and
+the final coverage delta. Campaign mode replaces this target with its
+per-declaration ledger.
 
 ## Discovery
 
@@ -165,7 +167,7 @@ Take every command below from the project itself: `AGENTS.md` / `CLAUDE.md`,
    dry-run that owns the real contract.
 3. Run the project's formatter on changed files, then `git diff --check`.
 4. Run the changed-files or full gate required by repository policy.
-5. Rerun the coverage command and compare it with the
+5. In audit mode, rerun the coverage command and compare it with the
    [audit target](#audit-target) baseline.
 6. Inspect `git diff --numstat`; report production/tooling separately from
    tests and test support.
@@ -187,7 +189,8 @@ Report:
 - production owner simplifications;
 - retained false positives and why they remain valuable;
 - focused and full proof actually run;
-- audit target, what ended the audit, and baseline versus final coverage;
+- in audit mode, the audit target, what ended the audit, and baseline versus
+  final coverage;
 - production versus test LOC;
 - PR and merge state;
 - named follow-ups.
