@@ -2,6 +2,7 @@
 name: test-audit
 description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate for new tests plus audit workflow for low-value, implementation-coupled, or duplicative tests and the test-only production seams they demand."
 ---
+<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added) -->
 
 # Test Audit
 
@@ -74,22 +75,42 @@ not automatically deletable; the authoring gate still rejects new ones.
 
 Before judging a candidate, read the complete test and production owner, its
 entry point, callers, callees, sibling implementations, overlapping tests, CI
-routing, and relevant history. Read root and scoped `AGENTS.md` files first.
+routing, and relevant history. Read root and scoped `AGENTS.md` / `CLAUDE.md`
+files first.
 When the test claims dependency-backed behavior, inspect the dependency source
 or types directly.
+
+## Audit target
+
+An audit with no target stops after the first few obvious candidates. Before
+discovery, take the target the user gave; with none, set and state this
+default: remove the least useful 20% of in-scope tests while keeping line
+coverage within 2 percentage points of the baseline. Record the baseline first:
+in-scope test count, test and test-support LOC, and coverage from the project's
+coverage command. With no coverage command, say so and hold the target on test
+count, with the [retention bar](#retention-bar) as the only guard.
+
+The target drives discovery; the [candidate evidence](#candidate-evidence) bar
+still gates every deletion. Done when the target is met, or when every in-scope
+test file has been read and each surviving test holds a retention reason;
+report which one ended the audit and the final coverage delta. Campaign mode
+replaces this target with its per-declaration ledger.
 
 ## Discovery
 
 Keep discovery read-only and report evidence before editing. For broad scope,
-run parallel discovery lanes when available:
+run parallel discovery lanes along the repository's own owner boundaries, for
+example:
 
-- core and packages (`src/`, `packages/`);
-- plugins (`extensions/`);
+- core source and packages;
+- plugins or extensions;
 - UI, apps, scripts, and tooling;
 - a cross-cutting pattern sweep.
 
-Outside campaign mode, prefer a few high-confidence candidates over a large
-speculative inventory. Hunt for the [junk patterns](#junk-patterns).
+Outside campaign mode, work in high-confidence batches rather than one large
+speculative inventory, and keep batching until the
+[audit target](#audit-target) is met. Hunt for the
+[junk patterns](#junk-patterns).
 
 ## Retention bar
 
@@ -134,27 +155,29 @@ to increase deletion counts.
 
 ## Validation
 
-Never edit source or tests while Vitest is running in the checkout. Follow
-`$openclaw-testing`; route heavy proof through its `$crabbox` rules.
+Stop any watch-mode test runner in the checkout before editing source or tests.
+Take every command below from the project itself: `AGENTS.md` / `CLAUDE.md`,
+`package.json` scripts, `Makefile`, `bin/`, or the CI workflow.
 
-1. Run the smallest owner and sibling tests with
-   `node scripts/run-vitest.mjs <path-or-filter>`.
+1. Run the smallest owner and sibling tests with the project's test command,
+   filtered to the changed paths.
 2. For removed source greps or plan assertions, run the executable script or
    dry-run that owns the real contract.
-3. Run targeted formatting, then `git diff --check`.
-4. Classify with
-   `node scripts/check-changed.mjs --dry-run -- <changed-paths>`, then run the
-   actual changed gate required by repository policy.
-5. Inspect `git diff --numstat`; report production/tooling separately from
+3. Run the project's formatter on changed files, then `git diff --check`.
+4. Run the changed-files or full gate required by repository policy.
+5. Rerun the coverage command and compare it with the
+   [audit target](#audit-target) baseline.
+6. Inspect `git diff --numstat`; report production/tooling separately from
    tests and test support.
-6. After final audit edits, run mandatory `$autoreview`.
+7. After final audit edits, review the diff with `/code-review`.
 
 ## Landing and continuation
 
-Commit, push, open a PR, or land only when authorized. Use
-`$openclaw-pr-maintainer` and the repository `scripts/pr` flow. Land one
-coherent PR at a time; after landing, refresh from current `main` and rerun
-read-only discovery for the next high-confidence batch.
+Commit, push, open a PR, or land only when authorized; follow the
+`git-workflow` skill and the repository's own PR flow. Land one coherent PR at
+a time; after landing, refresh from current `main` and rerun read-only
+discovery for the next high-confidence batch until the
+[audit target](#audit-target) is met.
 
 ## Handoff
 
@@ -164,6 +187,7 @@ Report:
 - production owner simplifications;
 - retained false positives and why they remain valuable;
 - focused and full proof actually run;
+- audit target, what ended the audit, and baseline versus final coverage;
 - production versus test LOC;
 - PR and merge state;
 - named follow-ups.
