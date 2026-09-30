@@ -45,6 +45,16 @@ for fixture in fixtures/*.md; do
   fi
 done
 
+# Stdin must decode as UTF-8 whatever the console encoding (cp1252 on Windows), or an em
+# dash reads as curly quotes and the "rerun until no dash" check in SKILL.md passes falsely.
+# The octal escapes are the UTF-8 bytes of an em dash.
+actual="$(printf 'x \342\200\224 y\n' | env -u PYTHONIOENCODING "$py" "$lint" | tr -d '\r')"
+if [ "$actual" = "$(printf '<stdin>:1:3: dash: "\342\200\224"')" ]; then
+  pass=$((pass + 1))
+else
+  report_fail "stdin: expected a dash finding, got: $actual"
+fi
+
 # Every id the lint prints must be a heading in patterns.md, or a finding points nowhere.
 while read -r id; do
   if grep -qx "### $id" "$skill/patterns.md"; then

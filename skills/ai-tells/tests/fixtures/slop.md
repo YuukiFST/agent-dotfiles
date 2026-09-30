@@ -32,6 +32,7 @@ The parser rejects bad input → exit 2.
 Our north star is the data flywheel.
 That's the real win.
 Adoption grew dramatically and feedback was overwhelmingly positive.
+Pipeline: build→test.
 
 ```text
 The fence — skips this. We utilize it.

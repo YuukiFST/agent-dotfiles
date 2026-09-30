@@ -226,10 +226,8 @@ RULES: list[Rule] = [
         r"(?:could|may|might|can) (?:potentially|possibly|arguably|conceivably)",
         rf"it{APOS}s also possible that",
     ),
-    words(
-        "over-compression",
-        r"→|⇒|(?<=\s)->(?=\s)|(?<=\s)=>(?=\s)",
-    ),
+    # No word guards: compressed notes glue arrows to words ("build→test").
+    Rule("over-compression", re.compile(r"[→⇒]|(?<=\s)->(?=\s)|(?<=\s)=>(?=\s)")),
     words(
         "metaphor-jargon",
         r"substrate",
@@ -275,6 +273,20 @@ MASKS = [
 FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 
 
+def closes_fence(line: str, fence: str) -> bool:
+    """CommonMark closer: same character, at least as long as the opener, no info string.
+
+    A looser check lets a ``` example inside a ```` block end the fence early.
+    """
+    closer = FENCE.match(line)
+    return bool(
+        closer
+        and closer.group(1)[0] == fence[0]
+        and len(closer.group(1)) >= len(fence)
+        and not line[closer.end() :].strip()
+    )
+
+
 def prose_lines(text: str) -> Iterator[tuple[int, str]]:
     """Yield (line number, line) for prose only: no frontmatter, no fenced code."""
     lines = text.split("\n")
@@ -286,13 +298,13 @@ def prose_lines(text: str) -> Iterator[tuple[int, str]]:
     fence = ""
     for i in range(start, len(lines)):
         line = lines[i]
-        opener = FENCE.match(line)
-        if opener and not fence:
-            fence = opener.group(1)[0] * 3
-            continue
         if fence:
-            if line.strip().startswith(fence):
+            if closes_fence(line, fence):
                 fence = ""
+            continue
+        opener = FENCE.match(line)
+        if opener:
+            fence = opener.group(1)
             continue
         yield i + 1, line
 
@@ -333,6 +345,8 @@ def label_findings(number: int, line: str) -> Iterator[Finding]:
     if not m:
         return
     label = {w.rstrip("s") for w in re.findall(r"[a-z]{3,}", (m.group(1) or m.group(2)).lower())}
+    if not label:  # "**CI:**" has no word to echo
+        return
     opening = {w.rstrip("s") for w in re.findall(r"[a-z]{3,}", m.group(3).lower())[:4]}
     # Half the label echoed: one shared word ("**E2E run:** each run leaves") is chance.
     if len(label & opening) * 2 >= len(label):
@@ -364,8 +378,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("files", nargs="*", help="files to lint; none or - reads stdin")
     parser.add_argument("--list-rules", action="store_true", help="print every rule id")
     args = parser.parse_args(argv)
-    # Windows consoles default to cp1252, which cannot print the dashes and emoji we report.
+    # Windows consoles default to cp1252, which cannot print the dashes and emoji we report,
+    # and which decodes a piped em dash as curly quotes.
     sys.stdout.reconfigure(encoding="utf-8")
+    sys.stdin.reconfigure(encoding="utf-8")
 
     if args.list_rules:
         ids = dict.fromkeys([r.id for r in RULES] + ["decorative-heading", "decorative-bold"])
