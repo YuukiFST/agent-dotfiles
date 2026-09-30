@@ -11,7 +11,7 @@ The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit 
 
 ## The flow
 
-1. **Issue first.** Before writing code, open an issue stating the problem and the acceptance criteria — not the solution. `gh-axi issue create`. Label it (`bug`, `feat`, `chore`). Skip only for pure formatting runs.
+1. **Issue first.** Before writing code, open an issue stating the problem and the acceptance criteria — not the solution. `gh-axi issue create`. Label it with an existing label that fits the change type, read from `gh-axi label list`; with GitHub's defaults that is `bug` for a fix and `enhancement` for a feat or chore. A label the repo lacks fails the create, and adding one to someone else's repo is their call. Skip only for pure formatting runs.
 2. **Branch per issue.** `<type>/<issue-number>-<slug>` — `feat/42-dashboard-consumo`, `fix/57-token-expiry`. Types match Conventional Commits (`rules/git.md` §2).
 3. **Atomic commits.** One logical change per commit. Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected. Read the diff before committing it, not after.
 4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified. Open it as a draft if the work spans sessions.
