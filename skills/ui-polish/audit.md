@@ -22,7 +22,7 @@ Done when: every reviewer returned a findings table or an explicit "No actionabl
 
 ## 4. Consolidate
 
-Read `better-interface/SKILL.md` sections 6 to 9 and `review-format.md`. Merge the reviewer tables:
+Read `better-interface/SKILL.md` (**Rank by user impact** through **Verify what can be verified**) and `review-format.md`. Merge the reviewer tables:
 
 - Verify each finding at its cited line. Drop what does not reproduce or is a documented project decision.
 - One root cause per row, all locations listed. Escalation triggers first. Cap 15; say how many the cap excluded.

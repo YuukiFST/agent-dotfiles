@@ -15,6 +15,8 @@ agent-browser
 loop-me
 autoreview
 wayfinder
+# ui-polish covers the stack-agnostic work; Libraries.dev effects dropped (#104).
+ui-craft
 
 # stacks/frontend deleted in #78 (replaced by ui-craft). A machine that once ran
 # `stack.sh enable frontend` still holds these; the stack prune no longer reaches them.
