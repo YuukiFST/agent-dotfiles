@@ -1,13 +1,11 @@
 ---
 name: ui-polish
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar on any stack, with no package required, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen or component from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, pick a UI library, show variants, or stress-test a component. Skip for pure logic, data or backend work; Libraries.dev effects go to ui-craft.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar on any stack, with no package required, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen or component from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality, add or fix animations, pick a UI library, show variants, or stress-test a component. Skip for pure logic, data or backend work.
 ---
 
 # UI polish
 
 One router, stack-agnostic. The taste lives in the reference library; this file decides which reference to read, when, and how the work is verified. Reading a reference means loading the whole file, not a grep. No rule here needs a package to be applied.
-
-`ui-craft` is this skill plus Libraries.dev: it reads this file as its foundation and layers the effects on every mode below.
 
 The **project's design system is the direction**. Tokens, component library, density and motion language already in the repo win over anything a reference proposes. A reference supplies the rule and the exact value; the project supplies the idiom the fix is written in. Never introduce a second styling system, a parallel token set, or a new aesthetic to apply a rule.
 
@@ -60,7 +58,7 @@ Pick one from the request. State it in one line before starting.
 | "Show me options for this UI" | **Variant** | Read `REFS/jakubkrehel-skills/skills/variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
 | "Stress-test this component" | **Break** | Read `REFS/jakubkrehel-skills/skills/break/SKILL.md` + `scenarios.md`: every state on one temporary page. |
 
-Audit and Build both end with the **review gate** in [audit.md](audit.md); Build reaches it after the screen exists. A request for a Libraries.dev effect, or recon finding a Libraries.dev package (`border-beam`, `thinking-orbs`, `liquid-gooey`, `voice-glow`, `bot-avatars`, `metal-fx`, `img-fx`) in `package.json`, is `ui-craft`'s: say so in one line and hand over.
+Audit and Build both end with the **review gate** in [audit.md](audit.md); Build reaches it after the screen exists.
 
 ## Domain reviewers (fan-out)
 
