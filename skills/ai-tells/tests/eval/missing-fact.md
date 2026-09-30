@@ -1,0 +1,1 @@
+Our new review bot significantly improves engineering productivity and dramatically reduces the time teams spend on code review. Experts agree that automated review is a game changer. Since rollout, the bot has garnered overwhelmingly positive feedback, underscoring its pivotal role in our development workflow.

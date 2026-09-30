@@ -36,6 +36,17 @@ jobs:
       - name: Shellcheck hooks and scripts
         run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
 
+  ai-tells-lint:
+    name: ai-tells lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Golden files pin every lint finding, and the id check fails when a lint rule or an
+      # ai-tells#<id> citation in another skill points at a pattern patterns.md no longer has.
+      - name: Run ai-tells lint regression and id consistency tests
+        run: bash skills/ai-tells/tests/run.sh
+
   skill-frontmatter:
     name: Skill frontmatter
     runs-on: ubuntu-latest
