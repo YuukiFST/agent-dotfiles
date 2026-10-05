@@ -32,7 +32,7 @@ Present the table. If the user is present and the fixes are many or invasive, st
 
 ## 5. Apply
 
-Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes take their exact values from `review-animations/STANDARDS.md`; polish values from `better-ui` siblings. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
+Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes take their exact values from `review-animations/STANDARDS.md`; gesture fixes from `apple-design` **Quick Reference**; overflow fixes from `break-ui` **Failure signatures**; polish values from `better-ui` siblings. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
 
 Done when: every applied row is checked off in the table with the file touched.
 

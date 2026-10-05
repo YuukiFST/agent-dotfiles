@@ -11,7 +11,11 @@ Domain → reference paths (all under `REFS`, resolve `~` to the absolute home d
 | writing | `jakubkrehel-skills/skills/better-writing/SKILL.md` |
 | typography | `jakubkrehel-skills/skills/better-typography/SKILL.md` and every sibling `.md` |
 | colors | `jakubkrehel-skills/skills/better-colors/SKILL.md` and every sibling `.md` |
-| polish+motion | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md`; `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md` |
+| polish | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md` |
+| motion | `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md`; Audit and Build only: `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` (missing motion is a finding only when it passes that gate) |
+| worst case | `emilkowalski-skills/skills/break-ui/CATALOG.md`; in `break-ui/SKILL.md` the sections **Failure signatures** and **Truncate, wrap, or clamp** |
+| gesture | `emilkowalski-skills/skills/apple-design/SKILL.md` minus its Typography section; in `emil-design-eng/SKILL.md` the section **Gesture and Drag Interactions** |
+| mobile | `emilkowalski-skills/skills/mobile-native/SKILL.md` |
 
 Every reviewer also gets `jakubkrehel-skills/skills/better-interface/SKILL.md` for severity. A domain skill's own severity ladder is for standalone use; this review ranks on the shared one.
 
@@ -37,8 +41,8 @@ Change (Change mode only; delete this block otherwise):
 - diff: {base ref and SHA}..{head ref and SHA}; read files at the head ref with `git show`, never check it out
 - removed signals this domain owns: {rows from interface-review/removed-signals.md, plus its Equivalent replacements list}
 
-Reference (read every file in full before reviewing; they are the rule set and carry the exact values to use):
-{absolute reference paths, one per line}
+Reference (read every file in full before reviewing, or only the named sections where the line names them; they are the rule set and carry the exact values to use):
+{absolute reference paths, one per line, with section names where the domain table gives them}
 Severity: the section **Rank by user impact** in {absolute path to better-interface/SKILL.md}, escalation triggers included. Apply only that section; the rest of the file is orchestration.
 Any "Initial Response" section or `disable-model-invocation` flag in a reference is for direct invocation; ignore it.
 
