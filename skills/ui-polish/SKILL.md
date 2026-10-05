@@ -1,6 +1,6 @@
 ---
 name: ui-polish
-description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar on any stack, with no package required, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen or component from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality of a screen or of a diff/branch/PR, add or fix animations, pick a UI library, show variants, or stress-test a component. Skip for pure logic, data or backend work.
+description: Build or improve a web UI (page, screen, component, flow) to a design-engineer craft bar on any stack, with no package required, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen or component from scratch, improve/polish/redesign an existing page ("improve the UI", "make the UI look better.", "feels off"), review UI or motion quality of a screen or of a diff/branch/PR, add or fix animations or gestures (drag, swipe, sheets), pick a UI library, fix Sonner toasts, show variants, or stress-test a component with worst-case data. Skip for pure logic, data or backend work.
 ---
 
 # UI polish
@@ -24,8 +24,11 @@ The **project's design system is the direction**. Tokens, component library, den
 | Motion bar: ten standards, escalation triggers, exact curves and durations | `REFS/emilkowalski-skills/skills/review-animations/` (`STANDARDS.md` has the values) |
 | Motion build: the gate, then the decision order | `REFS/emilkowalski-skills/skills/animate/` (`RECIPES.md` has code) |
 | Motion opportunities: where motion is missing, with restraint | `REFS/emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` |
+| Gesture and physical motion: 1:1 drag, interruptibility, velocity handoff, momentum, rubber-banding, materials | `REFS/emilkowalski-skills/skills/apple-design/SKILL.md` (**Quick Reference** has the values; its Typography section yields to `better-typography`), plus **Gesture and Drag Interactions** in `emil-design-eng/SKILL.md` for the web mechanics |
+| Worst-case data: realistic break values, failure signatures, truncate vs wrap vs clamp | `REFS/emilkowalski-skills/skills/break-ui/` (`CATALOG.md` has the values) |
 | Mobile feel: viewport, tap, safe areas, sticky hover | `REFS/emilkowalski-skills/skills/mobile-native/SKILL.md` |
 | Library pick: curated list per task | `REFS/emilkowalski-skills/skills/pick-ui-library/SKILL.md` |
+| Sonner toasts: setup, styling ladder, troubleshooting | `REFS/emilkowalski-skills/skills/ask-sonner/` (`API.md` has the props) |
 | Consolidation: severity scale, escalation triggers, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
@@ -43,6 +46,11 @@ Before any reference is read, establish the project facts. They go into every su
 4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
 5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
 6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse).
+7. **Conditional triggers**, one yes/no each, because each yes switches on a reviewer or a reference below:
+   - **gesture**: the scope has drag, swipe, sheets, carousels, sliders, pull-to-refresh or spring-driven motion.
+   - **mobile**: a phone viewport is supported.
+   - **worst case**: the scope renders text or lists it does not author (user input, API data, CMS, translations).
+   - **sonner**: `sonner` is in `package.json`.
 
 Write recon as a short block. It is the CONTEXT section of every reviewer prompt.
 
@@ -54,10 +62,11 @@ Pick one from the request. State it in one line before starting.
 | --- | --- | --- |
 | "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
 | "Create / build this screen, flow or component" | **Build** | [build.md](build.md) |
-| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. |
-| "Animate X" / "add motion" / "this feels static" | **Motion** | Read `animate/SKILL.md`. Run its gate first: frequency and purpose decide whether anything animates at all. Zero lines is a valid outcome. |
+| "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. The pick is Sonner → wire it per `ask-sonner/SKILL.md`. |
+| "Toasts appear twice / sit behind the modal / ignore dark mode", Sonner setup or styling | **Toast** | Read `ask-sonner/SKILL.md`; `API.md` for an exact prop. Styling follows its escalation ladder, in the project's tokens. |
+| "Animate X" / "add motion" / "this feels static" | **Motion** | Read `animate/SKILL.md`. Run its gate first: frequency and purpose decide whether anything animates at all. Zero lines is a valid outcome. **gesture** → also read the gesture row's references: drag, flick and sheet motion is springs and velocity, not duration and curve. |
 | "Show me options for this UI" | **Variant** | Read `REFS/jakubkrehel-skills/skills/variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
-| "Stress-test this component" | **Break** | Read `REFS/jakubkrehel-skills/skills/break/SKILL.md` + `scenarios.md`: every state on one temporary page. |
+| "Stress-test this component" / "try the worst case" | **Break** | [break.md](break.md): jakubkrehel `break` harness filled with emilkowalski `break-ui` worst-case values. |
 | "Review this diff / branch / PR / my uncommitted changes" | **Change** | [change.md](change.md). Read-only; fixes only when the user asks. |
 
 Audit and Build both end with the **review gate** in [audit.md](audit.md); Build reaches it after the screen exists. Change reaches it only when the user asks for the fixes.
@@ -67,7 +76,8 @@ Audit and Build both end with the **review gate** in [audit.md](audit.md); Build
 A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
-- Default set: accessibility, layout, writing, typography, colors, polish+motion (six). `quick` scope: accessibility and polish+motion only.
+- Default set: accessibility, layout, writing, typography, colors, polish, motion (seven). `quick` scope: accessibility, polish and motion only.
+- Conditional set, added per recon step 7: **worst case** → worst-case reviewer; **gesture** → gesture reviewer; **mobile** → mobile reviewer. `quick` scope keeps them only when the request names that concern.
 - Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - A domain whose reference is missing on disk is `Not reviewed`, named in the report. Never rebuild its rules from memory or hand it to a neighbour.
 - Consolidation stays in the main thread: read `better-interface/SKILL.md` (**Rank by user impact**, **Prefer the cheaper fix**, **Consolidate systemic findings**, **Verify what can be verified**) and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). Re-read the cited line of every finding before keeping it.
@@ -86,5 +96,8 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
+| Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
+| Demo data only, or an invented worst case (`aaaa…`) | Values from `break-ui/CATALOG.md` or the schema limit |
+| A recon step 7 trigger was yes but its reviewer never ran | Dispatch it, or name it `Not reviewed` in the report |
 | "Improved" claimed from source alone | Before/after screenshot, or mark Not verified |
 | Project gates skipped after edits | Run the recon step 6 commands and report their output |
