@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Copy config (CLAUDE.md, skills/, rules/, plus any root payload an active stack adds)
+# Copy config (CLAUDE.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into the harness dirs on a Windows machine.
 # Shared by every setup-*.ps1 / update-*.ps1 so "git pull + update" always propagates config.
 #
@@ -73,6 +73,9 @@ function Sync-Shared {
   # rules/ live at ~/.claude/rules on EVERY harness — CLAUDE.md's conditional pointers
   # hardcode that path, so it must resolve even where Claude Code is not installed.
   Sync-Rules "$UserHome\.claude\rules"
+  # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
+  # is disclosed — read only when CLAUDE.md's pointer fires on a code-writing turn.
+  Copy-Item "$Repo\CODING_STANDARDS.md" "$UserHome\.claude\CODING_STANDARDS.md" -Force
 
   # ~/.agents/skills is read natively by pi AND OpenCode (opencode.ai/docs/skills) — one dir,
   # two agents, no second copy.

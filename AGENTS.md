@@ -1,7 +1,6 @@
 # Agent bootstrap — reaching config parity
 
-You are an agent (Cursor, pi, Claude Code, or other) that was pointed at this
-repo. This repo is the **canonical source** of the user's harness configuration.
+This repo is the **canonical source** of the user's harness configuration.
 Your job when asked to "sync", "set up", or "reach parity": make the machine you are
 running on match this repo, for the harness you are running in.
 
@@ -58,6 +57,7 @@ What the scripts propagate:
 - `skills/ui-polish/update-refs.sh` → `~/.claude/ui-refs/` (design reference repos the `ui-polish` skill reads).
   Not run by sync: run it once by hand after the first sync, and again to refresh. The clones sit
   outside every skills dir so none of their frontmatter reaches a session.
+- `CODING_STANDARDS.md` → `~/.claude/CODING_STANDARDS.md` on EVERY harness, read on demand via the pointer in `CLAUDE.md`
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
 - `scripts/show-shot` → `~/.local/bin/show-shot` (inline terminal screenshots, any PNG)
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak).
@@ -87,12 +87,6 @@ What the scripts propagate:
   `settings.json`, which the scripts never overwrite).
   For pi, `defaultProvider` / `defaultModel` / `defaultThinkingLevel` in the live
   `~/.pi/agent/settings.json` are also machine-owned after the first sync.
-- Commits: English, Conventional Commits, no AI attribution of any kind
-  (no `Co-authored-by`, no "Generated with"). In Cursor use `git-safe-commit`, not `git commit`.
-  See `rules/git.md` and `git-hooks/`. The issue → branch → PR → review → merge flow
-  lives in the `git-workflow` skill, not in the rule file.
+- Commits and pushes follow `rules/git.md` (hooks in `git-hooks/`).
 - Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
   Customize → Rules manually after edits.
-- Browser automation: `chrome-devtools-axi`, installed by the setup scripts and documented
-  by its own `--help`. Nothing about it is configured in this repo — it needs no per-machine
-  file and launches an already-installed Chrome, which is why it replaced `agent-browser`.

@@ -1,6 +1,6 @@
 # CLAUDE.md — Global
 
-Cross-project guidance. Lean by design: only what's non-obvious or machine-specific. Project `CLAUDE.md` overrides this; for generic best-practice, trust the model. For trivial tasks, judgment over ceremony.
+Project `CLAUDE.md` overrides this; for generic best-practice, trust the model. For trivial tasks, judgment over ceremony.
 
 ## Output
 
@@ -27,20 +27,6 @@ Cross-project guidance. Lean by design: only what's non-obvious or machine-speci
 - **Paragraph-long comment = code is wrong:** an agent writing a long comment to justify a stub or a shortcut is hiding incorrect code. Flag the comment; don't accept the explanation.
 - README leads with the problem it solves (one sentence, top); stack/architecture go in `docs/`.
 
-## Code rules (override model defaults)
-
-The reader is an LLM: token cost, tool-call latency and output quality are technical constraints here, not style opinions.
-
-- **Before a helper:** grep for the canonical one, reuse it.
-- **File > 500 lines = decompose first**, don't append. SRP, small functions: three 250-line modules beat one 800-line file doing three things.
-- **Flatten control flow:** early returns / guard clauses; cap ~2 indent levels.
-- **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
-- **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
-- **Inject dependencies** (constructor/parameter) so a named fake swaps in without infra.
-- **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`); never spend a turn on formatting.
-- **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
-- **Defensive code is opt-in:** no retry/backoff, timeout, circuit-breaker, rate-limit, or fallback unless the project names the categories it needs.
-
 ## Testing
 
 - **Black-box first.** Test through the outermost interface the caller touches: browser flow, HTTP request, CLI run, a library's public API. E2E is the default; go lower only when the outer layer can't reach the failure.
@@ -60,6 +46,7 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 
 ## Rule files (already loaded — this maps a task to the block that governs it)
 
+- **Writing or changing code** → Read `~/.claude/CODING_STANDARDS.md` first; not auto-loaded (helpers, file size, control flow, naming, types, DI, formatting, logs, defensive code).
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
 - **Building a screen/component or improving how an existing one looks and feels** → skill `ui-polish` (any stack, no package; routes over the design references in `~/.claude/ui-refs/`, never read those references directly).
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
