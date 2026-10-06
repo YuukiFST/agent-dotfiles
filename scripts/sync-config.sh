@@ -146,7 +146,7 @@ sync_shared() {
   # hardcode that path, so it must resolve even where Claude Code is not installed.
   sync_rules "$HOME/.claude/rules"
   # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
-  # is disclosed — read only when CLAUDE.md's pointer fires on a code-writing turn.
+  # is disclosed — read only when CLAUDE.md's pointer fires before a project edit.
   cp "$repo/CODING_STANDARDS.md" "$HOME/.claude/CODING_STANDARDS.md"
 
   # ~/.agents/skills is read natively by both Cursor and pi — one dir, two agents.

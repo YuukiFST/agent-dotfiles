@@ -74,7 +74,7 @@ function Sync-Shared {
   # hardcode that path, so it must resolve even where Claude Code is not installed.
   Sync-Rules "$UserHome\.claude\rules"
   # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
-  # is disclosed — read only when CLAUDE.md's pointer fires on a code-writing turn.
+  # is disclosed — read only when CLAUDE.md's pointer fires before a project edit.
   Copy-Item "$Repo\CODING_STANDARDS.md" "$UserHome\.claude\CODING_STANDARDS.md" -Force
 
   # ~/.agents/skills is read natively by pi AND OpenCode (opencode.ai/docs/skills) — one dir,

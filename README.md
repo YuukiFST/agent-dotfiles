@@ -57,7 +57,7 @@ Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scr
 | Path | What |
 |------|------|
 | `CLAUDE.md` | Global instructions, synced to Claude Code, pi and OpenCode and loaded every session |
-| `CODING_STANDARDS.md` | Code and testing rules, synced to every harness, read on demand via the `CLAUDE.md` pointer |
+| `CODING_STANDARDS.md` | Rules for editing a project (code, tests, docs), synced to every harness, read on demand via the `CLAUDE.md` pointer |
 | `AGENTS.md` | Instructions for an agent working on this repo (sync, setup); not synced |
 | `rules/` | Rule files (git, prompting) — Claude Code loads every `.md` here at launch |
 | `skills/` | Active skills, flat (`~/.claude/skills/<name>/SKILL.md`) |
