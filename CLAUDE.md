@@ -1,65 +1,30 @@
-# CLAUDE.md — Global
+# Global agent instructions
 
-Cross-project guidance. Lean by design: only what's non-obvious or machine-specific. Project `CLAUDE.md` overrides this; for generic best-practice, trust the model. For trivial tasks, judgment over ceremony.
+A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the task.
+
+## Task routing
+
+- **Editing a project** (code, tests, CI, docs) → read `~/.claude/CODING_STANDARDS.md` before the first edit.
+- **Committing or pushing** → `~/.claude/rules/git.md` before the first commit (identity confirmation, Conventional Commits, no AI attribution).
+- **Writing a prompt** for a sub-agent, tool or LLM call, or a prompt file → `~/.claude/rules/prompting.md`.
 
 ## Output
 
-- Concise output. No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
-- Never guess APIs, versions, flags, SHAs, or package names — verify in code/docs first.
-- Don't print full files back; show diffs with `...` for omitted parts.
-- Long Markdown files: each full sentence on its own line.
-- Never manually modify CHANGELOG.md or files marked auto-generated.
-- **Don't prune an agent's own comments on refactor** — they carry intent/provenance. Comment the *why* (bug, upstream constraint, issue#/SHA), never the obvious *what*. Docstrings on public functions: intent + one usage example.
+- **Plain prose:** lead with the answer and stop when done; chat carries no emojis or em-dashes (rule/doc files may use them), so "Done" stays plain.
+- **Verify, then cite:** APIs, versions, flags, SHAs and package names come from code, docs or `--help` read this session, never from memory.
+- **Diffs, not files:** show a change as a diff with `...` for omitted parts.
+- **Long Markdown files:** each full sentence on its own line.
 
 ## Working method
 
-- State assumptions; ask before coding only when the ambiguity would change the result. Surface tradeoffs, don't pick silently.
-- **Autonomy:** when a step doesn't need my input, keep going; put status notes in the same message as the next action. Stop and ask only when you can't continue without me, or before anything destructive.
-- Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
-- Turn tasks into verifiable goals; refactors keep existing tests green before and after.
-- **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
-- Same error twice → stop, show error, ask one question. Never install packages to fix errors.
-- **Git history is an investigation tool:** unfamiliar code, or "why is this like this" → `git log`/`blame` before theorizing; the history tells the story the current state can't.
-- See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
-- **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
-- **Repeat issue → automate, don't re-fix:** same class of problem seen twice (style, API misuse, missing check) → propose a lint rule, CI step, or hook that kills the class forever; never rely on fixing it per-occurrence.
-- **Review rejection = missing rule:** a PR rejected for an unwritten convention means the convention gets encoded (CLAUDE.md, lint, skill) as part of resolving the rejection.
-- **Paragraph-long comment = code is wrong:** an agent writing a long comment to justify a stub or a shortcut is hiding incorrect code. Flag the comment; don't accept the explanation.
-- README leads with the problem it solves (one sentence, top); stack/architecture go in `docs/`.
-
-## Code rules (override model defaults)
-
-The reader is an LLM: token cost, tool-call latency and output quality are technical constraints here, not style opinions.
-
-- **Before a helper:** grep for the canonical one, reuse it.
-- **File > 500 lines = decompose first**, don't append. SRP, small functions: three 250-line modules beat one 800-line file doing three things.
-- **Flatten control flow:** early returns / guard clauses; cap ~2 indent levels.
-- **Grep-able names:** avoid `data`/`handler`/`Manager`/`Service` — a name returning 50 grep hits is wrong.
-- **Types explicit:** no `any`, no `@ts-ignore`, no `as X` papering over an invariant, no `T | undefined` on always-set fields.
-- **Inject dependencies** (constructor/parameter) so a named fake swaps in without infra.
-- **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`); never spend a turn on formatting.
-- **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
-- **Defensive code is opt-in:** no retry/backoff, timeout, circuit-breaker, rate-limit, or fallback unless the project names the categories it needs.
-
-## Testing
-
-- **Black-box first.** Test through the outermost interface the caller touches: browser flow, HTTP request, CLI run, a library's public API. E2E is the default; go lower only when the outer layer can't reach the failure.
-- **A test earns its maintenance cost.** Add one only when you can name the observable behavior it protects and the credible regression that turns it red; a change with no such regression ships without a new test. When existing coverage already catches that regression, add nothing; when a nearby test shares its setup, extend it (a table row, a shared fixture) instead of writing a near-duplicate. Assert behavior at the public boundary, so a behavior-preserving refactor keeps the test green. Full authoring gate and pruning workflow: skill `test-audit`.
-- **Failure list before code.** When something needs isolated tests, first list the distinct regressions as test cases, one case per regression (table-driven when setup is shared), watch them go red, then write the code. A test written after the code restates it and passes by construction.
-- **Artifact per E2E run:** each run leaves a checkable artifact (golden file, HTTP transcript, screenshot, log) that the same one command regenerates. Diff against it; don't eyeball.
-- **Bug fixes:** reproduce E2E as the end user experiences it; that red test becomes the regression test once green, and the only one: no copies at the inner layers the bug crosses.
-- **Legacy code:** pin current behavior with characterization (golden master) tests before changing it.
-- Mock only external I/O, with named fakes. Headless, one command — no manual seed, missing config, or secret.
+- **Assumptions out loud:** state them, ask only when the ambiguity would change the result, and name each tradeoff with the option you picked.
+- **Autonomy:** keep going while a step needs no input from me, with status notes in the same message as the next action.
+  Stop and ask when you can't continue without me, before anything destructive, or when the same error shows up twice (show it, ask one question).
+- **Fix errors with what is installed:** a genuinely needed new dependency is a question for me.
+- **Git history is an investigation tool:** for unfamiliar code or "why is it like this", read `git log`/`blame` before theorizing; history explains what the current state can't.
 
 ## Tools (machine-specific)
 
-- **[AXI](https://github.com/kunchenguid/axi) CLIs first** — `{domain}-axi` tools are built for agents: fewer tokens and higher task accuracy than the equivalent MCP server or plain CLI. Prefer one over an MCP server or a hand-rolled script whenever it covers the domain.
-- **gh-axi for GitHub ops** (subcommands `issue`/`pr`/`run`/`workflow`/`release`/`repo`/`label`/`search`/`api`) over plain `gh`. Uses the existing `gh auth login` session; raw `gh` only for what gh-axi lacks.
-- **chrome-devtools-axi for anything needing a real browser** (`open`/`snapshot`/`click`/`fill`/`eval`/`console`/`network`/`screenshot`/`lighthouse`) — the only browser automation on this machine. Skip it when `curl` is enough. Read `chrome-devtools-axi <command> --help` for current usage; never trust a remembered flag.
-- **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
-
-## Rule files (already loaded — this maps a task to the block that governs it)
-
-- **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
-- **Building a screen/component or improving how an existing one looks and feels** → skill `ui-polish` (any stack, no package; routes over the design references in `~/.claude/ui-refs/`, never read those references directly).
-- **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
+- **AXI CLIs first:** a `{domain}-axi` CLI is built for agents and beats the matching MCP server, plain CLI or hand-rolled script on tokens and accuracy.
+  `gh-axi` for GitHub (reuses the `gh auth login` session; raw `gh` only for what it lacks); `chrome-devtools-axi` is the only browser automation here, for pages a `curl` can't read.
+- **RTK:** a PreToolUse hook rewrites Bash commands to `rtk` form, so write them plain; `rtk` corrupts `prisma`/`tsc`/`vitest` output, so run those directly.

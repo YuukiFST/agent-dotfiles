@@ -41,7 +41,7 @@ Run the script for your harness directly. Idempotent — re-run to update.
 | **OpenCode** | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
 | **Cursor** | — | `bash scripts/setup-cursor.sh` |
 
-Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scripts/sync-config.sh <harness>`; use `all` to cover every harness on PATH.
+Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scripts/sync-config.sh <harness>`; `sync-config.ps1 all` covers every harness on PATH (the bash script takes one per run).
 
 ## What each harness gets
 
@@ -56,7 +56,9 @@ Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scr
 
 | Path | What |
 |------|------|
-| `CLAUDE.md`, `AGENTS.md` | Global instructions, loaded every session |
+| `CLAUDE.md` | Global instructions, synced to Claude Code, pi and OpenCode and loaded every session |
+| `CODING_STANDARDS.md` | Rules for editing a project (code, tests, docs), synced to every harness, read on demand via the `CLAUDE.md` pointer |
+| `AGENTS.md` | Instructions for an agent working on this repo (sync, setup); not synced |
 | `rules/` | Rule files (git, prompting) — Claude Code loads every `.md` here at launch |
 | `skills/` | Active skills, flat (`~/.claude/skills/<name>/SKILL.md`) |
 | `stacks/` | Archived config, not loaded — enable with `bash scripts/stack.sh enable <name>` |
