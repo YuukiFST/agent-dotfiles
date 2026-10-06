@@ -1,12 +1,10 @@
 # Agent bootstrap — reaching config parity
 
 This repo is the **canonical source** of the user's harness configuration.
-Your job when asked to "sync", "set up", or "reach parity": make the machine you are
-running on match this repo, for the harness you are running in.
+Your job when asked to "sync", "set up", or "reach parity": make the machine you are running on match this repo, for the harness you are running in.
 
-Note: `CLAUDE.md` at the repo root is a **payload** (the user's global instructions,
-copied into harness config dirs by the scripts) — it is not instructions for working on
-this repo. This file is.
+Note: `CLAUDE.md` and `CODING_STANDARDS.md` at the repo root are **payloads** (the user's global instructions, copied into harness config dirs by the scripts) — not instructions for working on this repo.
+This file is.
 
 ## Machines
 
@@ -16,77 +14,47 @@ this repo. This file is.
 | Windows, home PC | pi, OpenCode | `pwsh -File scripts/sync-config.ps1 all` |
 | NixOS, home PC | pi, OpenCode | `bash scripts/sync-config.sh pi` **and** `bash scripts/sync-config.sh opencode` |
 
-Use the PowerShell script on Windows and the bash one on Unix; both take a harness
-(`claude` / `pi` / `opencode`, plus `cursor` on bash), and `sync-config.ps1 all` covers every
-harness found on PATH. Whichever you run, the shared payload (`~/.claude/rules`,
-`~/.agents/skills`) is written first, then the harness-specific dir.
+Sync only the harnesses in the machine's row: an extra one grows a config dir nobody keeps current.
+`all` exists only in `sync-config.ps1`; `sync-config.sh` takes one harness per run.
 
-Do not sync a harness the machine does not run: it grows a config dir nobody keeps current —
-that is how the work PC ended up carrying a pi install for a harness it never ran
-(removed 2026-08-26, issue #29; pi and OpenCode are genuinely in use there since 2026-09).
-
-**Cursor** is no longer used on any machine. `scripts/setup-cursor.sh` and the Cursor notes
-stay because the config is still correct, not because a machine consumes them.
+**Cursor** runs on no machine: skip it when syncing, and keep `scripts/setup-cursor.sh` and the Cursor notes in place.
 
 ## How to reach parity
 
-Run the setup script for your harness (idempotent — also the updater):
-
-| Harness | Windows | Unix |
-|---------|---------|------|
-| Claude Code | `pwsh -File scripts/setup-claude.ps1` | `bash scripts/setup-claude.sh` |
-| pi | `pwsh -File scripts/setup-pi.ps1` | `bash scripts/setup-pi.sh` |
-| OpenCode | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
-| Cursor | — | `bash scripts/setup-cursor.sh` |
-
-On a machine with no clone yet, `scripts/bootstrap.ps1` / `bootstrap.sh` does the whole thing
-from a URL (see README) — it clones with a sparse checkout that **excludes `stacks/`**, then
-runs the setup script for every harness on PATH.
-
-If tools are already installed and only config drifted, `scripts/sync-config.sh <harness>`
-(or `sync-config.ps1 <harness>` on Windows) is enough.
+Full install or update: the setup script for your harness, listed in `README.md` § Already cloned (idempotent; also the updater).
+Config drift only: the machine's sync command above.
 
 What the scripts propagate:
 
-- `CLAUDE.md` → global instructions (`~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`)
-- `stacks/` → nothing: archived config, pruned from live dirs. Enable with `scripts/stack.sh enable <name>` (see `stacks/README.md`)
-- `skills/` → `~/.claude/skills`, `~/.agents/skills` (Cursor + pi); archived stacks pruned from live dirs.
-  `sync-config.sh pi` and `cursor` also prune stale copies under `~/.claude/skills` when that dir exists.
-  The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a
-  skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
-- `skills/ui-polish/update-refs.sh` → `~/.claude/ui-refs/` (design reference repos the `ui-polish` skill reads).
-  Not run by sync: run it once by hand after the first sync, and again to refresh. The clones sit
-  outside every skills dir so none of their frontmatter reaches a session.
+- `CLAUDE.md` → global instructions: `~/.claude/CLAUDE.md`, `~/.pi/agent/AGENTS.md`, `~/.config/opencode/AGENTS.md`
 - `CODING_STANDARDS.md` → `~/.claude/CODING_STANDARDS.md` on EVERY harness, read on demand via the pointer in `CLAUDE.md`
 - `rules/` → `~/.claude/rules` on EVERY harness, full mirror (archived rules live in `stacks/<name>/rules/` and never ship)
+- `skills/` → `~/.claude/skills`, `~/.agents/skills` (read natively by pi, OpenCode and Cursor); archived stacks pruned from live dirs.
+  `sync-config.sh pi` and `cursor` also prune stale copies under `~/.claude/skills` when that dir exists.
+  The copy is per-skill and never a mirror, so local-only skills survive — which is also why deleting a skill needs its name in `skills/REMOVED.txt` to actually reach a machine that already synced it.
+- `skills/ui-polish/update-refs.sh` → `~/.claude/ui-refs/` (design reference repos the `ui-polish` skill reads).
+  Not run by sync: run it once by hand after the first sync, and again to refresh.
+  The clones sit outside every skills dir so none of their frontmatter reaches a session.
+- `stacks/` → nothing: archived config, pruned from live dirs, and absent from a bootstrap clone (sparse checkout).
+  Enable with `scripts/stack.sh enable <name>` (see `stacks/README.md`)
 - `scripts/show-shot` → `~/.local/bin/show-shot` (inline terminal screenshots, any PNG)
+- `settings.json` → `~/.claude/settings.json` (`sync-config.ps1` only), a seed: written only when absent; Claude Code owns the live file.
 - `pi/` → `~/.pi/agent` agent config (settings packages, extensions, cloak).
   `settings.json` there is a MERGE, not a mirror: pi owns keys like `lastChangelogVersion`.
-  `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel`
-  apply on first install only — sync never overwrites a live choice. `enabledModels`, `theme`,
-  and `packages` always converge from the repo.
-- `CLAUDE.md` → `~/.config/opencode/AGENTS.md` (OpenCode global instructions). Its skills come
-  from `~/.agents/skills`, which OpenCode loads natively; `opencode.json` is never written
+  `pi/settings.json` is a seed: `defaultProvider`, `defaultModel`, and `defaultThinkingLevel` apply on first install only — sync never overwrites a live choice.
+  `enabledModels`, `theme`, and `packages` always converge from the repo.
 - tools (setup scripts only): rtk, portless, gh-axi, chrome-devtools-axi
 
 ## Verify (after syncing)
 
 1. `ls ~/.claude/rules` and the skills dir for your harness — non-empty, matches repo.
-2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` — returns a
-   page snapshot. It drives an installed Chrome and keeps no per-machine config, so a failure
-   here means Chrome is missing, not that the repo drifted.
+2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` — returns a page snapshot.
+   It drives an installed Chrome and keeps no per-machine config, so a failure here means Chrome is missing, not that the repo drifted.
 3. pi only: `show-shot <any png>` renders in the terminal.
-4. `portless doctor` — requires Node 24+ and a one-time bootstrap (`portless service
-   install` + `portless trust`, see `portless/setup.md`). When the proxy is up, prefer
-   `https://<name>.localhost` URLs over `http://localhost:<port>` when driving dev servers.
+4. `portless doctor` — passes once Node 24+ and the one-time bootstrap in `portless/setup.md` are in place.
 
 ## Hard rules for agents working on this repo
 
-- Config is edited HERE and propagated by scripts — never patch `~/.claude`,
-  `~/.agents` directly (except files documented as seeds:
-  `settings.json`, which the scripts never overwrite).
-  For pi, `defaultProvider` / `defaultModel` / `defaultThinkingLevel` in the live
-  `~/.pi/agent/settings.json` are also machine-owned after the first sync.
+- Config is edited HERE and propagated by scripts; the live dirs (`~/.claude`, `~/.agents`, `~/.pi/agent`) change only through a sync.
+  The seeds above are the exception: once written, the live copy is machine-owned.
 - Commits and pushes follow `rules/git.md` (hooks in `git-hooks/`).
-- Cursor global rules cannot be file-synced — tell the user to paste `CLAUDE.md` into
-  Customize → Rules manually after edits.

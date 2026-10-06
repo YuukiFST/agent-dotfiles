@@ -1,41 +1,26 @@
 # CLAUDE.md — Global
 
-Project `CLAUDE.md` overrides this; for generic best-practice, trust the model. For trivial tasks, judgment over ceremony.
+Project `CLAUDE.md` overrides this. For trivial tasks, judgment over ceremony.
 
 ## Output
 
-- Concise output. No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
+- No sycophantic openers/closers; in chat prose no emojis and no em-dashes (rule/doc files may use them). Plain "Done", never "✅ Done".
 - Never guess APIs, versions, flags, SHAs, or package names — verify in code/docs first.
 - Don't print full files back; show diffs with `...` for omitted parts.
 - Long Markdown files: each full sentence on its own line.
 - Never manually modify CHANGELOG.md or files marked auto-generated.
-- **Don't prune an agent's own comments on refactor** — they carry intent/provenance. Comment the *why* (bug, upstream constraint, issue#/SHA), never the obvious *what*. Docstrings on public functions: intent + one usage example.
 
 ## Working method
 
 - State assumptions; ask before coding only when the ambiguity would change the result. Surface tradeoffs, don't pick silently.
 - **Autonomy:** when a step doesn't need my input, keep going; put status notes in the same message as the next action. Stop and ask only when you can't continue without me, or before anything destructive.
-- Simplest code that solves it; surgical diffs; match existing style. Remove only orphans *your* change created; flag pre-existing dead code, don't delete it.
-- Turn tasks into verifiable goals; refactors keep existing tests green before and after.
-- **Debugging loop:** produce fix → run tests/lint → repair only failures → repeat. Run lint/typecheck on your own output before showing it.
 - Same error twice → stop, show error, ask one question. Never install packages to fix errors.
 - **Git history is an investigation tool:** unfamiliar code, or "why is this like this" → `git log`/`blame` before theorizing; the history tells the story the current state can't.
 - See a lint/typecheck/test failure or flake → fix it, even if unrelated to your change. UI work: fix visible pixel issues along the way.
 - **Standardize for agent automation:** same command does the same thing across projects (`bin/deploy`, tag-release, layout) so an agent runs "deploy" without guessing.
 - **Repeat issue → automate, don't re-fix:** same class of problem seen twice (style, API misuse, missing check) → propose a lint rule, CI step, or hook that kills the class forever; never rely on fixing it per-occurrence.
 - **Review rejection = missing rule:** a PR rejected for an unwritten convention means the convention gets encoded (CLAUDE.md, lint, skill) as part of resolving the rejection.
-- **Paragraph-long comment = code is wrong:** an agent writing a long comment to justify a stub or a shortcut is hiding incorrect code. Flag the comment; don't accept the explanation.
 - README leads with the problem it solves (one sentence, top); stack/architecture go in `docs/`.
-
-## Testing
-
-- **Black-box first.** Test through the outermost interface the caller touches: browser flow, HTTP request, CLI run, a library's public API. E2E is the default; go lower only when the outer layer can't reach the failure.
-- **A test earns its maintenance cost.** Add one only when you can name the observable behavior it protects and the credible regression that turns it red; a change with no such regression ships without a new test. When existing coverage already catches that regression, add nothing; when a nearby test shares its setup, extend it (a table row, a shared fixture) instead of writing a near-duplicate. Assert behavior at the public boundary, so a behavior-preserving refactor keeps the test green. Full authoring gate and pruning workflow: skill `test-audit`.
-- **Failure list before code.** When something needs isolated tests, first list the distinct regressions as test cases, one case per regression (table-driven when setup is shared), watch them go red, then write the code. A test written after the code restates it and passes by construction.
-- **Artifact per E2E run:** each run leaves a checkable artifact (golden file, HTTP transcript, screenshot, log) that the same one command regenerates. Diff against it; don't eyeball.
-- **Bug fixes:** reproduce E2E as the end user experiences it; that red test becomes the regression test once green, and the only one: no copies at the inner layers the bug crosses.
-- **Legacy code:** pin current behavior with characterization (golden master) tests before changing it.
-- Mock only external I/O, with named fakes. Headless, one command — no manual seed, missing config, or secret.
 
 ## Tools (machine-specific)
 
@@ -44,9 +29,9 @@ Project `CLAUDE.md` overrides this; for generic best-practice, trust the model. 
 - **chrome-devtools-axi for anything needing a real browser** (`open`/`snapshot`/`click`/`fill`/`eval`/`console`/`network`/`screenshot`/`lighthouse`) — the only browser automation on this machine. Skip it when `curl` is enough. Read `chrome-devtools-axi <command> --help` for current usage; never trust a remembered flag.
 - **RTK:** a PreToolUse hook auto-rewrites Bash commands to `rtk` form — don't manually prefix. Known break: `rtk` corrupts `prisma`/`tsc`/`vitest` output — run those directly.
 
-## Rule files (already loaded — this maps a task to the block that governs it)
+## Task routing
 
-- **Writing or changing code** → Read `~/.claude/CODING_STANDARDS.md` first; not auto-loaded (helpers, file size, control flow, naming, types, DI, formatting, logs, defensive code).
+- **Writing code or tests** → read `~/.claude/CODING_STANDARDS.md` first.
 - **Writing prompts for sub-agents/tools/LLM calls, or maintaining prompt files** → `~/.claude/rules/prompting.md`.
 - **Building a screen/component or improving how an existing one looks and feels** → skill `ui-polish` (any stack, no package; routes over the design references in `~/.claude/ui-refs/`, never read those references directly).
 - **Committing or pushing** → `~/.claude/rules/git.md` FIRST (commit identity confirmation, Conventional Commits, no-AI-attribution). Not committing → skip.
