@@ -36,6 +36,7 @@ Choose chunk boundaries from the trace; a fixed item count does not guarantee sh
 button.addEventListener('click', async () => {
   button.classList.add('loading');
   if (globalThis.scheduler?.yield) await scheduler.yield();
+  else await new Promise((r) => setTimeout(r, 0));
   updateUI(calculateComplexThing());
   if ('requestIdleCallback' in window) requestIdleCallback(() => trackEvent('click'));
   else setTimeout(() => trackEvent('click'), 0);

@@ -2,7 +2,7 @@
 
 Read when field CLS is poor, `CLSCulprits` reports shifts, or source inspection finds content that changes geometry without reserved space.
 
-CLS scores unexpected shift clusters across the whole visit; a shift score is impact fraction times distance fraction.
+CLS is the largest session window of unexpected shifts (shifts less than 1 s apart, window at most 5 s), not the sum over the visit; a shift score is impact fraction times distance fraction.
 Use the shifted-node and initiator evidence: the element that moved is often the victim of content inserted above it.
 Exercise the page states that shift (scroll, late banners, consent, route changes), not only the initial load.
 

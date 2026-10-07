@@ -108,7 +108,14 @@ Use it after the current page is fixed, for predictable same-origin journeys.
 
 ```html
 <script type="speculationrules">
-{ "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+{ "prerender": [{
+  "where": { "and": [
+    { "href_matches": "/*" },
+    { "not": { "href_matches": "/logout" } },
+    { "not": { "href_matches": "/cart/*" } }
+  ] },
+  "eagerness": "moderate"
+}] }
 </script>
 ```
 
