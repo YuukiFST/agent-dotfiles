@@ -5,15 +5,15 @@ Sections run in the order an edit walks them.
 
 ## Before the first edit
 
-- **Verifiable goal:** restate the task as a check that goes from red to green; a refactor keeps the existing tests green before and after.
-- **Characterization tests:** pin legacy code's current behavior with golden-master tests before changing it.
-- **Red first:** when the change needs isolated tests, list the distinct regressions as cases (one per regression, table-driven when setup is shared) and watch them go red before writing the code; a test written after the code restates it and passes by construction.
+- **Verifiable goal:** restate the task as a check you run against the real artifact (CLI run, HTTP request, browser flow, existing test); a refactor keeps the existing tests green before and after.
+- **Characterization:** pin legacy code's current behavior with a golden-master E2E run before changing it.
 
 ## Tests
 
 Skill `test-audit` gates every new or changed test; these add what it lacks.
 
-- **Black-box first:** E2E through the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); go lower only when the outer layer can't reach the failure.
+- **E2E only:** every test you write drives the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); unit and integration tests are written only when the user asks for one.
+  A lower-layer test from your own reading of the task restates the implementation and adds time without lifting the pass rate (DeepSWE and ProgramBench evals, 2026, where TDD lowered it).
 - **Bug repro is E2E:** reproduce as the end user hits it; once green, that red test is the bug's one regression test.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
 - **One command, headless:** the suite seeds itself and needs no manual step, unshipped config or secret.

@@ -98,7 +98,7 @@ Write each plan **for the weakest plausible executor**. That means:
 - Steps that are explicit and ordered, each with its own verification command and expected output.
 - Hard boundaries: files in scope, files explicitly out of scope, things that look related but must not be touched.
 - Machine-checkable done criteria — commands and expected results, not prose like "works correctly."
-- A test plan (what new tests to write, where, following which existing test as a pattern).
+- A test plan (what new E2E tests to write, where, following which existing E2E test as a pattern).
 - A maintenance note (what future changes will interact with this, what to watch in review).
 - Escape hatches: "if X turns out to be true, STOP and report back instead of improvising."
 

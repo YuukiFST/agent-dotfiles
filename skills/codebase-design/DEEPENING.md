@@ -31,7 +31,7 @@ Third-party services (Stripe, Twilio, etc.) you don't control. The deepened modu
 
 ## Testing strategy: replace, don't layer
 
-- Old unit tests on shallow modules become waste once tests at the deepened module's interface exist — delete them.
-- Write new tests at the deepened module's interface. The **interface is the test surface**.
+- Old unit tests on shallow modules become waste once E2E tests cover the deepened module's behaviour — delete them.
+- New tests are E2E, through the outermost interface the caller touches; a test at the module's own interface is written only when the user asks for one.
 - Tests assert on observable outcomes through the interface, not internal state.
 - Tests should survive internal refactors — they describe behaviour, not implementation. If a test has to change when the implementation changes, it's testing past the interface.
