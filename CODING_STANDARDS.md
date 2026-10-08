@@ -13,7 +13,7 @@ Sections run in the order an edit walks them.
 Skill `test-audit` gates every new or changed test; these add what it lacks.
 
 - **E2E only:** every test you write drives the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); unit and integration tests are written only when the user asks for one.
-  A lower-layer test from your own reading of the task restates the implementation: on DeepSWE, banning agent-written unit and integration tests kept the pass rate and cut time and spend ([eval](https://x.com/kunchenguid/status/2108030810691629403)); on ProgramBench, TDD lowered it ([eval](https://x.com/kunchenguid/status/2064196342248030352)).
+  A lower-layer test from your own reading of the task restates the implementation and costs tokens without lifting the resolve rate.
 - **Bug repro is E2E:** reproduce as the end user hits it; once green, that red test is the bug's one regression test.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
 - **One command, headless:** the suite seeds itself and needs no manual step, unshipped config or secret.
