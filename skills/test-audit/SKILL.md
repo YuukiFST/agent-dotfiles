@@ -16,6 +16,12 @@ before starting one, read [CAMPAIGN.md](CAMPAIGN.md).
 
 ## Authoring gate
 
+New tests are E2E: they drive the outermost interface the caller touches
+(browser flow, HTTP request, CLI run, a library's public API). A unit or
+integration test lands only when the user asks for one; this skill's audit
+mode still applies to the ones that already exist. For a test you write, the
+"owner boundary" and "strongest boundary" below mean that outermost interface.
+
 Before adding any test, answer four questions; a missing answer means do not
 add it yet:
 

@@ -69,6 +69,7 @@ The facts the executor needs, inlined — never "as discussed" or "see audit":
 | Install   | `pnpm install`           | exit 0              |
 | Typecheck | `pnpm typecheck`         | exit 0, no errors   |
 | Tests     | `pnpm test -- <filter>`  | all pass            |
+| E2E       | `pnpm test:e2e`          | all pass            |
 | Lint      | `pnpm lint`              | exit 0              |
 
 (Exact commands from this repo — verified during recon, not guessed.)
@@ -86,7 +87,7 @@ executor's environment. Skip the section otherwise.)
 
 **In scope** (the only files you should modify):
 - `src/orders/api.ts`
-- `src/orders/api.test.ts` (create)
+- `e2e/orders.spec.ts` (create)
 
 **Out of scope** (do NOT touch, even though they look related):
 - `src/orders/legacy-api.ts` — deprecated path, scheduled for deletion;
@@ -119,18 +120,22 @@ callers, then remove old path.)
 
 ## Test plan
 
-- New tests to write, in which file, covering which cases (list them:
+- New E2E tests to write, in which file, covering which cases (list them:
   happy path, the specific bug/regression this plan fixes, named edge cases).
-- Which existing test to use as the structural pattern:
-  "model after `src/users/api.test.ts`".
-- Verification: `<test command>` → all pass, including N new tests.
+  Tests drive the outermost interface (browser flow, HTTP request, CLI run,
+  a library's public API);
+  unit and integration tests appear only when the user asks for them.
+- Which existing E2E test to use as the structural pattern:
+  "model after `e2e/users.spec.ts`".
+- Verification: `<E2E command>` → all pass, including N new E2E tests.
 
 ## Done criteria
 
 Machine-checkable. ALL must hold:
 
 - [ ] `pnpm typecheck` exits 0
-- [ ] `pnpm test` exits 0; new tests for <X> exist and pass
+- [ ] `pnpm test` exits 0
+- [ ] `pnpm test:e2e` exits 0; new E2E tests for <X> exist and pass
 - [ ] `grep -rn "<old pattern>" src/` returns no matches
 - [ ] No files outside the in-scope list are modified (`git status`)
 - [ ] `plans/README.md` status row updated

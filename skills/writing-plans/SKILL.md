@@ -7,9 +7,9 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. E2E-verified. Frequent commits.
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Assume they are a skilled developer, but know almost nothing about our toolset or problem domain.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
@@ -35,7 +35,7 @@ This structure informs the task decomposition. Each task should produce self-con
 
 ## Task Right-Sizing
 
-A task is the smallest unit that carries its own test cycle and is worth a
+A task is the smallest unit that carries its own verification cycle and is worth a
 fresh reviewer's gate. When drawing task boundaries: fold setup,
 configuration, scaffolding, and documentation steps into the task whose
 deliverable needs them; split only where a reviewer could meaningfully
@@ -45,11 +45,14 @@ independently testable deliverable.
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
+- "Implement the minimal code for the change" - step
+- "Write or extend the E2E test" - step (caller-visible changes only)
+- "Run the E2E check against the real artifact and read the result" - step
 - "Commit" - step
+
+Tests are E2E only: a task that changes caller-visible behavior adds or extends an E2E test; unit and integration tests appear only when the user asks for them.
+A bug-fix task reverses the first two steps: the E2E repro comes first and is run to watch it fail on the pre-fix code.
+A task with no caller-visible change (refactor, internal move) verifies with the existing suite.
 
 ## Plan Document Header
 
@@ -87,7 +90,7 @@ include this section.]
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+- E2E: `tests/e2e/exact/path/to/test.py` (when caller-visible behavior changes)
 
 **Interfaces:**
 - Consumes: [what this task uses from earlier tasks — exact signatures]
@@ -95,35 +98,30 @@ include this section.]
   and return types. A task's implementer sees only their own task; this
   block is how they learn the names and types neighboring tasks use.]
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write minimal implementation**
 
 ```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
+def order_total(items):
+    return sum(item.price * item.qty for item in items)
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 2: Write or extend the E2E test** (skip when no caller-visible behavior changes)
 
 ```python
-def function(input):
-    return expected
+def test_cli_prints_order_total(run_cli):
+    result = run_cli("total", "fixtures/order.json")
+    assert result.stdout.strip() == "Total: 42.50"
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 3: Verify against the real artifact**
 
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
+Run: `pytest tests/e2e/path/test.py::test_name -v` (no E2E file: the project's existing test command)
+Expected: PASS, or the exact observable output
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add tests/path/test.py src/path/file.py
+git add tests/e2e/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
 ````
@@ -133,7 +131,7 @@ git commit -m "feat: add specific feature"
 Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
+- "Verify it works" (without the command and its expected output)
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task

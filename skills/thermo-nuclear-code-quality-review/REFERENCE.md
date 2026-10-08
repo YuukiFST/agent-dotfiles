@@ -53,7 +53,7 @@
 ## 5. Architecture & Design 🟢
 
 - Single Responsibility: does this module/class/function have ONE reason to change?
-- Tight coupling: can you unit test this in isolation?
+- Tight coupling: can you swap this dependency without touching its callers?
 - Circular dependencies (direct or transitive).
 - Leaky abstractions: implementation details exposed through API.
 - God objects/functions. Over 50 lines? Justify every one.
