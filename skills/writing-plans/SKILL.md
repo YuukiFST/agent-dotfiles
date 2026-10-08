@@ -110,8 +110,7 @@ def order_total(items):
 ```python
 def test_cli_prints_order_total(run_cli):
     result = run_cli("total", "fixtures/order.json")
-    assert result.stdout == "Total: 42.50
-"
+    assert result.stdout.strip() == "Total: 42.50"
 ```
 
 - [ ] **Step 3: Verify against the real artifact**
