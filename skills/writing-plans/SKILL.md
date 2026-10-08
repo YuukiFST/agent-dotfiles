@@ -46,10 +46,13 @@ independently testable deliverable.
 
 **Each step is one action (2-5 minutes):**
 - "Implement the minimal code for the change" - step
+- "Write or extend the E2E test" - step (caller-visible changes only)
 - "Run the E2E check against the real artifact and read the result" - step
 - "Commit" - step
 
-Tests are E2E only: a task that changes caller-visible behavior adds or extends an E2E test; unit and integration tests appear only when the spec asks for them.
+Tests are E2E only: a task that changes caller-visible behavior adds or extends an E2E test; unit and integration tests appear only when the user asks for them.
+A bug-fix task reverses the first two steps: the E2E repro comes first and is run to watch it fail on the pre-fix code.
+A task with no caller-visible change (refactor, internal move) verifies with the existing suite.
 
 ## Plan Document Header
 
@@ -98,16 +101,25 @@ include this section.]
 - [ ] **Step 1: Write minimal implementation**
 
 ```python
-def function(input):
-    return expected
+def order_total(items):
+    return sum(item.price * item.qty for item in items)
 ```
 
-- [ ] **Step 2: Verify against the real artifact**
+- [ ] **Step 2: Write or extend the E2E test** (skip when no caller-visible behavior changes)
 
-Run: `pytest tests/e2e/path/test.py::test_name -v` (or the CLI run / request that exercises it)
+```python
+def test_cli_prints_order_total(run_cli):
+    result = run_cli("total", "fixtures/order.json")
+    assert result.stdout == "Total: 42.50
+"
+```
+
+- [ ] **Step 3: Verify against the real artifact**
+
+Run: `pytest tests/e2e/path/test.py::test_name -v` (no E2E file: the project's existing test command)
 Expected: PASS, or the exact observable output
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add tests/e2e/path/test.py src/path/file.py

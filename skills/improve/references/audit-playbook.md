@@ -54,7 +54,7 @@ The goal is not a percentage — it's *which untested code is dangerous*.
 - Map the critical paths (money, auth, data mutation, the feature the repo exists for) and check which have zero or trivial coverage.
 - Modules with high churn (git log) + no tests = top refactor risk; flag as "characterization tests first" candidates.
 - Existing test quality: tests that assert nothing meaningful, heavy mocking that tests the mocks, snapshot tests nobody reads, flaky patterns (real timers, real network, order dependence).
-- Missing E2E coverage: critical user paths with no test through the outermost interface (browser flow, HTTP request, CLI run). Recommend E2E tests only; a plan proposes unit or integration tests only when the user asks for them.
+- Missing E2E coverage: critical user paths with no test through the outermost interface (browser flow, HTTP request, CLI run, a library's public API). Recommend E2E tests only; a plan proposes unit or integration tests only when the user asks for them.
 - Verification infrastructure: is there a one-command way to know the codebase works? If not, that's finding #1 and a prerequisite plan for any risky change.
 
 ## 5. Tech Debt & Architecture
