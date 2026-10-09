@@ -47,6 +47,25 @@ jobs:
       - name: Run ai-tells lint regression and id consistency tests
         run: bash skills/ai-tells/tests/run.sh
 
+  security-audit-validators:
+    name: security-audit validators (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The Windows fallback in both validators diverges from upstream for good
+      # (cloudflare/security-audit-skill#69 closed unmerged), so only this job catches a
+      # mistake when it is applied again after an upstream update. Ubuntu runs the
+      # FIFO and symlink cases that Windows skips.
+      - name: Run the validator tests
+        run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs
+
   skill-frontmatter:
     name: Skill frontmatter
     runs-on: ubuntu-latest
