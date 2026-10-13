@@ -49,7 +49,7 @@ Config only, tools already installed: `scripts/sync-config.ps1 <harness>` / `scr
 |---------|-----------|
 | **Claude Code** | `CLAUDE.md`, `rules/`, `skills/`, `hooks/`, seed `settings.json` |
 | **pi** | `skills/`, `rules/`, agent config from `pi/` |
-| **OpenCode** | `skills/`, `rules/`, `~/.config/opencode/AGENTS.md` (its `opencode.json` is never touched) |
+| **OpenCode** | `skills/`, `rules/`, `~/.config/opencode/AGENTS.md`, reviewer agents `agents/interrogate-reviewer-<n>.md` generated from `skills/interrogate/reviewers.md` (its `opencode.json` is never touched) |
 | **Cursor** | `skills/`, `rules/` — User Rules are not file-backed: paste `CLAUDE.md` into Customize → Rules by hand, re-paste after edits |
 
 ## Repo layout
