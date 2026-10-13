@@ -37,7 +37,7 @@ This file is.
    1. `diff -rq rules ~/.claude/rules` prints nothing, and every `skills/<name>/` exists in the harness's skills dir (`~/.claude/skills` for Claude Code, `~/.agents/skills` for pi and OpenCode).
    2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       It drives an installed Chrome and keeps no per-machine config, so a failure means Chrome is missing, not that the repo drifted.
-   3. pi only: `show-shot <any png>` renders in the terminal.
+   3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
    4. `portless doctor` passes once Node 24+ and the one-time bootstrap in `portless/setup.md` are in place.
 
 ## What the scripts won't tell you

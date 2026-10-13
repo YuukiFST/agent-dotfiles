@@ -142,6 +142,13 @@ function Sync-Pi {
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }
 
+  # package.json above sets "type": "module" for the extensions, and Node applies it
+  # to pi's managed launcher (bin/pi-launcher.js, CommonJS) too; the nearest
+  # package.json wins, so bin/ gets its own (#148). Written whether or not bin/ exists
+  # yet: the installer can create bin/ after this sync, and it keeps files it did not write.
+  New-Item -ItemType Directory -Force -Path "$agent\bin" | Out-Null
+  '{ "type": "commonjs" }' | Set-Content "$agent\bin\package.json"
+
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.
   # Same split as sync_pi_agent() in sync-config.sh - keep the two in step.
@@ -180,7 +187,15 @@ function Sync-Pi {
   }
 
   # `pi install` resolves each package and registers it; re-running is a no-op.
+  # A pi that cannot start fails every install below with the same hidden error (#148).
   if (Test-Cmd pi) {
+    $piVersion = pi --version 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      $piError = $piVersion | Where-Object { "$_" -match 'Error' } | Select-Object -First 1
+      if (-not $piError) { $piError = $piVersion | Select-Object -Last 1 }
+      Write-Warning "pi does not start, packages not installed: $piError"
+      return
+    }
     foreach ($pkg in $packages) {
       $src = if ($pkg -is [string]) { $pkg } else { $pkg["source"] }
       Write-Host "  pi install $src"
