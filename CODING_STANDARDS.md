@@ -40,6 +40,19 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Green before shown:** run the project's tests, lint and typecheck on your change; repair what fails and rerun until green.
 - **Boy Scout rule:** a lint, typecheck or test failure or flake you see gets fixed, even if unrelated to your change; on UI work, so do visible pixel issues.
 
+## Leave no trace
+
+Disk is finite and a Rust `target/` reaches gigabytes in a day: a session ends with the footprint it found, plus only what the user asked to keep.
+
+- **Footprint ledger:** every worktree, clone, scratch dir, build output, container, image, volume and background process (dev server, watcher) the session creates goes on a running list, and each entry is removed or stopped before the final report.
+  The report names whatever stays (unpushed commits, a server the user wants running) and why.
+- **Worktree lifetime = branch lifetime:** once its branch is merged or abandoned, `git worktree remove <path>` (its ignored `target/`, `node_modules/`, `.venv/` go with it), then `git worktree prune`.
+  A worktree holding uncommitted changes or unpushed commits stays and goes in the report; `--force` only when the user says so.
+- **Scratch lives in OS temp:** throwaway files, clones and downloads go in a fresh dir under `$TMPDIR` / `%TEMP%`, deleted at the end; the repo and home dir hold only deliverables.
+- **Cheapest build that proves it:** `cargo check` when compiling is the proof, debug over `--release` unless the task measures release; an extra profile or toolchain is one more full copy of `target/`.
+- **Pre-existing state belongs to the user:** a `target/`, `node_modules/`, package cache (`~/.cargo/registry`, npm, pip) or Docker image that predates the session is their warm cache.
+  `cargo clean`, `docker system prune` and cache purges run only on request; when one is large, report its size and the command that frees it.
+
 ## Project hygiene
 
 - **Generated files** (CHANGELOG.md, anything marked auto-generated) change only through their generator.
