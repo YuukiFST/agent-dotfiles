@@ -1,6 +1,6 @@
 # CODING_STANDARDS.md — Global
 
-Rules for editing any project (code, tests, CI, docs), reached from the pointer in the global `CLAUDE.md`; they override model defaults.
+Rules for editing or running any project (code, tests, CI, docs, builds, worktrees, dev servers), reached from the pointer in the global `CLAUDE.md`; they override model defaults.
 Sections run in the order an edit walks them.
 
 ## Before the first edit
@@ -44,13 +44,14 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 
 Disk is finite and a Rust `target/` reaches gigabytes in a day: a session ends with the footprint it found, plus only what the user asked to keep.
 
-- **Footprint ledger:** every worktree, clone, scratch dir, build output, container, image, volume and background process (dev server, watcher) the session creates goes on a running list, and each entry is removed or stopped before the final report.
-  The report names whatever stays (unpushed commits, a server the user wants running) and why.
-- **Worktree lifetime = branch lifetime:** once its branch is merged or abandoned, `git worktree remove <path>` (its ignored `target/`, `node_modules/`, `.venv/` go with it), then `git worktree prune`.
-  A worktree holding uncommitted changes or unpushed commits stays and goes in the report; `--force` only when the user says so.
-- **Scratch lives in OS temp:** throwaway files, clones and downloads go in a fresh dir under `$TMPDIR` / `%TEMP%`, deleted at the end; the repo and home dir hold only deliverables.
+- **Footprint ledger:** every worktree, clone, scratch dir, container, image, volume and background process (dev server, watcher) the session creates goes on a running list.
+  Before the final report each entry is removed, stopped, or named in the report with the reason it stays (a worktree behind an open PR, a server the user wants running).
+- **Worktree lifetime = PR lifetime:** a worktree stays while its PR is open and goes once `gh-axi pr view` says merged or closed (or the user drops the branch); judge by the PR, since a rebase merge leaves local SHAs that look unpushed.
+  Removal order: stop processes running from it and move the shell out, delete the session's own untracked scratch in it, `git worktree remove <path>` (its ignored `target/`, `node_modules/`, `.venv/` go with it), then delete the branch.
+  A worktree that still refuses (uncommitted work, submodules) stays and goes in the report; `--force` only when the user says so, and `git worktree prune` only for a worktree dir deleted by hand.
+- **Scratch lives in OS temp:** throwaway files, clones and downloads go in a fresh `mktemp -d` dir, deleted at the end; the repo and home dir hold only deliverables.
 - **Cheapest build that proves it:** `cargo check` when compiling is the proof, debug over `--release` unless the task measures release; an extra profile or toolchain is one more full copy of `target/`.
-- **Pre-existing state belongs to the user:** a `target/`, `node_modules/`, package cache (`~/.cargo/registry`, npm, pip) or Docker image that predates the session is their warm cache.
+- **The user's checkout keeps its caches:** build output in the user's own checkout (`target/`, `node_modules/`) is their warm cache, whether it predates the session or a test run created it; so are package caches (`~/.cargo/registry`, npm, pip) and Docker images that predate the session.
   `cargo clean`, `docker system prune` and cache purges run only on request; when one is large, report its size and the command that frees it.
 
 ## Project hygiene

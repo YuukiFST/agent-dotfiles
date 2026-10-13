@@ -19,7 +19,7 @@ The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit 
 5. **Review before merge — always.** Run `/code-review` on the diff and post the findings **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CODING_STANDARDS.md, "Boy Scout rule": a lint/test failure found along the way gets fixed).
 7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
-8. **Delete the branch and its worktree after merge, then confirm the issue is closed.** Worktree removal follows global CODING_STANDARDS.md, "Leave no trace". `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
+8. **After merge, remove the worktree, then delete the branch, then confirm the issue is closed.** git refuses to delete a branch still checked out in a worktree; removal steps are in global CODING_STANDARDS.md, "Leave no trace". `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
 
 ## Shape of the work
 

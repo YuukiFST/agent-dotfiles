@@ -4,7 +4,7 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 
 ## Task routing
 
-- **Editing a project** (code, tests, CI, docs) → read `~/.claude/CODING_STANDARDS.md` before the first edit.
+- **Editing or running a project** (code, tests, CI, docs, builds, worktrees, dev servers) → read `~/.claude/CODING_STANDARDS.md` before the first change.
 - **Committing or pushing** → `~/.claude/rules/git.md` before the first commit (identity confirmation, Conventional Commits, no AI attribution).
 - **Writing a prompt** for a sub-agent, tool or LLM call, or a prompt file → `~/.claude/rules/prompting.md`.
 
