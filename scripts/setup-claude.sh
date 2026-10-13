@@ -17,11 +17,10 @@ echo "[3/4] portless + gh-axi + chrome-devtools-axi"
 npm install -g portless gh-axi chrome-devtools-axi
 
 echo "[4/4] Plugins"
-for m in JuliusBrussee/caveman anthropics/claude-plugins-official kingbootoshi/goal-ledger; do
+for m in JuliusBrussee/caveman anthropics/claude-plugins-official; do
   claude plugin marketplace add "$m" || true
 done
 claude plugin install caveman@caveman || true
-claude plugin install goal-ledger@goal-ledger || true
 
 case ":$PATH:" in *":$bin:"*) ;; *) echo "Note: add $bin to PATH";; esac
 echo "Done. Restart Claude Code."
