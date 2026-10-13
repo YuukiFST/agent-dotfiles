@@ -17,10 +17,9 @@ Write-Host "[3/4] portless + gh-axi + chrome-devtools-axi"
 npm install -g portless gh-axi chrome-devtools-axi
 
 Write-Host "[4/4] Plugins"
-foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official", "kingbootoshi/goal-ledger") {
+foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official") {
   claude plugin marketplace add $m
 }
 claude plugin install caveman@caveman
-claude plugin install goal-ledger@goal-ledger
 
 Write-Host "Done. Restart Claude Code."
