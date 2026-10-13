@@ -4,6 +4,8 @@ The community gallery is the repository `wheresryan22/anatomy-community`. People
 
 Publish only when the user asks to share or publish a figure. Never send anything without their explicit yes.
 
+**Local override (agent-dotfiles):** leave `--submit` out of steps 4 and 5 and take step 6. The submit path commits under whatever git identity is configured and force-pushes, so the commit, push and pull request follow `~/.claude/rules/git.md` instead.
+
 ## Steps
 
 1. **Check the figure is finished.** Its pages are built and up to date, the line check passes, `--audit` passes if it has pipes, cables or round parts, and with reduced motion on it holds one still pose. The gallery checks all of this too.
