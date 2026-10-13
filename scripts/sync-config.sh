@@ -64,12 +64,12 @@ sync_pi_agent() {
     fi
   done
 
-  # package.json above sets "type": "module" for the extensions, and Node applies it
-  # to pi's managed launcher (bin/pi-launcher.js, CommonJS) too; the nearest
-  # package.json wins, so bin/ gets its own (#148).
-  if [ -d "$agent/bin" ]; then
-    printf '{ "type": "commonjs" }\n' > "$agent/bin/package.json"
-  fi
+  # package.json above sets "type": "module" for the extensions. On Windows, pi's
+  # managed installer writes a CommonJS bin/pi-launcher.js that Node would then load
+  # as ESM; the nearest package.json wins, so bin/ gets its own (#148). Mirrored here
+  # for Git Bash on Windows; the Unix installer writes a shell launcher instead.
+  mkdir -p "$agent/bin"
+  printf '{ "type": "commonjs" }\n' > "$agent/bin/package.json"
 
   python3 - "$pi_src/settings.json" "$agent/settings.json" <<'PY'
 import json
@@ -115,7 +115,10 @@ PY
   done
 
   # settings.json packages only — never installs archived stacks/ (see stacks/README.md).
-  if command -v pi >/dev/null 2>&1; then
+  # A pi that cannot start fails every install below with the same hidden error (#148).
+  if command -v pi >/dev/null 2>&1 && ! pi --version >/dev/null 2>&1; then
+    echo "  warning: pi does not start, packages not installed: $(pi --version 2>&1 | tail -n 1)" >&2
+  elif command -v pi >/dev/null 2>&1; then
     for pkg in $(python3 - "$pi_src/settings.json" <<'PY'
 import json
 import sys
