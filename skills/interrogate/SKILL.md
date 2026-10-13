@@ -26,7 +26,9 @@ If you are unsure of the intent, ask the user before spawning reviewers.
 ## Step 3, Spawn reviewers
 
 Read `reviewers.md` and take the rows for your harness, in order; label them Reviewer A, B, and so on.
-Fill `references/reviewer-prompt.md` once with the intent, the packaged diff, `references/rubric.md` and `references/code-quality-review.md`, and send that same prompt to every reviewer.
+Fill `references/reviewer-prompt.md` once and send that same prompt to every reviewer.
+Paste text into it, not paths or commands: the intent, the diff output, and the full contents of `references/rubric.md` and `references/code-quality-review.md`.
+OpenCode reviewers have no shell, and the skill's own files sit outside the repo under review, so a reviewer cannot fetch any of it.
 Launch all reviewers in a single message so they run in parallel.
 
 | Harness | Call per row |
@@ -38,7 +40,7 @@ Launch all reviewers in a single message so they run in parallel.
 Fallbacks, each reported in the Reviewers section of the verdict:
 
 - Claude Code rejects a row's `model` or `effort`: rerun that reviewer without the rejected parameter.
-- OpenCode has no `interrogate-reviewer-<n>` agent: `sync-config` has not run on this machine since the row was added, so use `subagent_type: general` and tell the user to run the sync.
+- OpenCode has no `interrogate-reviewer-<n>` agent, or its description names a different model or variant than the row: `sync-config` has not run since the table changed, so use the agent as it is (or `subagent_type: general` when missing), report the model it actually runs, and tell the user to run the sync.
 - No row for your harness: one reviewer on the session model.
 
 ## Step 4, Synthesize

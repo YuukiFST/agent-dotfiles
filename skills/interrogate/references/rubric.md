@@ -75,7 +75,8 @@ Simpler is better unless simpler is wrong.
 
 For each security finding, trace the input path through the code and show it.
 
-- User input flowing to dangerous sinks (SQL, shell, eval, innerHTML) without sanitization
+- User input flowing to dangerous sinks (SQL, shell, eval, innerHTML, file paths) without sanitization; path traversal through `..`, absolute paths or symlinks
+- Secret comparison that leaks timing (`==` on tokens or MACs instead of a constant-time compare)
 - Authentication/authorization gaps in new endpoints
 - Secrets in code, logs, or error messages
 - TOCTOU (time-of-check-time-of-use) in security-critical paths
@@ -101,6 +102,7 @@ Flag only what the change makes worse on a path that runs often or on large inpu
 - Allocation or serialization (`JSON.parse`, regex compile) inside a hot loop
 - Synchronous blocking in an async context (`readFileSync` in a request handler)
 - Unbounded growth: caches without eviction, arrays that only append, listeners never removed
+- Leaked resources: file handles, sockets, DB connections or child processes not closed on every path, the error path included
 
 ## API Contracts
 
