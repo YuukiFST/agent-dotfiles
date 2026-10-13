@@ -55,7 +55,7 @@ Add a preload only when the resource stays late after that, for example a CSS ba
 ```
 
 Preconnect only to origins the LCP path actually requests from (`crossorigin` for fonts and CORS fetches).
-For framework image components, retrieve the current priority or preload API through context7; the prop names change between major versions.
+For framework image components, retrieve the current priority or preload API from the framework's official docs; the prop names change between major versions.
 
 ## Images
 
@@ -94,7 +94,7 @@ For framework image components, retrieve the current priority or preload API thr
 ## Client rendering
 
 When the LCP element is absent from the initial HTML and render delay dominates, move the content into server output: SSR, static generation, or streaming SSR.
-Retrieve the current framework API through context7 rather than writing it from memory.
+Retrieve the current framework API from its official docs rather than writing it from memory.
 
 ## Third parties
 
