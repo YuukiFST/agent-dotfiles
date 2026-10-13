@@ -191,7 +191,9 @@ function Sync-Pi {
   if (Test-Cmd pi) {
     $piVersion = pi --version 2>&1
     if ($LASTEXITCODE -ne 0) {
-      Write-Warning "pi does not start, packages not installed: $($piVersion | Select-Object -Last 1)"
+      $piError = $piVersion | Where-Object { "$_" -match 'Error' } | Select-Object -First 1
+      if (-not $piError) { $piError = $piVersion | Select-Object -Last 1 }
+      Write-Warning "pi does not start, packages not installed: $piError"
       return
     }
     foreach ($pkg in $packages) {

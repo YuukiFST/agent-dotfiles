@@ -117,7 +117,7 @@ PY
   # settings.json packages only — never installs archived stacks/ (see stacks/README.md).
   # A pi that cannot start fails every install below with the same hidden error (#148).
   if command -v pi >/dev/null 2>&1 && ! pi --version >/dev/null 2>&1; then
-    echo "  warning: pi does not start, packages not installed: $(pi --version 2>&1 | tail -n 1)" >&2
+    echo "  warning: pi does not start, packages not installed: $(pi --version 2>&1 | grep -m 1 Error || pi --version 2>&1 | tail -n 1)" >&2
   elif command -v pi >/dev/null 2>&1; then
     for pkg in $(python3 - "$pi_src/settings.json" <<'PY'
 import json
