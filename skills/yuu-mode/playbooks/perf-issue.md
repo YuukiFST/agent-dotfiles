@@ -3,7 +3,7 @@
 Every fix ties to a measurement; reading source is not measuring.
 Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; this playbook covers the rest.
 
-1. Capture a baseline on the real workload, and vet it and every later number with `principle-explain-the-number`.
+1. Capture a baseline on the real workload plus a profile or trace of it, and vet it and every later number with `principle-explain-the-number`.
 2. Ground the hypotheses in the trace, then try the performance mantras cheapest first, stopping at the first that meets the target:
    1. Don't do it: stop work whose result nothing uses.
    2. Do it, but don't do it again.

@@ -1,6 +1,6 @@
 ---
 name: yuu-mode
-description: "One front door for any task: route the prompt to the best skill or playbook in this kit, then work it to verified evidence. Run as /yuu-mode <task>."
+description: "One front door for any task: route the prompt to the best skill or playbook in this kit, then work it to verified evidence. Run as /yuu-mode <task> (pi: /skill:yuu-mode)."
 disable-model-invocation: true
 metadata:
   opencode/slash: "true"
@@ -23,10 +23,11 @@ A routed skill missing on disk: name it in the reply and take the next-best rout
 
 Match on every new task: the prompt that came with `/yuu-mode`, a "new task", or a clear change of subject.
 A follow-up on the same task ("continue", "do it", "keep going") keeps the current route.
+The user says to leave yuu-mode: stop routing.
 
-1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a UI bug runs the bug-fix playbook and verifies with `ui-polish`).
+1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a UI bug runs the bug-fix playbook and verifies with `chrome-devtools-axi`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
-3. Open a todo list whose first items are the route's steps copied verbatim; a step you skip stays with `skip: <reason>`.
+3. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
 A casual question or one-line answer gets answered directly, with no route line and no todo list.
 
@@ -40,6 +41,8 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Teach me a concept within this workspace | `teach` |
 | Research a question against primary sources, gather docs or API facts | `research` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
+
+Publishing an anatomy figure takes the path without `--submit` (its `references/publish.md` step 6), and the commit, push and PR follow `rules/git.md`.
 
 ### Build
 
@@ -66,7 +69,6 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Review a diff, branch or PR; "what could this break" | `interrogate` |
 | Write, change or audit tests | `test-audit` |
 | Security review or audit of existing code | `security-audit` |
-| Building auth, user input, secrets, payments | `security-review` |
 | Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
 | Survey a codebase and write plans for other agents | `improve` |
 | Stress-test a plan or idea | `grilling` |
@@ -99,7 +101,7 @@ A casual question or one-line answer gets answered directly, with no route line 
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.
 - **Prose that ships** (PR body, docs, commit body): an `ai-tells` pass before it goes out.
-- **Broken skill mid-task:** name the defect in the reply and fix it as its own change; keep the current task moving.
+- **Broken skill mid-task:** name the defect and the fix in the reply, so it lands in the agent-dotfiles repo; the copies under `~/.claude/skills` and `~/.agents/skills` are overwritten by the next sync. Keep the current task moving.
 
 ## Principles
 
@@ -110,9 +112,8 @@ Before any code, name the data shape and its organizing structure (`principle-mo
 
 ## Autonomy
 
-Reversible work proceeds without asking.
-Pause for irreversible writes: pushes outside a personal feature branch (`rules/git.md` §3), force-pushes, deploys, data deletion, messages to other people.
-"Don't stop", "run until done" or "going to bed" mean keep going through every reversible step.
+Pauses follow the global `CLAUDE.md` and `rules/git.md` §3.
+"Don't stop", "run until done" or "going to bed" keep you going through reversible steps; those stop rules still hold.
 Asked whether to do something or shown an approach, give your real judgment; "this doesn't earn its place" is a valid answer.
 
 ## Subagents
@@ -120,7 +121,7 @@ Asked whether to do something or shown an approach, give your real judgment; "th
 - Route bulk reads (a sweep across many files, long logs) to a read-only explore subagent and keep its summary; read a single known file yourself.
 - You own every subagent's output: review its diff and write your own summary.
 - A routed skill that prescribes its own subagents (`interrogate`) keeps them.
-- New work goes to a fresh subagent with consolidated scope: the original brief, every later directive, and the prior agent's report.
+- Re-delegating after a subagent's report: give a fresh subagent the original brief, every later directive, and that report.
 
 ## Reply
 
