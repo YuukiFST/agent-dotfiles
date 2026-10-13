@@ -177,7 +177,7 @@ Take every command below from the project itself: `AGENTS.md` / `CLAUDE.md`,
    [audit target](#audit-target) baseline.
 6. Inspect `git diff --numstat`; report production/tooling separately from
    tests and test support.
-7. After final audit edits, review the diff with `/code-review`.
+7. After final audit edits, review the diff with the `interrogate` skill.
 
 ## Landing and continuation
 

@@ -59,3 +59,5 @@ transitions-polish
 systematic-debugging
 diagnosing-bugs
 verification-before-completion
+# Merged into interrogate with pstack's interrogate and blast-radius (#135).
+thermo-nuclear-code-quality-review
