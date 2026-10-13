@@ -14,7 +14,7 @@ Write five lines before any code:
 
 Greenfield repo with no tokens and no neighbours → this is the one case a direction is needed. Ask the user for a Figma file, a design image or a reference product. A Figma file or an image switches to **Design** mode; a reference product is the direction this brief follows, never an aesthetic invented here.
 
-The screen's job is to show figures, a trend or a comparison → the chart, KPI and numeric-table parts follow [visualize.md](visualize.md) inside steps 3 to 6.
+The screen's job is to show figures, a trend or a comparison → the chart and KPI parts follow [visualize.md](visualize.md) inside steps 3 to 6.
 
 ## 2. Libraries
 

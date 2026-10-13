@@ -14,7 +14,7 @@ Done when: the scope files are listed.
 
 Open the route in the browser. Save a desktop and a 320px screenshot to a scratch folder the project ignores (`.scratch/ui-polish/<route>/before-*.png`, or the project's own evidence folder when one exists). Take a `snapshot` for names and roles. Note console errors.
 
-Done when: two screenshots exist and the accessibility snapshot is saved as text.
+Done when: two screenshots exist (Design mode: one per frame width instead) and the accessibility snapshot is saved as text.
 
 ## 3. Fan out the domain reviewers
 
@@ -58,7 +58,7 @@ The request asked for everything ("ao máximo", "every component"), so the work 
 - **Apply policy (step 4).** No stop for selection: the request already chose. Apply HIGH and MEDIUM, plus every LOW whose fix sits on the first four rungs of the ladder (delete, platform, reuse, correct value). A LOW that needs **Add** is `follow-up`.
 - **Carry-over (step 4).** The cap of 15 bounds a round's table, not the work. Rows past the cap are `carried` and lead the next round's table.
 - **Rounds (after step 6).** The after-screenshots become the next round's before, and steps 3 to 6 run again over the whole inventory. Each reviewer prompt carries the earlier rounds' rows with their status. An `applied` row that still reproduces comes back as `Fix incomplete`; `rejected` and `follow-up` rows are not proposed again.
-- **Stop.** A round ends the loop when its consolidated table has no HIGH or MEDIUM and nothing is carried. Round 3 ends it regardless; every row still open is listed as follow-up. Say which condition ended it.
+- **Stop.** A round ends the loop when its consolidated table has no HIGH or MEDIUM and nothing is carried. Round 3 ends it regardless; every row still open is listed as follow-up, except an open HIGH, which leads the report and keeps step 6 not done. Say which condition ended it.
 - **Report (step 7).** One table per round, the inventory with a verdict per component (improved, clean, not reviewed), and an offer, not a run, of **Break** for each inventory component that renders data it does not author and **Variant** for the piece the reviews flagged weakest.
 
 Done when: the stop condition is met and named, and every inventory line has a verdict.

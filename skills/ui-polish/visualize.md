@@ -21,7 +21,7 @@ Take the first row whose question matches; rows run from most to least specific.
 
 | The question | Form |
 | --- | --- |
-| Values arriving live | A streaming line, per `pick-ui-library` **Charts** |
+| Live values where the recent trend is the question | A streaming line, per `pick-ui-library` **Charts**; a single live figure is a KPI |
 | One figure that matters now | A KPI: the number large, its delta and the comparison period beside it; a sparkline only when the trend changes the reading |
 | Exact values the reader looks up or copies | A table, numbers right-aligned in tabular figures |
 | Compare categories | Bars, sorted by value unless the categories carry their own order; horizontal when labels run long |
@@ -58,6 +58,6 @@ Read `find-animation-opportunities/SKILL.md` **The Gate**, especially **4. Funct
 
 ## 7. Build every state, then review
 
-Build with a real-shaped fixture and the worst-case fixture from step 1 side by side, every state reachable in the browser. Then run Build's review gate ([build.md](build.md) step 7) with the **data viz** trigger on, so the data-viz reviewer joins the default set.
+Build with a real-shaped fixture and the worst-case fixture from step 1 side by side, every state reachable in the browser. Then run Build's review gate ([build.md](build.md) step 7). The **data viz** trigger is on when the chosen form is a chart or KPI; a table form is reviewed by typography and layout.
 
 Done when: every state renders, both fixtures render without overflow or overlap, and the review gate returns no HIGH finding.

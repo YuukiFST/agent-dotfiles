@@ -3,9 +3,9 @@
 # They live outside every harness skills dir on purpose: none of their frontmatter
 # reaches a session, only the skill's own description does.
 # Idempotent: run on a fresh machine or to refresh existing clones.
-# Ends with two drift checks against SKILL.md: UNROUTED for an upstream skill it
-# neither routes nor excludes, MISSING for a REFS/ path it cites that upstream
-# no longer has. Both surface on the next pull instead of mid-task.
+# Ends with two drift checks: UNROUTED for an upstream skill SKILL.md neither
+# routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
+# upstream no longer has. Both surface on the next pull instead of mid-task.
 set -euo pipefail
 REFS="${UI_REFS:-$HOME/.claude/ui-refs}"
 ROUTER="$(dirname "$0")/SKILL.md"
@@ -33,7 +33,7 @@ for skill in "$REFS"/*/skills/*/; do
     drift=1
   fi
 done
-for cited in $(grep -oE 'REFS/[A-Za-z0-9._/-]+' "$ROUTER" | sort -u); do
+for cited in $(grep -ohE 'REFS/[A-Za-z0-9._/-]+' "$(dirname "$ROUTER")"/*.md | sort -u); do
   if [ ! -e "$REFS/${cited#REFS/}" ]; then
     echo "MISSING $cited: upstream renamed or removed it; repoint SKILL.md"
     drift=1
