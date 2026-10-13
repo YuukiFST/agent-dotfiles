@@ -137,17 +137,18 @@ function Sync-Pi {
   # pi takes global instructions from ~/.pi/agent/AGENTS.md.
   Copy-Item "$Repo\CLAUDE.md" "$agent\AGENTS.md" -Force
 
-  foreach ($f in "cloak.json", "package.json", "tsconfig.json", "models.json", ".gitignore") {
+  foreach ($f in "cloak.json", "tsconfig.json", "models.json", ".gitignore") {
     $src = Join-Path $piSrc $f
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }
 
-  # package.json above sets "type": "module" for the extensions, and Node applies it
-  # to pi's managed launcher (bin/pi-launcher.js, CommonJS) too; the nearest
-  # package.json wins, so bin/ gets its own (#148). Written whether or not bin/ exists
-  # yet: the installer can create bin/ after this sync, and it keeps files it did not write.
-  New-Item -ItemType Directory -Force -Path "$agent\bin" | Out-Null
-  '{ "type": "commonjs" }' | Set-Content "$agent\bin\package.json"
+  # pi/package.json is for tsc only. Its "type": "module" in ~/.pi/agent made Node load
+  # pi's CommonJS launcher (bin/pi-launcher.js) as ESM (#148); each extension declares
+  # its own type in extensions/<name>/package.json instead. Remove the package.json files
+  # earlier syncs wrote, root first: a root that stays must keep the bin/ override (#150).
+  foreach ($stale in "$agent\package.json", "$agent\bin\package.json") {
+    if (Test-Path $stale) { Remove-Item $stale -Force }
+  }
 
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.

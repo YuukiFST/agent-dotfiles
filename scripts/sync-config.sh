@@ -58,18 +58,18 @@ sync_pi_agent() {
   [ -d "$pi_src" ] || return 0
 
   mkdir -p "$agent/extensions"
-  for f in cloak.json package.json tsconfig.json models.json .gitignore; do
+  for f in cloak.json tsconfig.json models.json .gitignore; do
     if [ -f "$pi_src/$f" ]; then
       cp "$pi_src/$f" "$agent/$f"
     fi
   done
 
-  # package.json above sets "type": "module" for the extensions. On Windows, pi's
-  # managed installer writes a CommonJS bin/pi-launcher.js that Node would then load
-  # as ESM; the nearest package.json wins, so bin/ gets its own (#148). Mirrored here
-  # for Git Bash on Windows; the Unix installer writes a shell launcher instead.
-  mkdir -p "$agent/bin"
-  printf '{ "type": "commonjs" }\n' > "$agent/bin/package.json"
+  # pi/package.json is for tsc only. Its "type": "module" in ~/.pi/agent made Node load
+  # pi's CommonJS launcher (bin/pi-launcher.js) as ESM (#148); each extension declares
+  # its own type in extensions/<name>/package.json instead. Remove the package.json files
+  # earlier syncs wrote, root first: a root that stays must keep the bin/ override (#150).
+  rm -f "$agent/package.json"
+  rm -f "$agent/bin/package.json"
 
   python3 - "$pi_src/settings.json" "$agent/settings.json" <<'PY'
 import json
