@@ -55,7 +55,6 @@
   "enabledPlugins": {
     "caveman@caveman": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
     "hookify@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
