@@ -7,12 +7,14 @@ Build in the order that decides quality: purpose, structure, then surface, then 
 Write five lines before any code:
 
 - **Purpose**: the one task the screen exists for, and the user who does it.
-- **Data and states**: what it shows; empty, loading, error, partial, one item, worst case. Worst-case values come from `break-ui/CATALOG.md` per field (long hyphenated names, unbreakable emails, counts of 1, 1,000 rows), or from the schema limit.
+- **Data and states**: what it shows, and every state from the kinds table in `state-machine/SKILL.md` **Find the states in the code** (data, account, feature) that the screen can reach. Worst-case values come from `break-ui/CATALOG.md` per field (long hyphenated names, unbreakable emails, counts of 1, 1,000 rows), or from the schema limit.
 - **Primary action** and the destructive ones.
 - **Viewports** from recon; **frequency**: is this seen 100 times a day or once?
 - **Neighbours**: the existing screens it must sit beside, by route. Open one in the browser; match its density and chrome.
 
-Greenfield repo with no tokens and no neighbours → this is the one case a direction is needed. Ask the user for a reference product or screenshot; do not invent an aesthetic.
+Greenfield repo with no tokens and no neighbours → this is the one case a direction is needed. Ask the user for a Figma file, a design image or a reference product. A Figma file or an image switches to **Design** mode; a reference product is the direction this brief follows, never an aesthetic invented here.
+
+The screen's job is to show figures, a trend or a comparison → the chart, KPI and numeric-table parts follow [visualize.md](visualize.md) inside steps 3 to 6.
 
 ## 2. Libraries
 
@@ -36,7 +38,7 @@ Read `better-ui/SKILL.md` and `surfaces.md`, plus `better-typography/SKILL.md`. 
 
 ## 6. Motion
 
-Read `animate/SKILL.md`. Run its gate per interactive element: frequency, purpose, budget. Most elements on a product screen get no motion or press feedback only. What survives the gate is built from `RECIPES.md` with the project's easing and duration tokens, ships with `prefers-reduced-motion` and hover gating in the same change.
+Read `animate/SKILL.md`. Run its gate per interactive element: frequency, purpose, budget. Most elements on a product screen get no motion or press feedback only. What survives the gate is built from `RECIPES.md` with the project's easing and duration tokens, ships with `prefers-reduced-motion` and hover gating in the same change, and animates only the properties `animation-performance` **What You Animate** clears.
 
 **gesture** in the brief → read the gesture row's references before building it: 1:1 tracking from pointer-down, interruptible springs, velocity handoff on release, rubber-band at the edges.
 

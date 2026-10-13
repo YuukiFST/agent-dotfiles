@@ -8,6 +8,10 @@ Name the exact route, component tree and states in scope: default, loading, empt
 
 List the source files the scope renders: the route, its components, the shared primitives it uses, the stylesheet lines it depends on. That list is the `scope files` of every reviewer prompt.
 
+`exhaustive` depth adds the **component inventory**: every visual component the route renders, from the source tree and the accessibility snapshot, one line each with its file, the states it reaches and whether it renders data it does not author. Headers, navigation, cards, tables, charts, forms, dialogs, toasts, empty and error blocks all count. The inventory goes into every reviewer prompt.
+
+Done when: the scope files are listed; at `exhaustive`, also every component in the rendered tree has an inventory line and the count is stated.
+
 ## 2. Capture the baseline
 
 Open the route in the browser. Save a desktop and a 320px screenshot to a scratch folder the project ignores (`.scratch/ui-polish/<route>/before-*.png`, or the project's own evidence folder when one exists). Take a `snapshot` for names and roles. Note console errors.
@@ -28,7 +32,7 @@ Read `better-interface/SKILL.md` (**Rank by user impact** through **Verify what 
 - One root cause per row, all locations listed. Escalation triggers first. Cap 15; say how many the cap excluded.
 - Propose the cheapest fix that works (delete, platform, reuse, correct value, add).
 
-Present the table. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply HIGH and MEDIUM, list LOW as follow-up.
+Present the table. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply HIGH and MEDIUM, list LOW as follow-up. `exhaustive`: the request already asked for everything, so apply HIGH and MEDIUM, plus every LOW whose fix sits on the first four rungs of the ladder (delete, platform, reuse, correct value); a LOW that needs **Add** stays follow-up.
 
 ## 5. Apply
 
@@ -44,6 +48,8 @@ Done when: every applied row is checked off in the table with the file touched.
 
 Done when: gates pass, both after-screenshots exist, and no HIGH finding remains open.
 
+`exhaustive` loops here: the after-screenshots become the next round's before, and steps 3 to 6 run again on the changed scope. Each reviewer prompt carries the previous rounds' applied and rejected rows, so nothing is re-proposed. Stop on a round that returns no HIGH or MEDIUM, or after round 3, and say which ended it.
+
 ## 7. Report
 
-The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths.
+The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths. `exhaustive`: one table per round, the inventory with a verdict per component (improved, clean, not reviewed), and an offer, not a run, of **Break** for each inventory component that renders data it does not author and **Variant** for the piece the reviews flagged weakest.
