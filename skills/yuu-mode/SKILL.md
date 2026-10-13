@@ -23,9 +23,9 @@ A routed skill missing on disk: name it in the reply and take the next-best rout
 
 Match on every new task: the prompt that came with `/yuu-mode`, a "new task", or a clear change of subject.
 A follow-up on the same task ("continue", "do it", "keep going") keeps the current route.
-The user says to leave yuu-mode: stop routing.
+The user says to leave yuu-mode: drop this file's rules for the rest of the session.
 
-1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a UI bug runs the bug-fix playbook and verifies with `chrome-devtools-axi`).
+1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
 3. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
@@ -41,8 +41,6 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Teach me a concept within this workspace | `teach` |
 | Research a question against primary sources, gather docs or API facts | `research` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
-
-Publishing an anatomy figure takes the path without `--submit` (its `references/publish.md` step 6), and the commit, push and PR follow `rules/git.md`.
 
 ### Build
 
@@ -101,7 +99,7 @@ Publishing an anatomy figure takes the path without `--submit` (its `references/
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.
 - **Prose that ships** (PR body, docs, commit body): an `ai-tells` pass before it goes out.
-- **Broken skill mid-task:** name the defect and the fix in the reply, so it lands in the agent-dotfiles repo; the copies under `~/.claude/skills` and `~/.agents/skills` are overwritten by the next sync. Keep the current task moving.
+- **Broken skill mid-task:** name the defect and the fix in the reply; edit only the agent-dotfiles repo copy, never `~/.claude/skills` or `~/.agents/skills`. Keep the current task moving.
 
 ## Principles
 
@@ -112,8 +110,8 @@ Before any code, name the data shape and its organizing structure (`principle-mo
 
 ## Autonomy
 
-Pauses follow the global `CLAUDE.md` and `rules/git.md` §3.
-"Don't stop", "run until done" or "going to bed" keep you going through reversible steps; those stop rules still hold.
+Pauses follow the global instructions and `~/.claude/rules/git.md` §3.
+"Don't stop", "run until done" or "going to bed" keep you going through reversible steps; those stop rules still hold, and a message other people will see waits for a yes.
 Asked whether to do something or shown an approach, give your real judgment; "this doesn't earn its place" is a valid answer.
 
 ## Subagents

@@ -5,7 +5,6 @@
 3. Settle the design: a change crossing a module boundary, or one with several valid shapes, goes through `codebase-design`; an empirical fork goes to `prototype`; only a product call no experiment settles goes to the user.
    A feature touching auth, user input, secrets or payments also runs `security-review`.
 4. Build in small units, each verified before the next (`principle-sequence-verifiable-units`).
-   Work that splits into disjoint files or layers: say whether subagents run it in parallel.
    UI parts follow `ui-polish`; new tests pass `test-audit`.
 5. Verify on the matching surface (`principle-prove-it-works`).
 6. A contested design or risky change gets `interrogate` before it ships; ship through `git-workflow` when the user asked to ship.
