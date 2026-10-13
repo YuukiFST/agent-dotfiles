@@ -1,6 +1,6 @@
 # Audit: improve an existing screen
 
-Improve what exists without changing what it does. The output is a ranked findings table, then the fixes applied in the project's idiom, then before/after evidence.
+Improve what exists without changing what it does. The output is a ranked findings table, then the fixes applied in the project's idiom, then before/after evidence. At `exhaustive` depth, the **Exhaustive** section at the end adds to steps 1, 4, 6 and 7; read it before step 1.
 
 ## 1. Resolve the scope
 
@@ -8,9 +8,7 @@ Name the exact route, component tree and states in scope: default, loading, empt
 
 List the source files the scope renders: the route, its components, the shared primitives it uses, the stylesheet lines it depends on. That list is the `scope files` of every reviewer prompt.
 
-`exhaustive` depth adds the **component inventory**: every visual component the route renders, from the source tree and the accessibility snapshot, one line each with its file, the states it reaches and whether it renders data it does not author. Headers, navigation, cards, tables, charts, forms, dialogs, toasts, empty and error blocks all count. The inventory goes into every reviewer prompt.
-
-Done when: the scope files are listed; at `exhaustive`, also every component in the rendered tree has an inventory line and the count is stated.
+Done when: the scope files are listed.
 
 ## 2. Capture the baseline
 
@@ -32,7 +30,7 @@ Read `better-interface/SKILL.md` (**Rank by user impact** through **Verify what 
 - One root cause per row, all locations listed. Escalation triggers first. Cap 15; say how many the cap excluded.
 - Propose the cheapest fix that works (delete, platform, reuse, correct value, add).
 
-Present the table. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply HIGH and MEDIUM, list LOW as follow-up. `exhaustive`: the request already asked for everything, so apply HIGH and MEDIUM, plus every LOW whose fix sits on the first four rungs of the ladder (delete, platform, reuse, correct value); a LOW that needs **Add** stays follow-up.
+Present the table. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply HIGH and MEDIUM, list LOW as follow-up.
 
 ## 5. Apply
 
@@ -48,8 +46,19 @@ Done when: every applied row is checked off in the table with the file touched.
 
 Done when: gates pass, both after-screenshots exist, and no HIGH finding remains open.
 
-`exhaustive` loops here: the after-screenshots become the next round's before, and steps 3 to 6 run again on the changed scope. Each reviewer prompt carries the previous rounds' applied and rejected rows, so nothing is re-proposed. Stop on a round that returns no HIGH or MEDIUM, or after round 3, and say which ended it.
-
 ## 7. Report
 
-The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths. `exhaustive`: one table per round, the inventory with a verdict per component (improved, clean, not reviewed), and an offer, not a run, of **Break** for each inventory component that renders data it does not author and **Variant** for the piece the reviews flagged weakest.
+The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths.
+
+## Exhaustive
+
+The request asked for everything ("ao máximo", "every component"), so the work runs in rounds over a fixed inventory instead of one capped pass. Everything else in steps 1 to 7 holds.
+
+- **Inventory (step 1).** One line per distinct component file the route renders, with the states it reaches and whether it renders data it does not author. A shared primitive (button, icon, input) gets one line however often it appears. The inventory and its count go into every reviewer prompt, and every reviewer returns a verdict line per component.
+- **Apply policy (step 4).** No stop for selection: the request already chose. Apply HIGH and MEDIUM, plus every LOW whose fix sits on the first four rungs of the ladder (delete, platform, reuse, correct value). A LOW that needs **Add** is `follow-up`.
+- **Carry-over (step 4).** The cap of 15 bounds a round's table, not the work. Rows past the cap are `carried` and lead the next round's table.
+- **Rounds (after step 6).** The after-screenshots become the next round's before, and steps 3 to 6 run again over the whole inventory. Each reviewer prompt carries the earlier rounds' rows with their status. An `applied` row that still reproduces comes back as `Fix incomplete`; `rejected` and `follow-up` rows are not proposed again.
+- **Stop.** A round ends the loop when its consolidated table has no HIGH or MEDIUM and nothing is carried. Round 3 ends it regardless; every row still open is listed as follow-up. Say which condition ended it.
+- **Report (step 7).** One table per round, the inventory with a verdict per component (improved, clean, not reviewed), and an offer, not a run, of **Break** for each inventory component that renders data it does not author and **Variant** for the piece the reviews flagged weakest.
+
+Done when: the stop condition is met and named, and every inventory line has a verdict.

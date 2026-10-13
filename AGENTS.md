@@ -32,7 +32,7 @@ This file is.
    Done when every command exits 0 and ends with `Config synced (...)`.
 3. **Fetch the design references** when `~/.claude/ui-refs/` is missing (first sync) or a refresh is asked for: `bash skills/ui-polish/update-refs.sh`.
    Sync never runs it, and the clones sit outside every skills dir on purpose so none of their frontmatter reaches a session.
-   Done when `~/.claude/ui-refs/` lists the cloned repos.
+   Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/SKILL.md` (a route, a **Not routed** entry, or a repointed path) and the script rerun.
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
    1. `diff -rq rules ~/.claude/rules` prints nothing, and every `skills/<name>/` exists in the harness's skills dir (`~/.claude/skills` for Claude Code, `~/.agents/skills` for pi and OpenCode).
    2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.

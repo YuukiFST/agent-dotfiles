@@ -2,7 +2,7 @@
 
 One subagent per domain. Fill every `{placeholder}`; leave nothing to the reviewer's memory. Dispatch all reviewers in one message so they run in parallel.
 
-Domain → reference paths (all under `REFS`, resolve `~` to the absolute home directory before pasting):
+Domain → reference paths (under `REFS` unless the row says otherwise; resolve `~` to the absolute home directory before pasting):
 
 | Domain | Reference files to read in full |
 | --- | --- |
@@ -16,7 +16,7 @@ Domain → reference paths (all under `REFS`, resolve `~` to the absolute home d
 | worst case | `emilkowalski-skills/skills/break-ui/CATALOG.md`; in `break-ui/SKILL.md` the sections **Failure signatures** and **Truncate, wrap, or clamp** |
 | gesture | `emilkowalski-skills/skills/apple-design/SKILL.md` minus its Typography section; in `emil-design-eng/SKILL.md` the section **Gesture and Drag Interactions** |
 | mobile | `emilkowalski-skills/skills/mobile-native/SKILL.md` |
-| data viz | `~/.claude/skills/ui-polish/visualize.md` steps 2, 4, 5 and 6; in `jakubkrehel-skills/skills/better-accessibility/screen-readers.md` the sections **Alt text** and **SVG**. Owns everything inside a chart, KPI or numeric table: form, encoding, color and type on the marks, labels, units and accessibility; the rest of the page stays with the other reviewers |
+| data viz | `visualize.md` beside the `SKILL.md` you loaded (resolve it to an absolute path; skills dirs differ per harness), steps 2, 4, 5 and 6; then the files those steps cite: `jakubkrehel-skills/skills/better-colors/color-usage.md` and `contrast.md`, in `better-typography/SKILL.md` the sections **Tabular numbers on changing values** and **Truncate with a way back**, in `better-writing/patterns.md` the section **Locale formatting**, in `better-accessibility/screen-readers.md` the sections **Alt text** and **SVG**, `better-accessibility/hit-areas.md`, and in `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` the section **The Gate**. Owns everything inside a chart or KPI figure |
 
 Expo or React Native stack, per `SKILL.md` recon step 1: the motion row reads `emilkowalski-skills/skills/animate-expo/SKILL.md` in place of `animation-performance`, and no mobile reviewer runs because the **mobile** trigger is off.
 
@@ -27,6 +27,7 @@ Every reviewer also gets `jakubkrehel-skills/skills/better-interface/SKILL.md` f
 ```
 TASK
 Review the {domain} of one interface scope, read-only, and return a findings table. You own only {domain}; a problem owned by another domain is out of scope and is not reported.
+{data viz trigger on: for the data-viz reviewer "Charts and KPI figures are yours; everything outside them belongs to the other reviewers."; for every other reviewer "Charts and KPI figures belong to the data-viz reviewer; skip them."; trigger off: delete this line}
 
 CONTEXT
 Project recon:
@@ -40,9 +41,12 @@ Rendered evidence (already captured; read, do not recapture):
 - accessibility snapshot: {path}
 - preview URL (open only if a claim needs runtime confirmation): {url or "none"}
 
+Visualize brief (data-viz reviewer only; delete this block otherwise):
+{the visualize.md step 1 brief, or "none: infer the reader's question from the screen and state it"}
+
 Inventory (`exhaustive` depth only; delete this block otherwise):
-- components: {one line per component: name, file, states it reaches}
-- earlier rounds: {applied and rejected rows from previous rounds, or "round 1"}; never re-propose one of them
+- components: {one line per distinct component file: name, file, states it reaches}
+- earlier rounds: {rows from previous rounds with their status, or "round 1"}. An `applied` row that still reproduces comes back as `Fix incomplete` with the new evidence. `rejected` and `follow-up` rows are not proposed again. `carried` rows are known; report one only with new evidence.
 
 Change (Change mode only; delete this block otherwise):
 - diff: {base ref and SHA}..{head ref and SHA}; read files at the head ref with `git show`, never check it out

@@ -11,16 +11,17 @@ Write before any code:
 - **Reader and question**: who looks at this, and the one question or decision it serves ("is revenue on track this month?"). Two unrelated questions are two views.
 - **Shape**: every field with its type (category, number, money, percent, date, duration), unit, range, cardinality, time grain and update rate (static, refetched, streaming), from the schema or the API type, cited `path:line`.
 - **States**: every state from the kinds table in `state-machine/SKILL.md` **Find the states in the code**, plus the chart-specific ones: a single point and the largest real set.
-- **Worst case per field**: from `break-ui/CATALOG.md` **Numbers and money**, **Collections** and **Time**: zero, negative, a value 1,000× the median, a 40-character category name, 500 categories, a gap in the series.
+- **Worst case per field**: the rows of `break-ui/CATALOG.md` **Numbers and money**, **Collections** and **Time** that match the field types, plus two cases this skill adds for charts: an outlier that flattens the rest of the scale, and a gap in a time series.
 
 Done when: the question fits one sentence and every field and state has a line.
 
 ## 2. Pick the form
 
-Take the first row whose question matches. The simplest form that answers it wins; a chart that needs a legend to decode one number is the wrong form.
+Take the first row whose question matches; rows run from most to least specific. The simplest form that answers it wins; a chart that needs a legend to decode one number is the wrong form.
 
 | The question | Form |
 | --- | --- |
+| Values arriving live | A streaming line, per `pick-ui-library` **Charts** |
 | One figure that matters now | A KPI: the number large, its delta and the comparison period beside it; a sparkline only when the trend changes the reading |
 | Exact values the reader looks up or copies | A table, numbers right-aligned in tabular figures |
 | Compare categories | Bars, sorted by value unless the categories carry their own order; horizontal when labels run long |
@@ -28,9 +29,8 @@ Take the first row whose question matches. The simplest form that answers it win
 | Part of a whole | One stacked bar, or a 100% bar per group; a donut only for two or three parts |
 | Distribution of one measure | A histogram or a box plot |
 | Relationship between two measures | A scatter plot |
-| Values arriving live | A streaming line, per `pick-ui-library` **Charts** |
 
-House rules for every form: bars start at zero; one y-axis per chart; flat 2D marks; label series directly at the line end or bar when there are five or fewer, with a legend only past that; more than six categories → the top five plus "Other". Several questions → a small grid of views sharing one time range and one scale, in reading order of importance (`better-layout` **Order by importance**).
+House rules for every form: bars start at zero; one y-axis per chart; flat 2D marks; label series directly at the line end or bar when there are five or fewer, with a legend only past that; more than five categories → the top four plus "Other". Several questions → a small grid of views sharing one time range and one scale, in reading order of importance (`better-layout` **Order by importance**).
 
 Done when: each question from step 1 has a form and one sentence on why it beats the table.
 
