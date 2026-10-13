@@ -1,6 +1,6 @@
 ---
 name: helmsman-explain
-description: Build a visual, self-contained HTML explainer of how the /helmsman skill works — the division of labour, the map, the three modes — drawn from the current SKILL.md and rendered against the user's live map when one exists. Use when the user asks how helmsman works, what it does, whether to use it, or invokes /helmsman-explain.
+description: Build a visual, self-contained HTML explainer of how the /helmsman skill works — the division of labour, the map, the phases — drawn from the current SKILL.md and rendered against the user's live map when one exists. Use when the user asks how helmsman works, what it does, whether to use it, or invokes /helmsman-explain.
 ---
 
 The user wants to understand `/helmsman` — a skill whose whole value is a division of labour, which is exactly the kind of thing prose explains badly and a picture explains at a glance. Produce one self-contained HTML page and open it for them.
@@ -34,7 +34,7 @@ Read the language off the conversation, not off the repo, the OS, or the tracker
 
 When that language isn't English, translate as you fill — **all** the static copy, including the sections you'd otherwise leave untouched: headings, the SVG `<text>` labels, figure captions, the classifier chips and their `data-why` strings, the JS counter strings, `<title>`, and `<html lang>`. A page half in each language is worse than either.
 
-Three things stay verbatim in every language: the commands (`/helmsman`, `/writing-plans`), the label and section names the skill actually uses (`helmsman:po`, `## Waiting on you`, `locks:`), and anything copied out of the user's tracker. Those are identifiers — translating them produces a page that teaches a system that doesn't exist. The class names and slot markers are identifiers too; they never change.
+Three things stay verbatim in every language: the commands and flags (`/helmsman`, `--review`, `--build`), the label and section names the skill actually uses (`helmsman:po`, `## Waiting on you`, `locks:`), and anything copied out of the user's tracker. Those are identifiers — translating them produces a page that teaches a system that doesn't exist. The class names and slot markers are identifiers too; they never change.
 
 ## Process
 
@@ -64,7 +64,7 @@ Filling `MAP_ANATOMY` and `TRACE`:
 
 - **Escape** `<`, `>`, `&` in anything copied from the tracker. A map body with a `<script>` in it should render as text, not run.
 - Keep the callout markup pattern from the default content — the numbered badges are positioned by CSS class, not by hand.
-- In `TRACE`, keep the three-session shape (chart → advance → review) even when the user's map hasn't reached the third yet; render the sessions that haven't happened as dimmed with `class="pending"` so the arc stays visible.
+- In `TRACE`, keep the four-session shape (chart → advance → review → build) even when the user's map hasn't reached the last ones yet; render the sessions that haven't happened as dimmed with `class="pending"` so the arc stays visible.
 - Preserve the audience colour classes (`.lane-po`, `.lane-dev`) on everything you inject. The colour *is* the explanation on this page.
 
 ## What the page has to land
@@ -75,4 +75,4 @@ If the reader takes only one thing from it, make it this, and check the filled p
 
 Say it in the reader's language, but say exactly that.
 
-Everything else on the page — the map anatomy, the ticket lifecycle, the three modes — is support for that sentence.
+Everything else on the page — the map anatomy, the ticket lifecycle, the phases — is support for that sentence.

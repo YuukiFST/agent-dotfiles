@@ -403,45 +403,57 @@ salon stops answering the phone to confirm times.
 
 <span class="cal">2</span>## Notes
 
-Domain: hair salon, 3 stylists.
-Every session consults /grilling and /domain-modeling.
+- Givens: runs in the browser, nothing to install
+- Budget: zero
+- Skills: /domain-modeling
 
 <span class="cal">3</span>## Product decisions
 
 - [Can a client reschedule alone?](#) — yes, up to 4h before
 - [What happens on a no-show?](#) — blocked for 30 days
 
-<span class="cal">4</span>## Technical decisions
+<span class="cal">4</span>## Assumed
+
+- Clients book for themselves only, not for someone else
+- Opening hours come from the salon, not per stylist
+
+<span class="cal">5</span>## Technical decisions
 
 - [Where bookings are stored](#) — Postgres —
   locks: a slot is an interval, not a point in time
 - [How a client identifies themselves](#) — magic link by
   email — locks: no password screen anywhere
 
-<span class="cal">5</span>## Waiting on you
+<span class="cal">6</span>## Waiting on you
 
 - [Can a stylist refuse a client?](#) — may they turn down
   a booking that already came in?
 
-<span class="cal">6</span>## Not yet specified
+<span class="cal">7</span>## Not yet specified
 
 - How the salon notifies the client (SMS? email? both?)
   — hangs on how the client identifies themselves
 
-<span class="cal">7</span>## Out of scope
+<span class="cal">8</span>## Out of scope
 
 - [Prepayment](#) — waits until the first month is
-  running</pre>
+  running
+
+<span class="cal">9</span>## Spec
+
+(empty until nothing is left to decide)</pre>
 <!--/SLOT:MAP_ANATOMY-->
 
     <ol class="callouts">
       <li><b>Destination.</b> Where this map ends. It is the first thing you settle and the thing that fixes scope — everything past it is "out of scope".</li>
-      <li><b>Notes.</b> Domain, preferences that hold for the whole effort, skills every session should consult.</li>
+      <li><b>Notes.</b> The givens from your first prompt (a stack, a paid service, a budget), the budget itself (zero unless you said otherwise), and the skills every session consults.</li>
       <li><b>Product decisions.</b> What <b>you</b> answered, in your own language. One line per closed question.</li>
+      <li><b>Assumed.</b> Product defaults it took <b>without asking you</b>, so the questions stay few. Written down, never silent: veto any line just by saying so.</li>
       <li><b>Technical decisions.</b> What <b>it</b> decided. The <code>locks:</code> clause is not decoration: it is what the next session reads so it doesn't contradict itself.</li>
       <li><b>Waiting on you.</b> The open questions that are yours. If this list is empty, the agent still has work it can do alone.</li>
       <li><b>Not yet specified.</b> The fog: what you can tell is coming but can't phrase sharply yet.</li>
       <li><b>Out of scope.</b> What was consciously cut. It never comes back — unless you redraw the destination.</li>
+      <li><b>Spec.</b> Filled in once nothing is left to decide: the link to the spec and its build tickets.</li>
     </ol>
   </div>
 </section>
@@ -500,15 +512,15 @@ Every session consults /grilling and /domain-modeling.
 <!-- ══════════════════ 6 ══════════════════ -->
 <section>
   <p class="number">06 · using it</p>
-  <h2>Three commands, and only one costs you time</h2>
+  <h2>Four commands, and only two cost you time</h2>
 
   <div class="modes">
     <div class="mode">
       <code class="cmd">/helmsman &lt;your idea&gt;</code>
       <h3>1. Chart the map</h3>
-      <p>The session where you do the talking. It interviews you until it understands the whole product, creates the map and fills it with tickets. <b>It asks you no technical question here</b> — those become its own tickets.</p>
-      <p class="ends"><b>Ends when</b> the map exists and you know how many questions are yours.</p>
-      <span class="clock you">your time: ~40 min</span>
+      <p>The session where you do the talking. It drafts the whole product from your prompt, assumes what it safely can, and asks only what it can't: <b>at most five questions a round, at most three rounds</b>, each with its recommended answer, so "ok" accepts them all. <b>It asks you no technical question here</b> — those become its own tickets, and it starts on them right away.</p>
+      <p class="ends"><b>Ends when</b> the map exists and the technical cascade has run as far as it can.</p>
+      <span class="clock you">your time: ~10 min</span>
     </div>
     <div class="mode">
       <code class="cmd">/helmsman &lt;map&gt;</code>
@@ -522,14 +534,21 @@ Every session consults /grilling and /domain-modeling.
       <h3>3. Answer what's yours</h3>
       <p>Drains <b>every</b> accumulated question in one conversation, instead of forcing a session per question. Each answer is recorded as it lands — if the conversation gets cut short, nothing is lost.</p>
       <p class="ends"><b>Ends when</b> the "Waiting on you" list hits zero.</p>
-      <span class="clock you">your time: ~20 min</span>
+      <span class="clock you">your time: ~10 min</span>
+    </div>
+    <div class="mode">
+      <code class="cmd">/helmsman &lt;map&gt; --build</code>
+      <h3>4. Build it</h3>
+      <p>Once nothing is left to decide, it writes the <b>spec</b> and slices it into <b>build tickets</b> on its own. This command builds them: a walking skeleton first, then every flow, in parallel where they don't depend on each other, each with end-to-end tests.</p>
+      <p class="ends"><b>Ends when</b> every build ticket is closed and a reviewed pull request waits for you to merge.</p>
+      <span class="clock afk">your time: ~1 min</span>
     </div>
   </div>
 
   <div style="margin-top:26px;border:1px solid var(--rule);border-left:4px solid var(--dev);border-radius:6px;padding:18px 20px;background:#fafafa">
-    <h3 style="margin:0 0 8px">You don't have to remember which of the three comes next</h3>
+    <h3 style="margin:0 0 8px">You don't have to remember which of the four comes next</h3>
     <p style="margin:0 0 14px;font-size:15px">
-      Every session — all three of them — ends by handing you <b>the next command, ready to run</b>, with the map's link already inside. You copy it, paste it into the next session, done. Picking which one is its job, not yours:
+      Every session — all four of them — ends by handing you <b>the next command, ready to run</b>, with the map's link already inside. You copy it, paste it into the next session, done. Picking which one is its job, not yours:
     </p>
     <code class="cmd" style="display:block">/helmsman https://github.com/salon/booking/issues/1</code>
     <p style="margin:10px 0 0;font-size:14.5px;color:var(--muted)">
@@ -538,7 +557,7 @@ Every session consults /grilling and /domain-modeling.
   </div>
 
   <p style="margin-top:26px;font-size:15px;color:var(--muted)">
-    The normal rhythm is <b>2 → 3 → 2 → 3</b> until no decision is left. You start each of those laps with a copy and paste. Then the last command handed over is <code>/writing-plans</code> against the map, and building starts with everything already decided.
+    The normal rhythm is <b>1 → 3 → 2 → 4</b>: often a single review is enough. You start each lap with a copy and paste. The last command handed over is <code>--build</code>, and building starts with everything already decided — at zero cost, unless you said otherwise.
   </p>
 </section>
 
@@ -546,16 +565,14 @@ Every session consults /grilling and /domain-modeling.
 <section style="border-bottom:0">
   <p class="number">07 · in practice</p>
   <h2>One full lap</h2>
-  <p class="lede">The same project, crossing all three modes.</p>
+  <p class="lede">The same project, from the first prompt to a pull request.</p>
 
 <!--SLOT:TRACE-->
   <div class="session lane-po">
     <p class="when">session 1 · you talk</p>
     <h3><code>/helmsman</code> "I want a booking system for the salon"</h3>
-    <div class="say from-agent"><b>agent</b>When a client doesn't show up and didn't warn anyone, what should happen?</div>
-    <div class="say from-you"><b>you</b>They're blocked for 30 days. I've lost too much money on that.</div>
-    <div class="say from-agent"><b>agent</b>And rescheduling? How close to the appointment can they still move it themselves?</div>
-    <div class="say from-you"><b>you</b>Up to 4 hours before. After that they have to call.</div>
+    <div class="say from-agent"><b>agent</b>1. Can a client reschedule alone? → I recommend: yes, up to 4h before. 2. What happens on a no-show? → I recommend: a warning first, a block on the second. Assumed: clients book only for themselves; opening hours come from the salon. Reply "ok" or change only the numbers you want.</div>
+    <div class="say from-you"><b>you</b>ok, but 2: block for 30 days on the first one. I've lost too much money on that.</div>
     <p style="font-size:14.5px;color:var(--muted);margin:14px 0 8px">Not one technical question came up. They became its tickets:</p>
     <ul>
       <li>Map created, destination and scope settled <span class="aside">— 14 tickets</span></li>
@@ -590,6 +607,17 @@ Every session consults /grilling and /domain-modeling.
     <p style="font-size:14.5px;color:var(--muted);margin:12px 0 6px">"That unblocks 5 technical questions, and I'll work through all of them alone":</p>
     <code class="cmd" style="display:block">/helmsman https://github.com/salon/booking/issues/1</code>
     <p style="font-size:14.5px;color:var(--muted);margin-top:8px">You answered what the system does. The block you copy sends the how to a session that doesn't need you.</p>
+  </div>
+
+  <div class="session lane-dev">
+    <p class="when">session 4 · one minute of yours</p>
+    <h3><code>/helmsman &lt;map&gt; --build</code></h3>
+    <ul>
+      <li>Nothing left to decide, so the previous session wrote the <b>spec</b> and sliced it into <b>8 build tickets</b> on its own</li>
+      <li>It asked one thing: which name and e-mail to commit as</li>
+      <li>Walking skeleton first, then the booking, rescheduling and no-show flows in parallel, each with end-to-end tests</li>
+    </ul>
+    <p style="font-size:14.5px;color:var(--muted);margin:12px 0 6px">It ends at a reviewed pull request, plus the command that puts it online when you say go.</p>
   </div>
 <!--/SLOT:TRACE-->
 </section>
