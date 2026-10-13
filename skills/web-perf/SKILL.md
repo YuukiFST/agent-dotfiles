@@ -20,7 +20,7 @@ Retrieve before citing a number or an API you are not reading from a tool's outp
 | `https://developer.chrome.com/docs/performance/insights` | What each trace insight means |
 | `https://developer.chrome.com/docs/lighthouse/performance/performance-scoring` | Lighthouse metric weights and scoring curves |
 | `https://developer.chrome.com/docs/crux` | CrUX scope, eligibility, API |
-| context7 (`resolve-library-id`, `query-docs`) | Framework image, font, script, and rendering APIs (Next.js, Nuxt, Astro, SvelteKit) |
+| The detected framework's official docs (nextjs.org, nuxt.com, docs.astro.build, svelte.dev) | Framework image, font, script, and rendering APIs |
 
 ## Evidence types
 

@@ -19,7 +19,7 @@ Check `package.json` dependencies and build scripts, then the config files:
 | SvelteKit | `svelte.config.js` |
 | Astro | `astro.config.mjs` |
 
-Retrieve the detected framework's current image, font, script, and rendering APIs through context7 before recommending one.
+Retrieve the detected framework's current image, font, script, and rendering APIs from its official docs before recommending one.
 
 ## Bundle size and dead code
 
