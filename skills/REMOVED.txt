@@ -61,3 +61,7 @@ diagnosing-bugs
 verification-before-completion
 # Merged into interrogate with pstack's interrogate and blast-radius (#135).
 thermo-nuclear-code-quality-review
+# Last skills vendored from obra/superpowers (0f4cd83); superpowers dropped entirely.
+brainstorming
+writing-plans
+executing-plans
