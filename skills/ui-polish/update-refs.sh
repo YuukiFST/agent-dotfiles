@@ -3,8 +3,11 @@
 # They live outside every harness skills dir on purpose: none of their frontmatter
 # reaches a session, only the skill's own description does.
 # Idempotent: run on a fresh machine or to refresh existing clones.
+# Ends by listing upstream skills SKILL.md neither routes nor excludes, so an
+# upstream addition surfaces on the next pull instead of going unread.
 set -euo pipefail
 REFS="${UI_REFS:-$HOME/.claude/ui-refs}"
+ROUTER="$(dirname "$0")/SKILL.md"
 mkdir -p "$REFS"
 while read -r name url; do
   dir="$REFS/$name"
@@ -19,3 +22,15 @@ jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
 make-interfaces-feel-better https://github.com/jakubkrehel/make-interfaces-feel-better
 REPOS
+
+unrouted=0
+for skill in "$REFS"/*/skills/*/; do
+  [ -d "$skill" ] || { echo "No upstream skills found under $REFS/*/skills/"; unrouted=1; continue; }
+  rel="${skill#"$REFS"/}"
+  if ! grep -qF "$rel" "$ROUTER"; then
+    echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
+    unrouted=1
+  fi
+done
+[ "$unrouted" -eq 0 ] && echo "Every upstream skill is routed or excluded."
+exit 0
