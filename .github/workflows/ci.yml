@@ -36,6 +36,17 @@ jobs:
       - name: Shellcheck hooks and scripts
         run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
 
+  sync-pi:
+    name: sync-config pi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A package.json synced into ~/.pi/agent reaches pi's CommonJS launcher in bin/
+      # and breaks every pi command on Windows (#148, #150).
+      - name: Run sync-config pi regression test
+        run: bash scripts/test-sync-pi.sh
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
