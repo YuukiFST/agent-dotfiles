@@ -64,10 +64,12 @@ sync_pi_agent() {
     fi
   done
 
-  # pi/package.json is dev-only (tsc, tests): pi loads extensions through jiti, which
-  # ignores "type". A live copy made Node load pi's CommonJS launcher as ESM (#148),
-  # so remove the package.json files earlier syncs wrote (#150).
-  rm -f "$agent/package.json" "$agent/bin/package.json"
+  # pi/package.json is for tsc only. Its "type": "module" in ~/.pi/agent made Node load
+  # pi's CommonJS launcher (bin/pi-launcher.js) as ESM (#148); each extension declares
+  # its own type in extensions/<name>/package.json instead. Remove the package.json files
+  # earlier syncs wrote, root first: a root that stays must keep the bin/ override (#150).
+  rm -f "$agent/package.json"
+  rm -f "$agent/bin/package.json"
 
   python3 - "$pi_src/settings.json" "$agent/settings.json" <<'PY'
 import json

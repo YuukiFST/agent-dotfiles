@@ -142,10 +142,13 @@ function Sync-Pi {
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }
 
-  # pi/package.json is dev-only (tsc, tests): pi loads extensions through jiti, which
-  # ignores "type". A live copy made Node load pi's CommonJS launcher as ESM (#148),
-  # so remove the package.json files earlier syncs wrote (#150).
-  Remove-Item "$agent\package.json", "$agent\bin\package.json" -Force -ErrorAction SilentlyContinue
+  # pi/package.json is for tsc only. Its "type": "module" in ~/.pi/agent made Node load
+  # pi's CommonJS launcher (bin/pi-launcher.js) as ESM (#148); each extension declares
+  # its own type in extensions/<name>/package.json instead. Remove the package.json files
+  # earlier syncs wrote, root first: a root that stays must keep the bin/ override (#150).
+  foreach ($stale in "$agent\package.json", "$agent\bin\package.json") {
+    if (Test-Path $stale) { Remove-Item $stale -Force }
+  }
 
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.
