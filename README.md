@@ -7,13 +7,13 @@ It runs in Claude Code and OpenCode, and in pi as `/skill:yuu-mode`.
 /yuu-mode the csv export drops its last row. repro first, then fix.
 ```
 
-The reply opens with the route it took (`route: playbooks/bug-fix.md`) and then works through that route's steps until the result is verified.
+Each task's reply opens with the route it took (`route: playbooks/bug-fix.md`) and then works through that route's steps until the result is verified.
 UI work goes to `ui-polish`, reviews to `interrogate`, visual explanations to `anatomy`; the full table is in [`skills/yuu-mode/SKILL.md`](skills/yuu-mode/SKILL.md).
 Say "new task" to switch subjects mid-session.
 
 ## Install
 
-The bootstrap clones the repo to `~/agent-dotfiles` and sets up every harness on PATH:
+The bootstrap needs `git` and `npm`. It clones the repo to `~/agent-dotfiles` and sets up each of Claude Code, pi and OpenCode found on PATH:
 
 ```powershell
 # Windows
@@ -25,7 +25,7 @@ irm https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/boots
 curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.sh | bash
 ```
 
-With no harness on PATH yet, name one (`claude`, `pi`, `opencode` or `all`):
+With none on PATH yet, name a target (`claude`, `pi`, `opencode` or `all`):
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.ps1))) -Target pi
@@ -35,11 +35,13 @@ With no harness on PATH yet, name one (`claude`, `pi`, `opencode` or `all`):
 curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.sh | bash -s -- pi
 ```
 
+The install overwrites the global `CLAUDE.md`, mirrors `rules/` to `~/.claude/rules` (hand edits there are lost), writes `settings.json` only when it is absent, and leaves `opencode.json` alone.
+On Linux and macOS it also points `core.hooksPath` at `git-hooks/` for every repo.
 Restart the agent after install.
 
 ## Already cloned
 
-From the clone, rerun the sync; it is idempotent:
+From the clone, run the setup script for your harness. It is idempotent, so rerun it to update:
 
 | Harness | Windows | Linux / macOS |
 |---------|---------|---------------|
@@ -48,22 +50,24 @@ From the clone, rerun the sync; it is idempotent:
 | OpenCode | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
 | Cursor | | `bash scripts/setup-cursor.sh` |
 
-The setup scripts also install missing tools.
-For config only, run `scripts/sync-config.ps1 all` or `scripts/sync-config.sh <harness>`.
+Each setup script installs or updates what its harness needs, such as rtk, portless and the axi CLIs for Claude Code, then syncs the config.
+For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
-Cursor keeps User Rules outside files, so paste `CLAUDE.md` into Customize, Rules by hand after each edit.
+OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
+Cursor keeps User Rules outside files, so paste `CLAUDE.md` into Customize > Rules > User Rules by hand after each edit.
 
 ## Layout
 
 | Path | What |
 |------|------|
-| `skills/` | `yuu-mode` and every skill it routes to, one folder each |
+| `skills/` | `yuu-mode` and the skills it loads, one folder each |
 | `CLAUDE.md` | Global instructions, loaded every session |
 | `CODING_STANDARDS.md` | Rules for editing a project, read when `CLAUDE.md` points to it |
 | `rules/` | Git and prompting rules |
-| `hooks/`, `git-hooks/` | Session hooks, the `pre-push` gate and `git-safe-commit` |
-| `scripts/` | Install and sync |
+| `hooks/`, `git-hooks/` | Session hooks and the `commit-msg` and `pre-push` gates |
+| `scripts/` | Install, sync and `git-safe-commit.sh` |
+| `settings.json` | Claude Code seed, written only when absent |
 | `pi/`, `portless/` | Per-tool config |
 | `AGENTS.md` | Instructions for an agent working on this repo |
 
-Installed separately: [rtk](https://github.com/rtk-ai/rtk), [caveman](https://github.com/JuliusBrussee/caveman), [portless](https://portless.sh) (Node 24+), [pi-codex-goal](https://github.com/fitchmultz/pi-codex-goal) (pi only).
+portless needs Node 24+ and a one-time bootstrap: [`portless/setup.md`](portless/setup.md).
