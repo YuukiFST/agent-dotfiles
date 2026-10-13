@@ -1,14 +1,35 @@
 {
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000"
+  },
   "permissions": {
+    "allow": [
+      "Bash(gh-axi:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git merge:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ],
     "deny": [
       "NotebookEdit",
       "DesignSync",
       "RemoteTrigger",
       "PushNotification"
-    ]
+    ],
+    "defaultMode": "auto"
   },
+  "model": "opus",
   "disableWorkflows": true,
   "disableArtifact": true,
+  "workflowKeywordTriggerEnabled": false,
   "skillOverrides": {
     "dataviz": "off",
     "artifact-design": "off"
@@ -32,7 +53,10 @@
     "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\tisao\\.claude\\hooks\\caveman-statusline.ps1\""
   },
   "enabledPlugins": {
-    "caveman@caveman": true
+    "caveman@caveman": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "caveman": {
@@ -40,12 +64,44 @@
         "source": "github",
         "repo": "JuliusBrussee/caveman"
       }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
     }
   },
+  "language": "portuguese",
   "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "low"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-haiku-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
+  "autoCompactEnabled": true,
+  "terminalProgressBarEnabled": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "theme": "dark"
+  "theme": "dark-daltonized",
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Merging a GitHub PR with gh or gh-axi (pr merge) is allowed when the user explicitly told Claude in this conversation to merge or to proceed without CI, even if the only review on the PR was written by Claude."
+    ]
+  }
 }
