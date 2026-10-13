@@ -64,6 +64,13 @@ sync_pi_agent() {
     fi
   done
 
+  # package.json above sets "type": "module" for the extensions, and Node applies it
+  # to pi's managed launcher (bin/pi-launcher.js, CommonJS) too; the nearest
+  # package.json wins, so bin/ gets its own (#148).
+  if [ -d "$agent/bin" ]; then
+    printf '{ "type": "commonjs" }\n' > "$agent/bin/package.json"
+  fi
+
   python3 - "$pi_src/settings.json" "$agent/settings.json" <<'PY'
 import json
 import sys

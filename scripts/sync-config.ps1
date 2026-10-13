@@ -142,6 +142,13 @@ function Sync-Pi {
     if (Test-Path $src) { Copy-Item $src (Join-Path $agent $f) -Force }
   }
 
+  # package.json above sets "type": "module" for the extensions, and Node applies it
+  # to pi's managed launcher (bin/pi-launcher.js, CommonJS) too; the nearest
+  # package.json wins, so bin/ gets its own (#148).
+  if (Test-Path "$agent\bin") {
+    '{ "type": "commonjs" }' | Set-Content "$agent\bin\package.json"
+  }
+
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.
   # Same split as sync_pi_agent() in sync-config.sh - keep the two in step.
