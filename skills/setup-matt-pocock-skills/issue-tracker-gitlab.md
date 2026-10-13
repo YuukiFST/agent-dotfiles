@@ -38,9 +38,12 @@ Run `glab issue view <number> --comments`.
 
 Used by `/helmsman`. The **map** is a single issue with **child** issues as tickets.
 
-- **Map**: a single issue labelled `helmsman:map`, holding the Notes / Decisions-so-far / Fog body. `glab issue create --label helmsman:map`. (On GitLab tiers with native epics, an epic may hold the map instead; a labelled issue works everywhere.)
-- **Child ticket**: an issue carrying `Part of #<map>` at the top of its description and labels `helmsman:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
+- **Map**: a single issue labelled `helmsman:map`, holding the Destination / Notes / decision sections / fog body. `glab issue create --label helmsman:map`. (On GitLab tiers with native epics, an epic may hold the map instead; a labelled issue works everywhere.)
+- **Child ticket**: an issue carrying `Part of #<map>` at the top of its description and two labels: an audience label (`helmsman:po`/`helmsman:dev`) and a method label `helmsman:<type>` (`decision`/`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
 - **Blocking**: GitLab's **native blocking link** — the canonical, UI-visible representation. Add it with the `/blocked_by #<n>` quick action, posted as a note (`glab issue note <child> --message "/blocked_by #<blocker>"`). Native blocking links are a Premium/Ultimate feature; on the free tier (or where unavailable) fall back to a `Blocked by: #<n>, #<n>` line at the top of the description. A ticket is unblocked when every blocker is closed.
 - **Frontier query**: `glab issue list -F json` scoped to the map's children, drop any with an open blocker — a native `blocked_by` link to an open issue (`glab api projects/:id/issues/:iid/links`), or an open issue in the `Blocked by` line — or an assignee; first in map order wins.
 - **Claim**: `glab issue update <n> --assignee @me` — the session's first write.
-- **Resolve**: `glab issue note <n> --message "<answer>"`, then `glab issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+- **Resolve**: `glab issue note <n> --message "<answer>"`, then `glab issue close <n>`, then append a context pointer (gist + link) to the map's matching decision section.
+- **Spec and build tickets**: the spec is an issue labelled `helmsman:spec`, linked from the map's Spec section; each build ticket is an issue carrying `Part of #<spec>` and the label `helmsman:build`, with blocking edges wired the same way as decision tickets. Close a build ticket with `glab issue close <n>` after a note saying what works and how it was verified.
+- **Children of a parent**: the frontier query works on any parent: the map for decision tickets, the spec for build tickets (`helmsman:build`). Listing every open `po` ticket for a review is the same query filtered by `helmsman:po`, keeping blocked and assigned ones.
+- **Unclaim**: remove yourself as assignee with `glab issue update <n>` (its unassign flag; `glab` was not installed when this was written, so confirm it with `glab issue update --help`).
