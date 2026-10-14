@@ -47,12 +47,37 @@ check block 'feat: novo endpoint' 'Generated with some tool'
 check allow 'docs(research): add ABNT norms and AI writing markers reference'
 check allow 'feat: suporte a agentes de IA'
 check allow 'feat(agents): add supervisor routing'
-check allow 'fix openai client'
+check allow 'fix: openai client'
 check allow 'feat(skills): extend autoreview to Cursor and Pi'
 check allow 'refactor: simplify agente de suporte'
 check allow 'docs: comparar arquitetura multi-agente e agente unico'
 check allow 'feat: integracao com IA generativa'
 check allow 'chore: bump gemini adapter version'
+
+# --- Conventional Commits format (rules/git.md §2) ---
+check block 'Update SKILL.md'
+check block 'remove(skills): drop shape skill'
+check block 'revert: restore references in CLAUDE.md'
+check block 'feat:missing space'
+check block 'feat(): empty scope'
+check block 'feat: subject ending in a period.'
+check block "feat(skills): $(printf 'x%.0s' {1..59})"
+check allow "feat(skills): $(printf 'x%.0s' {1..58})"
+# 72 characters but more bytes: the limit counts characters.
+check allow "docs: atualizar instruções de integração e validação $(printf 'x%.0s' {1..19})"
+check block "docs: atualizar instruções de integração e validação $(printf 'x%.0s' {1..20})"
+# A CRLF message file leaves \r on the subject under Linux bash; it is not part of the 72.
+# Git Bash drops \r from command substitution, so only Linux (CI) exercises this case.
+printf -v crlf_subject 'fix: %067d\r' 0
+check allow "${crlf_subject//0/x}"
+check allow 'feat(api)!: drop the v1 endpoints'
+check allow 'Merge pull request #160 from YuukiFST/docs/159-readme-yuu-mode'
+check allow "Merge branch 'main' into feat/42-dashboard"
+check allow 'Revert "feat: dashboard de consumo"'
+check allow 'Reapply "feat: dashboard de consumo"'
+check block 'Merge fixes for the dashboard.'
+check allow "$(printf '# commit.template comment\n\nfeat: subject below a comment')"
+check allow 'fixup! feat: dashboard de consumo'
 
 echo "ok: $pass | falhas: $fail"
 [ "$fail" -eq 0 ]

@@ -47,4 +47,5 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
 - **`skills/` is copied per skill, never mirrored,** so local-only skills survive a sync; a skill deleted from the repo reaches an already-synced machine only through its name in `skills/REMOVED.txt`.
 - **`rules/` is a full mirror** at `~/.claude/rules` on every harness, because CLAUDE.md's pointers hardcode that path; a file written there by hand is gone on the next sync.
 - **OpenCode reviewer agents are generated, not copied:** OpenCode's `task` tool takes no model, so the sync writes one `~/.config/opencode/agents/interrogate-reviewer-<n>.md` per `opencode` row of `skills/interrogate/reviewers.md` and deletes the rest of that prefix; edit the table, never the generated files.
+- **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.
 - **`CODING_STANDARDS.md` sits outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md`, and this file is disclosed, read only when CLAUDE.md's pointer fires.

@@ -12,6 +12,8 @@ Write-Host "[1/4] Config files"
 
 Write-Host "[2/4] rtk"
 & "$PSScriptRoot\install-rtk.ps1"
+# Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
+& "$PSScriptRoot\sync-config.ps1" | Out-Null
 
 Write-Host "[3/4] portless + gh-axi + chrome-devtools-axi"
 npm install -g portless gh-axi chrome-devtools-axi

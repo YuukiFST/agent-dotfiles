@@ -27,4 +27,4 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 
 - **AXI CLIs first:** a `{domain}-axi` CLI is built for agents and beats the matching MCP server, plain CLI or hand-rolled script on tokens and accuracy.
   `gh-axi` for GitHub (reuses the `gh auth login` session; raw `gh` only for what it lacks); `chrome-devtools-axi` is the only browser automation here, for pages a `curl` can't read.
-- **RTK:** a PreToolUse hook rewrites Bash commands to `rtk` form, so write them plain; `rtk` corrupts `prisma`/`tsc`/`vitest` output, so run those directly.
+- **RTK:** a PreToolUse hook rewrites Bash commands to `rtk` form, so write them plain.

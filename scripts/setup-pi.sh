@@ -45,7 +45,7 @@ Done. Restart pi.
 
 - Agent config: ~/.pi/agent (synced from pi/)
 - Skills: ~/.agents/skills · global instructions: ~/.pi/agent/AGENTS.md
-- RTK: ~/.pi/agent/extensions/rtk.ts rewrites bash → rtk (prisma/tsc/vitest: run raw)
+- RTK: ~/.pi/agent/extensions/rtk.ts rewrites bash → rtk (prisma/tsc/vitest excluded in rtk/config.toml)
 - Goal tracking: /goal, /create-goal (pi-codex-goal)
 
 NixOS: `npm install -g` needs a writable prefix (npm config set prefix ~/.npm-global,
