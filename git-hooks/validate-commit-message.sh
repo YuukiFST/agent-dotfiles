@@ -14,7 +14,7 @@ FORBIDDEN_MSG="(co-authored|co_authored|cursoragent|made.with|generated.(with|by
 # Conventional Commits, rules/git.md §2. Subjects git writes itself (merge, revert, autosquash) pass.
 COMMIT_TYPES='feat|fix|chore|docs|style|refactor|perf|test|ci'
 COMMIT_SUBJECT="^(${COMMIT_TYPES})(\([^)]+\))?!?: [^ ]"
-GIT_GENERATED_SUBJECT='^(Merge |Revert "|(fixup|squash|amend)! )'
+GIT_GENERATED_SUBJECT='^(Merge (branch|branches|remote-tracking branch|tag|commit|pull request) |(Revert|Reapply) "|(fixup|squash|amend)! )'
 
 validate_commit_message_file() {
   local msg_file="$1"
@@ -27,8 +27,10 @@ validate_commit_message_file() {
     return 1
   fi
 
+  # commit-msg gets the message before git's cleanup, so a commit.template comment or a
+  # leading blank line can sit above the real subject.
   local subject
-  subject="$(head -n 1 "$msg_file")"
+  subject="$(git stripspace --strip-comments < "$msg_file" | head -n 1)"
   if echo "$subject" | grep -qiE "$FORBIDDEN_MSG"; then
     echo "ERRO: assunto proibido em $label." >&2
     echo "Commits descrevem apenas o codigo; sem referencias a ferramentas ou autoria extra." >&2
@@ -37,7 +39,8 @@ validate_commit_message_file() {
   fi
 
   subject="${subject%$'\r'}"
-  if echo "$subject" | grep -qE "$GIT_GENERATED_SUBJECT"; then
+  # An empty message is git's to reject ("Aborting commit due to empty commit message").
+  if [ -z "$subject" ] || echo "$subject" | grep -qE "$GIT_GENERATED_SUBJECT"; then
     return 0
   fi
   # ${#subject} counts bytes under the C locale hooks often run in; dropping UTF-8

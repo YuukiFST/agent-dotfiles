@@ -19,12 +19,15 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     continue
   fi
 
-  if [ "${remote_sha:-}" = "$zero" ] || [ -z "${remote_sha:-}" ]; then
-    # Branch nova no remoto: sem `--not --remotes` o rev-list devolve a história
-    # inteira e o hook culpa commits antigos que já estão em origin/main.
-    range=("$local_sha" --not --remotes=origin)
-  else
-    range=("${remote_sha}..${local_sha}")
+  # Só commits que nenhum remoto conhece: os de outras pessoas trazidos por merge,
+  # ou que já estão num remoto que não se chama origin (upstream de um fork), não são
+  # deste push e passariam a bloqueá-lo.
+  range=("$local_sha" --not --remotes)
+  # Um force-push pode trazer um remote_sha que não existe localmente; rev-list falharia
+  # e o push passaria sem nenhuma checagem.
+  if [ -n "${remote_sha:-}" ] && [ "$remote_sha" != "$zero" ] &&
+     git cat-file -e "${remote_sha}^{commit}" 2>/dev/null; then
+    range+=("$remote_sha")
   fi
 
   while read -r commit; do

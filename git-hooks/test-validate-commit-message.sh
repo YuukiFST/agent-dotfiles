@@ -74,6 +74,9 @@ check allow 'feat(api)!: drop the v1 endpoints'
 check allow 'Merge pull request #160 from YuukiFST/docs/159-readme-yuu-mode'
 check allow "Merge branch 'main' into feat/42-dashboard"
 check allow 'Revert "feat: dashboard de consumo"'
+check allow 'Reapply "feat: dashboard de consumo"'
+check block 'Merge fixes for the dashboard.'
+check allow "$(printf '# commit.template comment\n\nfeat: subject below a comment')"
 check allow 'fixup! feat: dashboard de consumo'
 
 echo "ok: $pass | falhas: $fail"

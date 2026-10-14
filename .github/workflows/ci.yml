@@ -20,6 +20,9 @@ jobs:
       - name: Run validate-commit-message regression tests
         run: bash git-hooks/test-validate-commit-message.sh
 
+      - name: Run pre-push end-to-end tests
+        run: bash git-hooks/test-pre-push.sh
+
   shell:
     name: Shellcheck
     runs-on: ubuntu-latest
