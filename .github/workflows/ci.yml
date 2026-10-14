@@ -16,8 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # rules/git.md 4.2 requires these tests after any change to the trailer
-      # patterns. Running them here is what makes that requirement real.
+      # This job is what runs these tests; no rule asks agents to run them by hand.
       - name: Run validate-commit-message regression tests
         run: bash git-hooks/test-validate-commit-message.sh
 
