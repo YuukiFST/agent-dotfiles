@@ -23,6 +23,16 @@ jobs:
       - name: Run pre-push end-to-end tests
         run: bash git-hooks/test-pre-push.sh
 
+  coding-standards-gate:
+    name: coding-standards-gate hook
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Also fails when CODING_STANDARDS.md outgrows the 10,000-character additionalContext cap.
+      - name: Run coding-standards-gate end-to-end test
+        run: bash scripts/test-coding-standards-gate.sh
+
   shell:
     name: Shellcheck
     runs-on: ubuntu-latest
