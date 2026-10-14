@@ -45,6 +45,28 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:\\Users\\tisao\\.claude\\hooks\\coding-standards-gate.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:\\Users\\tisao\\.claude\\hooks\\coding-standards-gate.js\" --reset",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
