@@ -77,6 +77,18 @@ function Sync-Shared {
   # is disclosed — read only when CLAUDE.md's pointer fires before a project edit.
   Copy-Item "$Repo\CODING_STANDARDS.md" "$UserHome\.claude\CODING_STANDARDS.md" -Force
 
+  # rtk reads its config from an OS-specific dir that `rtk config` prints. The repo owns the
+  # whole file, so the exclusions reach every harness whose rtk hook rewrites commands.
+  # Mirrors sync_shared() in sync-config.sh.
+  if (Test-Cmd rtk) {
+    $rtkConfig = rtk config 2>$null | Select-String '^Config: (.+)$' | Select-Object -First 1
+    if ($rtkConfig) {
+      $rtkPath = $rtkConfig.Matches[0].Groups[1].Value.Trim()
+      New-Item -ItemType Directory -Force -Path (Split-Path $rtkPath -Parent) | Out-Null
+      Copy-Item "$Repo\rtk\config.toml" $rtkPath -Force
+    }
+  }
+
   # ~/.agents/skills is read natively by pi AND OpenCode (opencode.ai/docs/skills) — one dir,
   # two agents, no second copy.
   Sync-Skills "$UserHome\.agents\skills"

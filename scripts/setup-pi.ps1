@@ -38,6 +38,6 @@ Done. Restart pi.
 
 - Agent config: ~/.pi/agent (synced from pi/)
 - Skills: ~/.agents/skills - global instructions: ~/.pi/agent/AGENTS.md
-- RTK: rewrites bash -> rtk (prisma/tsc/vitest: run raw)
+- RTK: rewrites bash -> rtk (prisma/tsc/vitest excluded in rtk/config.toml)
 - Context compaction: pi-vcc - goal tracking: /goal, /create-goal (pi-codex-goal)
 "@

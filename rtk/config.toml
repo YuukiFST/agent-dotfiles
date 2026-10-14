@@ -1,0 +1,6 @@
+# Repo-owned: sync-config copies this file over the live rtk config on every sync.
+# Keys left out keep rtk's defaults (`rtk config` prints the merged result).
+
+[hooks]
+# rtk's filters corrupt these tools' output, and the rewrite drops `run` from `npx vitest run`.
+exclude_commands = ["prisma", "tsc", "vitest"]

@@ -218,6 +218,17 @@ sync_shared() {
     cp "$repo/CLAUDE.md" "$HOME/.pi/agent/AGENTS.md"
   fi
 
+  # rtk reads its config from an OS-specific dir that `rtk config` prints. The repo owns the
+  # whole file, so the exclusions reach every harness whose rtk hook rewrites commands.
+  if command -v rtk >/dev/null 2>&1; then
+    local rtk_config
+    rtk_config="$(rtk config 2>/dev/null | tr -d '\r' | sed -n 's/^Config: //p')"
+    if [ -n "$rtk_config" ]; then
+      mkdir -p "$(dirname "$rtk_config")"
+      cp "$repo/rtk/config.toml" "$rtk_config"
+    fi
+  fi
+
   # show-shot renders agent screenshots inline in the terminal (kitty/wezterm/chafa).
   # Not tied to any browser tool — it displays any PNG an agent writes to disk.
   mkdir -p "$HOME/.local/bin"
