@@ -222,7 +222,7 @@ sync_shared() {
   # whole file, so the exclusions reach every harness whose rtk hook rewrites commands.
   if command -v rtk >/dev/null 2>&1; then
     local rtk_config
-    rtk_config="$(rtk config 2>/dev/null | tr -d '\r' | sed -n 's/^Config: //p')"
+    rtk_config="$(rtk config 2>/dev/null | tr -d '\r' | sed -n '1s/^Config: //p')"
     if [ -n "$rtk_config" ]; then
       mkdir -p "$(dirname "$rtk_config")"
       cp "$repo/rtk/config.toml" "$rtk_config"

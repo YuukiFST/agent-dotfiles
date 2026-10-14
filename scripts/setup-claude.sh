@@ -12,6 +12,8 @@ echo "[1/4] Config files"
 echo "[2/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk init -g
+# Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
+"$(dirname "$0")/sync-config.sh" claude >/dev/null
 
 echo "[3/4] portless + gh-axi + chrome-devtools-axi"
 npm install -g portless gh-axi chrome-devtools-axi
