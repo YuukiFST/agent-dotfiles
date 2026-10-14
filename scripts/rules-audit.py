@@ -56,6 +56,12 @@ BASH_PATTERNS = {
 # opportunity separately is what keeps "0 violations" from reading as success.
 MCP_CALL = re.compile(r'"name":\s*"mcp__')
 
+# CLAUDE.md's routing pointer asks for CODING_STANDARDS.md before the first change; a
+# session passes when any tool call naming the file comes before its first edit.
+EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
+EDIT_CALL = re.compile(r'"name":\s*"(Edit|Write|MultiEdit|NotebookEdit)"')
+STANDARDS = "CODING_STANDARDS.md"
+
 
 def iter_lines(path):
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
@@ -114,12 +120,14 @@ def audit(root, since):
                     weak.append(path)
                 continue
 
+            edited = standards_read = False
             for line in iter_lines(path):
                 # Substring pre-filter first: JSON-parsing every line of a 595 MB
                 # corpus to reach the few that carry a tool call is the slow path.
                 has_mcp = bool(MCP_CALL.search(line))
                 has_bash = '"name":"Bash"' in line or '"name": "Bash"' in line
-                if not has_mcp and not has_bash:
+                watch_pointer = not edited and (STANDARDS in line or bool(EDIT_CALL.search(line)))
+                if not has_mcp and not has_bash and not watch_pointer:
                     continue
                 try:
                     rec = json.loads(line)
@@ -131,10 +139,21 @@ def audit(root, since):
                     continue
                 if has_mcp:
                     stats["mcp_calls"] += 1
+                content = rec.get("message", {}).get("content")
+                if watch_pointer and isinstance(content, list):
+                    for block in content:
+                        if not isinstance(block, dict) or block.get("type") != "tool_use":
+                            continue
+                        if block.get("name") in EDIT_TOOLS:
+                            edited = True
+                            stats["edit_sessions"] += 1
+                            stats["edit_sessions_standards_first"] += standards_read
+                            break
+                        if STANDARDS in json.dumps(block.get("input") or {}):
+                            standards_read = True
                 if not has_bash:
                     continue
                 sessions.add(rec.get("sessionId"))
-                content = rec.get("message", {}).get("content")
                 if not isinstance(content, list):
                     continue
                 for block in content:
@@ -166,6 +185,12 @@ def audit(root, since):
             "pct": round(100.0 * stats["prompt_neither"] / total),
         },
         "bash_signatures": {k: stats[k] for k in BASH_PATTERNS},
+        "coding_standards_before_first_edit": {
+            "editing_sessions": stats["edit_sessions"],
+            "hits": stats["edit_sessions_standards_first"],
+            "pct": round(100.0 * stats["edit_sessions_standards_first"]
+                         / (stats["edit_sessions"] or 1)),
+        },
         "mcp_calls": stats["mcp_calls"],
     }, weak
 
