@@ -30,10 +30,13 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Types tell the truth:** what the compiler can't prove gets validated; no `any`, `@ts-ignore`, or `as X` over an invariant, and always-set fields are non-optional.
 - **Inject dependencies** (constructor/parameter) so a test swaps in a named fake; fakes stand in for external I/O only.
 - **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`): run it and move on.
+- **The project's linter outranks this file:** where its config covers a rule here (file length, nesting depth, `any`), the config wins; where it lacks one, propose the lint rule instead of leaning on this text.
 - **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
 - **Defensive code is opt-in:** add retry/backoff, timeout, circuit-breaker, rate-limit or fallback only for the categories the project names.
-- **Comments carry the *why*** (bug, upstream constraint, issue#/SHA); keep an agent's own intent/provenance comments through a refactor; docstrings on public functions give intent plus one usage example.
-  A paragraph justifying a stub or shortcut marks wrong code: flag it instead of accepting the explanation.
+- **Code before comment:** a name, a type or a test says it first; a comment stays only for a *why* the code cannot express (upstream constraint with its link, bug ref).
+  The reasoning and provenance of a change go in the commit body, where `git log`/`blame` finds them.
+  A docstring states what the signature cannot (units, invariants, side effects); its example stays only if it runs (doctest).
+  A comment explaining a workaround, stub or shortcut marks wrong code: fix the code, or flag it in the report.
 
 ## Before you show it
 
@@ -59,4 +62,5 @@ Disk is finite and a Rust `target/` reaches gigabytes in a day: a session ends w
 - **Generated files** (CHANGELOG.md, anything marked auto-generated) change only through their generator.
 - **README leads with the problem** it solves (one sentence, top); stack and architecture go in `docs/`.
 - **Uniform entry points:** the same command does the same thing across projects (`bin/deploy`, tag-release, layout), so an agent runs "deploy" without guessing.
-- **Second occurrence → encode:** a class of problem seen twice (style, API misuse, missing check) gets a proposed lint rule, CI step or hook that ends the class; a PR rejected for an unwritten convention is resolved only once the convention is encoded (CLAUDE.md, lint, skill).
+- **Second occurrence → encode:** a class of problem seen twice (style, API misuse, missing check), or a PR rejected for an unwritten convention, gets a proposal to encode it, cheapest enforceable option first: a type, a lint rule, a test, a hook or CI step.
+  Prose (CLAUDE.md, a skill) holds only what no tool can check; once a tool enforces a rule, delete its prose.
