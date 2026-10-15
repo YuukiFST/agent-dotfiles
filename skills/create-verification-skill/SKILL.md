@@ -15,7 +15,8 @@ Write for the next agent, not for a human: it reads the skill cold, mid-task, wi
 
 ## 0. Check for an existing skill
 
-If `.claude/skills/verify-*/` already exists, stop and ask the user: update it in place, keeping its feature map and Gotchas, or regenerate it.
+If `.claude/skills/verify-*/` already exists, stop and ask the user.
+With a `features/README.md`, offer to refresh it in place with `/maintain-verification-skill`, which keeps its feature map and Gotchas, or to regenerate it; without one it is half-generated, so offer to regenerate it.
 Remove any verification scaffolding a crashed earlier run left behind before step 1.
 
 ## 1. Interview the repo, not the user
@@ -71,7 +72,7 @@ Fix what fails, and run the generated cleanup after every failed iteration too, 
 A generated skill that was never executed is a draft, not a deliverable.
 If you proved it in a stand-in for the real target (a container in place of a fresh VM, a local stack in place of a remote one), list every setup step the stand-in did that the target will not; those steps stay unverified until a run on the real target covers them.
 
-Done when all of these hold, and you report the evidence path, the feature driven, and any stand-in gaps:
+Done when all of these hold, and you report the evidence path, the feature driven, any stand-in gaps, and `/maintain-verification-skill` as the pass that catches drift the Upkeep rule misses (human commits, dependency bumps, other sessions); suggest a cadence only if the user asks:
 
 - The run went green once.
 - After cleanup, the processes, ports and browser session the run recorded are gone, and its scaffolding is removed.

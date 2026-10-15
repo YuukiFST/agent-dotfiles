@@ -87,6 +87,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Commit, branch, PR, merge | `git-workflow` |
 | Drive a web page in a real browser | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
+| Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
 | Find or install a skill this kit lacks | `find-skills` |
 | Set up a repo's issue tracker and labels for the engineering skills | `setup-matt-pocock-skills` |
