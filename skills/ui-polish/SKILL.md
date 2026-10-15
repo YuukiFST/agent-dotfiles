@@ -53,7 +53,7 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
 - `REFS/jakubkrehel-skills/skills/technical-drawing/`: drawings of physical objects, not interface work, and its viewer installs packages.
 - `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
-- `REFS/craft/content/`: craft's unlaunched drafts; its skill carries only the launched concepts, which reach this router through `update-refs.sh` as they ship.
+- `REFS/craft/content/`: craft's unlaunched drafts. A launched concept lands in a craft `references/` file; a file this table does not cite prints as `UNROUTED`.
 
 ## Step 0: Recon (every mode)
 

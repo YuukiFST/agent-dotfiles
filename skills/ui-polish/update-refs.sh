@@ -3,8 +3,8 @@
 # They live outside every harness skills dir on purpose: none of their frontmatter
 # reaches a session, only the skill's own description does.
 # Idempotent: run on a fresh machine or to refresh existing clones.
-# Ends with two drift checks: UNROUTED for an upstream skill SKILL.md neither
-# routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
+# Ends with two drift checks: UNROUTED for an upstream skill, or a file in its
+# references/ dir, that SKILL.md neither routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
 # upstream no longer has. Both surface on the next pull instead of mid-task.
 set -euo pipefail
 REFS="${UI_REFS:-$HOME/.claude/ui-refs}"
@@ -31,6 +31,14 @@ for skill in "$REFS"/*/skills/*/; do
   rel="${skill#"$REFS"/}"
   if ! grep -qF "$rel" "$ROUTER"; then
     echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
+    drift=1
+  fi
+done
+for ref in "$REFS"/*/skills/*/references/*.md; do
+  [ -e "$ref" ] || continue
+  rel="${ref#"$REFS"/}"
+  if ! grep -qF "$rel" "$ROUTER"; then
+    echo "UNROUTED $rel: route its gap-filling sections in the ui-polish reference table, or name it under Not routed"
     drift=1
   fi
 done
