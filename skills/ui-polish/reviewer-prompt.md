@@ -9,10 +9,10 @@ Domain → reference paths (under `REFS` unless the row says otherwise; resolve 
 | accessibility | `jakubkrehel-skills/skills/better-accessibility/SKILL.md` and every sibling `.md` |
 | layout | `jakubkrehel-skills/skills/better-layout/SKILL.md` and every sibling `.md` |
 | writing | `jakubkrehel-skills/skills/better-writing/SKILL.md` and every sibling `.md` |
-| typography | `jakubkrehel-skills/skills/better-typography/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/typography.md` |
-| colors | `jakubkrehel-skills/skills/better-colors/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/color.md` |
-| polish | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/layout.md` |
-| motion | `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md`; `craft/skills/craft-design-engineering/references/motion.md`; in `emilkowalski-skills/skills/animation-performance/SKILL.md` the sections **Hard Rules**, **Phase 2: Diagnose**, **The Symptom Table** and **What You Animate**; Audit and Build only: `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` (missing motion is a finding only when it passes that gate); `exhaustive` adds `emilkowalski-skills/skills/improve-animations/AUDIT.md` as the hunt checklist |
+| typography | `jakubkrehel-skills/skills/better-typography/SKILL.md` and every sibling `.md`; in `craft/skills/craft-design-engineering/references/typography.md` the section **Font Smoothing** and the **Hanging punctuation** subsection of **Optical Alignment** |
+| colors | `jakubkrehel-skills/skills/better-colors/SKILL.md` and every sibling `.md`; in `craft/skills/craft-design-engineering/references/color.md` the section **Noise** |
+| polish | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md`; in `craft/skills/craft-design-engineering/references/layout.md` the sections **HTML Background** and **Scroll Fades** |
+| motion | `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md`; in `craft/skills/craft-design-engineering/references/motion.md` the sections **Button Press** and **Interruptibility**; in `emilkowalski-skills/skills/animation-performance/SKILL.md` the sections **Hard Rules**, **Phase 2: Diagnose**, **The Symptom Table** and **What You Animate**; Audit and Build only: `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` (missing motion is a finding only when it passes that gate); `exhaustive` adds `emilkowalski-skills/skills/improve-animations/AUDIT.md` as the hunt checklist |
 | worst case | `emilkowalski-skills/skills/break-ui/CATALOG.md`; in `break-ui/SKILL.md` the sections **Failure signatures** and **Truncate, wrap, or clamp** |
 | gesture | `emilkowalski-skills/skills/apple-design/SKILL.md` minus its Typography section; in `emil-design-eng/SKILL.md` the section **Gesture and Drag Interactions** |
 | mobile | `emilkowalski-skills/skills/mobile-native/SKILL.md` |
@@ -21,8 +21,6 @@ Domain → reference paths (under `REFS` unless the row says otherwise; resolve 
 Expo or React Native stack, per `SKILL.md` recon step 1: the motion row reads `emilkowalski-skills/skills/animate-expo/SKILL.md` in place of `animation-performance`, and no mobile reviewer runs because the **mobile** trigger is off.
 
 Every reviewer also gets `jakubkrehel-skills/skills/better-interface/SKILL.md` for severity. A domain skill's own severity ladder is for standalone use; this review ranks on the shared one.
-
-A `craft/` file is a supplement to its row. Where its value differs from the row's other references (a press duration, a sheet curve), the fix takes the other reference's value.
 
 ## Template
 
@@ -56,6 +54,7 @@ Change (Change mode only; delete this block otherwise):
 
 Reference (read every file in full before reviewing, or only the named sections where the line names them; they are the rule set and carry the exact values to use):
 {absolute reference paths, one per line, with section names where the domain table gives them}
+{craft sections in this row: "The craft sections supplement the references above them. Where one conflicts with another reference, the other wins: press duration and sheet curves come from `STANDARDS.md`, font smoothing stays on the root only, and under reduced motion a press drops its scale. One exception: a press on a large surface (card, tile, full-width row) shrinks less than `0.97`, per craft **Button Press**."; no craft sections: delete this line}
 Severity: the section **Rank by user impact** in {absolute path to better-interface/SKILL.md}, escalation triggers included. Apply only that section; the rest of the file is orchestration.
 Any "Initial Response" section or `disable-model-invocation` flag in a reference is for direct invocation; ignore it.
 
