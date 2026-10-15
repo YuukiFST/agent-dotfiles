@@ -1,6 +1,8 @@
 ---
 name: git-workflow
 description: "Use when shipping a change through GitHub end to end — before the first commit, not at merge time. Covers opening the issue, naming the branch, sequencing commits, opening a PR that closes the issue, recording a review before merge, choosing merge vs rebase vs squash, and cleaning up after. Also covers reverting a merged mistake, forks vs standalone repos, and contributing to someone else's repo."
+model: sonnet
+effort: medium
 ---
 
 # Git workflow — issue → branch → PR → review → merge
