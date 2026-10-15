@@ -43,6 +43,7 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Defensive code is opt-in:** add retry/backoff, timeout, circuit-breaker, rate-limit or fallback only for the categories the project names.
 - **Code before comment:** a name, a type or a test says it first; a comment stays only for a *why* the code cannot express (upstream constraint with its link, bug ref).
   The reasoning and provenance of a change go in the commit body, where `git log`/`blame` finds them.
+  Names, comments and rendered errors use the domain's vocabulary; ticket names, migration phases and planning language belong in the commit body.
   A docstring states what the signature cannot (units, invariants, side effects); its example stays only if it runs (doctest).
   A comment explaining a workaround, stub or shortcut marks wrong code: fix the code, or flag it in the report.
 
