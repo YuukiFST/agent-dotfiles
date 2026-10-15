@@ -9,10 +9,10 @@ Domain → reference paths (under `REFS` unless the row says otherwise; resolve 
 | accessibility | `jakubkrehel-skills/skills/better-accessibility/SKILL.md` and every sibling `.md` |
 | layout | `jakubkrehel-skills/skills/better-layout/SKILL.md` and every sibling `.md` |
 | writing | `jakubkrehel-skills/skills/better-writing/SKILL.md` and every sibling `.md` |
-| typography | `jakubkrehel-skills/skills/better-typography/SKILL.md` and every sibling `.md` |
-| colors | `jakubkrehel-skills/skills/better-colors/SKILL.md` and every sibling `.md` |
-| polish | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md` |
-| motion | `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md`; in `emilkowalski-skills/skills/animation-performance/SKILL.md` the sections **Hard Rules**, **Phase 2: Diagnose**, **The Symptom Table** and **What You Animate**; Audit and Build only: `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` (missing motion is a finding only when it passes that gate); `exhaustive` adds `emilkowalski-skills/skills/improve-animations/AUDIT.md` as the hunt checklist |
+| typography | `jakubkrehel-skills/skills/better-typography/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/typography.md` |
+| colors | `jakubkrehel-skills/skills/better-colors/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/color.md` |
+| polish | `jakubkrehel-skills/skills/better-ui/SKILL.md` and every sibling `.md`; `craft/skills/craft-design-engineering/references/layout.md` |
+| motion | `emilkowalski-skills/skills/review-animations/SKILL.md`, `STANDARDS.md`; `craft/skills/craft-design-engineering/references/motion.md`; in `emilkowalski-skills/skills/animation-performance/SKILL.md` the sections **Hard Rules**, **Phase 2: Diagnose**, **The Symptom Table** and **What You Animate**; Audit and Build only: `emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` (missing motion is a finding only when it passes that gate); `exhaustive` adds `emilkowalski-skills/skills/improve-animations/AUDIT.md` as the hunt checklist |
 | worst case | `emilkowalski-skills/skills/break-ui/CATALOG.md`; in `break-ui/SKILL.md` the sections **Failure signatures** and **Truncate, wrap, or clamp** |
 | gesture | `emilkowalski-skills/skills/apple-design/SKILL.md` minus its Typography section; in `emil-design-eng/SKILL.md` the section **Gesture and Drag Interactions** |
 | mobile | `emilkowalski-skills/skills/mobile-native/SKILL.md` |
@@ -21,6 +21,8 @@ Domain → reference paths (under `REFS` unless the row says otherwise; resolve 
 Expo or React Native stack, per `SKILL.md` recon step 1: the motion row reads `emilkowalski-skills/skills/animate-expo/SKILL.md` in place of `animation-performance`, and no mobile reviewer runs because the **mobile** trigger is off.
 
 Every reviewer also gets `jakubkrehel-skills/skills/better-interface/SKILL.md` for severity. A domain skill's own severity ladder is for standalone use; this review ranks on the shared one.
+
+A `craft/` file is a supplement to its row. Where its value differs from the row's other references (a press duration, a sheet curve), the fix takes the other reference's value.
 
 ## Template
 

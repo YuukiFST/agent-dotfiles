@@ -22,6 +22,7 @@ done <<'REPOS'
 jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
 make-interfaces-feel-better https://github.com/jakubkrehel/make-interfaces-feel-better
+craft https://github.com/gustavo-fior/craft
 REPOS
 
 drift=0
