@@ -148,7 +148,9 @@ not ready for deletion:
 - stronger remaining owner-boundary proof, or why no proof is needed;
 - relevant history and the reason the test or seam exists;
 - production or test-support deletion unlocked;
-- risk and the focused validation command.
+- risk and the focused validation command;
+- for a bug regression test, the user's explicit approval to delete or weaken
+  it.
 
 ## Edit shape
 
