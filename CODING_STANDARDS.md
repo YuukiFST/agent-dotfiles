@@ -14,7 +14,10 @@ Skill `test-audit` gates every new or changed test; these add what it lacks.
 
 - **E2E only:** every test you write drives the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); unit and integration tests are written only when the user asks for one.
   A lower-layer test from your own reading of the task restates the implementation and costs tokens without lifting the resolve rate.
-- **Bug repro is E2E:** reproduce as the end user hits it; once green, that red test is the bug's one regression test.
+- **Every bug fix ships its regression test:** a bug the user reports or you find gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code, passes after the fix and stays in the suite.
+  Its name or a comment carries the issue ref or the symptom, so a later failure says which bug came back.
+- **Regression tests are frozen:** one that fails after your change means the change brought its bug back, so fix the code; skipping, deleting or loosening one needs the user's approval, since only an intended behavior change justifies it.
+- **CI runs the suite:** a project whose CI does not run the E2E suite on every PR gets that job in the PR that adds its first regression test; a test only an agent remembers to run guards nothing.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
 - **One command, headless:** the suite seeds itself and needs no manual step, unshipped config or secret.
 
