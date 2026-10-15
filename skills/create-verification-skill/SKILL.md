@@ -15,7 +15,7 @@ Write for the next agent, not for a human: it reads the skill cold, mid-task, wi
 
 ## 0. Check for an existing skill
 
-If `.claude/skills/verify-*/` already exists, stop and ask the user: update it in place, keeping its feature map and Gotchas, or regenerate it.
+If `.claude/skills/verify-*/` already exists, stop and ask the user: refresh it in place with `/maintain-verification-skill`, which keeps its feature map and Gotchas, or regenerate it.
 Remove any verification scaffolding a crashed earlier run left behind before step 1.
 
 ## 1. Interview the repo, not the user
@@ -77,5 +77,10 @@ Done when all of these hold, and you report the evidence path, the feature drive
 - After cleanup, the processes, ports and browser session the run recorded are gone, and its scaffolding is removed.
 - The evidence is still at its named path, and `git check-ignore <evidence path>` prints that path.
 - `opencode debug skill` lists `verify-<app>` with its description.
+
+## 5. Offer the maintenance loop
+
+Point the user at `/maintain-verification-skill` for keeping the map honest as the app changes outside the Upkeep rule: human commits, dependency bumps, other sessions.
+Suggest a cadence only if they ask.
 
 Adapted from pstack's [`create-verification-skill`](https://github.com/cursor/plugins/tree/main/pstack/skills/create-verification-skill), MIT, see `LICENSE`.
