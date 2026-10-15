@@ -2,6 +2,7 @@
 
 1. Read the affected subsystem to the depth of `investigation.md` step 1.
 2. Name the data shape and its organizing structure (`principle-model-the-domain`); in a typed language, shape the types with `principle-type-system-discipline`.
+   A new or changed error, its message or its public shape follows `principle-error-design`.
 3. Settle the design: a change crossing a module boundary, or one with several valid shapes, goes through `codebase-design`; an empirical fork goes to `prototype`; only a product call no experiment settles goes to the user.
    A feature touching auth, user input, secrets or payments also runs `security-review`.
 4. Build in small units, each verified before the next (`principle-sequence-verifiable-units`).
