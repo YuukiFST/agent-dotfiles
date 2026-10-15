@@ -10,6 +10,7 @@ A change that "might help" is a hypothesis: it ships only after evidence confirm
    Done when one mechanism survives, confirmed at runtime.
 3. Two fixes sharing one premise failed the same check: read `principle-attack-the-premise` before a third.
 4. Write the repro as a failing end-to-end test (`test-audit` gates it), then the smallest fix the evidence justifies.
+   A frozen regression test that already fails is the repro: go straight to the fix.
    A fix that crosses a module boundary gets `codebase-design` first; a visual or motion defect takes its fix's craft bar from `ui-polish`.
 5. Verify on the same surface: the original repro now passes.
 6. Order the commits so the failing repro lands before the fix (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user asked to ship.
