@@ -35,7 +35,7 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Grep-able names:** specific enough that grep finds its own uses; `data`, `handler`, `Manager`, `Service` return 50 hits and fail.
 - **Types tell the truth:** what the compiler can't prove gets validated; no `any`, `@ts-ignore`, or `as X` over an invariant, and always-set fields are non-optional.
   A known value keeps its type: widening it to `unknown` or a generic record and casting it back later fabricates the evidence the type carried; parse only what crosses a boundary.
-  An assertion the type system cannot avoid carries, directly above it, a `SAFETY:` comment proving the runtime type, a `Verified by:` line naming the test that fails if the invariant breaks, and the narrowest lint suppression.
+  An assertion the type system cannot avoid carries, directly above it, a `SAFETY:` comment proving the runtime type, a `Verified by:` line naming an E2E test that reaches the asserted path, and, where the linter flags it, the narrowest suppression for that rule on that line; the report names each new assertion, and one with no such test as unverified.
 - **Inject dependencies** (constructor/parameter) so a test swaps in a named fake; fakes stand in for external I/O only.
 - **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`): run it and move on.
 - **The project's linter outranks this file:** where its config covers a rule here (file length, nesting depth, `any`), the config wins; where it lacks one, propose the lint rule instead of leaning on this text.
@@ -43,7 +43,7 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Defensive code is opt-in:** add retry/backoff, timeout, circuit-breaker, rate-limit or fallback only for the categories the project names.
 - **Code before comment:** a name, a type or a test says it first; a comment stays only for a *why* the code cannot express (upstream constraint with its link, bug ref).
   The reasoning and provenance of a change go in the commit body, where `git log`/`blame` finds them.
-  Names, comments and rendered errors use the domain's vocabulary; ticket names, migration phases and planning language belong in the commit body.
+  Names, comments and rendered errors use the domain's vocabulary; migration phases and planning language belong in the commit body.
   A docstring states what the signature cannot (units, invariants, side effects); its example stays only if it runs (doctest).
   A comment explaining a workaround, stub or shortcut marks wrong code: fix the code, or flag it in the report.
 
