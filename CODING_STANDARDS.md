@@ -14,10 +14,13 @@ Skill `test-audit` gates every new or changed test; these add what it lacks.
 
 - **E2E only:** every test you write drives the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); unit and integration tests are written only when the user asks for one.
   A lower-layer test from your own reading of the task restates the implementation and costs tokens without lifting the resolve rate.
-- **Every bug fix ships its regression test:** a bug the user reports or you find gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code, passes after the fix and stays in the suite.
-  Its name or a comment carries the issue ref or the symptom, so a later failure says which bug came back.
-- **Regression tests are frozen:** one that fails after your change means the change brought its bug back, so fix the code; skipping, deleting or loosening one needs the user's approval, since only an intended behavior change justifies it.
-- **CI runs the suite:** a project whose CI does not run the E2E suite on every PR gets that job in the PR that adds its first regression test; a test only an agent remembers to run guards nothing.
+- **Every bug fix ships its regression test:** a behavior bug the user reports or you fix gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code for the bug's reason, passes after the fix and stays in the suite.
+  Its name carries `regression` plus the issue ref or the symptom, so grep finds the frozen set and a later failure says which bug came back.
+  A bug with no deterministic E2E repro (race, performance) gets none: say so in the report instead of shipping a flaky test.
+- **Regression tests are frozen:** one red on your branch and green on the base means your change brought its bug back, so fix the code.
+  Skipping, deleting, loosening one or regenerating its golden needs the user's approval; a behavior change the user asked for that contradicts one counts as approval, and the report names the test.
+  A flaky or base-red one gets the Boy Scout fix, keeping every assertion it makes.
+- **CI runs the suite:** a project whose CI does not run the E2E suite on every PR gets that job as its own commit in the next bug-fix PR, or proposed in a repo the user does not own; a test only an agent remembers to run guards nothing.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
 - **One command, headless:** the suite seeds itself and needs no manual step, unshipped config or secret.
 
