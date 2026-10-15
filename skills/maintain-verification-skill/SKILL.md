@@ -18,12 +18,13 @@ The unit of rigor is the feature, not every sentence: cover every feature file f
 Pick one, and say which:
 
 - **clean:** every feature got source and live coverage; nothing worth shipping. No branch, no PR.
+  A `verified-unreachable` feature whose prerequisite the map already names counts as covered, and the report lists it.
 - **changed:** one PR ships proven doc, harness, or map corrections.
 - **blocked:** coverage could not finish, or a proven fix could not ship safely. Say exactly what blocked it.
 
 ## Edit scope
 
-Edit only the verification skill's own directory: its SKILL.md, `features/`, and the harness scripts it owns.
+Edit only the verification skill's own directory: its SKILL.md, `features/`, and the harness scripts it owns, meaning every script whose invocation its body shows, wherever the script lives.
 Product code stays untouched during a run.
 A behavior the map describes that the app no longer does is either doc drift, which you fix in the map, or a product regression, which you report and leave in the map as written.
 
@@ -31,23 +32,27 @@ A behavior the map describes that the app no longer does is either doc drift, wh
 
 0. **Locate the target.** Find the verification skill to maintain: the project-local skill whose body has Launch and Drive sections and a feature map, usually `.claude/skills/verify-*/`.
    Several candidates: ask which one. None: stop and point at `/create-verification-skill`.
+   Run the whole pass in a fresh worktree off the default branch's tip, so the map is checked against merged behavior and the user's checkout stays untouched.
 1. **Index hygiene.** Read `features/README.md` and glob its sibling files.
    Fix missing, extra, duplicate, or dead entries. Lightweight; no generated inventory.
-2. **Source wave.** Launch one read-only subagent per feature file, concurrently.
+2. **Source wave.** Launch one read-only subagent per feature file, concurrently: `Explore` in Claude Code, `explore` in OpenCode.
+   With no subagent tool, read each feature yourself in turn and say so in the report.
+   A subagent starts with no context, so each prompt carries the feature file's text, the worktree path, and the return shape below.
    Each explains "how does this user-facing feature work?" from source, flags likely doc drift with file:line citations, and returns one concise live-verification recipe.
    Subagents read only: they never drive the app or edit files.
    Return shape: feature summary / source entry points / likely drift or none / one recipe.
 3. **Reconcile.** Done when every feature file has a returned summary.
    Merge overlapping recipes into as few app states as practical.
    Spot-check cited drift; take clean claims as reported.
-   Sweep recent churn (`git log` since the map's last change) for user-facing surfaces missing from the map; call one missing only with a concrete source path.
+   Sweep the churn since the audited commit, the `Audited at: <sha>` line in `features/README.md` (none yet: since that README's first commit), for user-facing surfaces missing from the map; call one missing only with a concrete source path.
 4. **Live pass.** Required even when source looks clean.
    You own all driving, and you follow the verification skill's own launch model: one long-lived instance driven serially for servers and UIs, or a fresh isolated session per drive for short-lived CLIs.
    The skill's Launch section decides which, not this one.
    Exercise every feature at least once, and hold three invariants the whole pass, whatever the failure:
-   1. **Doctor before trust.** Drive an instance only after a health check since it last did something surprising: doctor before the first drive, on each fresh session where sessions are the unit, and again after any failed drive.
+   1. **Doctor before trust.** Drive an instance only if a doctor run has passed since its last surprising behavior: doctor before the first drive, on each fresh session where sessions are the unit, and again after any failed drive.
       Where doctor cannot see the failure (a wedged UI on a healthy process), reset to a known state or relaunch.
    2. **Evidence survives.** Evidence captured so far survives every cleanup, checked at its named path, not assumed.
+      `git check-ignore <evidence path>` still prints that path; when it does not, the fix lies outside Edit scope and the pass is `blocked`.
    3. **Nothing outlives its use.** Failed-iteration residue is cleaned whether the session is stuck, exited, or shared; for a shared instance, clean the residue and keep the instance.
 
    A doctor failure caused by skill drift is drift: fix it under Edit scope and retry once, restarting only what the fix invalidated, before calling the pass `blocked`.
@@ -55,11 +60,13 @@ A behavior the map describes that the app no longer does is either doc drift, wh
    Re-drive every harness fix from triage live before it ships.
    Final teardown runs after the last drive of the run, re-proofs included, so nothing outlives the run; the evidence stays, per the skill.
 5. **Triage.**
-   - Wrong or missing user-POV description: doc drift. Fix it, citing the source change or file:line behind it.
+   - Wrong user-POV description: doc drift only when you can cite the commit or PR that changed the behavior; fix it with that citation. Without one, it is a product gap.
+   - Missing description of a surface the source shows: doc drift. Add it, citing the source file:line.
    - Working behavior the harness cannot drive: harness gap. Fix it; a harness fix follows the generator's Helpers rule (scripts executable, invocation shown in the skill body).
    - App behavior that is broken: product gap. Record it for the user and keep it out of this PR.
-6. **Ship or stop.** For `changed`: re-read every changed file, then ship one PR of proven corrections through `git-workflow`, with the live-pass evidence in its body.
-   For `clean` or `blocked`: no PR; report the outcome and the coverage honestly.
+6. **Ship or stop.** For `changed`: re-read every changed file, set `Audited at:` to the commit the pass ran on, then open one PR of proven corrections through `git-workflow`, with the live-pass output in its body.
+   The run ends at the open PR; review and merge follow `git-workflow`.
+   For `clean` or `blocked`: no PR; remove the worktree, and report the outcome and the coverage honestly.
 
 Keep concise run notes (features covered, unreachable prerequisites, confirmed drift, outcome) in a `mktemp -d` scratch dir, uncommitted, and delete it at the end.
 
