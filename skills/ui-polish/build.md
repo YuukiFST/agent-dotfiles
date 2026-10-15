@@ -34,7 +34,7 @@ Done when: every state from the brief is reachable in the browser.
 
 ## 5. Polish pass
 
-Read `better-ui/SKILL.md` and `surfaces.md`, plus `better-typography/SKILL.md`. Walk the screen once against them: concentric radii, optical alignment of icons, shadows versus borders, tabular numbers on changing figures, `text-wrap` on headings and body, hit areas at the accessibility minimum, icon stroke matching text weight. Exact values from the sibling files, never approximated.
+Read `better-ui/SKILL.md` and `surfaces.md`, plus `better-typography/SKILL.md` and craft's `layout.md` (**HTML Background**, **Scroll Fades**). Walk the screen once against them: concentric radii, optical alignment of icons, shadows versus borders, tabular numbers on changing figures, `text-wrap` on headings and body, hit areas at the accessibility minimum, icon stroke matching text weight, a fade on each scroll edge that still has content, the root canvas on the background token. Exact values from the sibling files, never approximated.
 
 ## 6. Motion
 

@@ -43,6 +43,7 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
 | Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
+| Craft supplements: edge-aware scroll fades, the root canvas, tiled grain, smoothing caveats, hanging punctuation, input never locked mid-motion, press scale per surface | Named sections only, since the rest of each file repeats an owner above: `REFS/craft/skills/craft-design-engineering/references/typography.md` (**Font Smoothing**; **Hanging punctuation** in **Optical Alignment**), `REFS/craft/skills/craft-design-engineering/references/color.md` (**Noise**), `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**), `REFS/craft/skills/craft-design-engineering/references/motion.md` (**Button Press**, **Interruptibility**). Conflicts resolve per the craft line in the [reviewer-prompt.md](reviewer-prompt.md) Template. |
 
 Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it. The same holds for `disable-model-invocation` in the jakubkrehel frontmatter: this router is the invocation, so `interface-review`, `variant`, `break` and `state-machine` are read like any other reference.
 
@@ -52,6 +53,7 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
 - `REFS/jakubkrehel-skills/skills/technical-drawing/`: drawings of physical objects, not interface work, and its viewer installs packages.
 - `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
+- `REFS/craft/content/`: craft's unlaunched drafts. A launched concept lands in a craft `references/` file; a file this table does not cite prints as `UNROUTED`.
 
 ## Step 0: Recon (every mode)
 
