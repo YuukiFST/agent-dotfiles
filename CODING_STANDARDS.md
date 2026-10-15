@@ -34,6 +34,8 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Guard clauses:** early returns, about 2 indent levels at most.
 - **Grep-able names:** specific enough that grep finds its own uses; `data`, `handler`, `Manager`, `Service` return 50 hits and fail.
 - **Types tell the truth:** what the compiler can't prove gets validated; no `any`, `@ts-ignore`, or `as X` over an invariant, and always-set fields are non-optional.
+  A known value keeps its type: widening it to `unknown` or a generic record and casting it back later fabricates the evidence the type carried; parse only what crosses a boundary.
+  An assertion the type system cannot avoid carries, directly above it, a `SAFETY:` comment proving the runtime type, a `Verified by:` line naming the test that fails if the invariant breaks, and the narrowest lint suppression.
 - **Inject dependencies** (constructor/parameter) so a test swaps in a named fake; fakes stand in for external I/O only.
 - **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`): run it and move on.
 - **The project's linter outranks this file:** where its config covers a rule here (file length, nesting depth, `any`), the config wins; where it lacks one, propose the lint rule instead of leaning on this text.
