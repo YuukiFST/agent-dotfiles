@@ -70,6 +70,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
 | Survey a codebase and write plans for other agents | `improve` |
 | Stress-test a plan or idea | `grilling` |
+| Measure whether a change to a user-invoked skill or a playbook alters agent behavior | `playbooks/eval.md` |
 
 ### Write
 
