@@ -62,9 +62,64 @@ name: my-skill
 description: $accented_desc
 ---
 EOF
+check allow user-invoked-with-opencode-metadata my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
+---
+EOF
+# OpenCode accepts YAML booleans here too; yq's `//` once turned false into "" (PR #187 review).
+check allow user-invoked-with-unquoted-opencode-metadata my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: true
+metadata:
+  opencode/slash: true
+  opencode/autoinvoke: false
+---
+EOF
+check allow model-invoked-without-opencode-metadata my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: false
+---
+EOF
 check allow crlf my-skill < <(printf -- '---\r\nname: my-skill\r\ndescription: Do one thing.\r\n---\r\n')
 
 # --- Broken frontmatter must be blocked ---
+# Issue #186: OpenCode ignores disable-model-invocation, so without this metadata it
+# kept offering user-invoked skills to the model.
+check block regression-186-user-invoked-without-opencode-metadata my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: true
+---
+EOF
+check block regression-186-user-invoked-without-opencode-slash my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
+---
+EOF
+check block regression-186-user-invoked-without-opencode-autoinvoke my-skill <<'EOF'
+---
+name: my-skill
+description: Do one thing.
+disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+---
+EOF
 # PR #97: an unquoted ": " inside a plain scalar made the harness drop the description.
 check block unquoted-colon my-skill <<'EOF'
 ---

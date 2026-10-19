@@ -2,6 +2,9 @@
 name: helmsman
 description: Start a project from one prompt - the human answers a few product questions, the agent decides everything technical at zero cost, charts the decisions as a shared map, writes the spec and build tickets, and hands over the command that builds it.
 disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
 A loose idea has arrived, usually a whole project, wrapped in fog.
