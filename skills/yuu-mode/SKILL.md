@@ -22,7 +22,7 @@ A routed skill missing on disk: name it in the reply and take the next-best rout
 ## Routing
 
 Match on every new task: the prompt that came with `/yuu-mode`, a "new task", or a clear change of subject.
-A follow-up on the same task ("continue", "do it", "keep going") keeps the current route; an explicit pause mid-task runs `playbooks/pause-safely.md` on it.
+A follow-up on the same task ("continue", "do it", "keep going") keeps the current route; an explicit pause mid-task runs `playbooks/pause-safely.md` on it, and a hand-off to run unattended ("keep going until it passes", "going to bed") runs `playbooks/autonomous-run.md` with the current route as secondary.
 The user says to leave yuu-mode: drop this file's rules for the rest of the session.
 
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
@@ -117,7 +117,7 @@ Before any code, name the data shape and its organizing structure (`principle-mo
 ## Autonomy
 
 Pauses follow the global instructions and `~/.claude/rules/git.md` §3.
-"Don't stop", "run until done" or "going to bed" keep you going through reversible steps; those stop rules still hold, and a message other people will see waits for a yes.
+"Don't stop", "run until done" or "going to bed" run `playbooks/autonomous-run.md`, which keeps you going through reversible steps; those stop rules still hold, and a message other people will see waits for a yes.
 Asked whether to do something or shown an approach, give your real judgment; "this doesn't earn its place" is a valid answer.
 
 ## Subagents
