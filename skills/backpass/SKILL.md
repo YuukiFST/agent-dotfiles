@@ -2,6 +2,9 @@
 name: backpass
 description: Train a project CLAUDE.md on its own session transcripts — one evidence-backed gradient step per run.
 disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
 # backpass — the backward pass on project memory

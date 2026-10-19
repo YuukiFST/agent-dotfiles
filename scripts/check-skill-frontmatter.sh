@@ -7,6 +7,8 @@
 # Rules from https://agentskills.io/specification: name is 1-64 chars of a-z, 0-9 and
 # single hyphens, not at either end, equal to the directory name; description is a
 # non-empty string of at most 1024 chars. Extra fields (user-invocable, author) are allowed.
+# A user-invoked skill (disable-model-invocation: true) also needs the metadata OpenCode
+# reads instead of that key, or OpenCode still offers it to the model (issue #186).
 # Needs mikefarah yq v4, preinstalled on GitHub's ubuntu runners.
 set -uo pipefail
 export LC_ALL=C.UTF-8
@@ -50,6 +52,14 @@ check_skill() {
     report "$file" "description must be a non-empty string"
   elif [ "$desc_len" -gt 1024 ]; then
     report "$file" "description is $desc_len chars, limit 1024"
+  fi
+
+  # No `//` fallback: yq's `//` also replaces boolean false, and OpenCode accepts YAML
+  # booleans as well as the quoted strings, which yq prints the same way (PR #187 review).
+  if [ "$(yq --front-matter=extract '.["disable-model-invocation"]' "$file")" = "true" ] &&
+    { [ "$(yq --front-matter=extract '.metadata["opencode/autoinvoke"]' "$file")" != "false" ] ||
+      [ "$(yq --front-matter=extract '.metadata["opencode/slash"]' "$file")" != "true" ]; }; then
+    report "$file" "disable-model-invocation needs metadata opencode/autoinvoke: \"false\" and opencode/slash: \"true\" for OpenCode"
   fi
 }
 
