@@ -90,6 +90,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
+| Drive a task to a stated end while the user is away ("keep going until it passes", "going to bed") | `playbooks/autonomous-run.md` |
 | Find or install a skill this kit lacks | `find-skills` |
 | Set up a repo's issue tracker and labels for the engineering skills | `setup-matt-pocock-skills` |
 
