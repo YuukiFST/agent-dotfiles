@@ -5,13 +5,14 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
 
 1. State the exit condition as a predicate you can check by running something (tests green, repro gone, every listed PR merged, pixel diff zero) before the first iteration.
    Beside it, name a progress measure the same command reports that moves before the predicate flips (failing tests left, PRs still open).
+   No commit identity confirmed this session (`~/.claude/rules/git.md` §1): confirm it before the user leaves; if they are already gone, iterations stay uncommitted, each kept pass staged so a revert restores the index, and each becomes a row in the todo list.
    Done when the predicate, the progress measure and the command that checks both are in the todo list.
 2. Waiting on something outside the session (CI, a merge, a ref advancing) gets a wake mechanism.
    One event: Bash with `run_in_background` and an `until` loop that exits on it; a stream of events: `Monitor` with a command that prints every terminal state, failures included.
    A long fallback heartbeat covers a watch that hangs: the `loop` skill without an interval, which self-paces through `ScheduleWakeup`.
    No event to watch: `loop` with a fixed interval sized to when the result is worth re-checking.
 3. Each iteration runs the secondary route's steps as its body, so copy them into the todo list under this step (bug-fix: repro, root cause, fix, verify).
-   At the end of the pass, run the check: commit the pass if the progress measure moved, and revert the whole pass if it did not, so a failing repro and the fix it waits on stand or fall together.
+   At the end of the pass, run the check: keep the pass if the progress measure moved, committed when step 1 confirmed an identity, and revert the whole pass if it did not, so a failing repro and the fix it waits on stand or fall together.
    A change that only "might help" is reverted, not left to ride; order the units with `principle-sequence-verifiable-units`.
    Done when the iteration has its row in the todo list: what changed, and the measure and the predicate before and after.
 4. Mid-run discoveries are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.
