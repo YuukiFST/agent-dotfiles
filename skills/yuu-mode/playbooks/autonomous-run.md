@@ -13,9 +13,9 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
    A change that only "might help" is reverted, not left to ride; order the units with `principle-sequence-verifiable-units`.
    Done when the iteration has its row in the todo list: what changed, and the predicate before and after.
 4. Mid-run discoveries are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.
-   Fix each in its own PR and return to the predicate.
-   Raise to the user only what the Autonomy section reserves for them, a product or preference call no experiment settles, or a real dead end.
+   Fix each on its own local branch, list the branch in the reply, and return to the predicate; opening its PR follows the Autonomy section.
+   A question only the user can answer, a product or preference call no experiment settles, becomes a row in the todo list, and work continues on whatever does not depend on it.
 5. Stop when the predicate holds.
    A plateau is not a stop: change approach and push past it; a real dead end gets named with its evidence, and the predicate stays as stated.
 
-**Reply:** the exit condition, the iteration rows, what landed, what was reverted, and the final predicate state with the output that checks it.
+**Reply:** the exit condition, the iteration rows, what landed, what was reverted, the local branches holding side fixes, the open questions, and the final predicate state with the output that checks it.
