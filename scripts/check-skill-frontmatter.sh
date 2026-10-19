@@ -54,9 +54,11 @@ check_skill() {
     report "$file" "description is $desc_len chars, limit 1024"
   fi
 
-  if [ "$(yq --front-matter=extract '.["disable-model-invocation"] // false' "$file")" = "true" ] &&
-    { [ "$(yq --front-matter=extract '.metadata["opencode/autoinvoke"] // ""' "$file")" != "false" ] ||
-      [ "$(yq --front-matter=extract '.metadata["opencode/slash"] // ""' "$file")" != "true" ]; }; then
+  # No `//` fallback: yq's `//` also replaces boolean false, and OpenCode accepts YAML
+  # booleans as well as the quoted strings, which yq prints the same way (PR #187 review).
+  if [ "$(yq --front-matter=extract '.["disable-model-invocation"]' "$file")" = "true" ] &&
+    { [ "$(yq --front-matter=extract '.metadata["opencode/autoinvoke"]' "$file")" != "false" ] ||
+      [ "$(yq --front-matter=extract '.metadata["opencode/slash"]' "$file")" != "true" ]; }; then
     report "$file" "disable-model-invocation needs metadata opencode/autoinvoke: \"false\" and opencode/slash: \"true\" for OpenCode"
   fi
 }
