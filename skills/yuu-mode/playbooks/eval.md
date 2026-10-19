@@ -22,7 +22,7 @@ A model-invoked skill's description or trigger, and the global `CLAUDE.md`, `rul
 4. Grade from the transcripts named by the run's `session_id`; the newest transcript by mtime is your own session.
    `find ~/.claude/projects -name '<session_id>.jsonl'` gives the main transcript, and the calls its subagents made sit in `<that dir>/<session_id>/subagents/agent-*.jsonl`.
    Tool calls are the `type: "tool_use"` entries of `message.content` on `type: "assistant"` lines: check the files read, the skills invoked and the reply against each criterion.
-   The run's `result` holds only its final text block; a line written earlier in the turn sits in the transcript's `type: "text"` entries.
+   The run's `result` holds only its final text block; a line written earlier in the turn sits in the `type: "text"` entries of `message.content`.
    A `Skill` call whose `skill` lacks the `kit:` prefix, or a read under `~/.claude/skills/`, exercised the installed copy instead of the arm, so that criterion is inconclusive for the run.
    Done when every criterion holds pass, fail or inconclusive for the run, each with the transcript entry behind it.
 5. Clean up by literal path, resolved and checked before the `rm`: the run's two `mktemp -d` dirs, the transcript dir holding `<session_id>.jsonl` once `find` printed exactly one match, and each `~/.claude/plans/` file the run's `Write` calls name.
