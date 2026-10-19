@@ -90,7 +90,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
-| Drive a task to a stated end while the user is away ("keep going until it passes", "going to bed") | `playbooks/autonomous-run.md` |
+| Drive a task to a stated end while the user is away ("keep going until it passes", "going to bed"); the task's own route rides as secondary | `playbooks/autonomous-run.md` |
 | Stop now so the work resumes cleanly later ("stop here", "I need to restart") | `playbooks/pause-safely.md` |
 | Resume a prior session from its id, a handoff note or a pushed branch | `playbooks/session-pickup.md` |
 | Find or install a skill this kit lacks | `find-skills` |
