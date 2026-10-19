@@ -10,6 +10,7 @@ The trail is authoritative input; a pass that re-derives it from scratch treats 
 2. Read the last messages first, then scan back for the decision points.
    A long transcript goes to a read-only explore subagent (Subagents in `../SKILL.md`), and only its reduced timeline enters this session.
 3. Reconstruct the operational state: the branch and worktree, what landed (`git log` and `git diff` against the base), the open todos and the decisions made.
+   A commit whose body opens `Work in progress.` is a pause checkpoint (`pause-safely.md`): its work counts as pending, not landed.
 4. Diff done against pending and name the resume point; completed work and the prior repro stay as they are.
    Done when every planned item is marked done, pending or dropped, each with the transcript line or commit behind it.
 5. Route the remaining work through Routing in `../SKILL.md` with a new route line; that route owns the rest.

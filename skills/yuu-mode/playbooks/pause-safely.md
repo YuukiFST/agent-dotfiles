@@ -7,8 +7,8 @@ Run it only on an explicit pause ("stop here", "I need to restart my machine", "
    Stop everything you started in the background: `TaskStop` for tasks, subagents and monitors, `CronDelete` for cron jobs, `ScheduleWakeup` with `stop: true` for a self-paced `loop`.
    Done when nothing you started is still running.
 2. Pause with reversible actions only: open no PR and push nothing a PR did not already carry.
-3. Make the work durable: commit the uncommitted edits on the current branch as one commit, typed like the work it holds (the `commit-msg` hook rejects `wip:`), with a body that opens `Work in progress.` and says in one line whether the tree builds.
-   No identity confirmed this session (`~/.claude/rules/git.md` §1): leave the edits uncommitted and list them in the note instead.
+3. Make the work durable: stage only the paths this session edited and commit them on the current branch as one commit, typed like the work it holds (the `commit-msg` hook rejects `wip:`), with a body that opens `Work in progress.` and says in one line whether the tree builds.
+   On the default branch, or with no identity confirmed this session (`~/.claude/rules/git.md` §1), leave the edits uncommitted and list them in the note instead.
 4. Write the resume note with `handoff` (`../../handoff/SKILL.md`), passing the first action on resume as its argument.
    Done when the note separates what was verified from what is only believed, and its path is in the reply.
 
