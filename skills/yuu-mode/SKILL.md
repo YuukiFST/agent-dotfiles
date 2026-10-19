@@ -92,6 +92,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Hand the work to another session | `handoff` |
 | Drive a task to a stated end while the user is away ("keep going until it passes", "going to bed") | `playbooks/autonomous-run.md` |
 | Stop now so the work resumes cleanly later ("stop here", "I need to restart") | `playbooks/pause-safely.md` |
+| Resume a prior session from its id, a handoff note or a pushed branch | `playbooks/session-pickup.md` |
 | Find or install a skill this kit lacks | `find-skills` |
 | Set up a repo's issue tracker and labels for the engineering skills | `setup-matt-pocock-skills` |
 
