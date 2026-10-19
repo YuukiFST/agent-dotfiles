@@ -7,7 +7,7 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
    Beside it, name a progress measure the same command reports that moves before the predicate flips (failing tests left, PRs still open).
    No commit identity confirmed this session (`~/.claude/rules/git.md` §1): confirm it before the user leaves; if they are already gone, iterations stay uncommitted, each kept pass staged so a revert restores the index, and each becomes a row in the todo list.
    Done when the predicate, the progress measure and the command that checks both are in the todo list.
-2. Waiting on something outside the session (CI, a merge, a ref advancing) gets a wake mechanism.
+2. Waiting on something outside the session (CI, a merge, a ref advancing) gets a wake mechanism; the tools named here are Claude Code's.
    One event: Bash with `run_in_background` and an `until` loop that exits on it; a stream of events: `Monitor` with a command that prints every terminal state, failures included.
    A long fallback heartbeat covers a watch that hangs: the `loop` skill without an interval, which self-paces through `ScheduleWakeup`.
    No event to watch: `loop` with a fixed interval sized to when the result is worth re-checking.

@@ -4,7 +4,7 @@ You own the resume point: read the prior trail and continue it, rather than redo
 The trail is authoritative input; a pass that re-derives it from scratch treats it as untrustworthy.
 
 1. Locate the trail: a handoff note the user names, a pushed branch or PR, or a transcript found by its session id.
-   `find ~/.claude/projects -name '<session_id>.jsonl'` gives the transcript, and its subagents sit in `<that dir>/<session_id>/subagents/agent-*.jsonl`.
+   Claude Code keeps transcripts under `~/.claude/projects`: `find ~/.claude/projects -name '<session_id>.jsonl'` gives the transcript, and its subagents sit in `<that dir>/<session_id>/subagents/agent-*.jsonl`.
    No id given: ask for it or for the note; the newest transcript by mtime is this session, and the other project dirs hold unrelated private chats.
    Done when you hold the trail's path and the prior session's goal.
 2. Read the last messages first, then scan back for the decision points.
