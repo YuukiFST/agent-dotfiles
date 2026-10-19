@@ -13,27 +13,35 @@ The usual trigger is a context window filling up.
 The next agent starts cold and trusts every line, so the document is its whole memory of this session.
 
 If the user passed arguments, treat them as what the next session will focus on and keep the reasoning that bears on it.
+Prose follows the conversation's language; template headings, the _unverified_ tag and the quoted heading names in the prompt stay in English, so the prompt and the document agree on them.
 
 ## Steps
 
-1. **Read the live state.** In each repo the work touched, run `git branch --show-current`, `git status --short` and `git log --oneline -5`.
+1. **Pick the mode.** Inline when the user asked for the prompt itself instead of a file ("send me the prompt", "inline"); file otherwise.
+   A mode request in the arguments is not focus text.
+2. **Read the live state.** In each repo the work touched, run `git rev-parse --show-toplevel`, `git status` and `git log --oneline -5`.
+   The long form of `git status` carries the upstream, ahead/behind and any rebase, merge or cherry-pick in progress.
    Outside a git repo, list the files the session created or changed.
-   Done when you hold the branch, the uncommitted files and the last commit.
-2. **Write the document** from the template below, in the conversation's language, to `<tmp>/handoff-<repo>-<slug>.md`.
-   `<tmp>` is `$TMPDIR`, else `/tmp`; `%TEMP%` on Windows.
-   Temp keeps the handoff out of the workspace and out of git.
+   Done when you hold the worktree path, the branch (or detached HEAD), whether it is pushed, the uncommitted files, any operation in progress and the last commit.
+3. **Write the document** from the template below.
+   File mode writes it to `<tmp>/handoff-<repo>-<slug>-<YYYYMMDD-HHMM>.md`: `<repo>` is the basename of the worktree path (`session` outside git), `<slug>` the task line in kebab-case.
+   `<tmp>` is `%TEMP%` on Windows, else `$TMPDIR`, else `/tmp`; temp keeps the handoff out of the workspace and out of git.
+   Inline mode writes no file.
    Drop a section that has nothing to say rather than filling it.
-3. **Audit every claim.** Each statement of fact is either verified, citing the command, test or `file:line` that showed it this session, or tagged _unverified_ (in the document's language).
+4. **Audit every claim.** A statement of fact counts as verified only with evidence gathered after the last edit to what it covers: the command, test or `file:line` that showed it.
+   Rerun a cheap check whose evidence went stale; tag the rest _unverified_.
    A belief written as fact becomes a false premise for everything the next agent does.
-   Done when no claim lacks evidence or the tag.
-4. **Hand it over.** Reply with the absolute path and a paste-ready prompt in a code block, in the conversation's language:
+   Done when no claim lacks fresh evidence or the tag.
+5. **Hand it over.**
+   - **File mode:** reply with the absolute path in the OS's native form (`C:\...` on Windows; from Git Bash, `cygpath -w <path>`) and this prompt in a code block:
 
-   ```text
-   Read <absolute path> and continue the work it describes. Confirm "State" with git before editing, then start at "Next steps".
-   ```
+     ```text
+     Read <absolute path> and continue the work it describes. Confirm "State" with git before editing, then start at "Next steps".
+     ```
 
-   When the user asked for the prompt itself instead of a file, put the whole document in the code block and skip the file.
-   Tell the user to paste the prompt into the new session as typed text: interpolated into a shell command like `claude "<prompt>"`, backticks and `$(...)` get expanded and the brief arrives silently truncated.
+   - **Inline mode:** reply with one code block fenced with more backticks than any fence inside the document (four when it holds a triple-backtick block).
+     Its first line is the instruction `Continue the work this brief describes. Confirm "State" with git before editing, then start at "Next steps".`, then the document.
+     Tell the user to paste it into the new session as typed text: inside a shell argument like `claude "<prompt>"`, backticks and `$(...)` in the brief run as commands.
 
 ## Template
 
@@ -44,7 +52,7 @@ If the user passed arguments, treat them as what the next session will focus on 
 What done looks like for the whole task, and why it matters.
 
 ## State
-Repo, branch, uncommitted files, last commit, and what is mid-edit right now.
+Worktree path, branch, push status, uncommitted files, operation in progress, last commit, and what is mid-edit right now.
 
 ## Done
 Finished items, each with its evidence.
@@ -65,7 +73,7 @@ What still needs the user, and assumptions nobody confirmed.
 Specs, plans, ADRs, issues, PRs, commits and files, by path or URL.
 
 ## Suggested skills
-Skills the next agent should call the Skill tool for, and at which step.
+Skills the next agent should load, and at which step; for a user-invoked skill, write "ask the user to run /<name>".
 ```
 
 ## Rules
