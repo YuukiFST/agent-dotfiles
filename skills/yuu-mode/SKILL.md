@@ -22,11 +22,12 @@ A routed skill missing on disk: name it in the reply and take the next-best rout
 ## Routing
 
 Match on every new task: the prompt that came with `/yuu-mode`, a "new task", or a clear change of subject.
-A follow-up on the same task ("continue", "do it", "keep going") keeps the current route.
+A follow-up on the same task ("continue", "do it", "keep going") keeps the current route; an explicit pause mid-task runs `playbooks/pause-safely.md` on it, and a hand-off to run unattended ("keep going until it passes", "going to bed") runs `playbooks/autonomous-run.md` with the current route as secondary.
 The user says to leave yuu-mode: drop this file's rules for the rest of the session.
 
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
+   When tool calls come between, the final message opens with the current route line.
 3. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
 A casual question or one-line answer gets answered directly, with no route line and no todo list.
@@ -90,6 +91,9 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
+| Drive a task to a stated end while the user is away ("keep going until it passes", "going to bed"); the task's own route rides as secondary | `playbooks/autonomous-run.md` |
+| Stop now so the work resumes cleanly later ("stop here", "I need to restart") | `playbooks/pause-safely.md` |
+| Resume a prior session from its id, a handoff note or a pushed branch | `playbooks/session-pickup.md` |
 | Find or install a skill this kit lacks | `find-skills` |
 | Set up a repo's issue tracker and labels for the engineering skills | `setup-matt-pocock-skills` |
 
@@ -113,7 +117,7 @@ Before any code, name the data shape and its organizing structure (`principle-mo
 ## Autonomy
 
 Pauses follow the global instructions and `~/.claude/rules/git.md` §3.
-"Don't stop", "run until done" or "going to bed" keep you going through reversible steps; those stop rules still hold, and a message other people will see waits for a yes.
+"Don't stop", "run until done" or "going to bed" run `playbooks/autonomous-run.md`, which keeps you going through reversible steps; those stop rules still hold, and a message other people will see waits for a yes.
 Asked whether to do something or shown an approach, give your real judgment; "this doesn't earn its place" is a valid answer.
 
 ## Subagents
