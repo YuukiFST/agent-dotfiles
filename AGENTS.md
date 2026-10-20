@@ -34,7 +34,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
    Sync never runs it, and the clones sit outside every skills dir on purpose so none of their frontmatter reaches a session.
    Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/SKILL.md` (a route, a **Not routed** entry, or a repointed path) and the script rerun.
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
-   1. `diff -rq rules ~/.claude/rules` prints nothing, and every `skills/<name>/` exists in the harness's skills dir (`~/.claude/skills` for Claude Code, `~/.agents/skills` for pi and OpenCode).
+   1. `diff -rq rules ~/.claude/rules` prints nothing, `cmp CODING_STANDARDS.md ~/.claude/CODING_STANDARDS.md` and `cmp PROMPT_ENGINEERING.md ~/.claude/PROMPT_ENGINEERING.md` pass, and every `skills/<name>/` exists in the harness's skills dir (`~/.claude/skills` for Claude Code, `~/.agents/skills` for pi and OpenCode).
    2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       It drives an installed Chrome and keeps no per-machine config, so a failure means Chrome is missing, not that the repo drifted.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.

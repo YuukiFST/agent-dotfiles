@@ -1,7 +1,7 @@
 # Prompting — Writing Instructions
 
 Apply when writing a prompt for a sub-agent, tool or LLM call.
-Designing an agentic task, debugging a prompt, writing its evals, or maintaining a prompt file or CLAUDE.md → also read `~/.claude/PROMPT_ENGINEERING.md`; training a project's CLAUDE.md on its transcripts → the `backpass` skill.
+Changing an existing prompt (the change ships with eval cases), designing an agentic task, debugging a prompt, or maintaining a prompt file or CLAUDE.md → also read `~/.claude/PROMPT_ENGINEERING.md`.
 
 ## Structure
 
@@ -21,6 +21,7 @@ Good: "Read `calculateTotal` in `src/billing.ts`. Trace negative quantity throug
 3. **Output format upfront.** "JSON only", "just the diff", "file:line references."
 4. **Few-shot for complex tasks.** One correct input/output pair > paragraphs of explanation. Show an existing pattern from the codebase.
 5. **Anti-hallucination guardrails.** "State if uncertain", "cite file:line", "insufficient data → say so."
+   **Information withholding** is the flip side of hallucination: a defensive instruction ("never give wrong info") can beat the accuracy instruction and make the model go silent. Fix: "Give accurate information. If uncertain, state what you checked and why you're uncertain."
 6. **Prefilled output.** Start the response with the expected format token to suppress preamble: prefill with `{` for JSON, `<tag>` for XML, ` ```diff` for code.
 7. **Tool over verbal.** Don't say "be careful with X." Give a specific tool/process: "Run `mypy .` after editing" not "make sure imports are correct."
 8. **Balanced instructions.** Give both sides of every tradeoff. "Never install packages to fix errors. If a new dependency is genuinely needed, confirm with the user."

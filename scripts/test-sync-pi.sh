@@ -46,6 +46,6 @@ expect "CommonJS launcher runs" node "$agent/bin/pi-launcher.js" --version
 expect "caveman declares its own module type" grep -q '"module"' "$agent/extensions/caveman/package.json"
 expect "settings.json packages installed through the launcher" test -s "$PI_STUB_LOG"
 expect "GLOBAL.md lands as ~/.pi/agent/AGENTS.md" cmp -s "$(dirname "$SYNC")/../GLOBAL.md" "$agent/AGENTS.md"
-expect "PROMPT_ENGINEERING.md lands beside the rules/prompting.md pointing to it" cmp -s "$(dirname "$SYNC")/../PROMPT_ENGINEERING.md" "$home/.claude/PROMPT_ENGINEERING.md"
+expect "PROMPT_ENGINEERING.md lands in ~/.claude" cmp -s "$(dirname "$SYNC")/../PROMPT_ENGINEERING.md" "$home/.claude/PROMPT_ENGINEERING.md"
 
 [ "$fail" -eq 0 ]
