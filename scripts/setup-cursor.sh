@@ -16,6 +16,6 @@ Done. Restart Cursor.
 
 MANUAL STEP — Cursor has no file-backed global rules. Open
   Customize -> Rules -> User Rules
-and paste the contents of CLAUDE.md there. Re-paste after editing CLAUDE.md;
+and paste the contents of GLOBAL.md there. Re-paste after editing it;
 no script can automate this. Skills above are synced from disk.
 EOF

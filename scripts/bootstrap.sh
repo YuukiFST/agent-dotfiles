@@ -57,7 +57,7 @@ set_sparse_state() {
 # ${BASH_SOURCE[0]:-$0}: on the documented `curl … | bash` path BASH_SOURCE is unset and
 # set -u would abort before anything ran.
 self_repo="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." 2>/dev/null && pwd || true)"
-if [ -n "$self_repo" ] && [ -f "$self_repo/CLAUDE.md" ]; then
+if [ -n "$self_repo" ] && [ -f "$self_repo/GLOBAL.md" ]; then
   dest="$self_repo"
   echo "Using the clone this script lives in: $dest"
 elif [ -d "$dest/.git" ]; then

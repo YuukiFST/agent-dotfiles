@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copy config (CLAUDE.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
+# Copy config (GLOBAL.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
 # Usage: sync-config.sh claude|cursor|pi|opencode
@@ -142,11 +142,11 @@ sync_opencode() {
   # A hand-maintained AGENTS.md predates this sync path on machines configured by hand —
   # keep one copy of it instead of dropping it silently.
   if [ -f "$oc/AGENTS.md" ] && [ ! -f "$oc/AGENTS.local.md.bak" ] &&
-     ! cmp -s "$oc/AGENTS.md" "$repo/CLAUDE.md"; then
+     ! cmp -s "$oc/AGENTS.md" "$repo/GLOBAL.md"; then
     cp "$oc/AGENTS.md" "$oc/AGENTS.local.md.bak"
     echo "  kept the previous hand-written AGENTS.md as AGENTS.local.md.bak"
   fi
-  cp "$repo/CLAUDE.md" "$oc/AGENTS.md"
+  cp "$repo/GLOBAL.md" "$oc/AGENTS.md"
   sync_opencode_reviewers "$oc"
 }
 
@@ -194,11 +194,11 @@ sync_opencode_reviewers() { # $1 = opencode config dir
 # Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi
 # side by side) converges on the same config no matter which script ran.
 sync_shared() {
-  # rules/ live at ~/.claude/rules on EVERY harness — CLAUDE.md's conditional pointers
+  # rules/ live at ~/.claude/rules on EVERY harness — GLOBAL.md's conditional pointers
   # hardcode that path, so it must resolve even where Claude Code is not installed.
   sync_rules "$HOME/.claude/rules"
   # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
-  # is disclosed — read only when CLAUDE.md's pointer fires before a project edit.
+  # is disclosed — read only when GLOBAL.md's pointer fires before a project edit.
   cp "$repo/CODING_STANDARDS.md" "$HOME/.claude/CODING_STANDARDS.md"
 
   # ~/.agents/skills is read natively by both Cursor and pi — one dir, two agents.
@@ -215,7 +215,7 @@ sync_shared() {
   # so a Claude-Code-only box does not grow a stray ~/.pi.
   if command -v pi >/dev/null 2>&1; then
     mkdir -p "$HOME/.pi/agent"
-    cp "$repo/CLAUDE.md" "$HOME/.pi/agent/AGENTS.md"
+    cp "$repo/GLOBAL.md" "$HOME/.pi/agent/AGENTS.md"
   fi
 
   # rtk reads its config from an OS-specific dir that `rtk config` prints. The repo owns the
@@ -244,7 +244,7 @@ case "$target" in
   claude)
     claude="$HOME/.claude"
     mkdir -p "$claude"
-    cp "$repo/CLAUDE.md" "$claude/CLAUDE.md"
+    cp "$repo/GLOBAL.md" "$claude/CLAUDE.md"
     # dreaming.md ships with the memory stack (stacks/memory/root/): present only
     # while that stack is enabled, so a stale copy has to go when it is not.
     if [ -f "$repo/dreaming.md" ]; then

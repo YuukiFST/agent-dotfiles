@@ -45,5 +45,6 @@ expect "no package.json in ~/.pi/agent/bin" test ! -e "$agent/bin/package.json"
 expect "CommonJS launcher runs" node "$agent/bin/pi-launcher.js" --version
 expect "caveman declares its own module type" grep -q '"module"' "$agent/extensions/caveman/package.json"
 expect "settings.json packages installed through the launcher" test -s "$PI_STUB_LOG"
+expect "GLOBAL.md lands as ~/.pi/agent/AGENTS.md" cmp -s "$(dirname "$SYNC")/../GLOBAL.md" "$agent/AGENTS.md"
 
 [ "$fail" -eq 0 ]
