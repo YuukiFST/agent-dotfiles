@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Copy config (GLOBAL.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
+# Copy config (GLOBAL.md, CODING_STANDARDS.md, PROMPT_ENGINEERING.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into the harness dirs on a Windows machine.
 # Shared by every setup-*.ps1 / update-*.ps1 so "git pull + update" always propagates config.
 #
@@ -76,6 +76,8 @@ function Sync-Shared {
   # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
   # is disclosed — read only when GLOBAL.md's pointer fires before a project edit.
   Copy-Item "$Repo\CODING_STANDARDS.md" "$UserHome\.claude\CODING_STANDARDS.md" -Force
+  # Same reason; read only when rules/prompting.md's pointer fires.
+  Copy-Item "$Repo\PROMPT_ENGINEERING.md" "$UserHome\.claude\PROMPT_ENGINEERING.md" -Force
 
   # rtk reads its config from an OS-specific dir that `rtk config` prints. The repo owns the
   # whole file, so the exclusions reach every harness whose rtk hook rewrites commands.

@@ -3,7 +3,7 @@
 This repo is the **canonical source** of the user's harness configuration.
 Asked to "sync", "set up", or "reach parity", you make the machine you run on match this repo for the harnesses in its row below.
 
-`GLOBAL.md` and `CODING_STANDARDS.md` at the repo root are **payloads** (the user's global instructions, copied into harness config dirs by the scripts), not instructions for working on this repo.
+`GLOBAL.md`, `CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md` at the repo root are **payloads** (the user's global instructions, copied into harness config dirs by the scripts), not instructions for working on this repo.
 This file is; the root `CLAUDE.md` only imports it, because by default Claude Code skips `AGENTS.md` when a `CLAUDE.md` or `CLAUDE.local.md` sits in the working directory or above.
 
 ## Hard rules
@@ -49,4 +49,4 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
 - **`rules/` is a full mirror** at `~/.claude/rules` on every harness, because GLOBAL.md's pointers hardcode that path; a file written there by hand is gone on the next sync.
 - **OpenCode reviewer agents are generated, not copied:** OpenCode's `task` tool takes no model, so the sync writes one `~/.config/opencode/agents/interrogate-reviewer-<n>.md` per `opencode` row of `skills/interrogate/reviewers.md` and deletes the rest of that prefix; edit the table, never the generated files.
 - **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.
-- **`CODING_STANDARDS.md` sits outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md`, and this file is disclosed, read only when GLOBAL.md's pointer fires.
+- **`CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md` sit outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md` in every session and subagent, and these files are disclosed, read only when a pointer fires (in `GLOBAL.md` and `rules/prompting.md`).
