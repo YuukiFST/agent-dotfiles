@@ -52,7 +52,7 @@ foreach ($dep in "git", "npm") {
 }
 
 # Running from inside an existing clone (scripts/bootstrap.ps1) - use it, don't re-clone.
-if ($PSScriptRoot -and (Test-Path (Join-Path (Split-Path $PSScriptRoot -Parent) "CLAUDE.md"))) {
+if ($PSScriptRoot -and (Test-Path (Join-Path (Split-Path $PSScriptRoot -Parent) "GLOBAL.md"))) {
   $Dest = Split-Path $PSScriptRoot -Parent
   Write-Host "Using the clone this script lives in: $Dest"
 } elseif (Test-Path (Join-Path $Dest ".git")) {

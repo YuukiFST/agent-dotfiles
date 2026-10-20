@@ -17,7 +17,7 @@ Write-Host @"
 
 Done. Restart OpenCode.
 
-- Global instructions: ~/.config/opencode/AGENTS.md (copy of global/CLAUDE.md)
+- Global instructions: ~/.config/opencode/AGENTS.md (copy of GLOBAL.md)
 - Skills: ~/.agents/skills - OpenCode loads that dir natively, no second copy
 - ~/.config/opencode/opencode.json is NOT touched: it holds per-machine MCP/provider state
 "@

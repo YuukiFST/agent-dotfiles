@@ -54,15 +54,15 @@ Each setup script installs or updates what its harness needs, such as rtk, portl
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
-Cursor keeps User Rules outside files, so paste `global/CLAUDE.md` into Customize > Rules > User Rules by hand after each edit.
+Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rules > User Rules by hand after each edit.
 
 ## Layout
 
 | Path | What |
 |------|------|
 | `skills/` | `yuu-mode` and the skills it loads, one folder each |
-| `global/CLAUDE.md` | Global instructions, loaded every session |
-| `CODING_STANDARDS.md` | Rules for editing a project, read when `global/CLAUDE.md` points to it |
+| `GLOBAL.md` | Global instructions, loaded every session |
+| `CODING_STANDARDS.md` | Rules for editing a project, read when `GLOBAL.md` points to it |
 | `rules/` | Git and prompting rules |
 | `hooks/`, `git-hooks/` | Session hooks and the `commit-msg` and `pre-push` gates |
 | `scripts/` | Install, sync and `git-safe-commit.sh` |
