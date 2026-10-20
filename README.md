@@ -54,20 +54,20 @@ Each setup script installs or updates what its harness needs, such as rtk, portl
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
-Cursor keeps User Rules outside files, so paste `CLAUDE.md` into Customize > Rules > User Rules by hand after each edit.
+Cursor keeps User Rules outside files, so paste `global/CLAUDE.md` into Customize > Rules > User Rules by hand after each edit.
 
 ## Layout
 
 | Path | What |
 |------|------|
 | `skills/` | `yuu-mode` and the skills it loads, one folder each |
-| `CLAUDE.md` | Global instructions, loaded every session |
-| `CODING_STANDARDS.md` | Rules for editing a project, read when `CLAUDE.md` points to it |
+| `global/CLAUDE.md` | Global instructions, loaded every session |
+| `CODING_STANDARDS.md` | Rules for editing a project, read when `global/CLAUDE.md` points to it |
 | `rules/` | Git and prompting rules |
 | `hooks/`, `git-hooks/` | Session hooks and the `commit-msg` and `pre-push` gates |
 | `scripts/` | Install, sync and `git-safe-commit.sh` |
 | `settings.json` | Claude Code seed, written only when absent |
 | `pi/`, `portless/` | Per-tool config |
-| `AGENTS.md` | Instructions for an agent working on this repo |
+| `AGENTS.md` | Instructions for an agent working on this repo, imported by the root `CLAUDE.md` |
 
 portless needs Node 24+ and a one-time bootstrap: [`portless/setup.md`](portless/setup.md).

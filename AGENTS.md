@@ -3,8 +3,8 @@
 This repo is the **canonical source** of the user's harness configuration.
 Asked to "sync", "set up", or "reach parity", you make the machine you run on match this repo for the harnesses in its row below.
 
-`CLAUDE.md` and `CODING_STANDARDS.md` at the repo root are **payloads** (the user's global instructions, copied into harness config dirs by the scripts), not instructions for working on this repo.
-This file is.
+`global/CLAUDE.md` and `CODING_STANDARDS.md` are **payloads** (the user's global instructions, copied into harness config dirs by the scripts), not instructions for working on this repo.
+This file is; the root `CLAUDE.md` only imports it, because Claude Code skips `AGENTS.md` whenever a `CLAUDE.md` sits beside it.
 
 ## Hard rules
 
@@ -50,3 +50,4 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
 - **OpenCode reviewer agents are generated, not copied:** OpenCode's `task` tool takes no model, so the sync writes one `~/.config/opencode/agents/interrogate-reviewer-<n>.md` per `opencode` row of `skills/interrogate/reviewers.md` and deletes the rest of that prefix; edit the table, never the generated files.
 - **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.
 - **`CODING_STANDARDS.md` sits outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md`, and this file is disclosed, read only when CLAUDE.md's pointer fires.
+- **`global/` holds `CLAUDE.md` alone:** Claude Code loads a subdirectory's `CLAUDE.md` as instructions once a session touches another file in it, so any file added there drags the payload into sessions on this repo.

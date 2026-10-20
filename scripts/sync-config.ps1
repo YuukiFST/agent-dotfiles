@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Copy config (CLAUDE.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
+# Copy config (global/CLAUDE.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into the harness dirs on a Windows machine.
 # Shared by every setup-*.ps1 / update-*.ps1 so "git pull + update" always propagates config.
 #
@@ -104,7 +104,7 @@ function Sync-Claude {
   $Claude = Join-Path $UserHome ".claude"
   New-Item -ItemType Directory -Force -Path "$Claude\skills" | Out-Null
 
-  Copy-Item "$Repo\CLAUDE.md" "$Claude\CLAUDE.md" -Force
+  Copy-Item "$Repo\global\CLAUDE.md" "$Claude\CLAUDE.md" -Force
 
   # dreaming.md ships with the memory stack (stacks/memory/root/) - present only while
   # that stack is enabled, so a stale copy has to go when it is not.
@@ -147,7 +147,7 @@ function Sync-Pi {
   New-Item -ItemType Directory -Force -Path "$agent\extensions" | Out-Null
 
   # pi takes global instructions from ~/.pi/agent/AGENTS.md.
-  Copy-Item "$Repo\CLAUDE.md" "$agent\AGENTS.md" -Force
+  Copy-Item "$Repo\global\CLAUDE.md" "$agent\AGENTS.md" -Force
 
   foreach ($f in "cloak.json", "tsconfig.json", "models.json", ".gitignore") {
     $src = Join-Path $piSrc $f
@@ -231,13 +231,13 @@ function Sync-OpenCode {
   # A hand-maintained AGENTS.md predates this sync path on machines that had OpenCode
   # configured by hand — keep one copy of it instead of dropping it silently.
   if ((Test-Path $agents) -and -not (Test-Path $backup)) {
-    $repoText = (Get-Content "$Repo\CLAUDE.md" -Raw)
+    $repoText = (Get-Content "$Repo\global\CLAUDE.md" -Raw)
     if ((Get-Content $agents -Raw) -ne $repoText) {
       Copy-Item $agents $backup -Force
       Write-Host "  kept the previous hand-written AGENTS.md as AGENTS.local.md.bak"
     }
   }
-  Copy-Item "$Repo\CLAUDE.md" $agents -Force
+  Copy-Item "$Repo\global\CLAUDE.md" $agents -Force
   Sync-OpenCodeReviewers $oc
 }
 
