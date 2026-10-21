@@ -168,7 +168,7 @@ Once the validators pass, list capability chains:
 node <skill-dir>/chain-findings.cjs <output-dir>/findings.json
 ```
 
-Each chain it prints joins two or more `confirmed` or `needs_validation` records whose `grants` satisfy the next record's `requires`, from `principal:anonymous` to a critical objective. A chain proves nothing on its own: treat it as a new candidate with fingerprint `chain:` plus its member fingerprints joined by `+`, record that fingerprint in each member's ledger unit, and give it to a fresh Phase 3 verifier under the same budget rules. The verifier must establish that each link's result meets the next link's conditions in one deployment and reproduce the combined bounded result where the sandbox allows. A chain with a `needs_validation` member stays `needs_validation`. Member records stay as they are.
+Each chain it prints joins two or more `confirmed` or `needs_validation` records whose `grants` satisfy the next record's `requires`, from `principal:anonymous` to a critical objective. A chain proves nothing on its own: treat it as a new candidate under the `fingerprint` it prints, `chain:` plus its member fingerprints joined by `+`, and record that fingerprint in each member's ledger unit, and give it to a fresh Phase 3 verifier under the same budget rules. The verifier must establish that each link's result meets the next link's conditions in one deployment and reproduce the combined bounded result where the sandbox allows. A chain with a `needs_validation` member stays `needs_validation`. Member records stay as they are, and a chain that already has a record in `findings.json` is not printed again.
 
 ### Phase 5: Verify the final records with fresh eyes
 
@@ -193,6 +193,7 @@ For `needs_validation`, require it to check:
 3. The candidate names a boundary and a possible concrete result rather than a generic concern.
 4. At least one validation-plan field is present and exact. `local` uses a bounded fixture; `deployment` asks an owner to observe a configuration, identity, route, policy, or runtime fact. Do not invent a plan for an inapplicable context, and never send audit traffic to a deployment.
 5. The fingerprint matches prior/current records for the same root cause.
+6. `capabilities` name only what the claimed path requires and would grant, since `chain-findings.cjs` joins records on them.
 
 Each verifier returns exactly one JSON object: `{"decision":"verified","fingerprint":"..."}` or `{"decision":"replace","reason":"...","record":{...}}`, with no surrounding prose. A replacement record must match its `confirmed`, `needs_validation`, or `rejected` schema branch. Treat a malformed or prose-wrapped Phase 5 result the same way as in Phase 3: discard it without repairing it and re-run with a fresh verifier when the budget permits.
 

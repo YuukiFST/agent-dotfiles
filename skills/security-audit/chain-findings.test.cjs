@@ -47,7 +47,12 @@ test("lists a chain from an anonymous attacker through a takeover to code execut
   assert.equal(result.status, 0, result.output);
   assert.deepEqual(JSON.parse(result.stdout), {
     start: "principal:anonymous",
-    chains: [{ objectives: ["exec:server_code"], fingerprints: ["a-reset-token-leak", "b-upload-runs-code"], needs_validation: [] }],
+    chains: [{
+      fingerprint: "chain:a-reset-token-leak+b-upload-runs-code",
+      objectives: ["exec:server_code"],
+      fingerprints: ["a-reset-token-leak", "b-upload-runs-code"],
+      needs_validation: [],
+    }],
   });
 });
 
@@ -59,6 +64,7 @@ test("names needs_validation members and joins objectives one chain reaches", ()
   const result = runChains(findings);
   assert.equal(result.status, 0, result.output);
   assert.deepEqual(JSON.parse(result.stdout).chains, [{
+    fingerprint: "chain:a-ssrf-metadata+b-admin-export",
     objectives: ["exec:server_code", "read:all_data"],
     fingerprints: ["a-ssrf-metadata", "b-admin-export"],
     needs_validation: ["a-ssrf-metadata"],
@@ -72,6 +78,18 @@ test("lists nothing for a single-record path, an unreachable step, or a rejected
     rejected(),
   ];
   const result = runChains(findings);
+  assert.equal(result.status, 0, result.output);
+  assert.deepEqual(JSON.parse(result.stdout).chains, []);
+});
+
+test("regression: does not propose again a chain whose chain: record exists", () => {
+  const members = [
+    confirmedStep("a-reset-token-leak", ["principal:anonymous"], ["session:other_user"]),
+    confirmedStep("b-upload-runs-code", ["principal:authenticated_user"], ["exec:server_code"]),
+  ];
+  const chainRecord = rejected();
+  chainRecord.fingerprint = "chain:a-reset-token-leak+b-upload-runs-code";
+  const result = runChains([...members, chainRecord]);
   assert.equal(result.status, 0, result.output);
   assert.deepEqual(JSON.parse(result.stdout).chains, []);
 });

@@ -8,7 +8,9 @@
  * capabilities.requires is already held adds its capabilities.grants, layer by layer, in
  * fingerprint order. For each critical objective reached, the chain is the set of records that
  * first produced each capability the objective depends on. Only chains of two or more records are
- * printed, as JSON on stdout. A chain is a candidate for independent validation, never a finding.
+ * printed, as JSON on stdout, each with its fingerprint: "chain:" plus the member fingerprints joined
+ * by "+". A chain whose fingerprint already has a record is left out, so a validated or rejected
+ * chain is not proposed again. A chain is a candidate for independent validation, never a finding.
  */
 
 const fs = require("fs");
@@ -54,19 +56,22 @@ function chainTo(objective, { producers, layers }) {
 
 function listChains(findings) {
   const graph = buildCapabilityGraph(findings);
+  const recorded = new Set(findings.map((finding) => finding.fingerprint));
   const chains = new Map();
   for (const objective of OBJECTIVES.filter((token) => graph.producers.get(token))) {
     const members = chainTo(objective, graph);
     if (members.length < 2) continue;
-    const key = members.map((record) => record.fingerprint).join("\u0000");
-    if (!chains.has(key)) {
-      chains.set(key, {
+    const fingerprint = `chain:${members.map((record) => record.fingerprint).join("+")}`;
+    if (recorded.has(fingerprint)) continue;
+    if (!chains.has(fingerprint)) {
+      chains.set(fingerprint, {
+        fingerprint,
         objectives: [],
         fingerprints: members.map((record) => record.fingerprint),
         needs_validation: members.filter((record) => record.verdict === "needs_validation").map((record) => record.fingerprint),
       });
     }
-    chains.get(key).objectives.push(objective);
+    chains.get(fingerprint).objectives.push(objective);
   }
   return [...chains.values()];
 }
