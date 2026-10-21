@@ -9,9 +9,9 @@ The user describes an effect without its name ("the bouncy popover thing") → l
 - **One named target** ("animate the dropdown", "add a press state to this button"): that target is the only candidate. Go to step 2.
 - **A scope with no named target** ("add motion to this page", "this feels static", "make it feel alive", "what could animate here?"): read `find-animation-opportunities/SKILL.md` and run its **Workflow** over the scope. The recon block stands in for its step 1, plus the frequency map that step asks for.
 
-The sweep is read-only and ends in its **Required Output Format**: the opportunities table with exact values in the project's tokens, the rejected candidates, the verdict. Its closing handoff to `improve-animations plan` is replaced by step 2 here.
+The sweep is read-only and ends in `find-animation-opportunities` **Required Output Format**: the opportunities table with exact values in the project's tokens, the rejected candidates, the verdict. Its closing handoff to `improve-animations plan` is replaced by step 2 here.
 
-Done when: either one named target is the candidate, or every seam class in **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
+Done when: either one named target is the candidate, or every seam class in `find-animation-opportunities` **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
 
 Then, by request:
 

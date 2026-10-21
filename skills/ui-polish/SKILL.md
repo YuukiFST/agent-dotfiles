@@ -59,7 +59,7 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 
 Before any reference is read, establish the project facts. They go into every subagent prompt and every fix.
 
-1. **Stack and styling system**: framework, CSS approach, component library, motion library, chart library, from `package.json` and the root layout. React Native or Expo → `animate-expo` replaces `animate`, `animation-performance` and `mobile-native` everywhere in this skill (Build, Visualize, Motion and the motion reviewer), and the **mobile** trigger is off. Jank mode runs its **6. Keep it off the JS thread**, **Setup that silently breaks motion** and **120fps** in place of the `animation-performance` Workflow. The browser checks below do not reach a native screen: say so, and mark those checks Not verified.
+1. **Stack and styling system**: framework, CSS approach, component library, motion library, chart library, from `package.json` and the root layout. React Native or Expo → `animate-expo` replaces `animate`, `animation-performance` and `mobile-native` everywhere in this skill (Build, Visualize, Motion and the motion reviewer), and the **mobile** trigger is off. Jank mode runs `animate-expo` **6. Keep it off the JS thread**, **Setup that silently breaks motion** and **120fps** in place of the `animation-performance` Workflow. The browser checks below do not reach a native screen: say so, and mark those checks Not verified.
 2. **Tokens**: the global stylesheet (`globals.css`, theme file, Tailwind config). Note radius, spacing, easing, duration and color tokens by name.
 3. **Shared components**: the project's own primitives (buttons, dialogs, tables, filters, charts, empty/error/loading states). A fix reuses them before adding markup.
 4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
@@ -82,7 +82,7 @@ Pick one from the request. State it in one line before starting, with the depth 
 | --- | --- | --- |
 | "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
 | "Create / build this screen, flow, component or dashboard" | **Build** | [build.md](build.md) |
-| "Build this from the Figma / this mockup / this screenshot" | **Design** | Read `build-design/SKILL.md` and `figma.md`, and follow its five steps: the design decides, every value maps to a project token. Before its **Report and stop**, run [audit.md](audit.md) steps 1 to 4 on the build, at the frames' widths and over every state the code reaches (step 2 is build-design's comparison screenshots, one per frame width). Sort each kept finding into build-design's report: the design breaks a rule → **Domain conflicts**, with its owner; a state the design does not draw → **Missing states**; anything else is outside the piece and dropped. Apply none without the user's word. |
+| "Build this from the Figma / this mockup / this screenshot" | **Design** | Read `build-design/SKILL.md` and `figma.md`, and follow its five steps: the design decides, every value maps to a project token. Before its **Report and stop**, run [audit.md](audit.md) steps 1 to 4 on the build, at the frames' widths and over every state the code reaches (step 2 is build-design's comparison screenshots, one per frame width). Sort each kept finding into `build-design`'s report: the design breaks a rule → **Domain conflicts**, with its owner; a state the design does not draw → **Missing states**; anything else is outside the piece and dropped. Apply none without the user's word. |
 | "Visualize this data" / "a chart / KPI for X" in an existing screen | **Visualize** | [visualize.md](visualize.md). A whole new screen of charts is Build, which runs visualize.md for its chart parts. |
 | "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. The pick is Sonner → wire it per `ask-sonner/SKILL.md`. |
 | "Toasts appear twice / sit behind the modal / ignore dark mode", Sonner setup or styling | **Toast** | Read `ask-sonner/SKILL.md`; `API.md` for an exact prop. Styling follows its escalation ladder, in the project's tokens. |
@@ -103,7 +103,7 @@ Audit runs at one of three depths. Read the depth from the request; default is `
 | --- | --- | --- | --- |
 | `quick` | "quick pass", "just the obvious" | accessibility, polish, motion; conditional ones only when the request names them | 1 |
 | `standard` | any other improve request | the default set plus every conditional reviewer recon switched on | 1 |
-| `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard` plus the `improve-animations` hunt checklist for the motion reviewer; inventory, apply policy and rounds per **Exhaustive** in [audit.md](audit.md) | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
+| `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard` plus the `improve-animations` hunt checklist for the motion reviewer; inventory, apply policy and rounds per [audit.md](audit.md) **Exhaustive** | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
 
 ## Domain reviewers (fan-out)
 
@@ -132,7 +132,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
 | Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
-| Jank "fixed" with `will-change` alone | Name the cause from **Phase 2: Diagnose**; swap the property or move the work off the main thread first |
+| Jank "fixed" with `will-change` alone | Name the cause from `animation-performance` **Phase 2: Diagnose**; swap the property or move the work off the main thread first |
 | Demo data only, or an invented worst case (`aaaa…`) | Values from `break-ui/CATALOG.md` or the schema limit |
 | A recon step 7 trigger was yes but its reviewer never ran | Dispatch it, or name it `Not reviewed` in the report |
 | `exhaustive` asked, one round of 15 delivered | Run the next round per **Exhaustive** in [audit.md](audit.md) until its stop condition |

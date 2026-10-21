@@ -50,50 +50,84 @@ for cited in $(grep -ohE 'REFS/[A-Za-z0-9._/-]+' "$(dirname "$ROUTER")"/*.md | s
   fi
 done
 # Section citations. Upstream names a section by heading or bold label, and this
-# skill cites one as a **bold** name. In a clause opened by a backticked upstream
-# skill (`animate`, `animate/SKILL.md`) or REFS/ path, the name must still be in
-# that skill; any other bold name must be in some upstream skill. A name this
-# skill defines itself is local: a heading, a `- **term**` list item, a
-# `| **term** |` table cell, or the emphasis named here.
+# skill cites one as a **bold** name. A line splits at each backticked token: a
+# token naming an upstream skill (`animate`, `animate/SKILL.md`) or a path under
+# REFS (with or without the REFS/ prefix)
+# binds the bold names after it, up to the next token, and a bare `*.md` token
+# keeps the skill bound before it; a table cell border or a link to a sibling
+# file ends the binding. A bound name must be in that skill; an unbound one,
+# only in some upstream skill. Names this skill defines are local: a
+# `- **term**` list item, a `| **term** |` table cell, a listed emphasis, and,
+# for unbound names only, one of its own headings. Builtins only past this
+# point: a fork per line costs minutes in Git Bash.
 SKILL_DIR="$(dirname "$ROUTER")"
-local_emphasis="project's design system is the direction"
-local_headings="$(grep -ohE '^#{1,6} .*' "$SKILL_DIR"/*.md)"
-local_terms="$(grep -ohE '^ *([0-9]+\.|-) \*\*[^*]+\*\*|\| \*\*[^*]+\*\* \|' "$SKILL_DIR"/*.md | sed 's/\.\*\*/**/')"
-is_local() {
-  [ "$1" = "$local_emphasis" ] || grep -qiF -- "$1" <<<"$local_headings" || grep -qF -- "**$1**" <<<"$local_terms"
-}
-labels_in() { grep -rhE --include='*.md' '^#{1,6} |\*\*' "$@"; }
-bold_names() { grep -oE '\*\*[^*]+\*\*' | sed -E 's/^\*\*//; s/\*\*$//; s/\.$//'; }
-section_target() {
-  case "$1" in
-    REFS/*) [ -e "$REFS/${1#REFS/}" ] && echo "$REFS/${1#REFS/}"; return 0 ;;
-  esac
-  for dir in "$REFS"/*/skills/"${1%%/*}"; do
-    [ -d "$dir" ] && echo "$dir"
-  done
-  return 0
-}
-checked=""
-while IFS= read -r clause; do
-  token="${clause#\`}"
-  token="${token%%\`*}"
-  mapfile -t targets < <(section_target "$token")
-  [ "${#targets[@]}" -gt 0 ] || continue
-  while IFS= read -r name; do
-    is_local "$name" && continue
-    checked+="$name"$'\n'
-    grep -qF -- "$name" <<<"$(labels_in "${targets[@]}")" && continue
-    echo "MISSING section **$name** in $token: upstream renamed or removed it; repoint the citation"
-    drift=1
-  done < <(bold_names <<<"$clause")
-done < <(grep -ohE '`[^`]+`[^`;.]*' "$SKILL_DIR"/*.md | sort -u)
+declare -A local_term local_heading target_of labels_of
+local_term["project's design system is the direction"]=1
+while IFS= read -r term; do
+  term="${term%$'\r'}"; term="${term#*\*\*}"; term="${term%%\*\**}"; local_term["${term%.}"]=1
+done < <(grep -ohE '^ *([0-9]+\.|-) \*\*[^*]+\*\*|\| \*\*[^*]+\*\* \|' "$SKILL_DIR"/*.md || true)
+while IFS= read -r heading; do
+  heading="${heading%$'\r'}"; local_heading["${heading,,}"]=1
+done < <(grep -ohE '^#{1,6} .*' "$SKILL_DIR"/*.md | sed -E 's/^#+ +//; s/^[0-9]+\. +//; s/ \(.*\)$//' || true)
+labels_in() { grep -rhE --include='*.md' '^#{1,6} |\*\*' "$@" 2>/dev/null || true; }
 upstream_labels="$(labels_in "$REFS"/*/skills)"
-while IFS= read -r name; do
-  is_local "$name" && continue
-  grep -qxF -- "$name" <<<"$checked" && continue
-  grep -qF -- "$name" <<<"$upstream_labels" && continue
-  echo "MISSING section **$name**: no upstream skill has it; repoint the citation, or define it here if it is a local term"
-  drift=1
-done < <(cat "$SKILL_DIR"/*.md | bold_names | sort -u)
+resolve_token() { # sets target_of[$1] to the skill dir or REFS/ file it names, or empty
+  [ -n "${target_of[$1]+set}" ] && return 0
+  local found="" dir
+  if [[ "$1" == REFS/* ]]; then
+    [ -e "$REFS/${1#REFS/}" ] && found="$REFS/${1#REFS/}"
+  elif [[ "$1" == */* && -e "$REFS/$1" ]]; then
+    found="$REFS/$1"
+  else
+    for dir in "$REFS"/*/skills/"${1%%/*}"; do [ -d "$dir" ] && found="$dir"; done
+  fi
+  target_of[$1]="$found"
+  [ -z "$found" ] || labels_of[$found]="$(labels_in "$found")"
+}
+check_names() { # $1 = file:line, $2 = text, $3 = cited token, $4 = its target or empty
+  local where="$1" text="$2" name
+  while [[ "$text" =~ \*\*([^*]+)\*\* ]]; do
+    text="${text#*"${BASH_REMATCH[0]}"}"
+    name="${BASH_REMATCH[1]%.}"
+    [ -n "${local_term[$name]+set}" ] && continue
+    if [ -n "$4" ]; then
+      [[ "${labels_of[$4]}" == *"$name"* ]] && continue
+      echo "MISSING section **$name** at $where, cited from $3: upstream renamed or removed it; repoint the citation"
+    else
+      [ -n "${local_heading[${name,,}]+set}" ] && continue
+      [[ "$upstream_labels" == *"$name"* ]] && continue
+      echo "MISSING section **$name** at $where: no upstream skill has it; repoint the citation, or define it as a local term"
+    fi
+    drift=1
+  done
+}
+link_re='\[[^]]*\]\([^)]*\.md\)'
+segment_re='^`([^`]+)`([^`]*)'
+for file in "$SKILL_DIR"/*.md; do
+  number=0
+  while IFS= read -r line || [ -n "$line" ]; do
+    number=$((number + 1))
+    line="${line%$'\r'}"
+    [[ "$line" == *'**'* ]] || continue
+    where="${file##*/}:$number"
+    line="${line// | /\`|\`}"
+    while [[ "$line" =~ $link_re ]]; do line="${line/"${BASH_REMATCH[0]}"/\`|\`}"; done
+    check_names "$where" "${line%%\`*}" "" ""
+    rest="${line#"${line%%\`*}"}"
+    bound="" bound_token=""
+    while [[ "$rest" =~ $segment_re ]]; do
+      rest="${rest#"${BASH_REMATCH[0]}"}"
+      token="${BASH_REMATCH[1]}"
+      text="${BASH_REMATCH[2]}"
+      resolve_token "$token"
+      if [ -n "${target_of[$token]}" ]; then
+        bound="${target_of[$token]}" bound_token="$token"
+      elif [[ "$token" != *.md ]]; then
+        bound="" bound_token=""
+      fi
+      check_names "$where" "$text" "$bound_token" "$bound"
+    done
+  done < "$file"
+done
 [ "$drift" -eq 0 ] && echo "Every upstream skill is routed or excluded, and every cited path and section exists."
 exit 0
