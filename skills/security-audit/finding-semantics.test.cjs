@@ -37,11 +37,13 @@ function confirmedWith(requires, grants, severity, { modelDependent = false, mar
 
 const NO_GAIN = { marginal: "NOT_APPLICABLE" };
 
-test("regression: an admin who reaches a higher principal, any account, or a secret is not capped at medium", () => {
+test("regression: an admin who reaches a higher principal, any account, a secret, or the internal network is not capped at medium", () => {
   for (const finding of [
     confirmedWith(["principal:tenant_admin"], ["principal:system_admin"], "high"),
     confirmedWith(["principal:tenant_admin"], ["session:any_user"], "critical"),
     confirmedWith(["principal:system_admin"], ["read:secret"], "high"),
+    confirmedWith(["principal:tenant_admin"], ["read:internal_network"], "high"),
+    confirmedWith(["principal:tenant_admin"], ["availability:shared_service"], "high"),
   ]) {
     const result = runValidator([finding]);
     assert.equal(result.status, 0, `${JSON.stringify(finding.capabilities)}: ${result.output}`);
@@ -126,7 +128,7 @@ test("accepts a needs_validation record whose checklist leaves a check UNKNOWN",
 
 test("regression: a confirmed checklist cannot pass by skipping checks or claiming a gain the capabilities lack", () => {
   const cases = [
-    [confirmed(), (finding) => { finding.refutation_checklist = checklist(failing("control_bypassed", "NOT_APPLICABLE")); }, /refutation_checklist\[2\]\.status: a confirmed record cannot skip control_bypassed as NOT_APPLICABLE/],
+    [confirmed(), (finding) => { finding.refutation_checklist = checklist(failing("control_bypassed", "NOT_APPLICABLE")); }, /refutation_checklist\[2\]\.status: control_bypassed is NOT_APPLICABLE, but no earlier check is FAIL or UNKNOWN/],
     [confirmedWith(["principal:authenticated_user"], ["read:own_data"], "medium"), () => {}, /marginal_capability is PASS, but capabilities\.grants adds nothing beyond capabilities\.requires/],
     [confirmed(), (finding) => { finding.refutation_checklist = checklist(failing("marginal_capability", "NOT_APPLICABLE")); }, /marginal_capability is NOT_APPLICABLE, but capabilities\.grants adds a capability/],
   ];
@@ -139,6 +141,22 @@ test("regression: a confirmed checklist cannot pass by skipping checks or claimi
   const rejectedEarly = rejected();
   rejectedEarly.refutation_checklist[7] = { check: "marginal_capability", status: "NOT_APPLICABLE", reason: "The path stops at control_bypassed." };
   assert.equal(runValidator([rejectedEarly]).status, 0);
+});
+
+test("regression: NOT_APPLICABLE needs an earlier FAIL or UNKNOWN in checklist order", () => {
+  const blocked = needsValidation();
+  blocked.refutation_checklist = checklist({
+    ...failing("lower_trust_principal", "NOT_APPLICABLE"),
+    ...failing("marginal_capability", "UNKNOWN"),
+  });
+  const result = runValidator([blocked]);
+  assert.equal(result.status, 1, result.output);
+  assert.match(result.stderr, /refutation_checklist\[0\]\.status: lower_trust_principal is NOT_APPLICABLE, but no earlier check is FAIL or UNKNOWN/);
+  blocked.refutation_checklist = checklist({
+    ...failing("reachable_entrypoint", "UNKNOWN"),
+    ...failing("crosses_boundary", "NOT_APPLICABLE"),
+  });
+  assert.equal(runValidator([blocked]).status, 0);
 });
 
 test("fails a checklist that does not fit its verdict", () => {

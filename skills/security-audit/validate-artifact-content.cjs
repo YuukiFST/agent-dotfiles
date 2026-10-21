@@ -19,7 +19,7 @@ const RESERVED_HOST_NAME = /^(?:localhost|example\.(?:com|net|org))$|\.(?:localh
 // Loopback, "this network", and the RFC 5737 documentation ranges never identify a real host.
 const RESERVED_IPV4 = ["127.0.0.0/8", "0.0.0.0/8", "192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24"];
 // Weakness and vulnerability catalogs a remediation cites; they never come from the target.
-const PUBLIC_REFERENCE_HOST = /^(?:(?:cwe|capec|attack)\.mitre\.org|(?:[a-z0-9-]+\.)*owasp\.org|nvd\.nist\.gov|(?:www\.)?cve\.org)$/;
+const PUBLIC_REFERENCE_HOST = /^(?:(?:cwe|capec|attack|cve)\.mitre\.org|(?:[a-z0-9-]+\.)*owasp\.org|nvd\.nist\.gov|(?:www\.)?cve\.org)$/;
 const CNPJ_WEIGHTS = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
 function parseIpv4(value) {
@@ -54,6 +54,11 @@ function isPublicReferenceHost(host) {
   return PUBLIC_REFERENCE_HOST.test(host.replace(/\.$/, "").toLowerCase());
 }
 
+// "user:password@host" after "scheme://" is URL userinfo, which url-credentials and host already cover.
+function isUrlUserinfo(match) {
+  return /:\/\/(?:[^\s/?#@:]*:)?$/.test(match.input.slice(0, match.index));
+}
+
 // Brazilian check digits: weighted sum mod 11, with remainders 0 and 1 giving digit 0.
 function checkDigit(values, weights) {
   const remainder = values.reduce((sum, value, index) => sum + value * weights[index], 0) % 11;
@@ -86,11 +91,11 @@ const BUILT_IN_DETECTORS = [
   { name: "github-token", pattern: new RegExp(`${ALNUM_BEFORE}(?:gh[opsru]_[0-9A-Za-z]{36,}|github_pat_[0-9A-Za-z_]{22,})`, "g") },
   { name: "slack-token", pattern: new RegExp(`${ALNUM_BEFORE}xox[abposr]-[0-9A-Za-z-]{10,}`, "g") },
   { name: "jwt", pattern: /(?<![0-9A-Za-z_-])eyJ[0-9A-Za-z_-]{4,}\.[0-9A-Za-z_-]{4,}\.[0-9A-Za-z_-]{4,}/g },
-  { name: "url-credentials", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/[^\s/?#@:]+:[^\s/?#@]+@/g },
+  { name: "url-credentials", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/([^\s/?#@:]+:[^\s/?#@]+)@/g, group: 1 },
   { name: "cpf", pattern: new RegExp(`${ALNUM_BEFORE}\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCpf },
   { name: "cnpj", pattern: new RegExp(`${ALNUM_BEFORE}[0-9A-Z]{2}\\.?[0-9A-Z]{3}\\.?[0-9A-Z]{3}/?[0-9A-Z]{4}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCnpj },
-  { name: "email", pattern: /[A-Za-z0-9._%+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-]))/g, keep: (_, match) => !isReservedHost(match[1]) },
-  { name: "host", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[^\s/?#@]*@)?(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9.-]+)/g, group: 1, keep: (host) => !isReservedHost(host) && !isPublicReferenceHost(host) },
+  { name: "email", pattern: /[A-Za-z0-9._%+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-]))/g, keep: (_, match) => !isReservedHost(match[1]) && !isUrlUserinfo(match) },
+  { name: "host", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[^\s/?#@]*@)?(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*)/g, group: 1, keep: (host) => !isReservedHost(host) && !isPublicReferenceHost(host) },
   { name: "host", pattern: /(?<![0-9A-Za-z.])(?:\d{1,3}\.){3}\d{1,3}(?![0-9A-Za-z]|\.[0-9A-Za-z])/g, keep: (host) => parseIpv4(host) !== null && !isReservedHost(host) },
 ];
 

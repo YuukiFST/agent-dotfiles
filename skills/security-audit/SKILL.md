@@ -170,7 +170,7 @@ Every `confirmed` and `needs_validation` record declares `capabilities` from the
 
 - no marginal capability: `medium`, or `low` when the attacker is `principal:trusted_controller`; the refutation checklist marks `marginal_capability` `NOT_APPLICABLE`;
 - only the attacker's own data: `medium`;
-- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no higher principal, any-user session, secret, cross-tenant access, all-data read, code write, or code execution: `medium`;
+- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution: `medium`;
 - `severity.model_dependent: true`, a result that depends on probabilistic model behavior: `high`.
 
 A cap only bounds severity; the anchors above still decide it.

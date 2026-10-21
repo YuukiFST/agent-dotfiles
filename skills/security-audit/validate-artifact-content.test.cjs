@@ -108,12 +108,22 @@ test("regression: an allow pattern matches whole values, not a fragment", () => 
 test("regression: public weakness catalogs a remediation cites pass the host detector", () => {
   const report = [
     "See https://cwe.mitre.org/data/definitions/79.html, https://cheatsheetseries.owasp.org/ and https://nvd.nist.gov/vuln.",
+    "The legacy record is https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228.",
     "The worker calls https://cwe.mitre.org.prod.corp.com.br/ on start.",
   ].join("\n");
   withArtifacts({ "REPORT.md": report }, (file) => {
     const result = runCli([file("REPORT.md")]);
     assert.equal(result.status, 1, result.output);
-    assert.deepEqual(result.stderr.match(/^ERROR: .*$/gm), ['ERROR: "REPORT.md" line 2: host']);
+    assert.deepEqual(result.stderr.match(/^ERROR: .*$/gm), ['ERROR: "REPORT.md" line 3: host']);
+  });
+});
+
+test("regression: an allow rule names the dummy host at a sentence end and the dummy user:password pair", () => {
+  const rules = { allow: [{ detector: "host", match: "api\\.acme-dummy\\.dev" }, { detector: "url-credentials", match: "qa:dummy-pw" }] };
+  const report = ["Call https://api.acme-dummy.dev.", `Connect with postgres://${"qa:dummy-pw"}@api.acme-dummy.dev/app`].join("\n");
+  withArtifacts({ "REPORT.md": report, "rules.json": rules }, (file) => {
+    const result = runCli(["--rules", file("rules.json"), file("REPORT.md")]);
+    assert.equal(result.status, 0, result.output);
   });
 });
 

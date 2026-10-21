@@ -41,12 +41,15 @@ const CAPABILITY_IMPLIES = Object.freeze({
 
 const OWN_DATA = new Set(["read:own_data", "write:own_data"]);
 const ADMIN_PRINCIPALS = new Set(["principal:tenant_admin", "principal:system_admin"]);
-// What an admin cannot already reach: a higher principal or any account, secrets, other tenants, all data, code.
+/// What an admin cannot already reach: a higher principal or any account, secrets, the internal network, a shared
+// service other tenants use, other tenants' data, all data, or code.
 const BEYOND_ADMIN = new Set([
   "principal:system_admin",
   "principal:trusted_controller",
   "session:any_user",
   "read:secret",
+  "read:internal_network",
+  "availability:shared_service",
   "read:cross_tenant_data",
   "write:cross_tenant_data",
   "read:all_data",
@@ -77,8 +80,7 @@ function marginalCapabilities(capabilities) {
   return [...capabilityClosure(capabilities.grants)].filter((token) => !required.has(token));
 }
 
-function severityCeiling(capabilities, modelDependent) {
-  const marginal = marginalCapabilities(capabilities);
+function severityCeiling(capabilities, marginal, modelDependent) {
   const principal = capabilities.requires.find((token) => token.startsWith("principal:"));
   const ceilings = [];
   if (modelDependent === true) ceilings.push(["high", "the result depends on probabilistic model behavior"]);
@@ -90,12 +92,13 @@ function severityCeiling(capabilities, modelDependent) {
     ceilings.push(["medium", "the attacker gains only its own data"]);
   }
   if (ADMIN_PRINCIPALS.has(principal) && !marginal.some((token) => BEYOND_ADMIN.has(token))) {
-    ceilings.push(["medium", "an admin attacker gains no higher principal, any-user session, secret, cross-tenant access, all-data read, code write, or code execution"]);
+    ceilings.push(["medium", "an admin attacker gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution"]);
   }
   return ceilings.reduce((lowest, ceiling) =>
     lowest === null || SEVERITY_RANK.get(ceiling[0]) < SEVERITY_RANK.get(lowest[0]) ? ceiling : lowest, null);
 }
 
+// In order: a NOT_APPLICABLE check refers to an earlier check in this list.
 const REFUTATION_CHECKS = [
   "lower_trust_principal",
   "reachable_entrypoint",
@@ -106,20 +109,30 @@ const REFUTATION_CHECKS = [
   "beyond_best_practice",
   "marginal_capability",
 ];
-// The statuses each verdict may not carry, the one it must carry at least once, and the checks that may
-// be NOT_APPLICABLE (null: any check). A confirmed record skips only marginal_capability, when grants adds nothing.
+// The statuses each verdict may not carry, and the one it must carry at least once.
 const CHECKLIST_VERDICT_RULES = {
-  confirmed: { forbidden: ["FAIL", "UNKNOWN"], needed: null, notApplicable: ["marginal_capability"] },
-  needs_validation: { forbidden: ["FAIL"], needed: "UNKNOWN", notApplicable: null },
-  rejected: { forbidden: [], needed: "FAIL", notApplicable: null },
+  confirmed: { forbidden: ["FAIL", "UNKNOWN"], needed: null },
+  needs_validation: { forbidden: ["FAIL"], needed: "UNKNOWN" },
+  rejected: { forbidden: [], needed: "FAIL" },
 };
+const CUTS_THE_PATH = new Set(["FAIL", "UNKNOWN"]);
 
-function collectChecklistErrors(finding, base, isSafeRelativeSourcePath, errors) {
+function isCutBefore(check, statuses) {
+  return REFUTATION_CHECKS.slice(0, REFUTATION_CHECKS.indexOf(check)).some((earlier) => CUTS_THE_PATH.has(statuses.get(earlier)));
+}
+
+// NOT_APPLICABLE means an earlier check is FAIL or UNKNOWN, or marks marginal_capability on a record whose grants
+// add nothing; marginal_capability is PASS only when grants add something. hasMarginal is null without capabilities.
+function collectChecklistErrors(finding, hasMarginal, base, isSafeRelativeSourcePath, errors) {
   const items = finding.refutation_checklist;
   const rules = CHECKLIST_VERDICT_RULES[finding.verdict];
   if (!Array.isArray(items) || !rules) return;
   const location = `${base}.refutation_checklist`;
   const counts = new Map(REFUTATION_CHECKS.map((check) => [check, 0]));
+  const statuses = new Map();
+  for (const item of items) {
+    if (item && typeof item === "object" && counts.has(item.check) && !statuses.has(item.check)) statuses.set(item.check, item.status);
+  }
   items.forEach((item, itemIndex) => {
     if (!item || typeof item !== "object" || !counts.has(item.check)) return;
     counts.set(item.check, counts.get(item.check) + 1);
@@ -129,9 +142,14 @@ function collectChecklistErrors(finding, base, isSafeRelativeSourcePath, errors)
     if (item.file !== undefined && !isSafeRelativeSourcePath(item.file)) errors.push(`${at}.file: must be a safe repository-relative source path`);
     if (item.status === "FAIL" && item.file === undefined) errors.push(`${at}: a FAIL cites the file and line that refute the check`);
     if (rules.forbidden.includes(item.status)) errors.push(`${at}.status: a ${finding.verdict} record cannot have a ${item.status} check`);
-    if (item.status === "NOT_APPLICABLE" && rules.notApplicable && !rules.notApplicable.includes(item.check)) {
-      errors.push(`${at}.status: a ${finding.verdict} record cannot skip ${item.check} as NOT_APPLICABLE`);
+    const isMarginal = item.check === "marginal_capability";
+    if (isMarginal && item.status === "PASS" && hasMarginal === false) {
+      errors.push(`${at}.status: marginal_capability is PASS, but capabilities.grants adds nothing beyond capabilities.requires`);
     }
+    if (item.status !== "NOT_APPLICABLE" || isCutBefore(item.check, statuses) || (isMarginal && hasMarginal === false)) return;
+    errors.push(isMarginal && hasMarginal === true
+      ? `${at}.status: marginal_capability is NOT_APPLICABLE, but capabilities.grants adds a capability; mark it PASS`
+      : `${at}.status: ${item.check} is NOT_APPLICABLE, but no earlier check is FAIL or UNKNOWN`);
   });
   for (const [check, count] of counts) {
     if (count !== 1) errors.push(`${location}: check ${JSON.stringify(check)} must appear exactly once, got ${count}`);
@@ -141,18 +159,14 @@ function collectChecklistErrors(finding, base, isSafeRelativeSourcePath, errors)
   }
 }
 
-// marginal_capability must agree with the capabilities: PASS only when grants adds something, and a confirmed
-// record marks the no-gain case NOT_APPLICABLE so the medium ceiling, not the checklist, decides it.
-function collectMarginalCheckErrors(finding, hasMarginal, base, errors) {
-  if (!Array.isArray(finding.refutation_checklist)) return;
-  const item = finding.refutation_checklist.find((entry) => entry && entry.check === "marginal_capability");
-  if (!item) return;
-  if (item.status === "PASS" && !hasMarginal) {
-    errors.push(`${base}.refutation_checklist: marginal_capability is PASS, but capabilities.grants adds nothing beyond capabilities.requires`);
-  }
-  if (item.status === "NOT_APPLICABLE" && hasMarginal && finding.verdict === "confirmed") {
-    errors.push(`${base}.refutation_checklist: marginal_capability is NOT_APPLICABLE, but capabilities.grants adds a capability; mark it PASS`);
-  }
+// Returns well-formed capabilities with exactly one starting principal, or null after reporting why not.
+function startingCapabilities(finding, base, errors) {
+  const capabilities = finding.capabilities;
+  if (!capabilities || !isTokenList(capabilities.requires) || !isTokenList(capabilities.grants)) return null;
+  const principals = capabilities.requires.filter((token) => token.startsWith("principal:"));
+  if (principals.length === 1) return capabilities;
+  errors.push(`${base}.capabilities.requires: must name exactly one principal:* token, got ${principals.length}`);
+  return null;
 }
 
 function collectLocalFindingErrors(findings, isSafeRelativeSourcePath) {
@@ -160,19 +174,13 @@ function collectLocalFindingErrors(findings, isSafeRelativeSourcePath) {
   if (!Array.isArray(findings)) return errors;
   findings.forEach((finding, index) => {
     if (!finding || typeof finding !== "object" || Array.isArray(finding)) return;
-    collectChecklistErrors(finding, `$[${index}]`, isSafeRelativeSourcePath, errors);
-    const capabilities = finding.capabilities;
-    if (!capabilities || !isTokenList(capabilities.requires) || !isTokenList(capabilities.grants)) return;
     const base = `$[${index}]`;
-    const principals = capabilities.requires.filter((token) => token.startsWith("principal:"));
-    if (principals.length !== 1) {
-      errors.push(`${base}.capabilities.requires: must name exactly one principal:* token, got ${principals.length}`);
-      return;
-    }
-    collectMarginalCheckErrors(finding, marginalCapabilities(capabilities).length > 0, base, errors);
-    if (finding.verdict !== "confirmed" || !finding.severity || typeof finding.severity !== "object") return;
+    const capabilities = startingCapabilities(finding, base, errors);
+    const marginal = capabilities && marginalCapabilities(capabilities);
+    collectChecklistErrors(finding, marginal && marginal.length > 0, base, isSafeRelativeSourcePath, errors);
+    if (!capabilities || finding.verdict !== "confirmed" || !finding.severity || typeof finding.severity !== "object") return;
     const overall = finding.severity.overall_severity;
-    const ceiling = severityCeiling(capabilities, finding.severity.model_dependent);
+    const ceiling = severityCeiling(capabilities, marginal, finding.severity.model_dependent);
     if (ceiling && SEVERITY_RANK.has(overall) && SEVERITY_RANK.get(overall) > SEVERITY_RANK.get(ceiling[0])) {
       errors.push(`${base}.severity.overall_severity: ${JSON.stringify(overall)} exceeds the ${JSON.stringify(ceiling[0])} ceiling: ${ceiling[1]}`);
     }

@@ -69,7 +69,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -99,7 +99,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
@@ -128,7 +128,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
             "properties": {
               "requires": {
                 "type": "array",
@@ -154,7 +154,7 @@
           },
           "refutation_checklist": {
             "type": "array",
-            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier FAIL or UNKNOWN cuts the path before the check; a confirmed record uses it only for marginal_capability, when grants adds nothing beyond requires. VALIDATION-AND-REPORTING.md defines the checks.",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
             "minItems": 8,
             "uniqueItems": true,
             "items": {
@@ -184,7 +184,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["check", "status"],
@@ -382,7 +382,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -412,7 +412,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
@@ -421,7 +421,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
             "properties": {
               "requires": {
                 "type": "array",
@@ -447,7 +447,7 @@
           },
           "refutation_checklist": {
             "type": "array",
-            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier FAIL or UNKNOWN cuts the path before the check; a confirmed record uses it only for marginal_capability, when grants adds nothing beyond requires. VALIDATION-AND-REPORTING.md defines the checks.",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
             "minItems": 8,
             "uniqueItems": true,
             "items": {
@@ -477,7 +477,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["check", "status"],
@@ -574,7 +574,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -604,7 +604,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
@@ -613,7 +613,7 @@
           },
           "refutation_checklist": {
             "type": "array",
-            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier FAIL or UNKNOWN cuts the path before the check; a confirmed record uses it only for marginal_capability, when grants adds nothing beyond requires. VALIDATION-AND-REPORTING.md defines the checks.",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
             "minItems": 8,
             "uniqueItems": true,
             "items": {
@@ -643,7 +643,7 @@
                 "snippet_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$",
-                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["check", "status"],

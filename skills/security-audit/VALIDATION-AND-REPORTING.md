@@ -49,8 +49,8 @@ safe is a claim to verify.
    target only by type and file:line, never by its value or its hash. Only a random
    key or token may add the first 12 hex characters of its SHA-256.
 8. Record your refutation attempt in refutation_checklist, each check exactly once:
-   - lower_trust_principal: the path starts from a principal with less trust than
-     the authority it reaches.
+   - lower_trust_principal: the path starts from a principal that the bypassed control
+     is meant to restrict.
    - reachable_entrypoint: that principal can reach the first trace entry.
    - control_bypassed: the strongest source-visible control on the path does not stop it.
    - crosses_boundary: the result reaches another principal, tenant, or shared resource.
@@ -59,14 +59,16 @@ safe is a claim to verify.
    - result_not_overstated: the claimed result is no stronger than the observed one.
    - beyond_best_practice: a real boundary fails, not only a best practice.
    - marginal_capability: capabilities.grants adds something beyond capabilities.requires.
-     When it adds nothing, the status is NOT_APPLICABLE and severity is capped at medium.
+     When it adds nothing, the status is NOT_APPLICABLE and severity is capped at medium
+     (low for principal:trusted_controller).
    PASS means the check holds. FAIL means source refutes it, and the item cites the
    refuting file and line: the control, the authority the actor already had, or the
    check the prerequisite fails. A path nothing reaches is FAIL too: cite the definition
    no caller reaches or the route table that omits it. UNKNOWN means only a fact
    outside source and bounded local evidence can settle the check, and its reason names
-   that fact. NOT_APPLICABLE means an earlier FAIL or UNKNOWN cuts the path before the
-   check. Every status but PASS gives a reason. A confirmed record has no FAIL or
+   that fact. NOT_APPLICABLE means an earlier check in this list is FAIL or UNKNOWN
+   and cuts the path before this one, or marks marginal_capability when grants adds
+   nothing. Every status but PASS gives a reason. A confirmed record has no FAIL or
    UNKNOWN and uses NOT_APPLICABLE only for marginal_capability; a rejected record has
    at least one FAIL; a needs_validation record has at least one UNKNOWN and no FAIL.
 
@@ -148,9 +150,9 @@ node <skill-dir>/validate-coverage-ledger.cjs <output-dir>/coverage-ledger.json
 node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/findings.json <output-dir>/coverage-ledger.json
 ```
 
-Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. The citation validator fails a path that is missing, differs in case, crosses a symlink, or is not a regular file, a line past the end of its file, and a `snippet_sha256` that no longer matches its line. Copy each hash it prints into that entry's `snippet_sha256`, so a later run can tell whether the cited line changed, and rerun it.
+Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. The citation validator fails a path that is missing, differs in case, crosses a symlink, or is not a regular file, a line past the end of its file, and a `snippet_sha256` that no longer matches its line. Copy each hash it prints into that entry's `snippet_sha256`, so a later run can tell whether the cited line changed, and rerun it. Leave the hash off an entry whose line holds a password, personal datum, or real host, since that line's hash gives the value back.
 
-The content validator denies by default. Each value its detectors flag fails unless an `allow` rule in `rules-of-engagement.json` matches it: private keys, cloud and service tokens, JWTs, URL credentials, CPF and CNPJ with valid check digits, e-mail outside reserved domains, and hosts other than loopback, reserved names, and the public weakness catalogs a remediation cites (MITRE CWE, CAPEC, and ATT&CK, OWASP, NVD, CVE). The parent writes the file before delegation and allows only the dummy values the run uses. An allow `match` must match the whole value. `fields` scopes a rule to JSON field paths without array indexes; Markdown and other line-scanned files use the field `text`, so a rule the Phase 6 reports also need lists `text` or omits `fields`. `deny` rules add project-specific detectors:
+The content validator denies by default. Each value its detectors flag fails unless an `allow` rule in `rules-of-engagement.json` matches it: private keys, cloud and service tokens, JWTs, URL credentials, CPF and CNPJ with valid check digits, e-mail outside reserved domains, and hosts other than loopback, reserved names, and the public weakness catalogs a remediation cites (MITRE CWE, CAPEC, and ATT&CK, OWASP, NVD, CVE). The parent writes the file before delegation and allows only the dummy values the run uses. An allow `match` must match the whole value the detector reports: the address for `email`, the host without scheme, port, or path for `host`, the `user:password` pair for `url-credentials`, the PEM header line for `private-key`, and the number or token itself for the rest. `fields` scopes a rule to JSON field paths without array indexes; Markdown and other line-scanned files use the field `text`, so a rule the Phase 6 reports also need lists `text` or omits `fields`. `deny` rules add project-specific detectors:
 
 ```json
 {
