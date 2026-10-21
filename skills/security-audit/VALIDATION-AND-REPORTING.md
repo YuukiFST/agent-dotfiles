@@ -38,6 +38,8 @@ unavailable or fails, do not use that file as evidence.
    missing fact remains decisive, keep needs_validation and make the local and
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
+7. Name a secret or personal datum found in the target only by type and file:line,
+   plus at most the first 12 hex characters of its SHA-256, never by its value.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -114,9 +116,24 @@ Run:
 node <skill-dir>/validate-findings.cjs <output-dir>/findings.json
 node <skill-dir>/validate-citations.cjs --print-hashes <output-dir>/findings.json <target>
 node <skill-dir>/validate-coverage-ledger.cjs <output-dir>/coverage-ledger.json
+node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/findings.json <output-dir>/coverage-ledger.json
 ```
 
-Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. The citation validator fails a path that is missing, differs in case, crosses a symlink, or is not a regular file, a line past the end of its file, and a `snippet_sha256` that no longer matches its line. Copy each hash it prints into that entry's `snippet_sha256`, so a later run can tell whether the cited line changed, and rerun it. Validator success proves format, citation existence, and ledger consistency only.
+Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. The citation validator fails a path that is missing, differs in case, crosses a symlink, or is not a regular file, a line past the end of its file, and a `snippet_sha256` that no longer matches its line. Copy each hash it prints into that entry's `snippet_sha256`, so a later run can tell whether the cited line changed, and rerun it.
+
+The content validator denies by default. Each value its detectors flag fails unless an `allow` rule in `rules-of-engagement.json` matches it: private keys, cloud and service tokens, JWTs, URL credentials, CPF and CNPJ with valid check digits, e-mail outside reserved domains, and hosts other than loopback and reserved names. The parent writes the file before delegation and allows only the dummy values the run uses, optionally per field path; `deny` rules add project-specific detectors:
+
+```json
+{
+  "allow": [
+    {"detector": "email", "match": "^qa@tenant-a\\.test$", "fields": ["execution.payloads"]},
+    {"detector": "host", "cidr": "198.18.0.0/15"}
+  ],
+  "deny": [{"name": "project-api-key", "match": "PRJ-[A-Z0-9]{24}"}]
+}
+```
+
+Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a value the run invented. Validator success proves format, citation existence, and ledger consistency only.
 
 ### Phase 5: Verify the final records with fresh eyes
 
@@ -185,3 +202,9 @@ For every unresolved record, copy the source trace, verified evidence, exact blo
 HTTP is one possible native interface, not the default. A library finding may use a function call, a parser a fixture, a CLI a command, a desktop app an IPC or file action, and infrastructure a locally rendered policy. Do not require an endpoint, external account, or live environment that the target does not have.
 
 Keep the report proportional to the evidence. A clean run may have zero confirmed records. State that result and the remaining coverage/validation limits without inventing LOW findings.
+
+Before the run ends, scan the three reports with the same rules file and fix every failure:
+
+```sh
+node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/REPORT.md <output-dir>/FINDINGS-DETAIL.md <output-dir>/NEEDS-VALIDATION.md
+```

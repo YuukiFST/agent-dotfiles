@@ -88,7 +88,7 @@ jobs:
       # FIFO and symlink cases that Windows skips. Every local divergence is listed in
       # docs/security-audit-upstream-divergence.md.
       - name: Run the validator tests
-        run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs skills/security-audit/validate-citations.test.cjs
+        run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs skills/security-audit/validate-citations.test.cjs skills/security-audit/validate-artifact-content.test.cjs
 
   skill-frontmatter:
     name: Skill frontmatter
