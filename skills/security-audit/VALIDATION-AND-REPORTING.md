@@ -38,8 +38,9 @@ unavailable or fails, do not use that file as evidence.
    missing fact remains decisive, keep needs_validation and make the local and
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
-7. Name a secret or personal datum found in the target only by type and file:line,
-   plus at most the first 12 hex characters of its SHA-256, never by its value.
+7. Name a secret, a personal datum, or a real host name or address found in the
+   target only by type and file:line, plus at most the first 12 hex characters of its
+   SHA-256, never by its value.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -133,7 +134,7 @@ The content validator denies by default. Each value its detectors flag fails unl
 }
 ```
 
-Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a value the run invented. Validator success proves format, citation existence, and ledger consistency only.
+Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a dummy value the run invented. Validator success proves only format, citation existence, ledger consistency, and that no detector flags a value.
 
 ### Phase 5: Verify the final records with fresh eyes
 
