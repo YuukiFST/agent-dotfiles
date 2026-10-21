@@ -41,8 +41,8 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Stress harness: scenario axes, one page, one look | `REFS/jakubkrehel-skills/skills/break/` (`scenarios.md`) |
 | Consolidation: severity scale, escalation triggers, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
-| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**What to Flag**, **Use the Removal Test**). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s, invented proof is `HIGH` as misleading. |
-| Direction intake: a greenfield screen with no reference to follow | `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/SKILL.md` (**Questions to ask** for the user, **Prompt Structure** as the spec skeleton minus FORMAT and NEGATIVE PROMPT, which are for image models) |
+| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**Decorative stacking**, **Component and template repetition**, **Fake proof**, **Use the Removal Test**; the rest of its **What to Flag** repeats an owner above). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s. Proof the code marks as mock or the build made up is `HIGH` as misleading; proof on an existing screen with no traceable source is a question for the user, never a removal. |
+| Direction intake: a greenfield screen with no reference to follow | `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/SKILL.md` (**Questions to ask**, **Prompt Structure**); which parts Build takes is in [build.md](build.md) step 1 |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
 | Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
 | Craft supplements: edge-aware scroll fades, the root canvas, tiled grain, smoothing caveats, hanging punctuation, input never locked mid-motion, press scale per surface | Named sections only, since the rest of each file repeats an owner above: `REFS/craft/skills/craft-design-engineering/references/typography.md` (**Font Smoothing**; **Hanging punctuation** in **Optical Alignment**), `REFS/craft/skills/craft-design-engineering/references/color.md` (**Noise**), `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**), `REFS/craft/skills/craft-design-engineering/references/motion.md` (**Button Press**, **Interruptibility**). Conflicts resolve per the craft line in the [reviewer-prompt.md](reviewer-prompt.md) Template. |
@@ -105,13 +105,13 @@ Audit runs at one of three depths. Read the depth from the request; default is `
 
 | Depth | Request shape | Reviewers | Rounds |
 | --- | --- | --- | --- |
-| `quick` | "quick pass", "just the obvious" | accessibility, polish, motion; conditional ones only when the request names them | 1 |
+| `quick` | "quick pass", "just the obvious" | accessibility, polish, motion, plus slop when the request calls the UI generic or AI-made; conditional ones only when the request names them | 1 |
 | `standard` | any other improve request | the default set plus every conditional reviewer recon switched on | 1 |
 | `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard` plus the `improve-animations` hunt checklist for the motion reviewer; inventory, apply policy and rounds per [audit.md](audit.md) **Exhaustive** | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
 
 ## Domain reviewers (fan-out)
 
-A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
+A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews the domains inline: that thins attention and fills context with reference text.
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
 - Default set: accessibility, layout, writing, typography, colors, polish, motion, slop (eight).
@@ -131,9 +131,9 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Mistake | Fix |
 | --- | --- |
 | A fix written in a new styling idiom or a new token | Rewrite it with the project's tokens and components from recon |
-| Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
+| Domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
-| A gradient, glow, card, eyebrow, icon tile or section kept because it looks premium | Run the slop removal test; it stays only with a named job for this product |
+| A gradient, glow, card, eyebrow, icon tile or section kept because it looks premium | Run `audit-ai-design-slop` **Use the Removal Test**; it stays only with a named job for this product |
 | A metric, logo, testimonial, avatar or chart invented to fill a section | Real data, or a placeholder that reads as one, per `no-ai-design-slop` **Make the product specific** |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
 | Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |

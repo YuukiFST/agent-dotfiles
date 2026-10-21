@@ -11,9 +11,9 @@ Write six lines before any code:
 - **Primary action** and the destructive ones.
 - **Viewports** from recon; **frequency**: is this seen 100 times a day or once?
 - **Neighbours**: the existing screens it must sit beside, by route. Open one in the browser; match its density and chrome.
-- **Visual thesis**: the one focal point per viewport and the one idea type, color, imagery and motion all serve, per `no-ai-design-slop` **Choose one coherent idea**. Taken from the neighbours when they exist.
+- **Visual thesis**: the one focal point per viewport and the one idea type, color, imagery and motion all serve, per `no-ai-design-slop` **Choose one coherent idea**. Taken from the neighbours when they exist; greenfield, written once the direction spec below is approved.
 
-Greenfield repo with no tokens and no neighbours → this is the one case a direction is needed. Ask the user for a Figma file, a design image or a reference product, together with the `design-first-ui-prompting` **Questions to ask**. A Figma file or an image switches to **Design** mode; a reference product is the direction this brief follows. With answers but no reference, write the direction spec from its **Prompt Structure** (layout, type system, color and material, UI style, copy, constraints), get the user's yes, and land it as tokens before any markup. Every value in it traces to a reference or an answer, never to an aesthetic invented here.
+Greenfield repo with no tokens and no neighbours → this is the one case a direction is needed. Ask the user for a Figma file, a design image or a reference product, together with the `design-first-ui-prompting` **Questions to ask**. A Figma file or an image switches to **Design** mode; a reference product is the direction this brief follows. With answers but no reference, write the direction spec: the token categories of `no-ai-design-slop` **Start from context** (type roles, spacing rhythm, palette, radii, borders, shadows, imagery, icons, motion), laid out on the GOAL, LAYOUT, TYPE SYSTEM and COLOR + MATERIAL blocks of `design-first-ui-prompting` **Prompt Structure**, minus its micro-label tracking line; its other blocks prompt image models. A value the answers leave open goes to the user as two or three options to pick from. Get the user's yes and land the spec as tokens before any markup: every value traces to a reference, an answer or a pick, never to an aesthetic invented here.
 
 The screen's job is to show figures, a trend or a comparison → the chart and KPI parts follow [visualize.md](visualize.md) inside steps 3 to 6.
 
@@ -37,7 +37,7 @@ Done when: every state from the brief is reachable in the browser.
 
 Read `better-ui/SKILL.md` and `surfaces.md`, plus `better-typography/SKILL.md` and craft's `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**). Walk the screen once against them: concentric radii, optical alignment of icons, shadows versus borders, tabular numbers on changing figures, `text-wrap` on headings and body, hit areas at the accessibility minimum, icon stroke matching text weight, a fade on each scroll edge that still has content, the root canvas on the background token. Exact values from the sibling files, never approximated.
 
-Then read `no-ai-design-slop/SKILL.md` and run its **Compact Quality Gates** over each section, container, decorative layer and pill the build added, and its **Removal Test** on every one that fails a gate: what survives names its job.
+Then read `no-ai-design-slop/SKILL.md` and run its **Compact Quality Gates** over each section, container, decorative layer and pill the build added, and `audit-ai-design-slop` **Use the Removal Test** on every one that fails a gate: what survives names its job.
 
 ## 6. Motion
 

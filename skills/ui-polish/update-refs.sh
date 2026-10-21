@@ -18,10 +18,11 @@ while read -r name url sparse; do
     git -C "$dir" pull -q --ff-only
   elif [ -n "$sparse" ]; then
     git clone -q --depth 1 --filter=blob:none --sparse "$url" "$dir"
-    git -C "$dir" sparse-checkout set "$sparse"
   else
     git clone -q --depth 1 "$url" "$dir"
   fi
+  # Every run, so a full clone, a clone cut short or a changed path converges.
+  [ -z "$sparse" ] || git -C "$dir" sparse-checkout set "$sparse"
   printf '%-28s %s %s\n' "$name" "$(git -C "$dir" rev-parse --short HEAD)" "$(git -C "$dir" log -1 --format=%cs)"
 done <<'REPOS'
 jakubkrehel-skills https://github.com/jakubkrehel/skills
