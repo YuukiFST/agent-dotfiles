@@ -34,7 +34,7 @@ The author does not grade its own motion.
 1. **Evidence.** Run the project gates from recon step 6, open the route, emulate `prefers-reduced-motion` once and confirm movement drops while opacity and color stay, and keyboard-walk every element whose motion changed. A failed check is a blocking row of this round.
 2. **Dispatch.** One motion reviewer per [reviewer-prompt.md](reviewer-prompt.md), plus the gesture reviewer when **gesture** is on and the mobile reviewer when **mobile** is on, in one message. Fill the Template with these changes:
    - Scope files: the files this mode touched since the recon step 6 baseline.
-   - TASK gains: "Review only the motion this change added or altered. The diff:" followed by `git diff` against the baseline, with every file new since the baseline pasted in full.
+   - TASK gains: "Review only the motion this change added or altered. The diff:" followed by `git diff <baseline SHA>`, with every file untracked since the baseline pasted in full.
    - Rendered evidence: the results of **Evidence** above, the preview URL, and "none" for anything not captured.
    - Inventory block: keep only its earlier-rounds line, with each earlier row and its status (`fixed`, `follow-up`). Round 1 says "round 1".
    - Delete the Change and Visualize brief blocks.

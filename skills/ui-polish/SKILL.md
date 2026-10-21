@@ -64,7 +64,7 @@ Before any reference is read, establish the project facts. They go into every su
 3. **Shared components**: the project's own primitives (buttons, dialogs, tables, filters, charts, empty/error/loading states). A fix reuses them before adding markup.
 4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
 5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
-6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse), and `git status --porcelain` before the first edit: the baseline every motion review diffs against.
+6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse), and, before the first edit, the baseline every motion review diffs against: the SHA `git stash create` prints (`HEAD` when it prints nothing), plus `git status --porcelain` for untracked files.
 7. **Conditional triggers**, one yes/no each, because each yes switches on a reviewer or a reference below:
    - **gesture**: the scope has drag, swipe, sheets, carousels, sliders, pull-to-refresh or spring-driven motion.
    - **mobile**: a phone viewport is supported.

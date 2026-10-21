@@ -46,4 +46,4 @@ Mobile in the viewports → read `mobile-native/SKILL.md` once and apply its pla
 
 ## 7. Review gate
 
-Run the **Audit** procedure from step 3 onward (`audit.md`) on the new screen: fan-out reviewers, consolidate, fix, gates, screenshots, report. A new screen ships only after its own audit returns no HIGH finding.
+Run the **Audit** procedure from step 3 onward (`audit.md`) on the new screen: fan-out reviewers, consolidate, fix, gates, screenshots, report. A new screen ships only after its own audit returns no HIGH finding and its motion closed on Approve.
