@@ -86,14 +86,14 @@ Pick one from the request. State it in one line before starting, with the depth 
 | "Visualize this data" / "a chart / KPI for X" in an existing screen | **Visualize** | [visualize.md](visualize.md). A whole new screen of charts is Build, which runs visualize.md for its chart parts. |
 | "Which library for toasts / charts / drag-and-drop / OTP / ⌘K..." | **Library** | Read `pick-ui-library/SKILL.md`. Check `package.json` before recommending; reuse what is installed. The pick is Sonner → wire it per `ask-sonner/SKILL.md`. |
 | "Toasts appear twice / sit behind the modal / ignore dark mode", Sonner setup or styling | **Toast** | Read `ask-sonner/SKILL.md`; `API.md` for an exact prop. Styling follows its escalation ladder, in the project's tokens. |
-| "Animate X" / "add motion" / "this feels static" | **Motion** | Read `animate/SKILL.md`. Run its gate first: frequency and purpose decide whether anything animates at all. Zero lines is a valid outcome. **gesture** → also read the gesture row's references: drag, flick and sheet motion is springs and velocity, not duration and curve. The user describes an effect without its name → look it up in `animation-vocabulary` **Glossary** first and confirm the term. |
+| "Animate X" / "add motion" / "this feels static" / "what could animate here?" | **Motion** | [motion.md](motion.md): `find-animation-opportunities` sweeps a scope with no named target, `animate` builds what survives its gate, a fresh `review-animations` reviewer approves or blocks. Zero lines is a valid outcome. |
 | "This animation stutters / drops frames / is janky" | **Jank** | Read `animation-performance/SKILL.md` and run its **Workflow** through the Phase 3 report: what animates, the cause from **Phase 2: Diagnose**, the fix from **The Symptom Table**, and the Verified field. The user asked for smooth motion, so that request is the "when asked": apply the fixes, each naming its cause. A performance trace (`chrome-devtools-axi`) under CPU throttle is partial evidence only; a finding it cannot settle stays "needs a device recording". |
 | "Show me options for this UI" | **Variant** | Read `variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
 | "Show every state of this component" / "I want to work on its loading/empty/error looks" | **States** | Read `state-machine/SKILL.md` + `switcher.md` and follow it: a throwaway page, mock data at the data boundary, a grouped switcher, handed over and left up until the user says done. |
 | "Stress-test this component" / "try the worst case" | **Break** | [break.md](break.md): jakubkrehel `break` harness filled with emilkowalski `break-ui` worst-case values. |
 | "Review this diff / branch / PR / my uncommitted changes" | **Change** | [change.md](change.md). Read-only; fixes only when the user asks. |
 
-Audit, Build and Visualize all end with the **review gate** in [audit.md](audit.md); Build and Visualize reach it after the screen exists. Change reaches it only when the user asks for the fixes.
+Audit, Build and Visualize all end with the **review gate** in [audit.md](audit.md); Build and Visualize reach it after the screen exists. Change reaches it only when the user asks for the fixes. Motion ends with its own review in [motion.md](motion.md) step 3.
 
 ## Depth
 
@@ -130,6 +130,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
+| Motion mode shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 and close on its Approve or Block |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
 | Jank "fixed" with `will-change` alone | Name the cause from **Phase 2: Diagnose**; swap the property or move the work off the main thread first |
 | Demo data only, or an invented worst case (`aaaa…`) | Values from `break-ui/CATALOG.md` or the schema limit |
