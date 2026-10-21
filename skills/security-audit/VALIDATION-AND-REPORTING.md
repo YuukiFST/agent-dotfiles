@@ -155,7 +155,7 @@ For `confirmed`, require it to check:
 2. Real entry interface and exact local input shape.
 3. Every condition, parser/policy step, source-visible preventing layer, and observed local result.
 4. Affected principal/resource and demonstrated impact.
-5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the capability ceiling in `SKILL.md`, and `capabilities` that name only what the attacker held and gained.
+5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the cap the `capabilities` schema description states, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
 
 For `needs_validation`, require it to check:

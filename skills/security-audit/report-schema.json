@@ -128,7 +128,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md read both.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no cross-tenant access, all-data read, or code execution, medium.",
             "properties": {
               "requires": {
                 "type": "array",
@@ -382,7 +382,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md read both.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no cross-tenant access, all-data read, or code execution, medium.",
             "properties": {
               "requires": {
                 "type": "array",
