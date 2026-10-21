@@ -9,9 +9,9 @@ The user describes an effect without its name ("the bouncy popover thing") → l
 - **One named target** ("animate the dropdown", "add a press state to this button"): that target is the only candidate. Go to step 2.
 - **A scope with no named target** ("add motion to this page", "this feels static", "make it feel alive", "what could animate here?"): read `find-animation-opportunities/SKILL.md` and run its **Workflow** over the scope. The recon block stands in for its step 1, plus the frequency map that step asks for.
 
-The sweep is read-only and ends in its **Required Output Format**: the opportunities table with exact values in the project's tokens, the rejected candidates, the verdict. Its closing handoff to `improve-animations plan` is replaced by step 2 here.
+The sweep is read-only and ends in `find-animation-opportunities` **Required Output Format**: the opportunities table with exact values in the project's tokens, the rejected candidates, the verdict. Its closing handoff to `improve-animations plan` is replaced by step 2 here.
 
-Done when: either one named target is the candidate, or every seam class in **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
+Done when: either one named target is the candidate, or every seam class in `find-animation-opportunities` **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
 
 Then, by request:
 
@@ -21,9 +21,7 @@ Then, by request:
 
 ## 2. Build
 
-Run `git status --porcelain` first: it is the baseline step 3 diffs against.
-
-Read `animate/SKILL.md` and `RECIPES.md`. Each row runs **The Build Sequence** in order; a named target from step 1 runs its gate (steps 1 and 2) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set.
+Read `animate/SKILL.md` and `RECIPES.md`. Each row runs `animate` **The Build Sequence** in order; a named target from step 1 runs its gate (steps 1 and 2) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set.
 
 **gesture** on the row (drag, swipe, sheet, carousel, slider) → read the gesture row's references before building it: drag, flick and sheet motion is springs and velocity, not duration and curve. **mobile** on → apply `mobile-native/SKILL.md` to the touched elements.
 
@@ -35,8 +33,8 @@ The author does not grade its own motion.
 
 1. **Evidence.** Run the project gates from recon step 6, open the route, emulate `prefers-reduced-motion` once and confirm movement drops while opacity and color stay, and keyboard-walk every element whose motion changed. A failed check is a blocking row of this round.
 2. **Dispatch.** One motion reviewer per [reviewer-prompt.md](reviewer-prompt.md), plus the gesture reviewer when **gesture** is on and the mobile reviewer when **mobile** is on, in one message. Fill the Template with these changes:
-   - Scope files: the files this mode touched since the step 2 baseline.
-   - TASK gains: "Review only the motion this change added or altered. The diff:" followed by `git diff` against the baseline, with every file new since the baseline pasted in full.
+   - Scope files: the files this mode touched since the recon step 6 baseline.
+   - TASK gains: "Review only the motion this change added or altered. The diff:" followed by `git diff <baseline SHA>`, with every file untracked since the baseline pasted in full.
    - Rendered evidence: the results of **Evidence** above, the preview URL, and "none" for anything not captured.
    - Inventory block: keep only its earlier-rounds line, with each earlier row and its status (`fixed`, `follow-up`). Round 1 says "round 1".
    - Delete the Change and Visualize brief blocks.

@@ -6,15 +6,15 @@ Read `REFS/jakubkrehel-skills/skills/interface-review/SKILL.md`, `scope-resoluti
 
 ## 1. Resolve the change scope
 
-Resolve the target per **Resolve the change scope first**: the merge-base range before the working tree, untracked files included, lockfiles, snapshots and generated output excluded and named. A pull request is fetched into `refs/remotes/pr/<n>` and read with `git show`; `git checkout`, `git switch`, `gh pr checkout` and `git stash` stay unused.
+Resolve the target per `interface-review` **Resolve the change scope first**: the merge-base range before the working tree, untracked files included, lockfiles, snapshots and generated output excluded and named. A pull request is fetched into `refs/remotes/pr/<n>` and read with `git show`; `git checkout`, `git switch`, `gh pr checkout` and `git stash` stay unused.
 
-No change to review → **With no change, ask rather than invent one**: state the facts, offer the open PR, the last commit by SHA, a named target, or a whole-screen Audit, and wait.
+No change to review → `interface-review` **With no change, ask rather than invent one**: state the facts, offer the open PR, the last commit by SHA, a named target, or a whole-screen Audit, and wait.
 
 Done when: the scope block is filled (target, base ref and SHA, head ref and SHA, commit and uncommitted counts, files in scope, excluded).
 
 ## 2. Expand to surfaces and intent
 
-Per **A diff is not a surface**: one hop of importers, two for tokens, theme values and shared primitives, at most five consumers, with the count not expanded stated. Per **Hold the change to its stated intent**: read the PR title and body, the linked issue and the commit subjects, then list the states and siblings the change should have covered.
+Per `interface-review` **A diff is not a surface**: one hop of importers, two for tokens, theme values and shared primitives, at most five consumers, with the count not expanded stated. Per `interface-review` **Hold the change to its stated intent**: read the PR title and body, the linked issue and the commit subjects, then list the states and siblings the change should have covered.
 
 Done when: the surface list and the intent line exist.
 

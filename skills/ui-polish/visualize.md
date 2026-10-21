@@ -60,4 +60,4 @@ Read `find-animation-opportunities/SKILL.md` **The Gate**, especially **4. Funct
 
 Build with a real-shaped fixture and the worst-case fixture from step 1 side by side, every state reachable in the browser. Then run Build's review gate ([build.md](build.md) step 7). The **data viz** trigger is on when the chosen form is a chart or KPI; a table form is reviewed by typography and layout.
 
-Done when: every state renders, both fixtures render without overflow or overlap, and the review gate returns no HIGH finding.
+Done when: every state renders, both fixtures render without overflow or overlap, and the review gate returns no HIGH finding with changed motion closed on Approve.
