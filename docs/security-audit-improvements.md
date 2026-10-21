@@ -34,7 +34,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 |----|-------|------|------------------|--------|------------|--------|
 | SA-01 | Validador de citações: cada `trace[].path:line` precisa existir no target, com linha dentro do arquivo | script | `validate-findings.cjs` | Mantis, hermes-agent, ThreatPath | alta | feito ([#199](https://github.com/YuukiFST/agent-dotfiles/pull/199)) |
 | SA-02 | Tetos de severidade por capacidade marginal | schema + script | `report-schema.json`, `validate-findings.cjs`, `SKILL.md` | Mantis, hermes-agent, caldera | alta | feito ([#209](https://github.com/YuukiFST/agent-dotfiles/pull/209)) |
-| SA-03 | Checklist estruturado de refutação por finding | schema + prompt | `report-schema.json`, `VALIDATION-AND-REPORTING.md` | Mantis, ThreatPath, hermes-agent | alta | proposto |
+| SA-03 | Checklist estruturado de refutação por finding | schema + prompt | `report-schema.json`, `VALIDATION-AND-REPORTING.md` | Mantis, ThreatPath, hermes-agent | alta | feito ([#211](https://github.com/YuukiFST/agent-dotfiles/pull/211)) |
 | SA-04 | Varredura de call-sites generalizada para qualquer contrato documentado | prompt | `HUNTING.md` | Mantis, hexstrike-ai, caldera | média | proposto |
 | SA-05 | Unidade de varredura adversarial no ledger | prompt + schema | `RECONNAISSANCE.md`, `HUNTING.md` | Mantis | média | proposto |
 | SA-06 | Histórico do git como fonte de variantes | prompt | `RECONNAISSANCE.md` | Mantis, openworker, caldera, hermes-agent | média | proposto |
