@@ -13,6 +13,7 @@ const {
   readFileWithinLimit,
   validateDocument,
 } = require("./validate-findings.cjs");
+const { confirmed, needsValidation, rejected, source } = require("./findings-fixtures.cjs");
 
 const validatorPath = path.join(__dirname, "validate-findings.cjs");
 const CLI_TIMEOUT_MS = 5000;
@@ -31,71 +32,6 @@ const TERMINAL_CONTROL_BYTES = [
   Buffer.from("\u034f"),
   Buffer.from("\ufe0f"),
 ];
-
-function source(kind = "entrypoint", file = "src/handler.c", line = 10) {
-  return { kind, file, line, scope: "handle", description: "Attacker data reaches the operation." };
-}
-
-function evidence(file = "src/handler.c", line = 10) {
-  return { file, line, description: "The source performs the operation without the required check." };
-}
-
-function confirmed() {
-  return {
-    verdict: "confirmed",
-    fingerprint: "src-handler-missing-check",
-    title: "Missing ownership check",
-    description: "An attacker can reach an operation without the intended ownership check.",
-    root_cause: "handle omits the ownership check before changing the object.",
-    intended_behavior: "Only the object's owner can change it.",
-    trace: [source("entrypoint"), source("propagation", "src/model.c", 20), source("sink", "src/store.c", 30)],
-    evidence: [evidence()],
-    conditions: [],
-    execution: {
-      attacker_perspective: "An unprivileged remote user with their own account.",
-      payloads: ["An object identifier owned by another user."],
-      instructions: ["Submit the identifier through the public operation."],
-      observed_result: "The other user's object changes.",
-    },
-    remediation: { strategy: "Check ownership before the state change." },
-    severity: {
-      likelihood: { score: "medium", reason: "The operation is directly reachable." },
-      impact: { score: "medium", reason: "The attacker changes one protected object." },
-      overall_severity: "medium",
-    },
-    confidence: { score: "high", reason: "The source path and result were reproduced." },
-  };
-}
-
-function needsValidation() {
-  return {
-    verdict: "needs_validation",
-    fingerprint: "src-parser-size-hypothesis",
-    title: "Unchecked parsed size",
-    description: "A parsed size may reach an allocation without a limit.",
-    claimed_root_cause: "parse_size may pass an unbounded value to allocate.",
-    trace: [source()],
-    evidence: [evidence()],
-    blockers: ["The generated parser source is absent from this checkout."],
-    validation_plan: {
-      local: "Generate the parser and submit the smallest input that exceeds the documented limit.",
-      deployment: "In an approved test deployment, confirm the request reaches the generated parser and record the bounded observable result.",
-    },
-  };
-}
-
-function rejected() {
-  return {
-    verdict: "rejected",
-    fingerprint: "src-router-auth-bypass",
-    title: "Authorization bypass in router",
-    description: "The candidate claimed a route bypassed authorization.",
-    claimed_root_cause: "dispatch was claimed to skip the authorization wrapper.",
-    trace: [source("sink")],
-    evidence: [evidence()],
-    reason: "All routes pass through the authorization wrapper before dispatch.",
-  };
-}
 
 function errorsFor(value) {
   return validateDocument(value, schema);

@@ -16,18 +16,30 @@ const {
   LIMITS,
   SafeInputError,
   UNSAFE_DIAGNOSTIC_CHARACTER,
+  isSafeRelativeSourcePath,
   readBytesWithinLimit,
   readFileWithinLimit,
-  validateDocument,
 } = require("./validate-findings.cjs");
 
 const CITATION_FIELDS = ["trace", "evidence"];
+const SNIPPET_HASH = /^[0-9a-f]{64}$/;
 const LINE_FEED = 0x0a;
 const TRIMMED_BYTES = new Set([0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20]);
 
 function quote(value) {
   return JSON.stringify(String(value)).replace(UNSAFE_DIAGNOSTIC_CHARACTER, (character) =>
     `\\u{${character.codePointAt(0).toString(16)}}`);
+}
+
+// Checks only the citation shape, so a findings.json from a run under an older schema still loads.
+function hasCitationShape(findings) {
+  return Array.isArray(findings) && findings.every((finding) =>
+    finding && typeof finding === "object" && CITATION_FIELDS.every((field) =>
+      Array.isArray(finding[field]) && finding[field].every((citation) =>
+        citation && typeof citation === "object" &&
+        isSafeRelativeSourcePath(citation.file) &&
+        Number.isInteger(citation.line) && citation.line >= 1 &&
+        (citation.snippet_sha256 === undefined || SNIPPET_HASH.test(citation.snippet_sha256)))));
 }
 
 function lineStarts(bytes) {
@@ -136,9 +148,8 @@ function run(args) {
     console.error("Failed to read findings JSON: input could not be opened, read, or parsed safely");
     return 1;
   }
-  const schema = JSON.parse(fs.readFileSync(path.join(__dirname, "report-schema.json"), "utf8"));
-  if (validateDocument(findings, schema).length > 0) {
-    console.error("findings.json does not pass validate-findings.cjs; fix those errors first");
+  if (!hasCitationShape(findings)) {
+    console.error("findings.json has a record without well-formed trace and evidence citations; validate-findings.cjs names it");
     return 1;
   }
 

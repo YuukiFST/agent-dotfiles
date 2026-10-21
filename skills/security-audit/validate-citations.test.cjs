@@ -4,6 +4,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const test = require("node:test");
+const { confirmed, evidence, source } = require("./findings-fixtures.cjs");
 
 const validatorPath = path.join(__dirname, "validate-citations.cjs");
 const CLI_TIMEOUT_MS = 5000;
@@ -112,13 +113,20 @@ test("fails a citation through a symlink that leaves the target", (t) => {
   });
 });
 
-test("refuses findings that fail validate-findings without an exception trace", () => {
+test("reads a confirmed record written before capabilities, and refuses a record without citations", () => {
   withTarget({ "src/handler.ts": HANDLER_SOURCE }, (dirs) => {
-    const finding = rejectedCiting("src/handler.ts", 1);
-    delete finding.trace;
-    const result = runCli(dirs, [finding]);
-    assert.equal(result.status, 1, result.output);
-    assert.match(result.stderr, /does not pass validate-findings\.cjs/);
-    assert.doesNotMatch(result.output, /TypeError|at validate-citations/);
+    const prior = confirmed();
+    delete prior.capabilities;
+    delete prior.severity.model_dependent;
+    prior.trace = [source("sink", "src/handler.ts", 2)];
+    prior.evidence = [evidence("src/handler.ts", 2)];
+    const read = runCli(dirs, [prior]);
+    assert.equal(read.status, 0, read.output);
+
+    delete prior.trace;
+    const refused = runCli(dirs, [prior]);
+    assert.equal(refused.status, 1, refused.output);
+    assert.match(refused.stderr, /without well-formed trace and evidence citations/);
+    assert.doesNotMatch(refused.output, /TypeError|at validate-citations/);
   });
 });

@@ -101,7 +101,7 @@ No one pass is complete. Build a deterministic coverage plan before hunting and 
 If prior runs exist, read every compatible `coverage-ledger.json` and `findings.json` before planning the current run:
 
 1. Compare the relevant current source with each prior record and unit. A prior source ref alone is not evidence that a path is unchanged. Run `validate-citations.cjs` on each prior `findings.json` against the current target: a citation or `snippet_sha256` it fails marks that record's source as changed. A pass shows only that the cited lines are unchanged, so still compare the conditions and controls around them.
-2. Carry a prior `confirmed` record into the current candidate set only when its relevant source and conditions are unchanged and its evidence still meets the current contract. Link it to a current ledger unit seeded `planned`, preserve its fingerprint, exclude only that carried root cause from hunters, and send the carried record through the current final verification path; the Phase 3 verifier that re-checks it becomes that unit's assignment owner and moves it to `candidate`.
+2. Carry a prior `confirmed` record into the current candidate set only when its relevant source and conditions are unchanged and its evidence still meets the current contract. Link it to a current ledger unit seeded `planned`, preserve its fingerprint, exclude only that carried root cause from hunters, and send the carried record through the current final verification path, which rewrites it under the current schema; the Phase 3 verifier that re-checks it becomes that unit's assignment owner and moves it to `candidate`.
 3. When relevant source for a prior `confirmed` record changed, create a current planned revalidation unit. Do not put that record on the hunter exclusion list. It remains confirmed only if current independent validation establishes the current path and result.
 4. Make prior `needs_validation`, `deferred`, `blocked`, `out_of_scope`, and any changed-source unit current work. A still-external `needs_validation` record may be carried only after the current source trace is checked and linked by fingerprint to a current `planned` unit whose verifier re-check supplies its owner and evidence; the record keeps the unresolved blocker. These prior states never suppress a current unit.
 5. A prior same-source covered unit may inform priority, but it remains visible in the current ledger. A prior `rejected` record suppresses only the unchanged failed claim, not coverage of its unit; changed evidence creates current work.
@@ -165,6 +165,15 @@ Calibrate overall severity with these anchors:
 - **informational** — a confirmed but minimal-impact observation, useful mainly as a prerequisite inside a larger finding.
 
 The high/medium discriminator: does the demonstrated result fully defeat an explicit control for an action with real consequences, or only weaken it? If you cannot state the concrete damage, the severity is lower than it feels.
+
+Every `confirmed` and `needs_validation` record declares `capabilities` from the closed token list in `report-schema.json`: `requires` is what the attacker must already hold, with exactly one `principal:*` token, and `grants` is what the result adds. A token implies the weaker ones listed in `finding-semantics.cjs`, so an admin also holds a user's capabilities. The marginal capability, what `grants` adds beyond `requires`, caps `overall_severity`, and `validate-findings.cjs` enforces each cap:
+
+- no marginal capability: `medium`, or `low` when the attacker is `principal:trusted_controller`;
+- only the attacker's own data: `medium`;
+- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no cross-tenant access, all-data read, or code execution: `medium`;
+- `severity.model_dependent: true`, a result that depends on probabilistic model behavior: `high`.
+
+A cap only bounds severity; the anchors above still decide it.
 
 ### Recommend the smallest effective source fix
 

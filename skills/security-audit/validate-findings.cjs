@@ -11,6 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 const { TextDecoder } = require("util");
+const { collectLocalFindingErrors } = require("./finding-semantics.cjs");
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const SUPPORTED_TYPES = new Set(["object", "array", "string", "integer", "number", "boolean", "null"]);
@@ -590,6 +591,7 @@ function validateDocument(findings, schema) {
   const errors = collectUnchecked(findings, schema, "$");
   if (errors.length < LIMITS.validationErrors) {
     errors.push(...collectFindingSemanticErrors(findings));
+    errors.push(...collectLocalFindingErrors(findings));
   }
   return errors;
 }

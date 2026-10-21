@@ -37,8 +37,9 @@ safe is a claim to verify.
 3. For a proposed confirmed candidate, independently reproduce the minimum observed
    result when possible. Verify inputs, interface shape, conditions, and affected
    dummy principal/resource. Do not infer a stronger result or continue after it.
-4. Verify that likelihood, impact, confidence, and the proposed source fix match only
-   what the evidence establishes.
+4. Verify that likelihood, impact, confidence, capabilities, and the proposed source
+   fix match only what the evidence establishes: `requires` names what the attacker
+   already held and `grants` only what the result adds.
 5. For a proposed needs_validation candidate, decide whether the blocker is genuinely
    outside source/local observation. If source refutes the trace, reject it. If the
    missing fact remains decisive, keep needs_validation and make the local and
@@ -110,8 +111,8 @@ The parent writes all independently decided records to `<output-dir>/findings.js
 
 Read `report-schema.json` immediately before writing. It uses `additionalProperties: false`; do not carry hunter wrapper fields into a record. Keep these verdict contracts distinct:
 
-- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
-- A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. It must not use severity, execution, remediation, reason, or confirmed root cause.
+- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
+- A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. It must not use severity, execution, remediation, reason, or confirmed root cause.
 - A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
 Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact.
@@ -153,7 +154,7 @@ For `confirmed`, require it to check:
 2. Real entry interface and exact local input shape.
 3. Every condition, parser/policy step, source-visible preventing layer, and observed local result.
 4. Affected principal/resource and demonstrated impact.
-5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact.
+5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the capability ceiling in `SKILL.md`, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
 
 For `needs_validation`, require it to check:
