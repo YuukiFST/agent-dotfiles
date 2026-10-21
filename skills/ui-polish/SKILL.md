@@ -1,6 +1,6 @@
 ---
 name: ui-polish
-description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel, emilkowalski and MengTo reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
+description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel, emilkowalski and MengTo reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, strip generic AI-design slop, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
 ---
 
 # UI polish
@@ -84,7 +84,7 @@ Pick one from the request. State it in one line before starting, with the depth 
 
 | Request shape | Mode | Procedure |
 | --- | --- | --- |
-| "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
+| "Improve / polish / redesign / review this page or component", "it looks generic / AI-made" | **Audit** | [audit.md](audit.md) |
 | "Create / build this screen, flow, component or dashboard" | **Build** | [build.md](build.md) |
 | "Build this from the Figma / this mockup / this screenshot" | **Design** | Read `build-design/SKILL.md` and `figma.md`, and follow its five steps: the design decides, every value maps to a project token. Before its **Report and stop**, run [audit.md](audit.md) steps 1 to 4 on the build, at the frames' widths and over every state the code reaches (step 2 is build-design's comparison screenshots, one per frame width). Sort each kept finding into `build-design`'s report: the design breaks a rule → **Domain conflicts**, with its owner; a state the design does not draw → **Missing states**; anything else is outside the piece and dropped. Apply none without the user's word. |
 | "Visualize this data" / "a chart / KPI for X" in an existing screen | **Visualize** | [visualize.md](visualize.md). A whole new screen of charts is Build, which runs visualize.md for its chart parts. |
@@ -114,7 +114,7 @@ Audit runs at one of three depths. Read the depth from the request; default is `
 A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
-- Default set: accessibility, layout, writing, typography, colors, polish, motion (seven).
+- Default set: accessibility, layout, writing, typography, colors, polish, motion, slop (eight).
 - Conditional set, added per recon step 7: **worst case** → worst-case reviewer; **gesture** → gesture reviewer; **mobile** → mobile reviewer; **data viz** → data-viz reviewer.
 - Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - A domain whose reference is missing on disk is `Not reviewed`, named in the report. Never rebuild its rules from memory or hand it to a neighbour.
@@ -133,6 +133,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | A fix written in a new styling idiom or a new token | Rewrite it with the project's tokens and components from recon |
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
+| A gradient, glow, card, eyebrow, icon tile or section kept because it looks premium | Run the slop removal test; it stays only with a named job for this product |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
 | Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
