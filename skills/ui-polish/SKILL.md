@@ -1,6 +1,6 @@
 ---
 name: ui-polish
-description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
+description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel, emilkowalski and MengTo reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, strip generic AI-design slop, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
 ---
 
 # UI polish
@@ -41,6 +41,8 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Stress harness: scenario axes, one page, one look | `REFS/jakubkrehel-skills/skills/break/` (`scenarios.md`) |
 | Consolidation: severity scale, escalation triggers, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
+| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**Decorative stacking**, **Component and template repetition**, **Fake proof**, **Use the Removal Test**; the rest of its **What to Flag** repeats an owner above). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s. Proof the code marks as mock or the build made up is `HIGH` as misleading; proof on an existing screen with no traceable source is a question for the user, never a removal. |
+| Direction intake: a greenfield screen with no reference to follow | `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/SKILL.md` (**Questions to ask**, **Prompt Structure**); which parts Build takes is in [build.md](build.md) step 1 |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
 | Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
 | Craft supplements: edge-aware scroll fades, the root canvas, tiled grain, smoothing caveats, hanging punctuation, input never locked mid-motion, press scale per surface | Named sections only, since the rest of each file repeats an owner above: `REFS/craft/skills/craft-design-engineering/references/typography.md` (**Font Smoothing**; **Hanging punctuation** in **Optical Alignment**), `REFS/craft/skills/craft-design-engineering/references/color.md` (**Noise**), `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**), `REFS/craft/skills/craft-design-engineering/references/motion.md` (**Button Press**, **Interruptibility**). Conflicts resolve per the craft line in the [reviewer-prompt.md](reviewer-prompt.md) Template. |
@@ -53,6 +55,8 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
 - `REFS/jakubkrehel-skills/skills/technical-drawing/`: drawings of physical objects, not interface work, and its viewer installs packages.
 - `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
+- `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/ARTICLE.md` and `demo/`: model and tool picks, template selling, and "craft signals" (numbered labels, beam animations) that `no-ai-design-slop` `ARTICLE.md` lists as slop. The router reads the skill's `SKILL.md` only.
+- `REFS/mengto-skills/agent-skills/ui/*/REFERENCES.md` and `agents/`: source link lists and a Codex manifest. The other `agent-skills/` categories are never checked out: `update-refs.sh` clones `agent-skills/ui` sparse.
 - `REFS/craft/content/`: craft's unlaunched drafts. A launched concept lands in a craft `references/` file; a file this table does not cite prints as `UNROUTED`.
 
 ## Step 0: Recon (every mode)
@@ -80,7 +84,7 @@ Pick one from the request. State it in one line before starting, with the depth 
 
 | Request shape | Mode | Procedure |
 | --- | --- | --- |
-| "Improve / polish / redesign / review this page or component" | **Audit** | [audit.md](audit.md) |
+| "Improve / polish / redesign / review this page or component", "it looks generic / AI-made" | **Audit** | [audit.md](audit.md) |
 | "Create / build this screen, flow, component or dashboard" | **Build** | [build.md](build.md) |
 | "Build this from the Figma / this mockup / this screenshot" | **Design** | Read `build-design/SKILL.md` and `figma.md`, and follow its five steps: the design decides, every value maps to a project token. Before its **Report and stop**, run [audit.md](audit.md) steps 1 to 4 on the build, at the frames' widths and over every state the code reaches (step 2 is build-design's comparison screenshots, one per frame width). Sort each kept finding into `build-design`'s report: the design breaks a rule → **Domain conflicts**, with its owner; a state the design does not draw → **Missing states**; anything else is outside the piece and dropped. Apply none without the user's word. |
 | "Visualize this data" / "a chart / KPI for X" in an existing screen | **Visualize** | [visualize.md](visualize.md). A whole new screen of charts is Build, which runs visualize.md for its chart parts. |
@@ -101,16 +105,16 @@ Audit runs at one of three depths. Read the depth from the request; default is `
 
 | Depth | Request shape | Reviewers | Rounds |
 | --- | --- | --- | --- |
-| `quick` | "quick pass", "just the obvious" | accessibility, polish, motion; conditional ones only when the request names them | 1 |
+| `quick` | "quick pass", "just the obvious" | accessibility, polish, motion, plus slop when the request calls the UI generic or AI-made; conditional ones only when the request names them | 1 |
 | `standard` | any other improve request | the default set plus every conditional reviewer recon switched on | 1 |
 | `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard` plus the `improve-animations` hunt checklist for the motion reviewer; inventory, apply policy and rounds per [audit.md](audit.md) **Exhaustive** | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
 
 ## Domain reviewers (fan-out)
 
-A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews six domains inline: that thins attention and fills context with reference text.
+A review of a screen runs one read-only subagent per domain, in parallel, each holding only its own reference. The main thread never reviews the domains inline: that thins attention and fills context with reference text.
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
-- Default set: accessibility, layout, writing, typography, colors, polish, motion (seven).
+- Default set: accessibility, layout, writing, typography, colors, polish, motion, slop (eight).
 - Conditional set, added per recon step 7: **worst case** → worst-case reviewer; **gesture** → gesture reviewer; **mobile** → mobile reviewer; **data viz** → data-viz reviewer.
 - Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - A domain whose reference is missing on disk is `Not reviewed`, named in the report. Never rebuild its rules from memory or hand it to a neighbour.
@@ -127,8 +131,10 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Mistake | Fix |
 | --- | --- |
 | A fix written in a new styling idiom or a new token | Rewrite it with the project's tokens and components from recon |
-| Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
+| Domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
+| A gradient, glow, card, eyebrow, icon tile or section kept because it looks premium | Run `audit-ai-design-slop` **Use the Removal Test**; it stays only with a named job for this product |
+| A metric, logo, testimonial, avatar or chart invented to fill a section | Real data, or a placeholder that reads as one, per `no-ai-design-slop` **Make the product specific** |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
 | Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
