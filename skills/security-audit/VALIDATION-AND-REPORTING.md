@@ -47,6 +47,23 @@ safe is a claim to verify.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
 7. Name a secret or personal datum found in the target only by type and file:line,
    plus at most the first 12 hex characters of its SHA-256, never by its value.
+8. Record your refutation attempt in refutation_checklist, each check exactly once:
+   - lower_trust_principal: the path starts from a principal with less trust than
+     the authority it reaches.
+   - reachable_entrypoint: that principal can reach the first trace entry.
+   - control_bypassed: the strongest source-visible control on the path does not stop it.
+   - crosses_boundary: the result reaches another principal, tenant, or shared resource.
+   - decided_by_visible_facts: no unobserved deployment, provider, or runtime fact
+     decides the result.
+   - result_not_overstated: the claimed result is no stronger than the observed one.
+   - beyond_best_practice: a real boundary fails, not only a best practice.
+   - marginal_capability: capabilities.grants adds something beyond capabilities.requires.
+   PASS means the check holds. FAIL means source refutes it, and the item cites the
+   refuting file and line: the control, the authority the actor already had, or the
+   check the prerequisite fails. UNKNOWN means source and bounded local evidence cannot
+   settle it. Every status but PASS gives a reason. Finding nothing is UNKNOWN, never
+   FAIL. A confirmed record has no FAIL or UNKNOWN; a rejected record has at least one
+   FAIL; a needs_validation record has at least one UNKNOWN and no FAIL.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -93,7 +110,7 @@ file separately:
     promotion blocker.
 ```
 
-A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim. `needs_validation` is never a parking place for a speculative idea.
+A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim at a citable file and line; a refutation that rests on finding nothing is `needs_validation`. `needs_validation` is never a parking place for a speculative idea.
 
 The parent checks that each verifier returned the same fingerprint unless it identified a genuinely different root cause. Merge corrections, record the decision in every linked coverage unit, and ensure there is one final record per fingerprint. Discard a malformed or prose-wrapped verifier result without repairing it; re-run that candidate with a fresh verifier when the budget permits, otherwise it remains an unvalidated ledger candidate under the incomplete-run rule.
 
@@ -111,9 +128,9 @@ The parent writes all independently decided records to `<output-dir>/findings.js
 
 Read `report-schema.json` immediately before writing. It uses `additionalProperties: false`; do not carry hunter wrapper fields into a record. Keep these verdict contracts distinct:
 
-- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
-- A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. It must not use severity, execution, remediation, reason, or confirmed root cause.
-- A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
+- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
+- A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. An optional `refutation_checklist` has at least one `UNKNOWN` and no `FAIL`. It must not use severity, execution, remediation, reason, or confirmed root cause.
+- A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, `refutation_checklist` with at least one `FAIL` that cites its refuting file and line, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
 Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact.
 
@@ -156,6 +173,7 @@ For `confirmed`, require it to check:
 4. Affected principal/resource and demonstrated impact.
 5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the capability ceiling in `SKILL.md`, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
+7. Every `refutation_checklist` `PASS` still holds against current source.
 
 For `needs_validation`, require it to check:
 

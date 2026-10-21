@@ -152,6 +152,45 @@
             "required": ["requires", "grants"],
             "additionalProperties": false
           },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                }
+              },
+              "required": ["check", "status"],
+              "additionalProperties": false
+            }
+          },
           "execution": {
             "type": "object",
             "description": "Target-neutral reproduction in the target's native interface.",
@@ -280,7 +319,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "capabilities", "execution", "remediation", "severity", "confidence"],
+        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "capabilities", "refutation_checklist", "execution", "remediation", "severity", "confidence"],
         "additionalProperties": false
       },
       {
@@ -405,6 +444,45 @@
             },
             "required": ["requires", "grants"],
             "additionalProperties": false
+          },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                }
+              },
+              "required": ["check", "status"],
+              "additionalProperties": false
+            }
           },
           "blockers": {
             "type": "array",
@@ -533,13 +611,52 @@
               "additionalProperties": false
             }
           },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
+                }
+              },
+              "required": ["check", "status"],
+              "additionalProperties": false
+            }
+          },
           "reason": {
             "type": "string",
             "minLength": 1,
             "visibleContent": true
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "reason"],
+        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "refutation_checklist", "reason"],
         "additionalProperties": false
       }
     ]

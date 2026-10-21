@@ -6,7 +6,7 @@ const { spawnSync } = require("node:child_process");
 const test = require("node:test");
 const schema = require("./report-schema.json");
 const { CAPABILITY_IMPLIES } = require("./finding-semantics.cjs");
-const { confirmed, needsValidation } = require("./findings-fixtures.cjs");
+const { checklist, confirmed, needsValidation, rejected } = require("./findings-fixtures.cjs");
 
 const validatorPath = path.join(__dirname, "validate-findings.cjs");
 const CLI_TIMEOUT_MS = 5000;
@@ -91,4 +91,37 @@ test("keeps the schema's capability enum aligned with the implication table", ()
     }
   }
   for (const implied of Object.values(CAPABILITY_IMPLIES).flat()) assert(tokens.includes(implied), implied);
+});
+
+function failing(check, status, extra = {}) {
+  return { [check]: { check, status, reason: "Settled from source.", ...extra } };
+}
+
+test("accepts a needs_validation record whose checklist leaves a check UNKNOWN", () => {
+  const blocked = needsValidation();
+  blocked.refutation_checklist = checklist(failing("decided_by_visible_facts", "UNKNOWN"));
+  const result = runValidator([blocked]);
+  assert.equal(result.status, 0, result.output);
+});
+
+test("fails a checklist that does not fit its verdict", () => {
+  const cases = [
+    [confirmed, (finding) => { delete finding.refutation_checklist; }, /missing required field "refutation_checklist"/],
+    [rejected, (finding) => { delete finding.refutation_checklist; }, /missing required field "refutation_checklist"/],
+    [confirmed, (finding) => { finding.refutation_checklist = checklist(failing("crosses_boundary", "UNKNOWN")); }, /refutation_checklist\[3\]\.status: a confirmed record cannot have a UNKNOWN check/],
+    [confirmed, (finding) => { finding.refutation_checklist = checklist(failing("crosses_boundary", "FAIL", { file: "src/a.c", line: 1 })); }, /a confirmed record cannot have a FAIL check/],
+    [confirmed, (finding) => { finding.refutation_checklist = checklist({ crosses_boundary: { check: "crosses_boundary", status: "NOT_APPLICABLE" } }); }, /refutation_checklist\[3\]\.reason: required when status is "NOT_APPLICABLE"/],
+    [confirmed, (finding) => { finding.refutation_checklist[7] = { check: "crosses_boundary", status: "PASS" }; }, /check "marginal_capability" must appear exactly once, got 0/],
+    [rejected, (finding) => { finding.refutation_checklist = checklist(); }, /a rejected record needs at least one FAIL check/],
+    [rejected, (finding) => { delete finding.refutation_checklist[2].file; delete finding.refutation_checklist[2].line; }, /a FAIL cites the file and line that refute the check; finding nothing is UNKNOWN/],
+    [rejected, (finding) => { delete finding.refutation_checklist[2].line; }, /file and line go together/],
+    [needsValidation, (finding) => { finding.refutation_checklist = checklist(); }, /a needs_validation record needs at least one UNKNOWN check/],
+  ];
+  for (const [factory, mutate, message] of cases) {
+    const finding = factory();
+    mutate(finding);
+    const result = runValidator([finding]);
+    assert.equal(result.status, 1, result.output);
+    assert.match(result.stderr, message);
+  }
 });

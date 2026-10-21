@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Checks that every trace[] and evidence[] citation in findings.json exists in the target.
+ * Checks that every trace[], evidence[], and refutation_checklist[] citation in findings.json
+ * exists in the target.
  * Usage: node validate-citations.cjs [--print-hashes] <path-to-findings.json> <target-root>
  *
  * A citation passes when its path names a regular file under the target without crossing a
@@ -31,15 +32,32 @@ function quote(value) {
     `\\u{${character.codePointAt(0).toString(16)}}`);
 }
 
+// Every cited location: each trace and evidence entry, and each refutation_checklist item with a file.
+function citationsOf(finding) {
+  const citations = [];
+  for (const field of CITATION_FIELDS) {
+    finding[field].forEach((citation, index) => citations.push({ location: `${field}[${index}]`, citation }));
+  }
+  (finding.refutation_checklist || []).forEach((item, index) => {
+    if (item && typeof item === "object" && item.file !== undefined) citations.push({ location: `refutation_checklist[${index}]`, citation: item });
+  });
+  return citations;
+}
+
+function isCitation(citation) {
+  return Boolean(citation) && typeof citation === "object" &&
+    isSafeRelativeSourcePath(citation.file) &&
+    Number.isInteger(citation.line) && citation.line >= 1 &&
+    (citation.snippet_sha256 === undefined || SNIPPET_HASH.test(citation.snippet_sha256));
+}
+
 // Checks only the citation shape, so a findings.json from a run under an older schema still loads.
 function hasCitationShape(findings) {
   return Array.isArray(findings) && findings.every((finding) =>
-    finding && typeof finding === "object" && CITATION_FIELDS.every((field) =>
-      Array.isArray(finding[field]) && finding[field].every((citation) =>
-        citation && typeof citation === "object" &&
-        isSafeRelativeSourcePath(citation.file) &&
-        Number.isInteger(citation.line) && citation.line >= 1 &&
-        (citation.snippet_sha256 === undefined || SNIPPET_HASH.test(citation.snippet_sha256)))));
+    Boolean(finding) && typeof finding === "object" &&
+    CITATION_FIELDS.every((field) => Array.isArray(finding[field])) &&
+    (finding.refutation_checklist === undefined || Array.isArray(finding.refutation_checklist)) &&
+    citationsOf(finding).every(({ citation }) => isCitation(citation)));
 }
 
 function lineStarts(bytes) {
@@ -108,26 +126,24 @@ function collectCitationErrors(findings, readSource) {
   const errors = [];
   const hashes = [];
   findings.forEach((finding, index) => {
-    for (const field of CITATION_FIELDS) {
-      finding[field].forEach((citation, entryIndex) => {
-        if (errors.length >= LIMITS.validationErrors) return;
-        const location = `$[${index}].${field}[${entryIndex}]`;
-        const source = readSource(citation.file);
-        if (source.error) {
-          errors.push(`${location}.file: ${quote(citation.file)} ${source.error}`);
-          return;
-        }
-        if (citation.line > source.starts.length) {
-          errors.push(`${location}.line: ${citation.line} is past the end of ${quote(citation.file)} (${source.starts.length} lines)`);
-          return;
-        }
-        const hash = snippetHash(source.bytes, source.starts, citation.line);
-        if (citation.snippet_sha256 !== undefined && citation.snippet_sha256 !== hash) {
-          errors.push(`${location}.snippet_sha256: ${quote(citation.file)} line ${citation.line} changed since the hash was recorded`);
-          return;
-        }
-        hashes.push(`${location} ${hash}`);
-      });
+    for (const { location: field, citation } of citationsOf(finding)) {
+      if (errors.length >= LIMITS.validationErrors) break;
+      const location = `$[${index}].${field}`;
+      const source = readSource(citation.file);
+      if (source.error) {
+        errors.push(`${location}.file: ${quote(citation.file)} ${source.error}`);
+        continue;
+      }
+      if (citation.line > source.starts.length) {
+        errors.push(`${location}.line: ${citation.line} is past the end of ${quote(citation.file)} (${source.starts.length} lines)`);
+        continue;
+      }
+      const hash = snippetHash(source.bytes, source.starts, citation.line);
+      if (citation.snippet_sha256 !== undefined && citation.snippet_sha256 !== hash) {
+        errors.push(`${location}.snippet_sha256: ${quote(citation.file)} line ${citation.line} changed since the hash was recorded`);
+        continue;
+      }
+      hashes.push(`${location} ${hash}`);
     }
   });
   return { errors, hashes };

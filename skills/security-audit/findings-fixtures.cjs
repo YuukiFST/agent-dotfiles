@@ -1,5 +1,11 @@
 // One valid record per verdict, shared by the validator tests so a schema change updates one place.
 
+const { REFUTATION_CHECKS } = require("./finding-semantics.cjs");
+
+function checklist(overrides = {}) {
+  return REFUTATION_CHECKS.map((check) => overrides[check] || { check, status: "PASS" });
+}
+
 function source(kind = "entrypoint", file = "src/handler.c", line = 10) {
   return { kind, file, line, scope: "handle", description: "Attacker data reaches the operation." };
 }
@@ -20,6 +26,7 @@ function confirmed() {
     evidence: [evidence()],
     conditions: [],
     capabilities: { requires: ["principal:authenticated_user"], grants: ["write:other_user_data"] },
+    refutation_checklist: checklist(),
     execution: {
       attacker_perspective: "An unprivileged remote user with their own account.",
       payloads: ["An object identifier owned by another user."],
@@ -64,8 +71,17 @@ function rejected() {
     claimed_root_cause: "dispatch was claimed to skip the authorization wrapper.",
     trace: [source("sink")],
     evidence: [evidence()],
+    refutation_checklist: checklist({
+      control_bypassed: {
+        check: "control_bypassed",
+        status: "FAIL",
+        reason: "dispatch wraps every route in the authorization check.",
+        file: "src/router.c",
+        line: 12,
+      },
+    }),
     reason: "All routes pass through the authorization wrapper before dispatch.",
   };
 }
 
-module.exports = { confirmed, evidence, needsValidation, rejected, source };
+module.exports = { checklist, confirmed, evidence, needsValidation, rejected, source };

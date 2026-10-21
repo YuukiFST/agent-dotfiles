@@ -130,3 +130,18 @@ test("reads a confirmed record written before capabilities, and refuses a record
     assert.doesNotMatch(refused.output, /TypeError|at validate-citations/);
   });
 });
+
+test("checks the file and line a FAIL refutation check cites", () => {
+  withTarget({ "src/handler.ts": HANDLER_SOURCE, "src/router.ts": "route(handle);\n" }, (dirs) => {
+    const finding = rejectedCiting("src/handler.ts", 2);
+    finding.refutation_checklist = [{ check: "control_bypassed", status: "FAIL", reason: "route checks ownership.", file: "src/router.ts", line: 1 }];
+    const printed = runCli(dirs, [finding], ["--print-hashes"]);
+    assert.equal(printed.status, 0, printed.output);
+    assert.match(printed.stdout, /^\$\[0\]\.refutation_checklist\[0\] [0-9a-f]{64}$/m);
+
+    finding.refutation_checklist[0].line = 9;
+    const result = runCli(dirs, [finding]);
+    assert.equal(result.status, 1, result.output);
+    assert.match(result.stderr, /\$\[0\]\.refutation_checklist\[0\]\.line: 9 is past the end of "src\/router\.ts" \(1 lines\)/);
+  });
+});

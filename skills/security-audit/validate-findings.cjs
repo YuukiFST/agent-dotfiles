@@ -591,7 +591,7 @@ function validateDocument(findings, schema) {
   const errors = collectUnchecked(findings, schema, "$");
   if (errors.length < LIMITS.validationErrors) {
     errors.push(...collectFindingSemanticErrors(findings));
-    errors.push(...collectLocalFindingErrors(findings));
+    errors.push(...collectLocalFindingErrors(findings, isSafeRelativeSourcePath));
   }
   return errors;
 }
