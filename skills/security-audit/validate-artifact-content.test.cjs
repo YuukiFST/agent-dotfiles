@@ -92,6 +92,31 @@ test("an allow rule passes only its detector, value, and field", () => {
   });
 });
 
+test("regression: an allow pattern matches whole values, not a fragment", () => {
+  const rules = { allow: [{ detector: "email", match: "acme" }, { detector: "host", match: "api\\.acme-dummy\\.dev" }] };
+  const findings = [{ execution: { payloads: ["ceo@acme-corp.com.br", "https://api.acme-dummy.dev/v1", "https://api.acme-dummy.dev.evil.com.br/"] } }];
+  withArtifacts({ "findings.json": findings, "rules.json": rules }, (file) => {
+    const result = runCli(["--rules", file("rules.json"), file("findings.json")]);
+    assert.equal(result.status, 1, result.output);
+    assert.deepEqual(result.stderr.match(/^ERROR: .*$/gm), [
+      'ERROR: "findings.json" $[0].execution.payloads[0]: email',
+      'ERROR: "findings.json" $[0].execution.payloads[2]: host',
+    ]);
+  });
+});
+
+test("regression: public weakness catalogs a remediation cites pass the host detector", () => {
+  const report = [
+    "See https://cwe.mitre.org/data/definitions/79.html, https://cheatsheetseries.owasp.org/ and https://nvd.nist.gov/vuln.",
+    "The worker calls https://cwe.mitre.org.prod.corp.com.br/ on start.",
+  ].join("\n");
+  withArtifacts({ "REPORT.md": report }, (file) => {
+    const result = runCli([file("REPORT.md")]);
+    assert.equal(result.status, 1, result.output);
+    assert.deepEqual(result.stderr.match(/^ERROR: .*$/gm), ['ERROR: "REPORT.md" line 2: host']);
+  });
+});
+
 test("a deny rule adds a project-specific detector", () => {
   const rules = { deny: [{ name: "sb360-token", match: "SB360-[A-Z0-9]{16}" }] };
   withArtifacts({ "findings.json": [{ title: `Token ${"SB360-"}${"A1".repeat(8)} leaked` }], "rules.json": rules }, (file) => {

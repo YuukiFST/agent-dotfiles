@@ -43,7 +43,7 @@ The agent, outside the target-controlled process, may make a disposable source c
 
 Use dummy principals, fixtures, and secrets. Do not probe deployed endpoints, external services, shared infrastructure, production identities, other users' data, or live control planes. Do not test availability against a live or shared process, publish artifacts, alter releases, spend paid API quota, or continue beyond the minimum local effect needed to establish a defect. If the decisive fact is outside source or the sandboxed fixture, report it as needing validation.
 
-A secret, a personal datum, or a real host name or address found in the target (source, seed, fixture, test, or history) enters any output only by type and `file:line`, plus at most the first 12 hex characters of its SHA-256; never write the value or any part of it. Loopback, `.test`, `.example`, and `.invalid` names, and the RFC 5737 documentation ranges are not real hosts, so test inputs use them. The fix for an exposed secret rotates it first, then removes it from source or purges it from history.
+A secret, a personal datum, or a real host name or address found in the target (source, seed, fixture, test, or history) enters any output only by type and `file:line`; never write the value, any part of it, or its hash. A personal datum, password, or host has few enough possible values that its hash gives it back, so only a random key or token may add the first 12 hex characters of its SHA-256 to tell two values apart. Loopback, `.test`, `.example`, and `.invalid` names, and the RFC 5737 documentation ranges are not real hosts, so test inputs use them. The fix for an exposed secret rotates it first, then removes it from source or purges it from history.
 
 ## Full audit setup
 
@@ -168,9 +168,9 @@ The high/medium discriminator: does the demonstrated result fully defeat an expl
 
 Every `confirmed` and `needs_validation` record declares `capabilities` from the closed token list in `report-schema.json`: `requires` is what the attacker must already hold, with exactly one `principal:*` token, and `grants` is what the result adds. A token implies the weaker ones listed in `finding-semantics.cjs`, so an admin also holds a user's capabilities. The marginal capability, what `grants` adds beyond `requires`, caps `overall_severity`, and `validate-findings.cjs` enforces each cap:
 
-- no marginal capability: `medium`, or `low` when the attacker is `principal:trusted_controller`;
+- no marginal capability: `medium`, or `low` when the attacker is `principal:trusted_controller`; the refutation checklist marks `marginal_capability` `NOT_APPLICABLE`;
 - only the attacker's own data: `medium`;
-- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no cross-tenant access, all-data read, or code execution: `medium`;
+- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no higher principal, any-user session, secret, cross-tenant access, all-data read, code write, or code execution: `medium`;
 - `severity.model_dependent: true`, a result that depends on probabilistic model behavior: `high`.
 
 A cap only bounds severity; the anchors above still decide it.

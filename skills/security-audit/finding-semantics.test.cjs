@@ -23,24 +23,43 @@ function runValidator(findings) {
   }
 }
 
-function confirmedWith(requires, grants, severity, modelDependent = false) {
+function confirmedWith(requires, grants, severity, { modelDependent = false, marginal = "PASS" } = {}) {
   const finding = confirmed();
   finding.capabilities = { requires, grants };
   finding.severity.impact.score = severity;
   finding.severity.overall_severity = severity;
   finding.severity.model_dependent = modelDependent;
+  if (marginal !== "PASS") {
+    finding.refutation_checklist = checklist({ marginal_capability: { check: "marginal_capability", status: marginal, reason: "Grants adds nothing." } });
+  }
   return finding;
 }
 
+const NO_GAIN = { marginal: "NOT_APPLICABLE" };
+
+test("regression: an admin who reaches a higher principal, any account, or a secret is not capped at medium", () => {
+  for (const finding of [
+    confirmedWith(["principal:tenant_admin"], ["principal:system_admin"], "high"),
+    confirmedWith(["principal:tenant_admin"], ["session:any_user"], "critical"),
+    confirmedWith(["principal:system_admin"], ["read:secret"], "high"),
+  ]) {
+    const result = runValidator([finding]);
+    assert.equal(result.status, 0, `${JSON.stringify(finding.capabilities)}: ${result.output}`);
+  }
+});
+
 test("accepts severity at or under every capability ceiling", () => {
   const cases = [
-    confirmedWith(["principal:authenticated_user"], ["read:own_data"], "medium"),
-    confirmedWith(["principal:trusted_controller"], ["write:config"], "low"),
+    confirmedWith(["principal:authenticated_user"], ["read:own_data"], "medium", NO_GAIN),
+    confirmedWith(["principal:trusted_controller"], ["write:config"], "low", NO_GAIN),
     confirmedWith(["principal:anonymous"], ["read:own_data"], "medium"),
     confirmedWith(["principal:system_admin"], ["read:other_user_data"], "medium"),
     confirmedWith(["principal:tenant_admin"], ["read:cross_tenant_data"], "high"),
     confirmedWith(["principal:anonymous"], ["exec:server_code"], "critical"),
-    confirmedWith(["principal:anonymous"], ["exec:server_code"], "high", true),
+    confirmedWith(["principal:anonymous"], ["exec:server_code"], "high", { modelDependent: true }),
+    confirmedWith(["principal:tenant_admin"], ["principal:system_admin"], "high"),
+    confirmedWith(["principal:tenant_admin"], ["session:any_user"], "critical"),
+    confirmedWith(["principal:system_admin"], ["read:secret"], "high"),
   ];
   for (const finding of cases) {
     const result = runValidator([finding]);
@@ -50,11 +69,12 @@ test("accepts severity at or under every capability ceiling", () => {
 
 test("fails severity above each capability ceiling and names the reason", () => {
   const cases = [
-    [confirmedWith(["principal:authenticated_user"], ["read:own_data"], "high"), /"high" exceeds the "medium" ceiling: every granted capability is already required/],
-    [confirmedWith(["principal:trusted_controller"], ["write:config"], "medium"), /"medium" exceeds the "low" ceiling: a trusted controller gains nothing/],
+    [confirmedWith(["principal:authenticated_user"], ["read:own_data"], "high", NO_GAIN), /"high" exceeds the "medium" ceiling: every granted capability is already required/],
+    [confirmedWith(["principal:trusted_controller"], ["write:config"], "medium", NO_GAIN), /"medium" exceeds the "low" ceiling: a trusted controller gains nothing/],
     [confirmedWith(["principal:anonymous"], ["read:own_data"], "high"), /"high" exceeds the "medium" ceiling: the attacker gains only its own data/],
-    [confirmedWith(["principal:system_admin"], ["read:other_user_data"], "high"), /"high" exceeds the "medium" ceiling: an admin attacker gains no cross-tenant access/],
-    [confirmedWith(["principal:anonymous"], ["exec:server_code"], "critical", true), /"critical" exceeds the "high" ceiling: the result depends on probabilistic model behavior/],
+    [confirmedWith(["principal:system_admin"], ["read:other_user_data"], "high"), /"high" exceeds the "medium" ceiling: an admin attacker gains no higher principal/],
+    [confirmedWith(["principal:tenant_admin"], ["write:config"], "high"), /"high" exceeds the "medium" ceiling: an admin attacker gains no higher principal/],
+    [confirmedWith(["principal:anonymous"], ["exec:server_code"], "critical", { modelDependent: true }), /"critical" exceeds the "high" ceiling: the result depends on probabilistic model behavior/],
   ];
   for (const [finding, message] of cases) {
     const result = runValidator([finding]);
@@ -104,6 +124,23 @@ test("accepts a needs_validation record whose checklist leaves a check UNKNOWN",
   assert.equal(result.status, 0, result.output);
 });
 
+test("regression: a confirmed checklist cannot pass by skipping checks or claiming a gain the capabilities lack", () => {
+  const cases = [
+    [confirmed(), (finding) => { finding.refutation_checklist = checklist(failing("control_bypassed", "NOT_APPLICABLE")); }, /refutation_checklist\[2\]\.status: a confirmed record cannot skip control_bypassed as NOT_APPLICABLE/],
+    [confirmedWith(["principal:authenticated_user"], ["read:own_data"], "medium"), () => {}, /marginal_capability is PASS, but capabilities\.grants adds nothing beyond capabilities\.requires/],
+    [confirmed(), (finding) => { finding.refutation_checklist = checklist(failing("marginal_capability", "NOT_APPLICABLE")); }, /marginal_capability is NOT_APPLICABLE, but capabilities\.grants adds a capability/],
+  ];
+  for (const [finding, mutate, message] of cases) {
+    mutate(finding);
+    const result = runValidator([finding]);
+    assert.equal(result.status, 1, result.output);
+    assert.match(result.stderr, message);
+  }
+  const rejectedEarly = rejected();
+  rejectedEarly.refutation_checklist[7] = { check: "marginal_capability", status: "NOT_APPLICABLE", reason: "The path stops at control_bypassed." };
+  assert.equal(runValidator([rejectedEarly]).status, 0);
+});
+
 test("fails a checklist that does not fit its verdict", () => {
   const cases = [
     [confirmed, (finding) => { delete finding.refutation_checklist; }, /missing required field "refutation_checklist"/],
@@ -113,7 +150,7 @@ test("fails a checklist that does not fit its verdict", () => {
     [confirmed, (finding) => { finding.refutation_checklist = checklist({ crosses_boundary: { check: "crosses_boundary", status: "NOT_APPLICABLE" } }); }, /refutation_checklist\[3\]\.reason: required when status is "NOT_APPLICABLE"/],
     [confirmed, (finding) => { finding.refutation_checklist[7] = { check: "crosses_boundary", status: "PASS" }; }, /check "marginal_capability" must appear exactly once, got 0/],
     [rejected, (finding) => { finding.refutation_checklist = checklist(); }, /a rejected record needs at least one FAIL check/],
-    [rejected, (finding) => { delete finding.refutation_checklist[2].file; delete finding.refutation_checklist[2].line; }, /a FAIL cites the file and line that refute the check; finding nothing is UNKNOWN/],
+    [rejected, (finding) => { delete finding.refutation_checklist[2].file; delete finding.refutation_checklist[2].line; }, /a FAIL cites the file and line that refute the check/],
     [rejected, (finding) => { delete finding.refutation_checklist[2].line; }, /file and line go together/],
     [needsValidation, (finding) => { finding.refutation_checklist = checklist(); }, /a needs_validation record needs at least one UNKNOWN check/],
   ];

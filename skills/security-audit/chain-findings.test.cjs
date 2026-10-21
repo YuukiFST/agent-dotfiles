@@ -41,7 +41,7 @@ test("lists a chain from an anonymous attacker through a takeover to code execut
   const findings = [
     confirmedStep("a-reset-token-leak", ["principal:anonymous"], ["session:other_user"]),
     confirmedStep("b-upload-runs-code", ["principal:authenticated_user"], ["exec:server_code"]),
-    confirmedStep("c-own-profile-edit", ["principal:authenticated_user"], ["write:own_data"], "medium"),
+    confirmedStep("c-profile-overwrite", ["principal:authenticated_user"], ["write:other_user_data"], "medium"),
   ];
   const result = runChains(findings);
   assert.equal(result.status, 0, result.output);

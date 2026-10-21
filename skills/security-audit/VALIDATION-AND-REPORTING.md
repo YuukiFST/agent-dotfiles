@@ -46,8 +46,8 @@ safe is a claim to verify.
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
 7. Name a secret, a personal datum, or a real host name or address found in the
-   target only by type and file:line, plus at most the first 12 hex characters of its
-   SHA-256, never by its value.
+   target only by type and file:line, never by its value or its hash. Only a random
+   key or token may add the first 12 hex characters of its SHA-256.
 8. Record your refutation attempt in refutation_checklist, each check exactly once:
    - lower_trust_principal: the path starts from a principal with less trust than
      the authority it reaches.
@@ -59,14 +59,16 @@ safe is a claim to verify.
    - result_not_overstated: the claimed result is no stronger than the observed one.
    - beyond_best_practice: a real boundary fails, not only a best practice.
    - marginal_capability: capabilities.grants adds something beyond capabilities.requires.
+     When it adds nothing, the status is NOT_APPLICABLE and severity is capped at medium.
    PASS means the check holds. FAIL means source refutes it, and the item cites the
    refuting file and line: the control, the authority the actor already had, or the
    check the prerequisite fails. A path nothing reaches is FAIL too: cite the definition
    no caller reaches or the route table that omits it. UNKNOWN means only a fact
    outside source and bounded local evidence can settle the check, and its reason names
-   that fact. Every status but PASS gives a reason. A confirmed record has no FAIL or
-   UNKNOWN; a rejected record has at least one FAIL; a needs_validation record has at
-   least one UNKNOWN and no FAIL.
+   that fact. NOT_APPLICABLE means an earlier FAIL or UNKNOWN cuts the path before the
+   check. Every status but PASS gives a reason. A confirmed record has no FAIL or
+   UNKNOWN and uses NOT_APPLICABLE only for marginal_capability; a rejected record has
+   at least one FAIL; a needs_validation record has at least one UNKNOWN and no FAIL.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -131,7 +133,7 @@ The parent writes all independently decided records to `<output-dir>/findings.js
 
 Read `report-schema.json` immediately before writing. It uses `additionalProperties: false`; do not carry hunter wrapper fields into a record. Keep these verdict contracts distinct:
 
-- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
+- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN` and `NOT_APPLICABLE` only on `marginal_capability`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
 - A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. An optional `refutation_checklist` has at least one `UNKNOWN` and no `FAIL`. It must not use severity, execution, remediation, reason, or confirmed root cause.
 - A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, `refutation_checklist` with at least one `FAIL` that cites its refuting file and line, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
@@ -148,19 +150,19 @@ node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-eng
 
 Fix every structural and semantic error before continuing. The findings validator rejects input beyond 5 MiB, 1,000 top-level findings, or 64 nesting levels, and caps reported error output at 100 messages. The citation validator fails a path that is missing, differs in case, crosses a symlink, or is not a regular file, a line past the end of its file, and a `snippet_sha256` that no longer matches its line. Copy each hash it prints into that entry's `snippet_sha256`, so a later run can tell whether the cited line changed, and rerun it.
 
-The content validator denies by default. Each value its detectors flag fails unless an `allow` rule in `rules-of-engagement.json` matches it: private keys, cloud and service tokens, JWTs, URL credentials, CPF and CNPJ with valid check digits, e-mail outside reserved domains, and hosts other than loopback and reserved names. The parent writes the file before delegation and allows only the dummy values the run uses, optionally per field path; `deny` rules add project-specific detectors:
+The content validator denies by default. Each value its detectors flag fails unless an `allow` rule in `rules-of-engagement.json` matches it: private keys, cloud and service tokens, JWTs, URL credentials, CPF and CNPJ with valid check digits, e-mail outside reserved domains, and hosts other than loopback, reserved names, and the public weakness catalogs a remediation cites (MITRE CWE, CAPEC, and ATT&CK, OWASP, NVD, CVE). The parent writes the file before delegation and allows only the dummy values the run uses. An allow `match` must match the whole value. `fields` scopes a rule to JSON field paths without array indexes; Markdown and other line-scanned files use the field `text`, so a rule the Phase 6 reports also need lists `text` or omits `fields`. `deny` rules add project-specific detectors:
 
 ```json
 {
   "allow": [
-    {"detector": "email", "match": "^qa@tenant-a\\.test$", "fields": ["execution.payloads"]},
+    {"detector": "email", "match": "qa@tenant-a\\.dev", "fields": ["execution.payloads", "text"]},
     {"detector": "host", "cidr": "198.18.0.0/15"}
   ],
   "deny": [{"name": "project-api-key", "match": "PRJ-[A-Z0-9]{24}"}]
 }
 ```
 
-Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a dummy value the run invented. Validator success proves only format, citation existence, ledger consistency, and that no detector flags a value.
+Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a dummy value the run invented or a public reference the report cites, such as an advisory or an upstream fix commit. Validator success proves only format, citation existence, ledger consistency, and that no detector flags a value.
 
 Once the validators pass, list capability chains:
 

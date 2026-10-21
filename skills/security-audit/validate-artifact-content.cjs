@@ -18,6 +18,8 @@ const ALNUM_AFTER = "(?![0-9A-Za-z])";
 const RESERVED_HOST_NAME = /^(?:localhost|example\.(?:com|net|org))$|\.(?:localhost|test|example|invalid)$|\.example\.(?:com|net|org)$/;
 // Loopback, "this network", and the RFC 5737 documentation ranges never identify a real host.
 const RESERVED_IPV4 = ["127.0.0.0/8", "0.0.0.0/8", "192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24"];
+// Weakness and vulnerability catalogs a remediation cites; they never come from the target.
+const PUBLIC_REFERENCE_HOST = /^(?:(?:cwe|capec|attack)\.mitre\.org|(?:[a-z0-9-]+\.)*owasp\.org|nvd\.nist\.gov|(?:www\.)?cve\.org)$/;
 const CNPJ_WEIGHTS = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
 function parseIpv4(value) {
@@ -46,6 +48,10 @@ function isReservedHost(host) {
   if (name === "::1" || RESERVED_HOST_NAME.test(name)) return true;
   const address = parseIpv4(name);
   return address !== null && RESERVED_IPV4_RANGES.some((range) => inCidr(address, range));
+}
+
+function isPublicReferenceHost(host) {
+  return PUBLIC_REFERENCE_HOST.test(host.replace(/\.$/, "").toLowerCase());
 }
 
 // Brazilian check digits: weighted sum mod 11, with remainders 0 and 1 giving digit 0.
@@ -84,7 +90,7 @@ const BUILT_IN_DETECTORS = [
   { name: "cpf", pattern: new RegExp(`${ALNUM_BEFORE}\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCpf },
   { name: "cnpj", pattern: new RegExp(`${ALNUM_BEFORE}[0-9A-Z]{2}\\.?[0-9A-Z]{3}\\.?[0-9A-Z]{3}/?[0-9A-Z]{4}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCnpj },
   { name: "email", pattern: /[A-Za-z0-9._%+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-]))/g, keep: (_, match) => !isReservedHost(match[1]) },
-  { name: "host", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[^\s/?#@]*@)?(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9.-]+)/g, group: 1, keep: (host) => !isReservedHost(host) },
+  { name: "host", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[^\s/?#@]*@)?(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9.-]+)/g, group: 1, keep: (host) => !isReservedHost(host) && !isPublicReferenceHost(host) },
   { name: "host", pattern: /(?<![0-9A-Za-z.])(?:\d{1,3}\.){3}\d{1,3}(?![0-9A-Za-z]|\.[0-9A-Za-z])/g, keep: (host) => parseIpv4(host) !== null && !isReservedHost(host) },
 ];
 
@@ -128,7 +134,8 @@ function parseRules(document) {
     const cidr = rule.cidr === undefined ? null : parseCidr(rule.cidr);
     if (rule.cidr !== undefined && cidr === null) throw new RulesError(`${location}.cidr: expected an IPv4 CIDR such as 10.0.0.0/8`);
     const pattern = rule.match === undefined ? null : compileRulePattern(rule.match, `${location}.match`);
-    return { detector: rule.detector, pattern: pattern && new RegExp(pattern.source, "u"), cidr, fields: rule.fields || null };
+    // Anchored, so an allow rule names whole values and a fragment such as "acme" admits nothing.
+    return { detector: rule.detector, pattern: pattern && new RegExp(`^(?:${pattern.source})$`, "u"), cidr, fields: rule.fields || null };
   });
   return { allow, deny };
 }
