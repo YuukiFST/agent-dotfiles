@@ -65,6 +65,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -90,6 +95,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
@@ -113,6 +123,71 @@
                 }
               },
               "required": ["kind", "description"],
+              "additionalProperties": false
+            }
+          },
+          "capabilities": {
+            "type": "object",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
+            "properties": {
+              "requires": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["principal:anonymous", "principal:authenticated_user", "principal:tenant_admin", "principal:system_admin", "principal:trusted_controller", "principal:local_user", "read:own_data", "read:other_user_data", "read:cross_tenant_data", "read:all_data", "read:secret", "read:internal_network", "write:own_data", "write:other_user_data", "write:cross_tenant_data", "write:config", "write:code", "exec:other_user_browser", "exec:server_code", "exec:host_code", "session:other_user", "session:any_user", "availability:shared_service"]
+                }
+              },
+              "grants": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["principal:anonymous", "principal:authenticated_user", "principal:tenant_admin", "principal:system_admin", "principal:trusted_controller", "principal:local_user", "read:own_data", "read:other_user_data", "read:cross_tenant_data", "read:all_data", "read:secret", "read:internal_network", "write:own_data", "write:other_user_data", "write:cross_tenant_data", "write:config", "write:code", "exec:other_user_browser", "exec:server_code", "exec:host_code", "session:other_user", "session:any_user", "availability:shared_service"]
+                }
+              }
+            },
+            "required": ["requires", "grants"],
+            "additionalProperties": false
+          },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
+                }
+              },
+              "required": ["check", "status"],
               "additionalProperties": false
             }
           },
@@ -218,9 +293,13 @@
               "overall_severity": {
                 "type": "string",
                 "enum": ["informational", "low", "medium", "high", "critical"]
+              },
+              "model_dependent": {
+                "type": "boolean",
+                "description": "true when the result depends on probabilistic model behavior; caps overall_severity at high."
               }
             },
-            "required": ["likelihood", "impact", "overall_severity"],
+            "required": ["likelihood", "impact", "overall_severity", "model_dependent"],
             "additionalProperties": false
           },
           "confidence": {
@@ -240,7 +319,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "execution", "remediation", "severity", "confidence"],
+        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "capabilities", "refutation_checklist", "execution", "remediation", "severity", "confidence"],
         "additionalProperties": false
       },
       {
@@ -299,6 +378,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -324,9 +408,79 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "capabilities": {
+            "type": "object",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. A token holds the weaker ones: each principal holds the principals before it in anonymous, authenticated_user (with its own data), tenant_admin, system_admin, trusted_controller (with config, code, and server execution), and local_user holds anonymous; a wider read or write holds the narrower one; exec:host_code holds exec:server_code; session:other_user holds authenticated_user and session:any_user holds system_admin. What grants adds beyond requires caps a confirmed overall_severity, and validate-findings.cjs enforces each cap: nothing added, medium (low for principal:trusted_controller); only the attacker's own data, medium; a tenant_admin or system_admin attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution, medium. chain-findings.cjs joins one record's grants to another's requires.",
+            "properties": {
+              "requires": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["principal:anonymous", "principal:authenticated_user", "principal:tenant_admin", "principal:system_admin", "principal:trusted_controller", "principal:local_user", "read:own_data", "read:other_user_data", "read:cross_tenant_data", "read:all_data", "read:secret", "read:internal_network", "write:own_data", "write:other_user_data", "write:cross_tenant_data", "write:config", "write:code", "exec:other_user_browser", "exec:server_code", "exec:host_code", "session:other_user", "session:any_user", "availability:shared_service"]
+                }
+              },
+              "grants": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["principal:anonymous", "principal:authenticated_user", "principal:tenant_admin", "principal:system_admin", "principal:trusted_controller", "principal:local_user", "read:own_data", "read:other_user_data", "read:cross_tenant_data", "read:all_data", "read:secret", "read:internal_network", "write:own_data", "write:other_user_data", "write:cross_tenant_data", "write:config", "write:code", "exec:other_user_browser", "exec:server_code", "exec:host_code", "session:other_user", "session:any_user", "availability:shared_service"]
+                }
+              }
+            },
+            "required": ["requires", "grants"],
+            "additionalProperties": false
+          },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
+                }
+              },
+              "required": ["check", "status"],
               "additionalProperties": false
             }
           },
@@ -357,7 +511,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "blockers", "validation_plan"],
+        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "capabilities", "blockers", "validation_plan"],
         "additionalProperties": false
       },
       {
@@ -416,6 +570,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -441,9 +600,53 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
                 }
               },
               "required": ["file", "line", "description"],
+              "additionalProperties": false
+            }
+          },
+          "refutation_checklist": {
+            "type": "array",
+            "description": "One item per check, each exactly once. A status other than PASS needs a reason; a FAIL cites the file and line that refute the check. NOT_APPLICABLE means an earlier check in list order is FAIL or UNKNOWN, or marks marginal_capability when grants adds nothing beyond requires; a confirmed record uses it only for that marginal case. VALIDATION-AND-REPORTING.md defines the checks.",
+            "minItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "check": {
+                  "type": "string",
+                  "enum": ["lower_trust_principal", "reachable_entrypoint", "control_bypassed", "crosses_boundary", "decided_by_visible_facts", "result_not_overstated", "beyond_best_practice", "marginal_capability"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "visibleContent": true
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes. Left off a line that holds a password, personal datum, or real host."
+                }
+              },
+              "required": ["check", "status"],
               "additionalProperties": false
             }
           },
@@ -453,7 +656,7 @@
             "visibleContent": true
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "reason"],
+        "required": ["verdict", "fingerprint", "title", "description", "claimed_root_cause", "trace", "evidence", "refutation_checklist", "reason"],
         "additionalProperties": false
       }
     ]

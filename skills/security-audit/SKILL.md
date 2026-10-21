@@ -37,9 +37,13 @@ These rules apply in both operating modes. Source inspection is read-only. Run t
 - a read-only target and toolchain, with the target-controlled process able to write only inside its assigned `scratch/` directory; and
 - explicit low CPU, memory, process, file-size, disk, and wall-clock limits.
 
+An analysis tool that loads target code or configuration is target-controlled execution too, so it follows the same rule: language servers and type-checkers (TypeScript `tsconfig.json` plugins), linters and formatters with project configs or plugins (`eslint.config.*`, prettier plugins), `npx`, `pnpm exec`, and other runners of project binaries, and ORM or framework CLIs (`prisma` loads `prisma.config.ts`, `next` loads `next.config.*`). So is an agent harness started inside the target, which reads project config such as `.claude/settings.json` hooks, `opencode.json`, or `.mcp.json`. Start the parent and every delegated agent from a working directory outside the target, and read the target by path.
+
 The agent, outside the target-controlled process, may make a disposable source copy in an assigned `scratch/` directory when a build must write beside source. In guidance mode, do not retain target-controlled files. In full audit mode, only trusted parent-side code may promote the minimum non-secret result to retained `artifacts/` using the procedure under Write isolation. Never expose a retained output directory (other than the agent's own assigned `scratch/`), another agent's directory, the host home directory, credentials, sockets, or shared services to target code. Do not install dependencies or let builds fetch them. Use only tools and dependencies already available locally. If every control cannot be enforced, do not execute target code: report the missing sandbox capability as a needs-validation blocker and give a safe validation plan.
 
 Use dummy principals, fixtures, and secrets. Do not probe deployed endpoints, external services, shared infrastructure, production identities, other users' data, or live control planes. Do not test availability against a live or shared process, publish artifacts, alter releases, spend paid API quota, or continue beyond the minimum local effect needed to establish a defect. If the decisive fact is outside source or the sandboxed fixture, report it as needing validation.
+
+A secret, a personal datum, or a real host name or address found in the target (source, seed, fixture, test, or history) enters any output only by type and `file:line`; never write the value, any part of it, or its hash. A personal datum, password, or host has few enough possible values that its hash gives it back, so only a random key or token may add the first 12 hex characters of its SHA-256 to tell two values apart. Loopback, `.test`, `.example`, and `.invalid` names, and the RFC 5737 documentation ranges are not real hosts, so test inputs use them. The fix for an exposed secret rotates it first, then removes it from source or purges it from history.
 
 ## Full audit setup
 
@@ -56,6 +60,7 @@ In full audit mode, resolve these values before reconnaissance:
 The parent creates and is the only writer of shared run files:
 
 - `run-metadata.json`
+- `rules-of-engagement.json`
 - `architecture.md`
 - `coverage-ledger.json`
 - `findings.json`
@@ -83,7 +88,7 @@ Before execution, the parent opens and retains trusted, non-inheritable director
 
 For a reproduced check, record the command, exact test input, sandbox limits, and only the allowlisted environment variable names plus safe non-secret values needed to reproduce it. Never capture or copy the ambient environment, inherited variables, credential values, authentication state, or unrelated host paths. Launch from an empty environment rather than trying to redact one after execution.
 
-Before delegation, the parent writes `run-metadata.json` with at least `run_id`, `repo`, `target`, `source_ref`, `profile`, `scope_paths`, `budget` (null if unset), `execution_policy: "sandboxed-source-and-local-only"`, selected companion files, prior-run paths, shared-file owners, and `run_status: "in_progress"`. Update metadata only when those facts change; candidate state belongs in the coverage ledger and `findings.json`.
+Before delegation, the parent writes `run-metadata.json` with at least `run_id`, `repo`, `target`, `source_ref`, `profile`, `scope_paths`, `budget` (null if unset), `execution_policy: "sandboxed-source-and-local-only"`, selected companion files, prior-run paths, shared-file owners, and `run_status: "in_progress"`. Update metadata only when those facts change; candidate state belongs in the coverage ledger and `findings.json`. It also writes `rules-of-engagement.json`, allowing only the dummy values the run uses (format under Phase 4 in [VALIDATION-AND-REPORTING.md](VALIDATION-AND-REPORTING.md)).
 
 ## Full audit planning
 
@@ -95,8 +100,8 @@ No one pass is complete. Build a deterministic coverage plan before hunting and 
 
 If prior runs exist, read every compatible `coverage-ledger.json` and `findings.json` before planning the current run:
 
-1. Compare the relevant current source with each prior record and unit. A prior source ref alone is not evidence that a path is unchanged.
-2. Carry a prior `confirmed` record into the current candidate set only when its relevant source and conditions are unchanged and its evidence still meets the current contract. Link it to a current ledger unit seeded `planned`, preserve its fingerprint, exclude only that carried root cause from hunters, and send the carried record through the current final verification path; the Phase 3 verifier that re-checks it becomes that unit's assignment owner and moves it to `candidate`.
+1. Compare the relevant current source with each prior record and unit. A prior source ref alone is not evidence that a path is unchanged. Run `validate-citations.cjs` on each prior `findings.json` against the current target: a citation or `snippet_sha256` it fails marks that record's source as changed. A pass shows only that each cited line exists and, where the entry has a `snippet_sha256`, is unchanged, so still compare the conditions and controls around them.
+2. Carry a prior `confirmed` record into the current candidate set only when its relevant source and conditions are unchanged and its evidence still meets the current contract. Link it to a current ledger unit seeded `planned`, preserve its fingerprint, exclude only that carried root cause from hunters, and send the carried record through the current final verification path, which rewrites it under the current schema; the Phase 3 verifier that re-checks it becomes that unit's assignment owner and moves it to `candidate`.
 3. When relevant source for a prior `confirmed` record changed, create a current planned revalidation unit. Do not put that record on the hunter exclusion list. It remains confirmed only if current independent validation establishes the current path and result.
 4. Make prior `needs_validation`, `deferred`, `blocked`, `out_of_scope`, and any changed-source unit current work. A still-external `needs_validation` record may be carried only after the current source trace is checked and linked by fingerprint to a current `planned` unit whose verifier re-check supplies its owner and evidence; the record keeps the unresolved blocker. These prior states never suppress a current unit.
 5. A prior same-source covered unit may inform priority, but it remains visible in the current ledger. A prior `rejected` record suppresses only the unchanged failed claim, not coverage of its unit; changed evidence creates current work.
@@ -161,6 +166,15 @@ Calibrate overall severity with these anchors:
 
 The high/medium discriminator: does the demonstrated result fully defeat an explicit control for an action with real consequences, or only weaken it? If you cannot state the concrete damage, the severity is lower than it feels.
 
+Every `confirmed` and `needs_validation` record declares `capabilities` from the closed token list in `report-schema.json`: `requires` is what the attacker must already hold, with exactly one `principal:*` token, and `grants` is what the result adds. A token implies the weaker ones listed in `finding-semantics.cjs`, so an admin also holds a user's capabilities. The marginal capability, what `grants` adds beyond `requires`, caps `overall_severity`, and `validate-findings.cjs` enforces each cap:
+
+- no marginal capability: `medium`, or `low` when the attacker is `principal:trusted_controller`; the refutation checklist marks `marginal_capability` `NOT_APPLICABLE`;
+- only the attacker's own data: `medium`;
+- a `principal:tenant_admin` or `principal:system_admin` attacker that gains no higher principal, any-user session, secret, internal network, shared service, cross-tenant access, all-data read, code write, or code execution: `medium`;
+- `severity.model_dependent: true`, a result that depends on probabilistic model behavior: `high`.
+
+A cap only bounds severity; the anchors above still decide it.
+
 ### Recommend the smallest effective source fix
 
 For each confirmed finding, identify the invariant the code must enforce and the narrowest source change that enforces it at the last trusted decision point. Prefer specific repository-relative changes and regression tests over generic hardening advice. The audit describes fixes; it does not modify target source.
@@ -172,11 +186,11 @@ In full audit mode, follow all six phases in order:
 1. **Reconnaissance** — map the source, trust boundaries, local build paths, companion selections, prior evidence, and initial deterministic coverage ledger with [RECONNAISSANCE.md](RECONNAISSANCE.md).
 2. **Coverage-led hunting waves** — assign isolated hunters from the ledger and collect structured candidate results with [HUNTING.md](HUNTING.md), [ATTACK-CLASSES.md](ATTACK-CLASSES.md), and the selected domain companions.
 3. **Candidate validation** — consolidate fingerprints and give every candidate to a fresh source verifier as defined in [VALIDATION-AND-REPORTING.md](VALIDATION-AND-REPORTING.md).
-4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs`, and validate the coverage claim with `validate-coverage-ledger.cjs`.
+4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs`, check its citations against the target with `validate-citations.cjs`, scan it for secrets and personal data with `validate-artifact-content.cjs`, send each capability chain `chain-findings.cjs` lists back through candidate validation, and validate the coverage claim with `validate-coverage-ledger.cjs`.
 5. **Independent record verification** — use fresh agents to verify final source claims and reconcile corrections or state changes.
 6. **Target-neutral report** — derive `REPORT.md`, `FINDINGS-DETAIL.md`, and `NEEDS-VALIDATION.md` from the final records, with no live-probe instructions.
 
-Do not end the run before one of exactly two terminal states: (a) all Phase 6 artifacts are written and both validators pass, or (b) `run_status: "incomplete"` is recorded with its exact reason and the gap is disclosed in the report. Never stop mid-phase.
+Do not end the run before one of exactly two terminal states: (a) all Phase 6 artifacts are written and every validator passes, or (b) `run_status: "incomplete"` is recorded with its exact reason and the gap is disclosed in the report. Never stop mid-phase.
 
 ## Anti-patterns
 
