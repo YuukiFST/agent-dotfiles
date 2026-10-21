@@ -77,7 +77,8 @@ coverage unit as `uncovered`.
 
 USE THE NARROWEST LOCAL CHECK THAT SETTLES THE CLAIM. Target-controlled builds,
 tests, processes, browsers, emulators, fuzzers, and fixture processing may run only
-inside the parent-approved OS-enforced sandbox. It must disable external networking,
+inside the parent-approved OS-enforced sandbox. So may language servers, linters,
+type-checkers, and ORM or framework CLIs, because they load target code or config. It must disable external networking,
 start from an empty allowlisted environment, expose target and tools read-only, permit
 writes only to your scratch directory, and apply low CPU, memory, process, file-size,
 disk, and wall-clock limits. Isolated loopback is allowed only for a local fixture.

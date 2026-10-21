@@ -11,7 +11,8 @@ Assign each verifier a canonical lowercase unique ID and `<output-dir>/agents/<v
 ```text
 You did not write this candidate. Try to refute it from repository source and bounded
 local evidence. Do not contact deployed endpoints or external/shared services. Run
-target-controlled code only inside the approved OS-enforced sandbox: no external
+target-controlled code, including linters, type-checkers, and framework CLIs that load
+target config, only inside the approved OS-enforced sandbox: no external
 network, empty allowlisted environment, read-only target and tools, scratch-only
 writes, and explicit low resource and wall-clock limits. If any control is unavailable,
 do not execute; retain the exact missing capability as a needs_validation blocker.
