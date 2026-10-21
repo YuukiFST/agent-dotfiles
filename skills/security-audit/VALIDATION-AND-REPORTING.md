@@ -45,8 +45,9 @@ safe is a claim to verify.
    missing fact remains decisive, keep needs_validation and make the local and
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
-7. Name a secret or personal datum found in the target only by type and file:line,
-   plus at most the first 12 hex characters of its SHA-256, never by its value.
+7. Name a secret, a personal datum, or a real host name or address found in the
+   target only by type and file:line, plus at most the first 12 hex characters of its
+   SHA-256, never by its value.
 8. Record your refutation attempt in refutation_checklist, each check exactly once:
    - lower_trust_principal: the path starts from a principal with less trust than
      the authority it reaches.
@@ -157,7 +158,7 @@ The content validator denies by default. Each value its detectors flag fails unl
 }
 ```
 
-Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a value the run invented. Validator success proves format, citation existence, and ledger consistency only.
+Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a dummy value the run invented. Validator success proves only format, citation existence, ledger consistency, and that no detector flags a value.
 
 ### Phase 5: Verify the final records with fresh eyes
 
@@ -171,7 +172,7 @@ For `confirmed`, require it to check:
 2. Real entry interface and exact local input shape.
 3. Every condition, parser/policy step, source-visible preventing layer, and observed local result.
 4. Affected principal/resource and demonstrated impact.
-5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the capability ceiling in `SKILL.md`, and `capabilities` that name only what the attacker held and gained.
+5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the cap the `capabilities` schema description states, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
 7. Every `refutation_checklist` `PASS` still holds against current source.
 
