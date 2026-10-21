@@ -82,7 +82,7 @@ while IFS= read -r clause; do
   while IFS= read -r name; do
     is_local "$name" && continue
     checked+="$name"$'\n'
-    labels_in "${targets[@]}" | grep -qF -- "$name" && continue
+    grep -qF -- "$name" <<<"$(labels_in "${targets[@]}")" && continue
     echo "MISSING section **$name** in $token: upstream renamed or removed it; repoint the citation"
     drift=1
   done < <(bold_names <<<"$clause")
