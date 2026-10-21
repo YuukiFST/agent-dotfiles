@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copy config (GLOBAL.md, CODING_STANDARDS.md, skills/, rules/, plus any root payload an active stack adds)
+# Copy config (GLOBAL.md, CODING_STANDARDS.md, PROMPT_ENGINEERING.md, skills/, rules/, plus any root payload an active stack adds)
 # from this repo into harness dirs.
 # Shared by setup-* and update-* so "git pull + update" always propagates config.
 # Usage: sync-config.sh claude|cursor|pi|opencode
@@ -200,6 +200,8 @@ sync_shared() {
   # Sits outside rules/ on purpose: Claude Code auto-loads every rules/*.md, and this file
   # is disclosed — read only when GLOBAL.md's pointer fires before a project edit.
   cp "$repo/CODING_STANDARDS.md" "$HOME/.claude/CODING_STANDARDS.md"
+  # Same reason; read only when rules/prompting.md's pointer fires.
+  cp "$repo/PROMPT_ENGINEERING.md" "$HOME/.claude/PROMPT_ENGINEERING.md"
 
   # ~/.agents/skills is read natively by both Cursor and pi — one dir, two agents.
   # (Cursor: cursor.com/docs/skills · pi: packages/coding-agent/docs/skills.md)
