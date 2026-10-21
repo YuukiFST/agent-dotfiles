@@ -160,9 +160,10 @@ file separately:
 6. Use the same source-derived fingerprint for the same root cause in every state.
    It must match `^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$` and must not include a line,
    wave, agent, severity, or verdict.
-7. Cite a secret or personal datum found in the target only by type and file:line,
-   plus at most the first 12 hex characters of its SHA-256. Never copy the value or
-   part of it into any field. The fix for an exposed secret rotates it first, then
+7. Cite a secret, a personal datum, or a real host name or address found in the
+   target only by type and file:line, plus at most the first 12 hex characters of its
+   SHA-256. Never copy the value or part of it into any field. Test inputs use
+   loopback, `.test` names, or 192.0.2.0/24. The fix for an exposed secret rotates it first, then
    removes it or purges it from history.
 8. Return an empty candidate array when nothing survives these gates.
 ```
