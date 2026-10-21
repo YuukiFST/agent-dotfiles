@@ -21,7 +21,7 @@ Then, by request:
 
 ## 2. Build
 
-Read `animate/SKILL.md` and `RECIPES.md`. Each row runs **The Build Sequence** in order; a named target from step 1 runs its gate (steps 1 and 2) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set.
+Read `animate/SKILL.md` and `RECIPES.md`. Each row runs `animate` **The Build Sequence** in order; a named target from step 1 runs its gate (steps 1 and 2) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set.
 
 **gesture** on the row (drag, swipe, sheet, carousel, slider) → read the gesture row's references before building it: drag, flick and sheet motion is springs and velocity, not duration and curve. **mobile** on → apply `mobile-native/SKILL.md` to the touched elements.
 
