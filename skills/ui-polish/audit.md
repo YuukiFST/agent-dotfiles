@@ -42,9 +42,9 @@ Done when: every applied row is checked off in the table with the file touched.
 
 1. Run the project gates from recon step 6 (typecheck, lint, tests). Fix what your change broke.
 2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Reduced-motion emulated once if motion changed.
-3. Motion changed → re-read the ten standards in `review-animations/SKILL.md` against the diff. Any escalation trigger left = not done.
+3. Motion changed → run [motion.md](motion.md) step 3 **Dispatch** and **Close the round**, with 1 and 2 above as its **Evidence**. A Block left after its third round = not done.
 
-Done when: gates pass, both after-screenshots exist, and no HIGH finding remains open.
+Done when: gates pass, both after-screenshots exist, no HIGH finding remains open, and changed motion closed on Approve.
 
 ## 7. Report
 

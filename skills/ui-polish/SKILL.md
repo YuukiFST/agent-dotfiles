@@ -64,7 +64,7 @@ Before any reference is read, establish the project facts. They go into every su
 3. **Shared components**: the project's own primitives (buttons, dialogs, tables, filters, charts, empty/error/loading states). A fix reuses them before adding markup.
 4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
 5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
-6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse).
+6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse), and `git status --porcelain` before the first edit: the baseline every motion review diffs against.
 7. **Conditional triggers**, one yes/no each, because each yes switches on a reviewer or a reference below:
    - **gesture**: the scope has drag, swipe, sheets, carousels, sliders, pull-to-refresh or spring-driven motion.
    - **mobile**: a phone viewport is supported.
@@ -130,7 +130,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
-| Motion mode shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 and close on its Approve or Block |
+| Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
 | Jank "fixed" with `will-change` alone | Name the cause from **Phase 2: Diagnose**; swap the property or move the work off the main thread first |
 | Demo data only, or an invented worst case (`aaaa…`) | Values from `break-ui/CATALOG.md` or the schema limit |
