@@ -134,6 +134,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | Six domain reports pasted one after another | One consolidated table in the `better-interface` format |
 | Finding kept from a subagent without re-reading the line | Open the file at the cited line; drop what does not reproduce |
 | A gradient, glow, card, eyebrow, icon tile or section kept because it looks premium | Run the slop removal test; it stays only with a named job for this product |
+| A metric, logo, testimonial, avatar or chart invented to fill a section | Real data, or a placeholder that reads as one, per `no-ai-design-slop` **Make the product specific** |
 | Motion added because it looked nice | Run `animate`'s gate; delete motion on high-frequency or keyboard paths |
 | Motion shipped on the author's own read of the diff | Dispatch the motion reviewer per [motion.md](motion.md) step 3 (audit step 6.3 in Audit, Build and Visualize) and close on its Verdict line |
 | Drag, flick or sheet tuned with a duration and a curve | Springs with velocity handoff, values from `apple-design` **Quick Reference** |
