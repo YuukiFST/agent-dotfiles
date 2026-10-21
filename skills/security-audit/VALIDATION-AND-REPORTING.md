@@ -45,8 +45,9 @@ safe is a claim to verify.
    missing fact remains decisive, keep needs_validation and make the local and
    owner-observed plans exact and non-destructive.
 6. Preserve the fingerprint for the same source-derived root cause across every state.
-7. Name a secret or personal datum found in the target only by type and file:line,
-   plus at most the first 12 hex characters of its SHA-256, never by its value.
+7. Name a secret, a personal datum, or a real host name or address found in the
+   target only by type and file:line, plus at most the first 12 hex characters of its
+   SHA-256, never by its value.
 8. Record your refutation attempt in refutation_checklist, each check exactly once:
    - lower_trust_principal: the path starts from a principal with less trust than
      the authority it reaches.
@@ -60,10 +61,12 @@ safe is a claim to verify.
    - marginal_capability: capabilities.grants adds something beyond capabilities.requires.
    PASS means the check holds. FAIL means source refutes it, and the item cites the
    refuting file and line: the control, the authority the actor already had, or the
-   check the prerequisite fails. UNKNOWN means source and bounded local evidence cannot
-   settle it. Every status but PASS gives a reason. Finding nothing is UNKNOWN, never
-   FAIL. A confirmed record has no FAIL or UNKNOWN; a rejected record has at least one
-   FAIL; a needs_validation record has at least one UNKNOWN and no FAIL.
+   check the prerequisite fails. A path nothing reaches is FAIL too: cite the definition
+   no caller reaches or the route table that omits it. UNKNOWN means only a fact
+   outside source and bounded local evidence can settle the check, and its reason names
+   that fact. Every status but PASS gives a reason. A confirmed record has no FAIL or
+   UNKNOWN; a rejected record has at least one FAIL; a needs_validation record has at
+   least one UNKNOWN and no FAIL.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -110,7 +113,7 @@ file separately:
     promotion blocker.
 ```
 
-A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim at a citable file and line; a refutation that rests on finding nothing is `needs_validation`. `needs_validation` is never a parking place for a speculative idea.
+A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim, and cite the file and line the refutation rests on: the control, the definition no caller reaches, or the authority the actor already had. `needs_validation` is never a parking place for a speculative idea.
 
 The parent checks that each verifier returned the same fingerprint unless it identified a genuinely different root cause. Merge corrections, record the decision in every linked coverage unit, and ensure there is one final record per fingerprint. Discard a malformed or prose-wrapped verifier result without repairing it; re-run that candidate with a fresh verifier when the budget permits, otherwise it remains an unvalidated ledger candidate under the incomplete-run rule.
 
@@ -157,7 +160,7 @@ The content validator denies by default. Each value its detectors flag fails unl
 }
 ```
 
-Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a value the run invented. Validator success proves format, citation existence, and ledger consistency only.
+Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a dummy value the run invented. Validator success proves only format, citation existence, ledger consistency, and that no detector flags a value.
 
 Once the validators pass, list capability chains:
 
@@ -179,7 +182,7 @@ For `confirmed`, require it to check:
 2. Real entry interface and exact local input shape.
 3. Every condition, parser/policy step, source-visible preventing layer, and observed local result.
 4. Affected principal/resource and demonstrated impact.
-5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the capability ceiling in `SKILL.md`, and `capabilities` that name only what the attacker held and gained.
+5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the cap the `capabilities` schema description states, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
 7. Every `refutation_checklist` `PASS` still holds against current source.
 
