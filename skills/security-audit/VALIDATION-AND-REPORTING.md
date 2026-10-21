@@ -159,6 +159,14 @@ The content validator denies by default. Each value its detectors flag fails unl
 
 Fix a content failure by rewriting the record to cite the value by type and location. Widen the allowlist only for a value the run invented. Validator success proves format, citation existence, and ledger consistency only.
 
+Once the validators pass, list capability chains:
+
+```sh
+node <skill-dir>/chain-findings.cjs <output-dir>/findings.json
+```
+
+Each chain it prints joins two or more `confirmed` or `needs_validation` records whose `grants` satisfy the next record's `requires`, from `principal:anonymous` to a critical objective. A chain proves nothing on its own: treat it as a new candidate with fingerprint `chain:` plus its member fingerprints joined by `+`, record that fingerprint in each member's ledger unit, and give it to a fresh Phase 3 verifier under the same budget rules. The verifier must establish that each link's result meets the next link's conditions in one deployment and reproduce the combined bounded result where the sandbox allows. A chain with a `needs_validation` member stays `needs_validation`. Member records stay as they are.
+
 ### Phase 5: Verify the final records with fresh eyes
 
 Launch one fresh `research` verifier per final `confirmed` and `needs_validation` record, in parallel. This verifier checks the structured record, not the hunter write-up, and remains inside source/local boundaries. Its prompt carries the target-content paragraph of the candidate-verifier prompt.

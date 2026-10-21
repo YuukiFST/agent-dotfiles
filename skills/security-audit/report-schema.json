@@ -128,7 +128,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md read both.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md and chain-findings.cjs read both.",
             "properties": {
               "requires": {
                 "type": "array",
@@ -421,7 +421,7 @@
           },
           "capabilities": {
             "type": "object",
-            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md read both.",
+            "description": "requires: what the attacker must already hold, with exactly one principal:* token. grants: what the demonstrated or claimed result adds. The severity ceilings in SKILL.md and chain-findings.cjs read both.",
             "properties": {
               "requires": {
                 "type": "array",

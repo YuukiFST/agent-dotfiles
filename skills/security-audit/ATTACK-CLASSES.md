@@ -82,7 +82,7 @@ Legitimate features used for unintended purposes. Look for bugs in the design, n
 
 **Chained vulnerabilities and trust boundaries** (subagent_type: `general`)
 Individually allowed or contained behavior can become a vulnerability when another component or lifecycle step relies on a stronger guarantee:
-- **Multi-step boundary failures**: Map what a low-privilege principal may read, write, invoke, and retain, then connect only concrete outputs to later trust decisions. Confirm each prerequisite and do not assume a downstream effect.
+- **Multi-step boundary failures**: Map what a low-privilege principal may read, write, invoke, and retain, then connect only concrete outputs to later trust decisions. Confirm each prerequisite and do not assume a downstream effect. Declare each candidate's `capabilities` exactly, since `chain-findings.cjs` joins one record's `grants` to another's `requires` to propose chains across hunters.
 - **Cross-component trust gaps**: Component A validates input and passes it to component B. Compare the exact guarantee A produces with what B assumes, including truncation, type coercion, normalization, tenant scope, and plugin/extension access.
 - **Second-order use**: Data safe when stored may become dangerous in a later context. A field name becomes a JSON path, a slug becomes a file path, escaped text enters raw rendering, or a stored string becomes a URL, regex, template, or policy expression.
 - **Scope and capability growth**: Token, API-key, plugin, OAuth, MCP, or AI capabilities become broader after delegation, refresh, caching, role change, or composition. Name the concrete operation the resulting principal should not have.
