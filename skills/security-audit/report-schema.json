@@ -65,6 +65,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -90,6 +95,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["file", "line", "description"],
@@ -299,6 +309,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -324,6 +339,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["file", "line", "description"],
@@ -416,6 +436,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["kind", "file", "line", "scope", "description"],
@@ -441,6 +466,11 @@
                   "type": "string",
                   "minLength": 1,
                   "visibleContent": true
+                },
+                "snippet_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "description": "Optional. SHA-256 of the cited line with surrounding whitespace trimmed, as printed by validate-citations.cjs --print-hashes."
                 }
               },
               "required": ["file", "line", "description"],

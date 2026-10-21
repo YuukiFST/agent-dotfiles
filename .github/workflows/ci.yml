@@ -85,9 +85,10 @@ jobs:
       # The Windows fallback in both validators diverges from upstream for good
       # (cloudflare/security-audit-skill#69 closed unmerged), so only this job catches a
       # mistake when it is applied again after an upstream update. Ubuntu runs the
-      # FIFO and symlink cases that Windows skips.
+      # FIFO and symlink cases that Windows skips. Every local divergence is listed in
+      # docs/security-audit-upstream-divergence.md.
       - name: Run the validator tests
-        run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs
+        run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs skills/security-audit/validate-citations.test.cjs
 
   skill-frontmatter:
     name: Skill frontmatter

@@ -629,7 +629,7 @@ function openWindowsInput(file) {
   return descriptor;
 }
 
-function readFileWithinLimit(file) {
+function readBytesWithinLimit(file) {
   const noFollow = fs.constants.O_NOFOLLOW;
   const nonBlock = fs.constants.O_NONBLOCK;
   const hasNoFollowOpen = Number.isInteger(noFollow) && noFollow !== 0 && Number.isInteger(nonBlock) && nonBlock !== 0;
@@ -669,13 +669,18 @@ function readFileWithinLimit(file) {
       }
       chunks.push(Buffer.from(buffer.subarray(0, count)));
     }
-    try {
-      return UTF8_DECODER.decode(Buffer.concat(chunks, bytesRead));
-    } catch {
-      throw new SafeInputError("input is not valid UTF-8");
-    }
+    return Buffer.concat(chunks, bytesRead);
   } finally {
     fs.closeSync(descriptor);
+  }
+}
+
+function readFileWithinLimit(file) {
+  const bytes = readBytesWithinLimit(file);
+  try {
+    return UTF8_DECODER.decode(bytes);
+  } catch {
+    throw new SafeInputError("input is not valid UTF-8");
   }
 }
 
@@ -790,6 +795,7 @@ function run(file) {
 module.exports = {
   LIMITS,
   PATH_FORBIDDEN_CHARACTER,
+  SafeInputError,
   UNSAFE_DIAGNOSTIC_CHARACTER,
   VISIBLE_CONTENT,
   WINDOWS_RESERVED_COMPONENT,
@@ -798,6 +804,7 @@ module.exports = {
   collectSchemaErrors,
   hasVisibleProse,
   isSafeRelativeSourcePath,
+  readBytesWithinLimit,
   readFileWithinLimit,
   validateDocument,
 };
