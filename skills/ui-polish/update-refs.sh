@@ -2,7 +2,8 @@
 # Clone-or-pull the design reference repos the ui-polish skill reads.
 # They live outside every harness skills dir on purpose: none of their frontmatter
 # reaches a session, only the skill's own description does.
-# Idempotent: run on a fresh machine or to refresh existing clones.
+# Idempotent: run on a fresh machine or to refresh existing clones. A repo with a
+# third column is cloned sparse, that subdirectory only.
 # Ends with two drift checks: UNROUTED for an upstream skill, or a file in its
 # references/ dir, that SKILL.md neither routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
 # upstream no longer has, or a **bold** section name no upstream heading or label
@@ -11,10 +12,13 @@ set -euo pipefail
 REFS="${UI_REFS:-$HOME/.claude/ui-refs}"
 ROUTER="$(dirname "$0")/SKILL.md"
 mkdir -p "$REFS"
-while read -r name url; do
+while read -r name url sparse; do
   dir="$REFS/$name"
   if [ -d "$dir/.git" ]; then
     git -C "$dir" pull -q --ff-only
+  elif [ -n "$sparse" ]; then
+    git clone -q --depth 1 --filter=blob:none --sparse "$url" "$dir"
+    git -C "$dir" sparse-checkout set "$sparse"
   else
     git clone -q --depth 1 "$url" "$dir"
   fi
@@ -24,11 +28,12 @@ jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
 make-interfaces-feel-better https://github.com/jakubkrehel/make-interfaces-feel-better
 craft https://github.com/gustavo-fior/craft
+mengto-skills https://github.com/MengTo/Skills agent-skills/ui
 REPOS
 
 drift=0
-for skill in "$REFS"/*/skills/*/; do
-  [ -d "$skill" ] || { echo "No upstream skills found under $REFS/*/skills/"; drift=1; continue; }
+for skill in "$REFS"/*/skills/*/ "$REFS"/*/agent-skills/ui/*/; do
+  [ -d "$skill" ] || { echo "No upstream skills found under ${skill%/}"; drift=1; continue; }
   rel="${skill#"$REFS"/}"
   if ! grep -qF "$rel" "$ROUTER"; then
     echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
@@ -70,7 +75,7 @@ while IFS= read -r heading; do
   heading="${heading%$'\r'}"; local_heading["${heading,,}"]=1
 done < <(grep -ohE '^#{1,6} .*' "$SKILL_DIR"/*.md | sed -E 's/^#+ +//; s/^[0-9]+\. +//; s/ \(.*\)$//' || true)
 labels_in() { grep -rhE --include='*.md' '^#{1,6} |\*\*' "$@" 2>/dev/null || true; }
-upstream_labels="$(labels_in "$REFS"/*/skills)"
+upstream_labels="$(labels_in "$REFS"/*/skills "$REFS"/*/agent-skills/ui)"
 resolve_token() { # sets target_of[$1] to the skill dir or REFS/ file it names, or empty
   [ -n "${target_of[$1]+set}" ] && return 0
   local found="" dir
@@ -79,7 +84,7 @@ resolve_token() { # sets target_of[$1] to the skill dir or REFS/ file it names, 
   elif [[ "$1" == */* && -e "$REFS/$1" ]]; then
     found="$REFS/$1"
   else
-    for dir in "$REFS"/*/skills/"${1%%/*}"; do [ -d "$dir" ] && found="$dir"; done
+    for dir in "$REFS"/*/skills/"${1%%/*}" "$REFS"/*/agent-skills/ui/"${1%%/*}"; do [ -d "$dir" ] && found="$dir"; done
   fi
   target_of[$1]="$found"
   [ -z "$found" ] || labels_of[$found]="$(labels_in "$found")"

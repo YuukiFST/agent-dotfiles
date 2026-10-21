@@ -1,6 +1,6 @@
 ---
 name: ui-polish
-description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel and emilkowalski reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
+description: Build or improve a web UI (page, screen, component, flow, chart or dashboard) to a design-engineer craft bar on any stack, routing to the jakubkrehel, emilkowalski and MengTo reference skills. Use when asked to create a screen, component or data visualization from scratch or from a Figma file or design image, improve/polish/redesign an existing page ("improve the UI", "make the UI look better", "feels off"), up to every component on it, review UI or motion quality of a screen or of a diff/branch/PR, add, fix or de-jank animations and gestures, pick a UI library, fix Sonner toasts, show variants, render every state of a component, or stress-test it with worst-case data. Skip for pure logic, data pipelines or backend work.
 ---
 
 # UI polish
@@ -41,6 +41,8 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Stress harness: scenario axes, one page, one look | `REFS/jakubkrehel-skills/skills/break/` (`scenarios.md`) |
 | Consolidation: severity scale, escalation triggers, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
+| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**What to Flag**, **Use the Removal Test**). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s, invented proof is `HIGH` as misleading. |
+| Direction intake: a greenfield screen with no reference to follow | `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/SKILL.md` (**Questions to ask** for the user, **Prompt Structure** as the spec skeleton minus FORMAT and NEGATIVE PROMPT, which are for image models) |
 | Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
 | Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
 | Craft supplements: edge-aware scroll fades, the root canvas, tiled grain, smoothing caveats, hanging punctuation, input never locked mid-motion, press scale per surface | Named sections only, since the rest of each file repeats an owner above: `REFS/craft/skills/craft-design-engineering/references/typography.md` (**Font Smoothing**; **Hanging punctuation** in **Optical Alignment**), `REFS/craft/skills/craft-design-engineering/references/color.md` (**Noise**), `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**), `REFS/craft/skills/craft-design-engineering/references/motion.md` (**Button Press**, **Interruptibility**). Conflicts resolve per the craft line in the [reviewer-prompt.md](reviewer-prompt.md) Template. |
@@ -53,6 +55,8 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
 - `REFS/jakubkrehel-skills/skills/technical-drawing/`: drawings of physical objects, not interface work, and its viewer installs packages.
 - `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
+- `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/ARTICLE.md` and `demo/`: model and tool picks, template selling, and "craft signals" (numbered labels, beam animations) that `no-ai-design-slop` `ARTICLE.md` lists as slop. The router reads the skill's `SKILL.md` only.
+- `REFS/mengto-skills/agent-skills/ui/*/REFERENCES.md` and `agents/`: source link lists and a Codex manifest. The other `agent-skills/` categories are never checked out: `update-refs.sh` clones `agent-skills/ui` sparse.
 - `REFS/craft/content/`: craft's unlaunched drafts. A launched concept lands in a craft `references/` file; a file this table does not cite prints as `UNROUTED`.
 
 ## Step 0: Recon (every mode)
