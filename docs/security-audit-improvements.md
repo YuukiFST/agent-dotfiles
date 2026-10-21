@@ -32,7 +32,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 
 | ID | Ideia | Tipo | Arquivo da skill | Fontes | Prioridade | Status |
 |----|-------|------|------------------|--------|------------|--------|
-| SA-01 | Validador de citações: cada `trace[].path:line` precisa existir no target, com linha dentro do arquivo | script | `validate-findings.cjs` | Mantis, hermes-agent, ThreatPath | alta | proposto |
+| SA-01 | Validador de citações: cada `trace[].path:line` precisa existir no target, com linha dentro do arquivo | script | `validate-findings.cjs` | Mantis, hermes-agent, ThreatPath | alta | feito ([#199](https://github.com/YuukiFST/agent-dotfiles/pull/199)) |
 | SA-02 | Tetos de severidade por capacidade marginal | schema + script | `report-schema.json`, `validate-findings.cjs`, `SKILL.md` | Mantis, hermes-agent, caldera | alta | proposto |
 | SA-03 | Checklist estruturado de refutação por finding | schema + prompt | `report-schema.json`, `VALIDATION-AND-REPORTING.md` | Mantis, ThreatPath, hermes-agent | alta | proposto |
 | SA-04 | Varredura de call-sites generalizada para qualquer contrato documentado | prompt | `HUNTING.md` | Mantis, hexstrike-ai, caldera | média | proposto |
@@ -49,7 +49,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-15 | Prova negativa do sandbox antes de executar código do target | prompt + schema | `RECONNAISSANCE.md`, `SKILL.md:33-40`, `run-metadata.json` | openworker | média | proposto |
 | SA-16 | Corpus de avaliação da skill com pares metamórficos e holdout | script + fixtures | novo diretório de evals | openworker | média | proposto |
 | SA-17 | Defesa exigida por slot de injeção e argv re-tokenizado | prompt | `ATTACK-CLASSES.md:29-37`, `CLIENT-SIDE.md` | hermes-agent, caldera | média | proposto |
-| SA-18 | Hash do trecho citado para levar achados entre runs | schema + script | `report-schema.json`, `SKILL.md:98`, script do SA-01 | hermes-agent | média | proposto |
+| SA-18 | Hash do trecho citado para levar achados entre runs | schema + script | `report-schema.json`, `SKILL.md:98`, script do SA-01 | hermes-agent | média | feito ([#199](https://github.com/YuukiFST/agent-dotfiles/pull/199), com o SA-01) |
 | SA-19 | Opt-outs de autenticação para principal-máquina viram unidades próprias | prompt | `RECONNAISSANCE.md` (Agent 1b) | caldera | média | proposto |
 | SA-20 | Scanners locais já instalados como sementes offline | prompt | `RECONNAISSANCE.md` (Agent 1d), `ATTACK-CLASSES.md:113,120` | hexstrike-ai, openworker | baixa | proposto |
 | SA-21 | Códigos de motivo fechados para unidades não fechadas no ledger | schema + script | `RECONNAISSANCE.md:141-150`, `validate-coverage-ledger.cjs` | caldera | baixa | proposto |
