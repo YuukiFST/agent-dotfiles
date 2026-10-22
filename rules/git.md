@@ -69,10 +69,10 @@ The generic terms `IA`, `AI`, `agente` and `LLM` are **subjects, not attribution
 
 ### 4.3 Enforcement
 
-The `commit-msg` hook alone does not stop it: Cursor injects `Co-authored-by` *after* `git commit`, so in Cursor commit with `scripts/git-safe-commit.sh`, never `git commit`. The real gate is `pre-push`, which blocks any push carrying a forbidden trailer. Hook installation, the `git-safe-commit` invocation, and how to rebuild a commit that already went bad: the `git-workflow` skill.
+The `commit-msg` hook alone does not stop it: Cursor injects `Co-authored-by` *after* `git commit`, so in Cursor commit with `scripts/git-safe-commit.sh`, never `git commit`. The real gate is `pre-push`, which blocks any push carrying a forbidden trailer. Hook installation, the `git-safe-commit` invocation, and how to rebuild a commit that already went bad: "Enforcement mechanics" in `~/.claude/skills/git-workflow/SKILL.md`, which you may read for that section without running the flow.
 
 ## 5. Shipping a change
 
-The issue → branch → PR → review → merge flow, squash-vs-merge, forks vs standalone repos, and the GitHub contribution conditions live in the **`git-workflow` skill**. Load it before the first commit of a change, not at merge time.
+The issue → branch → PR → review → merge → cleanup flow, squash-vs-merge, forks vs standalone repos, and the GitHub contribution conditions live in the **`git-workflow` skill**. It is user-invoked: run it only when the user invokes `/git-workflow` or names it, and that invocation authorizes the merge of the PR it opens.
 
 Sections 1-4 above are not in that skill and are not optional: they apply to every commit, whether or not the flow is being followed.
