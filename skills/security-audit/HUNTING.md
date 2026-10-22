@@ -157,7 +157,12 @@ file separately:
 4. If a required fact is not source-visible or locally observable, use
    needs_validation. Name exact blockers; do not give it severity or speculative completion.
 5. A missing best practice with no affected principal/resource is excluded or hardening,
-   not a finding. A candidate disproved by source is not needs_validation.
+   not a finding. A candidate disproved by source is not needs_validation. Without a
+   chain that crosses a boundary, these are hardening at most: a missing security
+   header, framing of a page with no sensitive action, an open redirect alone, CSV
+   formula injection, a wildcard CORS origin without credentials, a key public by
+   design (a Stripe `pk_` key, a Sentry DSN, a `NEXT_PUBLIC_*` value), and a sample
+   secret its own file marks as demo data and no runtime configuration loads.
 6. Use the same source-derived fingerprint for the same root cause in every state.
    It must match `^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$` and must not include a line,
    wave, agent, severity, or verdict.

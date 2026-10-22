@@ -39,7 +39,12 @@ safe is a claim to verify.
    dummy principal/resource. Do not infer a stronger result or continue after it.
 4. Verify that likelihood, impact, confidence, capabilities, and the proposed source
    fix match only what the evidence establishes: `requires` names what the attacker
-   already held and `grants` only what the result adds.
+   already held and `grants` only what the result adds. Keep the mechanism (what the
+   code did) apart from the impact (what that gives the attacker). When the observed
+   result crosses the boundary but falls short of the stated impact, rewrite the
+   title, description, capabilities, and severity down to the observed result and
+   keep the record: the record must still stand with its impact sentence deleted.
+   Reject only when source refutes the mechanism itself.
 5. For a proposed needs_validation candidate, decide whether the blocker is genuinely
    outside source/local observation. If source refutes the trace, reject it. If the
    missing fact remains decisive, keep needs_validation and make the local and
@@ -64,7 +69,20 @@ safe is a claim to verify.
    PASS means the check holds. FAIL means source refutes it, and the item cites the
    refuting file and line: the control, the authority the actor already had, or the
    check the prerequisite fails. A path nothing reaches is FAIL too: cite the definition
-   no caller reaches or the route table that omits it. UNKNOWN means only a fact
+   no caller reaches or the route table that omits it. A control_bypassed FAIL completes
+   this sentence: "safe because <control> at <file:line> does <X> before <sink>, on
+   every path the principal reaches". None of these refutes on its own: trust in a
+   library or helper (escaping depends on context: an HTML escaper does nothing in a
+   script or attribute, a SQL identifier quoter does not quote values, a path join does
+   not contain a path), a control on a different path, a control that runs after the
+   effect, a control that can fail open (a swallowed exception, a flag the caller
+   overrides, an allowlist empty by default), a guarded sibling call site, a denylist,
+   pattern scanner, redaction, or model judge over attacker-influenced text, a caller
+   you did not find, an operator who could configure a filter, and internal-only or
+   authenticated-only reach, which lowers severity instead. A local check that showed no
+   effect is FAIL only with the control that stopped it cited; a check you could not
+   run, or an effect you could not reproduce without knowing why, is never FAIL.
+   UNKNOWN means only a fact
    outside source and bounded local evidence can settle the check, and its reason names
    that fact. NOT_APPLICABLE means an earlier check in this list is FAIL or UNKNOWN
    and cuts the path before this one, or marks marginal_capability when grants adds
@@ -117,7 +135,7 @@ file separately:
     promotion blocker.
 ```
 
-A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim, and cite the file and line the refutation rests on: the control, the definition no caller reaches, or the authority the actor already had. `needs_validation` is never a parking place for a speculative idea.
+A verifier can promote `needs_validation` to `confirmed` only after independently establishing the complete path and bounded observed result. Demote proposed confirmation to `needs_validation` when a specific deployment or runtime fact remains unknown. Use `rejected` when source, local behavior, a visible control, missing meaningful impact, or an impossible prerequisite refutes the claim, and cite the file and line the refutation rests on: the control, the definition no caller reaches, or the authority the actor already had. An impact stated beyond the observed result is not a refutation when the observed result still crosses the boundary: the verifier rewrites the claim down to it. `needs_validation` is never a parking place for a speculative idea.
 
 The parent checks that each verifier returned the same fingerprint unless it identified a genuinely different root cause. Merge corrections, record the decision in every linked coverage unit, and ensure there is one final record per fingerprint. Discard a malformed or prose-wrapped verifier result without repairing it; re-run that candidate with a fresh verifier when the budget permits, otherwise it remains an unvalidated ledger candidate under the incomplete-run rule.
 
