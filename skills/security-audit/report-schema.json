@@ -27,6 +27,11 @@
             "minLength": 1,
             "visibleContent": true
           },
+          "cwe": {
+            "type": "string",
+            "pattern": "^CWE-[1-9][0-9]*$",
+            "description": "The MITRE CWE identifier the root cause maps to. Leave it out when no weakness fits rather than guessing; export-sarif.cjs tags the result with it."
+          },
           "root_cause": {
             "type": "string",
             "minLength": 1,
@@ -409,6 +414,11 @@
             "type": "string",
             "minLength": 1,
             "visibleContent": true
+          },
+          "cwe": {
+            "type": "string",
+            "pattern": "^CWE-[1-9][0-9]*$",
+            "description": "The MITRE CWE identifier the root cause maps to. Leave it out when no weakness fits rather than guessing; export-sarif.cjs tags the result with it."
           },
           "claimed_root_cause": {
             "type": "string",

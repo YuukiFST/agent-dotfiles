@@ -177,7 +177,7 @@ Read `report-schema.json` immediately before writing. It uses `additionalPropert
 - A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. An optional `refutation_checklist` has at least one `UNKNOWN` and no `FAIL`. It must not use severity, execution, remediation, reason, or confirmed root cause.
 - A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, `refutation_checklist` with at least one `FAIL` that cites its refuting file and line, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
-Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact.
+Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact. A `confirmed` or `needs_validation` record carries an optional `cwe` only when its root cause maps to one MITRE CWE entry; leave it out rather than guess one from the title.
 
 Run:
 
@@ -281,12 +281,22 @@ For each confirmed `medium`, `high`, or `critical` record, copy the complete sou
 
 For every unresolved record, copy the source trace, verified evidence, exact blocker, affected boundary, and each applicable bounded local or owner-observed resolution plan. Keep these as prioritized leads without severity. Do not turn them into live test guidance or assume the missing deployment fact.
 
+#### `findings.sarif`
+
+Write it only when the owner asks for code-scanning output, from the final `findings.json`:
+
+```sh
+node <skill-dir>/export-sarif.cjs <output-dir>/findings.json > <output-dir>/findings.sarif
+```
+
+The script refuses a `findings.json` that fails `validate-findings.cjs`. A `confirmed` record becomes a `fail` result whose level and `security-severity` follow its overall severity, a `needs_validation` record becomes a `review` result with no severity, and a `rejected` record is left out; a record's `cwe` becomes its rule's tag. Uploading the file is the owner's decision after the run.
+
 HTTP is one possible native interface, not the default. A library finding may use a function call, a parser a fixture, a CLI a command, a desktop app an IPC or file action, and infrastructure a locally rendered policy. Do not require an endpoint, external account, or live environment that the target does not have.
 
 Keep the report proportional to the evidence. A clean run may have zero confirmed records. State that result and the remaining coverage/validation limits without inventing LOW findings.
 
-Before the run ends, scan the three reports with the same rules file and fix every failure:
+Before the run ends, scan the three reports, and `findings.sarif` when written, with the same rules file and fix every failure:
 
 ```sh
-node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/REPORT.md <output-dir>/FINDINGS-DETAIL.md <output-dir>/NEEDS-VALIDATION.md
+node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/REPORT.md <output-dir>/FINDINGS-DETAIL.md <output-dir>/NEEDS-VALIDATION.md [<output-dir>/findings.sarif]
 ```
