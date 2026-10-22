@@ -12,8 +12,11 @@ The deliverable is a verdict: apply no fix until the user picks one.
 ## Step 1, Scope
 
 - The user named files, a diff or a PR: use that (`gh pr diff <n>` for a PR).
-- On a feature branch: `git diff <base>...HEAD`, where base is the repo's default branch.
-- Otherwise: the changes made in this session.
+- On a feature branch: the merge base with the repo's default branch against the working tree, `git diff $(git merge-base HEAD <base>)`, so staged and unstaged work counts.
+- Otherwise: uncommitted work, `git diff HEAD`; when that is empty, the changes made in this session.
+
+Either way, add the full contents of each untracked file from `git ls-files --others --exclude-standard`.
+When `git diff --cached` and `git diff` disagree on a hunk, review the staged one too: the commit takes the index, not the working tree.
 
 Package the diff with the context files a reviewer needs to follow it (callers, types, the module it lives in).
 Done when you can name every changed file and say why each context file is included.
@@ -49,6 +52,7 @@ Parse every reviewer's findings.
 Merge findings that describe the same issue in different words, and record which reviewers raised each one.
 A finding two or more reviewers raised independently is the highest signal; read a lone reviewer's finding and weight it accordingly.
 When one reviewer flags something and another explicitly says the opposite, keep both as context for the verdict.
+A reviewer that failed, returned no parseable findings, or names changed files in its Coverage as skipped or partly read is **incomplete**: its silence on those files is no review, never agreement.
 
 ## Step 5, Lead judgment
 
@@ -74,7 +78,7 @@ For any other diff, write "not risky" with the reason and stop.
 > The intent paragraph from Step 2.
 
 ### Reviewers
-- Reviewer [label]: [model], [effort], [N findings], plus any fallback taken.
+- Reviewer [label]: [model], [effort], [N findings], [complete, or incomplete with the files it missed], plus any fallback taken.
 
 ### Act On
 Each: description, which reviewers raised it, why it matters.
