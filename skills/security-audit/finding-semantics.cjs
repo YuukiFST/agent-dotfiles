@@ -1,6 +1,7 @@
 /**
  * Finding checks this copy of the skill adds to validate-findings.cjs: the refutation checklist,
- * capability tokens, the severity ceilings they imply, and the control case of a confirmed execution. validateDocument runs collectLocalFindingErrors after upstream's
+ * capability tokens, the severity ceilings they imply, the control case of a confirmed execution, and the gates
+ * of a proposed patch. validateDocument runs collectLocalFindingErrors after upstream's
  * own semantic checks, so the schema has already rejected unknown tokens.
  */
 
@@ -176,6 +177,24 @@ function collectControlCaseErrors(finding, base, errors) {
   }
 }
 
+const FIX_GATES = ["closure", "bypass_review", "preserved_behavior", "regression_case"];
+
+// A ready patch must show it enforces the invariant; strategy prose alone needs no gates.
+function collectFixGateErrors(finding, base, errors) {
+  const remediation = finding.remediation;
+  if (finding.verdict !== "confirmed" || !remediation || typeof remediation !== "object") return;
+  if (!Array.isArray(remediation.code_changes) || remediation.code_changes.length === 0) return;
+  if (remediation.invariant === undefined) errors.push(`${base}.remediation.invariant: required when code_changes is nonempty`);
+  if (!Array.isArray(remediation.verification)) {
+    errors.push(`${base}.remediation.verification: required when code_changes is nonempty, one entry per gate`);
+    return;
+  }
+  for (const gate of FIX_GATES) {
+    const count = remediation.verification.filter((entry) => entry && entry.gate === gate).length;
+    if (count !== 1) errors.push(`${base}.remediation.verification: gate ${JSON.stringify(gate)} must appear exactly once, got ${count}`);
+  }
+}
+
 // Returns well-formed capabilities with exactly one starting principal, or null after reporting why not.
 function startingCapabilities(finding, base, errors) {
   const capabilities = finding.capabilities;
@@ -193,6 +212,7 @@ function collectLocalFindingErrors(findings, isSafeRelativeSourcePath) {
     if (!finding || typeof finding !== "object" || Array.isArray(finding)) return;
     const base = `$[${index}]`;
     collectControlCaseErrors(finding, base, errors);
+    collectFixGateErrors(finding, base, errors);
     const capabilities = startingCapabilities(finding, base, errors);
     const marginal = capabilities && marginalCapabilities(capabilities);
     collectChecklistErrors(finding, marginal && marginal.length > 0, base, isSafeRelativeSourcePath, errors);
@@ -208,6 +228,7 @@ function collectLocalFindingErrors(findings, isSafeRelativeSourcePath) {
 
 module.exports = {
   CAPABILITY_IMPLIES,
+  FIX_GATES,
   REFUTATION_CHECKS,
   capabilityClosure,
   collectLocalFindingErrors,

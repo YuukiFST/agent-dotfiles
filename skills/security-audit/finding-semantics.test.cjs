@@ -215,6 +215,38 @@ test("fails a confirmed record that lacks its evidence kind, control case, count
   }
 });
 
+test("accepts strategy-only remediation without gates and a patch whose gates each appear once", () => {
+  const strategyOnly = confirmed();
+  delete strategyOnly.remediation.invariant;
+  delete strategyOnly.remediation.verification;
+  const patched = confirmed();
+  patched.remediation.code_changes = [{ file_name: "src/handler.c", fixed_code: "if (!owns(user, object)) return deny();" }];
+  patched.remediation.verification[0].status = "PASS";
+  patched.remediation.verification[3].status = "NOT_RUN";
+  for (const finding of [strategyOnly, patched]) {
+    const result = runValidator([finding]);
+    assert.equal(result.status, 0, result.output);
+  }
+});
+
+test("fails a patch without its invariant or without each fix gate exactly once", () => {
+  const cases = [
+    [(remediation) => { delete remediation.invariant; }, /remediation\.invariant: required when code_changes is nonempty/],
+    [(remediation) => { delete remediation.verification; }, /remediation\.verification: required when code_changes is nonempty/],
+    [(remediation) => { remediation.verification.pop(); }, /gate "regression_case" must appear exactly once, got 0/],
+    [(remediation) => { remediation.verification[1].gate = "closure"; }, /gate "closure" must appear exactly once, got 2/],
+    [(remediation) => { remediation.verification[0].status = "FAIL"; }, /status/],
+  ];
+  for (const [mutate, message] of cases) {
+    const finding = confirmed();
+    finding.remediation.code_changes = [{ file_name: "src/handler.c", fixed_code: "if (!owns(user, object)) return deny();" }];
+    mutate(finding.remediation);
+    const result = runValidator([finding]);
+    assert.equal(result.status, 1, result.output);
+    assert.match(result.stderr, message);
+  }
+});
+
 test("fails a control case with the attack's own result", () => {
   const finding = confirmed();
   finding.execution.control.observed_result = ` ${finding.execution.observed_result} `;
