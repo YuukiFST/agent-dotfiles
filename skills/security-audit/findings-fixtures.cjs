@@ -32,13 +32,20 @@ function confirmed() {
       payloads: ["An object identifier owned by another user."],
       instructions: ["Submit the identifier through the public operation."],
       observed_result: "The other user's object changes.",
+      evidence_kind: "local_state_readback",
+      control: {
+        input: "The same request with an object identifier the attacker owns, then one from a second attacker-owned account without access.",
+        observed_result: "The attacker's own object changes; the request from the account without access changes nothing.",
+      },
     },
+    counterevidence: "The router requires a session before handle runs, but no ownership check follows on this path.",
     remediation: { strategy: "Check ownership before the state change." },
     severity: {
       likelihood: { score: "medium", reason: "The operation is directly reachable." },
       impact: { score: "medium", reason: "The attacker changes one protected object." },
       overall_severity: "medium",
       model_dependent: false,
+      change_conditions: "Identifiers that are guessable or listed to other users would raise likelihood.",
     },
     confidence: { score: "high", reason: "The source path and result were reproduced." },
   };

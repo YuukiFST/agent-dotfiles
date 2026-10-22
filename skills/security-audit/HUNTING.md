@@ -87,7 +87,8 @@ blocker. Prefer an existing unit test, minimal function harness, dummy-tenant se
 call, small malformed fixture, deterministic race schedule, or locally rendered policy.
 Do not install or fetch tools.
 
-Record the exact input, command, limits, and minimum result. For the environment,
+Record the exact input, command, limits, and minimum result, then run the same check
+with a benign input or an authorized principal and record that control result. For the environment,
 record only allowlisted variable names and safe non-secret values needed to reproduce
 the check. Never capture the ambient environment, inherited variables, credentials,
 authentication state, or unrelated host paths. The target-controlled process writes
@@ -151,7 +152,9 @@ file separately:
 1. A candidate needs a complete repository-relative source trace and evidence for the
    claimed root cause, including the strongest source-visible control.
 2. A proposed confirmed record needs a bounded local observed result, meaningful impact
-   across a stated boundary, complete conditions, and no visible preventing layer.
+   across a stated boundary, complete conditions, and no visible preventing layer. A
+   local result also needs a control case: the same check through the same boundary
+   with a benign input or an authorized principal, giving a different result.
 3. Do not strengthen a crash into code execution, ordinary work into shared availability,
    or a same-principal action into privilege gain.
 4. If a required fact is not source-visible or locally observable, use
@@ -226,7 +229,7 @@ Return exactly one JSON object, with no surrounding prose:
 
 Each `candidates` entry is schema-shaped except that it uses `proposed_verdict` in place of `verdict`:
 
-- `proposed_verdict: "confirmed"`: include every field required by the `confirmed` branch of `report-schema.json` other than `verdict` and `refutation_checklist`, which the candidate verifier fills: `fingerprint`, title, description, `root_cause`, `intended_behavior`, ordered `trace`, `evidence`, `conditions`, `capabilities`, target-neutral `execution`, `remediation`, `severity`, and `confidence`. The execution instructions describe only the bounded local check already performed. `payloads` holds the minimum test input, fixture, or native invocation. `observed_result` records actual local output. Overall severity must not exceed observed impact.
+- `proposed_verdict: "confirmed"`: include every field required by the `confirmed` branch of `report-schema.json` other than `verdict` and `refutation_checklist`, which the candidate verifier fills: `fingerprint`, title, description, `root_cause`, `intended_behavior`, ordered `trace`, `evidence`, `conditions`, `capabilities`, target-neutral `execution`, `counterevidence`, `remediation`, `severity`, and `confidence`. The execution instructions describe only the bounded local check already performed. `payloads` holds the minimum test input, fixture, or native invocation. `observed_result` records actual local output, `evidence_kind` names what establishes it, and `control` records the benign or authorized run and its different result; only `source_observation`, a result that is a fact of the repository itself, has no control. `counterevidence` is the strongest case against the candidate and why it does not hold, and `severity.change_conditions` is the fact that would move the severity. Overall severity must not exceed observed impact.
 - `proposed_verdict: "needs_validation"`: include every field required by that schema branch other than `verdict`: `fingerprint`, title, description, `claimed_root_cause`, ordered `trace`, `evidence`, `capabilities`, nonempty `blockers`, and `validation_plan` with at least one applicable `local` or `deployment` step. Do not invent an inapplicable context. Do not include severity, execution, remediation, reason, or a confirmed `root_cause`. `deployment` is an owner-observed check, not a request to probe a live target.
 
 Every assigned coverage ID appears exactly once in `units`. A `covered` unit needs an owner, nonempty `reviewed_paths` and `checks`, no unresolved fact, and no candidate. A `candidate` unit has the same owned evidence and is the only state that carries linked fingerprints. A `blocked` unit is an owned partial review with nonempty paths, checks, and unresolved facts but no fingerprint. All source paths are repository-relative, never absolute or traversal paths. A trace with several entries begins at `entrypoint`, ends at `sink`, and labels intermediate steps `propagation`. Every check has its own canonical lowercase `agent_id` and nonempty `reviewed_paths`; the unit-level list is exactly the union of those owned paths. A `source` check uses `artifact: null`. A `local` check uses one successfully parent-promoted regular file beneath `agents/<check.agent_id>/artifacts/`; this permits a verifier to add independently owned evidence without taking ownership from the hunter. Never link scratch, an output-root file, or another check owner's artifact.

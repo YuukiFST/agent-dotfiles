@@ -146,7 +146,7 @@ For every candidate, name the lower-trust principal, accepted input or action, i
 
 ### Use bounded local evidence
 
-Static analysis establishes the source path. Sandboxed local tests resolve behavior when all execution controls are available: a minimal function harness, existing unit test, small parser fixture, dummy-tenant integration test, locally rendered configuration, or bounded isolated-loopback client. Stop at a wrong return value, unauthorized dummy record, sanitizer finding, policy difference, or other minimum effect. Do not extend the local check beyond the minimum boundary result or produce persistence, post-fault, or concealment material.
+Static analysis establishes the source path. Sandboxed local tests resolve behavior when all execution controls are available: a minimal function harness, existing unit test, small parser fixture, dummy-tenant integration test, locally rendered configuration, or bounded isolated-loopback client. Stop at a wrong return value, unauthorized dummy record, sanitizer finding, policy difference, or other minimum effect. Pair it with a control case through the same boundary, a benign input or an authorized principal whose result differs, so the check could have failed. Do not extend the local check beyond the minimum boundary result or produce persistence, post-fault, or concealment material.
 
 ### Respect source visibility
 

@@ -37,6 +37,12 @@ safe is a claim to verify.
 3. For a proposed confirmed candidate, independently reproduce the minimum observed
    result when possible. Verify inputs, interface shape, conditions, and affected
    dummy principal/resource. Do not infer a stronger result or continue after it.
+   Reproduce the control case too: the same check with a benign input or an
+   authorized principal must give a different result, or the check proves nothing.
+   On their own these are not proof: reflected input is not script execution, a
+   success status on a write is not access until the dummy state is read back, one
+   slow response is not injection, and a result reached through a different defect
+   does not prove this one. Set evidence_kind to what establishes the result.
 4. Verify that likelihood, impact, confidence, capabilities, and the proposed source
    fix match only what the evidence establishes: `requires` names what the attacker
    already held and `grants` only what the result adds. Keep the mechanism (what the
@@ -44,7 +50,9 @@ safe is a claim to verify.
    result crosses the boundary but falls short of the stated impact, rewrite the
    title, description, capabilities, and severity down to the observed result and
    keep the record: the record must still stand with its impact sentence deleted.
-   Reject only when source refutes the mechanism itself.
+   Reject only when source refutes the mechanism itself. Write counterevidence, the
+   strongest case against the record from step 2 and why it does not hold, and
+   severity.change_conditions, the fact that would raise or lower the severity.
 5. For a proposed needs_validation candidate, decide whether the blocker is genuinely
    outside source/local observation. If source refutes the trace, reject it. If the
    missing fact remains decisive, keep needs_validation and make the local and
@@ -153,7 +161,7 @@ The parent writes all independently decided records to `<output-dir>/findings.js
 
 Read `report-schema.json` immediately before writing. It uses `additionalProperties: false`; do not carry hunter wrapper fields into a record. Keep these verdict contracts distinct:
 
-- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN` and `NOT_APPLICABLE` only on `marginal_capability`, `execution`, `remediation`, `severity`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual.
+- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN` and `NOT_APPLICABLE` only on `marginal_capability`, `execution`, `counterevidence`, `remediation`, `severity` with `change_conditions`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual. `evidence_kind` names what establishes it, and every kind but `source_observation` carries a `control` whose result differs from the attack's.
 - A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. An optional `refutation_checklist` has at least one `UNKNOWN` and no `FAIL`. It must not use severity, execution, remediation, reason, or confirmed root cause.
 - A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, `refutation_checklist` with at least one `FAIL` that cites its refuting file and line, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
@@ -207,6 +215,7 @@ For `confirmed`, require it to check:
 5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the cap the `capabilities` schema description states, and `capabilities` that name only what the attacker held and gained.
 6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
 7. Every `refutation_checklist` `PASS` still holds against current source.
+8. `execution.evidence_kind` matches how `observed_result` was established, the `control` ran through the same boundary, and `counterevidence` names the strongest control found on the path.
 
 For `needs_validation`, require it to check:
 
@@ -251,6 +260,8 @@ For each confirmed `medium`, `high`, or `critical` record, copy the complete sou
 - dummy attacker/principal and affected dummy resource;
 - native input, invocation, or fixture and exact bounded instructions;
 - observed output and the security invariant it proves;
+- the evidence kind, and the control case with its different result;
+- the counterevidence weighed and the facts that would change the severity;
 - conditions and containment;
 - source-level remediation and regression case.
 

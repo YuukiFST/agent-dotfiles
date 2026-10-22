@@ -1,6 +1,6 @@
 /**
  * Finding checks this copy of the skill adds to validate-findings.cjs: the refutation checklist,
- * capability tokens, and the severity ceilings they imply. validateDocument runs collectLocalFindingErrors after upstream's
+ * capability tokens, the severity ceilings they imply, and the control case of a confirmed execution. validateDocument runs collectLocalFindingErrors after upstream's
  * own semantic checks, so the schema has already rejected unknown tokens.
  */
 
@@ -159,6 +159,23 @@ function collectChecklistErrors(finding, hasMarginal, base, isSafeRelativeSource
   }
 }
 
+// A result that a repository fact establishes has no execution to control; every other kind ran a check that must
+// be able to fail.
+function collectControlCaseErrors(finding, base, errors) {
+  const execution = finding.execution;
+  if (finding.verdict !== "confirmed" || !execution || typeof execution !== "object") return;
+  if (typeof execution.evidence_kind !== "string" || execution.evidence_kind === "source_observation") return;
+  const control = execution.control;
+  if (!control || typeof control !== "object") {
+    errors.push(`${base}.execution.control: required when evidence_kind is ${JSON.stringify(execution.evidence_kind)}`);
+    return;
+  }
+  if (typeof control.observed_result === "string" && typeof execution.observed_result === "string"
+    && control.observed_result.trim() === execution.observed_result.trim()) {
+    errors.push(`${base}.execution.control.observed_result: equals the attack's observed_result, so the check could not have failed`);
+  }
+}
+
 // Returns well-formed capabilities with exactly one starting principal, or null after reporting why not.
 function startingCapabilities(finding, base, errors) {
   const capabilities = finding.capabilities;
@@ -175,6 +192,7 @@ function collectLocalFindingErrors(findings, isSafeRelativeSourcePath) {
   findings.forEach((finding, index) => {
     if (!finding || typeof finding !== "object" || Array.isArray(finding)) return;
     const base = `$[${index}]`;
+    collectControlCaseErrors(finding, base, errors);
     const capabilities = startingCapabilities(finding, base, errors);
     const marginal = capabilities && marginalCapabilities(capabilities);
     collectChecklistErrors(finding, marginal && marginal.length > 0, base, isSafeRelativeSourcePath, errors);

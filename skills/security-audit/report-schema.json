@@ -221,10 +221,39 @@
                 "type": "string",
                 "minLength": 1,
                 "visibleContent": true
+              },
+              "evidence_kind": {
+                "type": "string",
+                "enum": ["source_observation", "local_differential", "local_state_readback", "local_artifact", "sanitizer_report", "rendered_policy"],
+                "description": "What establishes observed_result. source_observation: the result is a fact of the repository itself, such as a committed credential, so no execution applies. local_differential: the attack input and the control input through the same boundary give different results. local_state_readback: dummy state read back after the action shows the change. local_artifact: the check reads back a unique marker that only the defect can produce. sanitizer_report: a sanitizer or runtime checker reports the fault. rendered_policy: a locally rendered or evaluated policy decides for the dummy attacker identity. Every kind but source_observation requires control."
+              },
+              "control": {
+                "type": "object",
+                "description": "The same check through the same boundary with a benign input or an authorized principal. Its observed_result must differ from the attack's, or the check could not have failed.",
+                "properties": {
+                  "input": {
+                    "type": "string",
+                    "minLength": 1,
+                    "visibleContent": true
+                  },
+                  "observed_result": {
+                    "type": "string",
+                    "minLength": 1,
+                    "visibleContent": true
+                  }
+                },
+                "required": ["input", "observed_result"],
+                "additionalProperties": false
               }
             },
-            "required": ["attacker_perspective", "payloads", "instructions", "observed_result"],
+            "required": ["attacker_perspective", "payloads", "instructions", "observed_result", "evidence_kind"],
             "additionalProperties": false
+          },
+          "counterevidence": {
+            "type": "string",
+            "minLength": 1,
+            "visibleContent": true,
+            "description": "The strongest case found against this finding and why it does not neutralize the result, or what was checked when nothing was found."
           },
           "remediation": {
             "type": "object",
@@ -297,9 +326,15 @@
               "model_dependent": {
                 "type": "boolean",
                 "description": "true when the result depends on probabilistic model behavior; caps overall_severity at high."
+              },
+              "change_conditions": {
+                "type": "string",
+                "minLength": 1,
+                "visibleContent": true,
+                "description": "The concrete fact that would raise or lower overall_severity, such as a deployment exposure or a precondition."
               }
             },
-            "required": ["likelihood", "impact", "overall_severity", "model_dependent"],
+            "required": ["likelihood", "impact", "overall_severity", "model_dependent", "change_conditions"],
             "additionalProperties": false
           },
           "confidence": {
@@ -319,7 +354,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "capabilities", "refutation_checklist", "execution", "remediation", "severity", "confidence"],
+        "required": ["verdict", "fingerprint", "title", "description", "root_cause", "intended_behavior", "trace", "evidence", "conditions", "capabilities", "refutation_checklist", "execution", "counterevidence", "remediation", "severity", "confidence"],
         "additionalProperties": false
       },
       {
