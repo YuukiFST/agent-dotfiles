@@ -60,7 +60,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-11 | Grafo de capacidades entre findings (`requires`/`grants`) e script de cadeias | schema + script | `report-schema.json`, novo `chain-findings.cjs`, `ATTACK-CLASSES.md` | caldera | alta | feito ([#213](https://github.com/YuukiFST/agent-dotfiles/pull/213)) |
 | SA-12 | Heurística (denylist, regex, LLM judge) não conta como controle | prompt | `AI-AND-LLM.md:14`, `VALIDATION-AND-REPORTING.md` | hermes-agent | média | feito ([#224](https://github.com/YuukiFST/agent-dotfiles/pull/224)) |
 | SA-13 | Proveniência de cada item de evidência | schema + script | `report-schema.json`, `validate-findings.cjs` | caldera, ThreatPath | média | proposto |
-| SA-14 | Re-execução contrafactual da correção | prompt + schema | `VALIDATION-AND-REPORTING.md`, `SKILL.md:164-166` | ThreatPath | média | proposto |
+| SA-14 | Re-execução contrafactual da correção | prompt + schema | `VALIDATION-AND-REPORTING.md`, `SKILL.md:164-166` | ThreatPath | média | feito ([#232](https://github.com/YuukiFST/agent-dotfiles/pull/232)) |
 | SA-15 | Prova negativa do sandbox antes de executar código do target | prompt + schema | `RECONNAISSANCE.md`, `SKILL.md:33-40`, `run-metadata.json` | openworker | média | proposto |
 | SA-16 | Corpus de avaliação da skill com pares metamórficos e holdout | script + fixtures | novo diretório de evals | openworker | média | proposto |
 | SA-17 | Defesa exigida por slot de injeção e argv re-tokenizado | prompt | `ATTACK-CLASSES.md:29-37`, `CLIENT-SIDE.md` | hermes-agent, caldera | média | proposto |
@@ -78,8 +78,8 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-29 | Matriz de autorização no recon: papel × ação × guard, com dominância do guard | prompt | `RECONNAISSANCE.md` (Agent 1b), `ATTACK-CLASSES.md` (Access control) | Shannon, xalgorix, NeuroSploit, mukul975, pentest-ai-agents | alta | feito ([#228](https://github.com/YuukiFST/agent-dotfiles/pull/228)) |
 | SA-30 | Inventário de invariantes de negócio por fluxo | prompt | `ATTACK-CLASSES.md` (Business logic) | Strix, xalgorix, mukul975 | média | feito ([#228](https://github.com/YuukiFST/agent-dotfiles/pull/228)) |
 | SA-31 | Escada de alcançabilidade para dependência com advisory conhecido | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | Strix, NeuroSploit, mukul975 | média | feito ([#230](https://github.com/YuukiFST/agent-dotfiles/pull/230)) |
-| SA-32 | Gates de verificação da correção proposta | prompt | `HUNTING.md`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon, pentest-ai-agents, Dark-Moon | média | proposto |
-| SA-33 | Regras próprias do run escopado num diff | prompt | `SKILL.md` (§ Run profiles and scope), `RECONNAISSANCE.md` | Strix, Decepticon | média | proposto |
+| SA-32 | Gates de verificação da correção proposta | prompt | `HUNTING.md`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon, pentest-ai-agents, Dark-Moon | média | feito ([#232](https://github.com/YuukiFST/agent-dotfiles/pull/232)) |
+| SA-33 | Regras próprias do run escopado num diff | prompt | `SKILL.md` (§ Run profiles and scope), `RECONNAISSANCE.md` | Strix, Decepticon | média | feito ([#232](https://github.com/YuukiFST/agent-dotfiles/pull/232)) |
 | SA-34 | Classes que sozinhas não são finding | prompt | `HUNTING.md` (Candidate gate), `ATTACK-CLASSES.md` (Obvious things) | xalgorix, Dark-Moon | média | feito ([#224](https://github.com/YuukiFST/agent-dotfiles/pull/224)) |
 | SA-35 | Detector de registro fabricado ou de placeholder | script | `validate-findings.cjs` | xalgorix | baixa | proposto |
 | SA-36 | Prioridade SSVC para dependência vulnerável, com snapshot KEV/EPSS fixado | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | mukul975 | baixa | proposto |
