@@ -21,8 +21,8 @@ Remove-Item -Recurse -Force $tmp
 Write-Host "[2/4] fff MCP"
 & "$PSScriptRoot\install-fff.ps1"
 
-Write-Host "[3/4] npm globals (chrome-devtools-axi, gh-axi, portless)"
-npm install -g chrome-devtools-axi@latest gh-axi@latest portless@latest
+Write-Host "[3/4] npm globals (chrome-devtools-axi, gh-axi)"
+npm install -g chrome-devtools-axi@latest gh-axi@latest
 # Windows runs Claude Code only — pi/Cursor live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 

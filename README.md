@@ -50,7 +50,7 @@ From the clone, run the setup script for your harness. It is idempotent, so reru
 | OpenCode | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
 | Cursor | | `bash scripts/setup-cursor.sh` |
 
-Each setup script installs or updates what its harness needs, such as rtk, portless, the axi CLIs and the fff MCP server, then syncs the config.
+Each setup script installs or updates what its harness needs, such as rtk, the axi CLIs and the fff MCP server, then syncs the config.
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
@@ -69,7 +69,5 @@ Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rul
 | `hooks/`, `git-hooks/` | Session hooks and the `commit-msg` and `pre-push` gates |
 | `scripts/` | Install, sync and `git-safe-commit.sh` |
 | `settings.json` | Claude Code seed, written only when absent |
-| `pi/`, `portless/` | Per-tool config |
+| `pi/` | pi config |
 | `AGENTS.md` | Instructions for an agent working on this repo, imported by the root `CLAUDE.md` |
-
-portless needs Node 24+ and a one-time bootstrap: [`portless/setup.md`](portless/setup.md).

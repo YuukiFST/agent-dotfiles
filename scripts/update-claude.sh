@@ -13,8 +13,8 @@ rtk --version
 echo "[2/4] fff MCP"
 bash "$(dirname "$0")/install-fff.sh"
 
-echo "[3/4] npm globals (chrome-devtools-axi, gh-axi, portless)"
-npm install -g chrome-devtools-axi@latest gh-axi@latest portless@latest
+echo "[3/4] npm globals (chrome-devtools-axi, gh-axi)"
+npm install -g chrome-devtools-axi@latest gh-axi@latest
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 

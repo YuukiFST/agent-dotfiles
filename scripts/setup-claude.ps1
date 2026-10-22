@@ -18,8 +18,8 @@ Write-Host "[2/5] rtk"
 Write-Host "[3/5] fff MCP"
 & "$PSScriptRoot\install-fff.ps1"
 
-Write-Host "[4/5] portless + gh-axi + chrome-devtools-axi"
-npm install -g portless gh-axi chrome-devtools-axi
+Write-Host "[4/5] gh-axi + chrome-devtools-axi"
+npm install -g gh-axi chrome-devtools-axi
 
 Write-Host "[5/5] Plugins"
 foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official") {
