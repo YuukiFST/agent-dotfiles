@@ -18,8 +18,8 @@ rtk init -g
 echo "[3/5] fff MCP"
 bash "$(dirname "$0")/install-fff.sh"
 
-echo "[4/5] portless + gh-axi + chrome-devtools-axi"
-npm install -g portless gh-axi chrome-devtools-axi
+echo "[4/5] gh-axi + chrome-devtools-axi"
+npm install -g gh-axi chrome-devtools-axi
 
 echo "[5/5] Plugins"
 for m in JuliusBrussee/caveman anthropics/claude-plugins-official; do

@@ -27,7 +27,6 @@ Answer these from the codebase, and ask the user only what you cannot observe:
 - **Run:** how does the app start locally? Prefer the repo's own dev command (package scripts, Makefile, README quickstart). Note ports, env vars, seed data, auth.
 - **Drive:** how can an agent interact with it programmatically? Existing harnesses first: Playwright/Cypress specs, expect scripts, PTY helpers, curl-able endpoints, a debug port. Then the machine's tools:
   - Web UI and Electron: `chrome-devtools-axi`, the only browser automation on these machines; take its syntax from `chrome-devtools-axi --help`. Each run sets a run-unique `CHROME_DEVTOOLS_AXI_SESSION`, so the browser is its own and cleanup's `stop` closes only that one. Refs are generation-tagged (`@g3:12`) and go stale on the next snapshot: a drive takes a snapshot, finds the element by role and accessible name in it, then acts on that snapshot's ref. Electron: start the app with `--remote-debugging-port` and point `CHROME_DEVTOOLS_AXI_BROWSER_URL` at it.
-  - Web dev server: when `portless doctor` passes, launch through portless for a stable named URL and per-worktree isolation (`portless --help`).
   - CLI: plain process runs, capturing stdout, stderr and exit code. TUI: tmux on NixOS; on Windows, a TUI with no repo harness is a gap to report.
   - Service: plain HTTP with `curl`.
 - **Observe:** what evidence can be captured? Screenshots, ARIA snapshots, terminal transcripts, response bodies, logs, exit codes, DB state.

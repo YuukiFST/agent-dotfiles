@@ -18,8 +18,8 @@ Write-Host "[3/5] rtk (+ OpenCode plugin)"
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 & "$PSScriptRoot\sync-config.ps1" opencode | Out-Null
 
-Write-Host "[4/5] portless + gh-axi + chrome-devtools-axi"
-npm install -g portless gh-axi chrome-devtools-axi
+Write-Host "[4/5] gh-axi + chrome-devtools-axi"
+npm install -g gh-axi chrome-devtools-axi
 
 Write-Host "[5/5] fff MCP"
 & "$PSScriptRoot\install-fff.ps1"

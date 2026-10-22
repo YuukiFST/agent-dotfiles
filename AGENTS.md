@@ -27,7 +27,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 
 1. **Find the row.** Match OS and machine to a row above.
    Done when you hold its harness list; a harness outside the row stays unsynced, since an extra one grows a config dir nobody keeps current.
-2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, portless, gh-axi, chrome-devtools-axi, fff-mcp), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
+2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, gh-axi, chrome-devtools-axi, fff-mcp), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
    `all` exists only in `sync-config.ps1`; `sync-config.sh` takes one harness per run.
    Done when every command exits 0 and ends with `Config synced (...)`.
 3. **Fetch the design references** when `~/.claude/ui-refs/` is missing (first sync) or a refresh is asked for: `bash skills/ui-polish/update-refs.sh`.
@@ -38,8 +38,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
    2. `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       It drives an installed Chrome and keeps no per-machine config, so a failure means Chrome is missing, not that the repo drifted.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
-   4. `portless doctor` passes once Node 24+ and the one-time bootstrap in `portless/setup.md` are in place.
-   5. `claude mcp get fff` prints `Status: ✔ Connected` (Claude Code), and `opencode mcp list` shows `fff connected` (OpenCode).
+   4. `claude mcp get fff` prints `Status: ✔ Connected` (Claude Code), and `opencode mcp list` shows `fff connected` (OpenCode).
 
 ## What the scripts won't tell you
 
