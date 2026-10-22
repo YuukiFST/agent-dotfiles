@@ -43,6 +43,12 @@ Verify that a caller cannot do something outside its authority. Go beyond checki
 - Are there endpoints that gate on authentication but forget authorization?
 - Does the same resource have multiple access paths with inconsistent checks?
 - What about bulk/batch/export/import operations — do they enforce per-item permissions?
+- Does the guard dominate every path to the side effect and run before it? A check in client code, after the object is fetched and returned, or on a sibling route does not count.
+- Horizontal: is the owner or tenant identifier taken from the request instead of the session? Vertical: can an ordinary role reach an admin-only action? Workflow: can a step run without the state the previous step should have set?
+- Which fields can each principal set? Mass assignment into `role`, `owner_id`, `tenant_id`, `balance`, or status fields, and object or GraphQL fields readable by a principal that should not see them, are property-level authorization failures.
+- Do a disabled, removed, or downgraded account and a revoked key lose API access at once, and does the API enforce what the UI hides?
+
+Anchor each candidate in the intended rule: contrast the correct guard on a sibling action with the missing or weaker one. If the guard may live in middleware or a decorator outside the paths you read, the candidate is needs_validation, not confirmed.
 
 For complex access models, split into separate agents for auth bypass vs authorization logic.
 
@@ -62,7 +68,7 @@ For complex access models, split into separate agents for auth bypass vs authori
 - What happens when crypto operations fail? Does the error path fall back to no-crypto?
 
 **Business logic** (subagent_type: `general`)
-Hunt logic errors by hand: standard scanners cannot find them, and they yield high-impact findings. For each major workflow:
+Hunt logic errors by hand: standard scanners cannot find them, and they yield high-impact findings. Start from an invariant inventory: for each critical flow, write the rule it must keep and the fields the attacker controls, then test one invariant at a time. Common invariants are conservation of value (nothing is created or lost between accounts), uniqueness and idempotency (a coupon, token, or payment applies once), monotonic counters, exclusivity (one holder at a time), step order, and time windows. Prove a violation with dummy state read back, and check the refund, cancel, and edit paths beside the main one. For each major workflow:
 - **State machine violations**: Can you skip steps? Go backwards? Reach an invalid state? What happens if you replay a completed flow? What about partial failure — if step 2 of 3 fails, is step 1 rolled back?
 - **Race conditions with business impact**: Concurrent operations that produce invalid states (double-spend, double-approve, lost updates). Focus on operations that check-then-act non-atomically.
 - **Numeric/quantity manipulation**: Negative values, zero values, overflow, precision loss, type coercion between string and number.

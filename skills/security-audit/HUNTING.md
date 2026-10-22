@@ -75,6 +75,16 @@ Consolidate the same root cause, but establish each variant's conditions and imp
 independently. Do not investigate peer-owned units. Return a variant with no current
 coverage unit as `uncovered`.
 
+SWEEP EVERY CALL SITE OF A CONTRACT. When a function, procedure, or helper documents
+or implies a security contract (the caller checks ownership, passes a sanitized value,
+holds a lock, or supplies a trusted path), grep every call site in your assigned
+units and check each one. Security-relevant configuration constants and environment
+defaults (bind address, debug, TLS, CORS, limits) are contracts too: trace each to the
+sink that consumes it. Once one instance turns up, sweep the whole sink family, such
+as every deserializer, XML parser factory, or archive extractor. A guarded call site
+never clears an unguarded sibling: list every reachable instance in the candidate's
+`evidence`, and make the remediation cover each one.
+
 USE THE NARROWEST LOCAL CHECK THAT SETTLES THE CLAIM. Target-controlled builds,
 tests, processes, browsers, emulators, fuzzers, and fixture processing may run only
 inside the parent-approved OS-enforced sandbox. So may language servers, linters,
@@ -238,7 +248,7 @@ Every assigned coverage ID appears exactly once in `units`. A `covered` unit nee
 
 The parent validates each unit result, maps it to exactly one assigned `coverage_id`, and updates only that ledger unit. Reject duplicate or absent IDs, unsafe unit or check agent IDs, source checks with artifacts, and local artifacts that trusted parent-side code did not promote into the check owner's artifacts subtree. Copy the unit's `reviewed_paths`, its `checks` into the unit's `local_checks`, linked artifact paths, candidate fingerprints, and unresolved facts into the ledger. Retain each hunter's `hardening` list in a parent bookkeeping field on the relevant units (outside the semantic fields) so Phase 6 can report it. A failed, malformed, or unsupported conclusion leaves that unit `planned` for reassignment. Untouched budget/profile units become unassigned `deferred` units with empty evidence and a reason; do not hide partial evidence in `deferred`. Run `validate-coverage-ledger.cjs` after the update; an invalid ledger cannot drive another assignment. This per-unit contract allows one hunter to close one unit while returning a candidate or blocker for another.
 
-Consolidate candidate entries by fingerprint and then by root cause. One root cause that exposes several entry paths or effects is one candidate with the strongest complete trace. Related but independent missing controls use separate fingerprints. Record duplicate fingerprints in the relevant ledger unit and do not send duplicate candidates to validation.
+Consolidate candidate entries by fingerprint and then by root cause. One root cause that exposes several entry paths or effects is one candidate with the strongest complete trace, whose `evidence` lists every reachable instance and whose remediation covers each. Related but independent missing controls use separate fingerprints. Record duplicate fingerprints in the relevant ledger unit and do not send duplicate candidates to validation.
 
 ## Coverage-critic waves
 

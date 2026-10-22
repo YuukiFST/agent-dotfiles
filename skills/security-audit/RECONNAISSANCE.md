@@ -38,6 +38,15 @@ Read all source that establishes identity, authorization, isolation, and privile
 4. Process, browser, workload, CI, plugin, model/tool, device, or local-IPC authority.
 5. Privilege changes, confirmation, revocation, recovery, and fallback paths.
 6. Which controls are source-visible and which depend on an unobserved deployment fact.
+7. An authorization matrix with one row per sensitive action (read, change, delete,
+   export, invite, role or value change, each step of a multi-step flow): the
+   principals allowed by design, the guard, and the file:line where it is enforced.
+   Infer the intended rule from code, tests, and docs. Mark a guard that runs after
+   the side effect, misses a path to it, lives only in client code, takes the owner
+   or tenant from the request instead of the session, or differs from the guard of a
+   sibling action on the same resource. For each writable model, list the fields each
+   principal may set, and flag privileged fields (role, owner, tenant, balance,
+   status) that a request body can reach.
 Return trust boundaries and control locations with repository-relative file:line references. Do not infer live reachability.
 ```
 
@@ -108,6 +117,8 @@ Derive `coverage_id` without lossy slugs:
 1. Require every reference to be Unicode NFC with valid scalar values, visible content, no control, format, line/paragraph separator, or default-ignorable code point, and no surrounding whitespace.
 2. Encode its UTF-8 bytes with RFC 3986 percent encoding: leave only `A-Z a-z 0-9 - . _ ~` unescaped and use uppercase `%HH` for every other byte.
 3. Join encoded `surface`, `boundary`, `subsystem`, and `attack_class` references with `::`; append encoded `lifecycle` when present.
+
+Seed one unit for each row of the Agent 1b authorization matrix that it marked, with the guard as the `boundary` reference, or the handler when no guard exists, and `ATTACK-CLASSES.md#Access control` as the class.
 
 Use the fixed canonical value `profile/quick/all-in-scope-subsystems` for the quick profile's coarsened subsystem dimension. Do not include wave number, agent, verdict, severity, or line number in a reference or ID. Sort units lexicographically by `coverage_id` before each assignment. Fail on every duplicate ID. If duplicate IDs have different semantic fields, treat that as a canonical identity collision; never merge or silently overwrite them. The validator also rejects one semantic tuple represented by different canonical references.
 
