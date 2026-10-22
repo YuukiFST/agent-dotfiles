@@ -148,6 +148,20 @@ sync_opencode() {
   fi
   cp "$repo/GLOBAL.md" "$oc/AGENTS.md"
   sync_opencode_reviewers "$oc"
+  prune_opencode_skill_commands "$oc"
+}
+
+# OpenCode lists every skill as a /name command on its own. A generated commands/<skill>.md
+# wrapper shadows that entry with a frozen copy of the description, and outlives the skill
+# it points at, so wrappers carrying the generator's marker go. Hand-written commands stay.
+prune_opencode_skill_commands() { # $1 = opencode config dir
+  local f n=0
+  for f in "$1"/commands/*.md; do
+    [ -f "$f" ] && grep -q 'generated:opencode-skill-command' "$f" || continue
+    rm -f "$f"
+    n=$((n + 1))
+  done
+  [ "$n" -eq 0 ] || echo "  removed $n generated skill command wrapper(s) from $1/commands"
 }
 
 # OpenCode's task tool takes no model, so each opencode row of skills/interrogate/reviewers.md

@@ -35,7 +35,7 @@ With none on PATH yet, name a target (`claude`, `pi`, `opencode` or `all`):
 curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/scripts/bootstrap.sh | bash -s -- pi
 ```
 
-The install overwrites the global `CLAUDE.md`, mirrors `rules/` to `~/.claude/rules` (hand edits there are lost), writes `settings.json` only when it is absent, and leaves `opencode.json` alone.
+The install overwrites the global `CLAUDE.md`, mirrors `rules/` to `~/.claude/rules` (hand edits there are lost), writes `settings.json` only when it is absent, and in `opencode.json` sets only the `mcp.fff` key.
 On Linux and macOS it also points `core.hooksPath` at `git-hooks/` for every repo.
 Restart the agent after install.
 
@@ -50,10 +50,11 @@ From the clone, run the setup script for your harness. It is idempotent, so reru
 | OpenCode | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
 | Cursor | | `bash scripts/setup-cursor.sh` |
 
-Each setup script installs or updates what its harness needs, such as rtk, portless and the axi CLIs for Claude Code, then syncs the config.
+Each setup script installs or updates what its harness needs, such as rtk, portless, the axi CLIs and the fff MCP server, then syncs the config.
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
+Every skill is a `/name` command in OpenCode too, with no command file per skill.
 Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rules > User Rules by hand after each edit.
 
 ## Layout
