@@ -52,7 +52,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-03 | Checklist estruturado de refutação por finding | schema + prompt | `report-schema.json`, `VALIDATION-AND-REPORTING.md` | Mantis, ThreatPath, hermes-agent | alta | feito ([#211](https://github.com/YuukiFST/agent-dotfiles/pull/211)) |
 | SA-04 | Varredura de call-sites generalizada para qualquer contrato documentado | prompt | `HUNTING.md` | Mantis, hexstrike-ai, caldera | média | feito ([#228](https://github.com/YuukiFST/agent-dotfiles/pull/228)) |
 | SA-05 | Unidade de varredura adversarial no ledger | prompt + schema | `RECONNAISSANCE.md`, `HUNTING.md` | Mantis | média | proposto |
-| SA-06 | Histórico do git como fonte de variantes | prompt | `RECONNAISSANCE.md` | Mantis, openworker, caldera, hermes-agent | média | proposto |
+| SA-06 | Histórico do git como fonte de variantes | prompt | `RECONNAISSANCE.md` | Mantis, openworker, caldera, hermes-agent | média | feito ([#230](https://github.com/YuukiFST/agent-dotfiles/pull/230)) |
 | SA-07 | Export SARIF 2.1.0 do `findings.json`, com `cwe` opcional por finding | script | novo `export-sarif.cjs`, `report-schema.json` | Shannon, caldera, hermes-agent | baixa | proposto |
 | SA-08 | Gate de conteúdo nos artefatos: segredos e PII só por tipo e local, regras de engajamento deny-by-default | script + prompt | `validate-findings.cjs`, `HUNTING.md`, `VALIDATION-AND-REPORTING.md`, `SKILL.md:84` | openworker, hermes-agent, caldera | alta | feito ([#201](https://github.com/YuukiFST/agent-dotfiles/pull/201)) |
 | SA-09 | Conteúdo do target é dado, não instrução; busca de Unicode bidi/invisível | prompt | `HUNTING.md`, `VALIDATION-AND-REPORTING.md`, `RECONNAISSANCE.md`, `ATTACK-CLASSES.md` | openworker, hermes-agent | alta | feito ([#203](https://github.com/YuukiFST/agent-dotfiles/pull/203)) |
@@ -66,7 +66,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-17 | Defesa exigida por slot de injeção e argv re-tokenizado | prompt | `ATTACK-CLASSES.md:29-37`, `CLIENT-SIDE.md` | hermes-agent, caldera | média | proposto |
 | SA-18 | Hash do trecho citado para levar achados entre runs | schema + script | `report-schema.json`, `SKILL.md:98`, script do SA-01 | hermes-agent | média | feito ([#199](https://github.com/YuukiFST/agent-dotfiles/pull/199), com o SA-01) |
 | SA-19 | Opt-outs de autenticação para principal-máquina viram unidades próprias | prompt | `RECONNAISSANCE.md` (Agent 1b) | caldera | média | proposto |
-| SA-20 | Scanners locais já instalados como sementes offline | prompt | `RECONNAISSANCE.md` (Agent 1d), `ATTACK-CLASSES.md:113,120` | hexstrike-ai, openworker | baixa | proposto |
+| SA-20 | Scanners locais já instalados como sementes offline | prompt | `RECONNAISSANCE.md` (Agent 1d), `ATTACK-CLASSES.md:113,120` | hexstrike-ai, openworker | baixa | feito ([#230](https://github.com/YuukiFST/agent-dotfiles/pull/230)) |
 | SA-21 | Códigos de motivo fechados para unidades não fechadas no ledger | schema + script | `RECONNAISSANCE.md:141-150`, `validate-coverage-ledger.cjs` | caldera | baixa | proposto |
 | SA-22 | Modelo de confiança declarado pelo alvo (`SECURITY.md`) como insumo do recon | prompt | `RECONNAISSANCE.md` (Agent 1b) | hermes-agent | baixa | proposto |
 | SA-23 | Checklist concreto de guard de SSRF | prompt | `ATTACK-CLASSES.md:51` | openworker | baixa | proposto |
@@ -77,7 +77,7 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-28 | Contra-evidência e condições de mudança de severidade no `confirmed` | schema + script | `report-schema.json`, `validate-findings.cjs`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon | média | feito ([#226](https://github.com/YuukiFST/agent-dotfiles/pull/226)) |
 | SA-29 | Matriz de autorização no recon: papel × ação × guard, com dominância do guard | prompt | `RECONNAISSANCE.md` (Agent 1b), `ATTACK-CLASSES.md` (Access control) | Shannon, xalgorix, NeuroSploit, mukul975, pentest-ai-agents | alta | feito ([#228](https://github.com/YuukiFST/agent-dotfiles/pull/228)) |
 | SA-30 | Inventário de invariantes de negócio por fluxo | prompt | `ATTACK-CLASSES.md` (Business logic) | Strix, xalgorix, mukul975 | média | feito ([#228](https://github.com/YuukiFST/agent-dotfiles/pull/228)) |
-| SA-31 | Escada de alcançabilidade para dependência com advisory conhecido | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | Strix, NeuroSploit, mukul975 | média | proposto |
+| SA-31 | Escada de alcançabilidade para dependência com advisory conhecido | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | Strix, NeuroSploit, mukul975 | média | feito ([#230](https://github.com/YuukiFST/agent-dotfiles/pull/230)) |
 | SA-32 | Gates de verificação da correção proposta | prompt | `HUNTING.md`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon, pentest-ai-agents, Dark-Moon | média | proposto |
 | SA-33 | Regras próprias do run escopado num diff | prompt | `SKILL.md` (§ Run profiles and scope), `RECONNAISSANCE.md` | Strix, Decepticon | média | proposto |
 | SA-34 | Classes que sozinhas não são finding | prompt | `HUNTING.md` (Candidate gate), `ATTACK-CLASSES.md` (Obvious things) | xalgorix, Dark-Moon | média | feito ([#224](https://github.com/YuukiFST/agent-dotfiles/pull/224)) |
