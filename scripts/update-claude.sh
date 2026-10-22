@@ -3,19 +3,22 @@
 # Companion to setup-claude.sh: setup installs, this refreshes to latest.
 set -euo pipefail
 
-echo "[0/3] Config files (skills, rules, CLAUDE.md)"
+echo "[0/4] Config files (skills, rules, CLAUDE.md)"
 "$(dirname "$0")/sync-config.sh" claude
 
-echo "[1/3] rtk"
+echo "[1/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
 
-echo "[2/3] npm globals (chrome-devtools-axi, gh-axi, portless)"
+echo "[2/4] fff MCP"
+bash "$(dirname "$0")/install-fff.sh"
+
+echo "[3/4] npm globals (chrome-devtools-axi, gh-axi, portless)"
 npm install -g chrome-devtools-axi@latest gh-axi@latest portless@latest
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 
-echo "[3/3] Claude Code plugins"
+echo "[4/4] Claude Code plugins"
 # SC2043: single-element loop is intentional extension point (more plugins may be added)
 # shellcheck disable=SC2043
 for p in caveman@caveman; do

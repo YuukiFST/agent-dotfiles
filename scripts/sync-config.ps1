@@ -241,6 +241,19 @@ function Sync-OpenCode {
   }
   Copy-Item "$Repo\GLOBAL.md" $agents -Force
   Sync-OpenCodeReviewers $oc
+  Remove-OpenCodeSkillCommands $oc
+}
+
+# OpenCode lists every skill as a /name command on its own. A generated commands/<skill>.md
+# wrapper shadows that entry with a frozen copy of the description, and outlives the skill
+# it points at, so wrappers carrying the generator's marker go. Hand-written commands stay.
+# Mirrors prune_opencode_skill_commands() in sync-config.sh.
+function Remove-OpenCodeSkillCommands($oc) {
+  $wrappers = @(Get-ChildItem (Join-Path $oc "commands") -Filter "*.md" -File -ErrorAction SilentlyContinue |
+    Where-Object { Select-String -Path $_.FullName -Pattern "generated:opencode-skill-command" -SimpleMatch -Quiet })
+  if (-not $wrappers) { return }
+  $wrappers | Remove-Item -Force
+  Write-Host "  removed $($wrappers.Count) generated skill command wrapper(s) from $oc\commands"
 }
 
 # OpenCode's task tool takes no model, so each opencode row of skills/interrogate/reviewers.md

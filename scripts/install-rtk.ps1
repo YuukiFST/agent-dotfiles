@@ -1,9 +1,9 @@
 #!/usr/bin/env pwsh
 # Download rtk into ~/.local/bin, put that dir on the user PATH, and run `rtk init -g`.
-# Shared by setup-claude.ps1 and setup-pi.ps1. Idempotent: re-running just refreshes the exe.
+# Shared by setup-claude.ps1, setup-pi.ps1 and setup-opencode.ps1. Idempotent: re-running just refreshes the exe.
 #
-# Usage: install-rtk.ps1 [-Agent claude|pi] [-AutoPatch]
-param([string]$Agent = "", [switch]$AutoPatch)
+# Usage: install-rtk.ps1 [-Agent claude|pi] [-AutoPatch] [-OpenCode]
+param([string]$Agent = "", [switch]$AutoPatch, [switch]$OpenCode)
 $ErrorActionPreference = "Stop"
 
 $Bin = Join-Path $env:USERPROFILE ".local\bin"
@@ -26,4 +26,5 @@ if ($userPath -notlike "*$Bin*") {
 $initArgs = @("init", "-g")
 if ($Agent) { $initArgs += @("--agent", $Agent) }
 if ($AutoPatch) { $initArgs += "--auto-patch" }
+if ($OpenCode) { $initArgs += "--opencode" }
 & "$Bin\rtk.exe" @initArgs | Out-Null

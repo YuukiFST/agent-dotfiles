@@ -27,7 +27,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 
 1. **Find the row.** Match OS and machine to a row above.
    Done when you hold its harness list; a harness outside the row stays unsynced, since an extra one grows a config dir nobody keeps current.
-2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, portless, gh-axi, chrome-devtools-axi), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
+2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, portless, gh-axi, chrome-devtools-axi, fff-mcp), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
    `all` exists only in `sync-config.ps1`; `sync-config.sh` takes one harness per run.
    Done when every command exits 0 and ends with `Config synced (...)`.
 3. **Fetch the design references** when `~/.claude/ui-refs/` is missing (first sync) or a refresh is asked for: `bash skills/ui-polish/update-refs.sh`.
@@ -39,6 +39,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
       It drives an installed Chrome and keeps no per-machine config, so a failure means Chrome is missing, not that the repo drifted.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
    4. `portless doctor` passes once Node 24+ and the one-time bootstrap in `portless/setup.md` are in place.
+   5. `claude mcp get fff` prints `Status: ✔ Connected` (Claude Code), and `opencode mcp list` shows `fff connected` (OpenCode).
 
 ## What the scripts won't tell you
 
@@ -46,6 +47,8 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
 
 - **`skills/` is copied per skill, never mirrored,** so local-only skills survive a sync; a skill deleted from the repo reaches an already-synced machine only through its name in `skills/REMOVED.txt`.
 - **A user-invoked skill needs two markers:** `disable-model-invocation: true` covers Claude Code and pi, but OpenCode reads `metadata` keys `opencode/autoinvoke: "false"` and `opencode/slash: "true"` instead; `scripts/check-skill-frontmatter.sh` fails CI when the pair is missing.
+- **OpenCode makes every skill a `/name` command by itself,** so no per-skill command file belongs in `~/.config/opencode/commands`: one shadows the native command with a frozen description and outlives its skill, and the sync deletes each file carrying the `generated:opencode-skill-command` marker.
+- **`opencode.json(c)` stays machine-owned except `mcp.fff`:** `install-fff` merges that one key through `scripts/set-opencode-mcp.mjs`, whose rewrite drops comments, so the first rewrite keeps the original as `.bak`.
 - **`rules/` is a full mirror** at `~/.claude/rules` on every harness, because GLOBAL.md's pointers hardcode that path; a file written there by hand is gone on the next sync.
 - **OpenCode reviewer agents are generated, not copied:** OpenCode's `task` tool takes no model, so the sync writes one `~/.config/opencode/agents/interrogate-reviewer-<n>.md` per `opencode` row of `skills/interrogate/reviewers.md` and deletes the rest of that prefix; edit the table, never the generated files.
 - **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.

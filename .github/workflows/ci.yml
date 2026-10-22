@@ -59,6 +59,17 @@ jobs:
       - name: Run sync-config pi regression test
         run: bash scripts/test-sync-pi.sh
 
+  sync-opencode:
+    name: sync-config opencode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Skill /name commands must not be shadowed by generated wrappers, and the fff MCP merge
+      # must keep every other key of a commented opencode.jsonc.
+      - name: Run sync-config opencode test
+        run: bash scripts/test-sync-opencode.sh
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
