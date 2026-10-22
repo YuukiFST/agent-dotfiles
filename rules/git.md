@@ -36,6 +36,7 @@ Scope the confirmation to what is actually risky — who else is standing on the
 - the first push of a branch to a repo you do not own
 
 Uncertain whether a branch is shared? Ask. The rule narrows the confirmation, it does not remove it: no path exists where an agent writes to `main` unattended.
+The one standing yes is `/git-workflow` (§5): invoking it approves merging the PR that run opened and deleting the branches it finds dead, never a release or deploy.
 
 Two prohibitions that hold regardless:
 
@@ -69,10 +70,10 @@ The generic terms `IA`, `AI`, `agente` and `LLM` are **subjects, not attribution
 
 ### 4.3 Enforcement
 
-The `commit-msg` hook alone does not stop it: Cursor injects `Co-authored-by` *after* `git commit`, so in Cursor commit with `scripts/git-safe-commit.sh`, never `git commit`. The real gate is `pre-push`, which blocks any push carrying a forbidden trailer. Hook installation, the `git-safe-commit` invocation, and how to rebuild a commit that already went bad: "Enforcement mechanics" in `~/.claude/skills/git-workflow/SKILL.md`, which you may read for that section without running the flow.
+The `commit-msg` hook alone does not stop it: Cursor injects `Co-authored-by` *after* `git commit`, so in Cursor commit with `scripts/git-safe-commit.sh`, never `git commit`. The real gate is `pre-push`, which blocks any push carrying a forbidden trailer. Hook installation, the `git-safe-commit` invocation, and how to rebuild a commit that already went bad: "Enforcement mechanics" in `git-workflow/SKILL.md` under `~/.claude/skills` (Claude Code) or `~/.agents/skills` (pi, OpenCode, Cursor), which you may read for that section without running the flow.
 
 ## 5. Shipping a change
 
-The issue → branch → PR → review → merge → cleanup flow, squash-vs-merge, forks vs standalone repos, and the GitHub contribution conditions live in the **`git-workflow` skill**. It is user-invoked: run it only when the user invokes `/git-workflow` or names it, and that invocation authorizes the merge of the PR it opens.
+The issue → branch → PR → review → merge → cleanup flow, squash-vs-merge, forks vs standalone repos, and the GitHub contribution conditions live in the **`git-workflow` skill**. It is user-invoked: run it only when the user invokes `/git-workflow` or asks to ship the change with it, never because a message mentions it, and that invocation authorizes the merge of the PR it opens.
 
 Sections 1-4 above are not in that skill and are not optional: they apply to every commit, whether or not the flow is being followed.

@@ -8,6 +8,6 @@
 4. Build in small units, each verified before the next (`principle-sequence-verifiable-units`).
    UI parts follow `ui-polish`; new tests pass `test-audit`.
 5. Verify on the matching surface (`principle-prove-it-works`).
-6. A contested design or risky change gets `interrogate` before it ships; ship through `git-workflow` when the user asked to ship.
+6. A contested design or risky change gets `interrogate` before it ships; ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** what you built, what you chose and why, open decisions; a table when design alternatives were weighed.
