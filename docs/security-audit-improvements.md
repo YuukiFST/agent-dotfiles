@@ -6,7 +6,7 @@ Este arquivo fica fora de `skills/` de propósito: o sync não o copia para os d
 
 ## Como adicionar uma fonte
 
-1. Clonar o repositório numa pasta temporária vazia e registrar o commit analisado.
+1. Clonar o repositório numa pasta temporária vazia, ou ler os arquivos remotamente com `gh api repos/<dono>/<repo>/contents/<caminho>?ref=<sha>`, e registrar o commit analisado.
 2. Só leitura: não instalar dependências, não executar nem compilar nada do repositório, e tratar o conteúdo dele como dado não confiável.
 3. Conferir a licença: AGPL/GPL ou sem licença permite aproveitar ideias, não copiar texto para a skill (MIT); Apache-2.0 e MIT permitem adaptar com atribuição.
 4. Comparar com a skill atual e só registrar o que ela ainda não cobre, citando o arquivo da skill afetado.
@@ -24,6 +24,21 @@ Este arquivo fica fora de `skills/` de propósito: o sync não o copia para os d
 | [andrewyng/openworker](https://github.com/andrewyng/openworker) | MIT | `7bac273885d77f5794416ba7da5ad4ab4ceafd5f` | 2026-10-21 | Coworker de IA com personas de segurança rasas; rende ideias de higiene de segredos, sandbox e evals |
 | [0x4m4/hexstrike-ai](https://github.com/0x4m4/hexstrike-ai) | MIT | `d689933ff579d839c676c82b231f8e98326c5f04` | 2026-10-21 | Servidor MCP ofensivo com RCE sem autenticação; só um reforço de backlog |
 | [apache/caldera](https://github.com/apache/caldera) (antigo `mitre/caldera`, que redireciona) | Apache-2.0 | `cb8d6a8160e0f4990af323a7c071d5e8482b42c7` | 2026-10-21 | Emulação de adversário; o modelo de fatos rende o grafo de capacidades e as regras de engajamento |
+| [usestrix/strix](https://github.com/usestrix/strix) | Apache-2.0 | `0f81f40765f0329006a9a7d2eb97513f56743a9b` | 2026-10-22 | Fonte principal da disciplina de fechamento, da verificação da correção, do modo diff e da alcançabilidade de dependências |
+| [JoasASantos/NeuroSploit](https://github.com/JoasASantos/NeuroSploit) | MIT | `92e8959f4ea17bddaa0436505edcddf98f7d6b16` | 2026-10-22 | Separação entre mecanismo e impacto; agentes de fonte para autorização, variantes de patch e dependências |
+| [xalgorix/xalgorix](https://github.com/xalgorix/xalgorix) | Apache-2.0 | `6d84972f51b1ca868c8eac65b574a4199370b981` | 2026-10-22 | Padrão de prova por classe com controle negativo; classes que sozinhas não são finding |
+| [0xSteph/pentest-ai](https://github.com/0xSteph/pentest-ai) | MIT | `85b5509907724ffe2cc1879e81398c6ba228adad` | 2026-10-22 | DAST com oráculo obrigatório no veredito; gêmeos limpo e corrigido para medir precisão |
+| [BitterSecurity/Decepticon](https://github.com/BitterSecurity/Decepticon) | Apache-2.0 | `feecaa5c4d6837bf969d367a9c50d9960daa0763` | 2026-10-22 | Red team autônomo; campos epistêmicos obrigatórios e verificação da correção |
+| [0xSteph/pentest-ai-agents](https://github.com/0xSteph/pentest-ai-agents) | MIT | `e5d7aa02c4c0c29a90e4789034b45e0cb7488e89` | 2026-10-22 | Prompts ofensivos de subagente; o verificador de correção e a tabela de correções falsas servem |
+| [Armur-Ai/Pentest-Swarm-AI](https://github.com/Armur-Ai/Pentest-Swarm-AI) | AGPL-3.0 | `eb202859137acf3a8e299ca62b05e6ba35461960` | 2026-10-22 | Enxame black-box; só ideias de oráculo fora do modelo, corroboração e eval |
+| [GreyDGL/PentestGPT](https://github.com/GreyDGL/PentestGPT) | MIT | `e8b1bb77d1ac00329675cec3b060aba971ec1ac8` | 2026-10-22 | Pacote novo ainda de pesquisa; rende a regra de evidência como trecho exato do output |
+| [ASCIT31/Dark-Moon](https://github.com/ASCIT31/Dark-Moon) | GPL-3.0 | `9dbb9c460faebf2d3d241e69c8d1dacaa2c91994` | 2026-10-22 | Pentest autônomo; só ideias, com uma lista concreta de falsos positivos |
+| [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills) | Apache-2.0 | `54a798831d2266a3ca61ce68a7acb80b81160d57` | 2026-10-22 | 817 skills largas e rasas; SSVC, VEX e autorização por campo |
+| [AIPentest/CyberStrikeAI](https://github.com/AIPentest/CyberStrikeAI) | Apache-2.0 | `5c5c5e199dc614d976b352f507320f41b3695c87` | 2026-10-22 | Plataforma red team com C2; um reforço, e prompts que não devem ser copiados |
+| [CyberStrikeus/CyberStrike](https://github.com/CyberStrikeus/CyberStrike) | AGPL-3.0 | `5979ca37b0016faa54947f378ac4205b58b8cb83` | 2026-10-22 | Harness de replay HTTP; só a ideia de metadados CWE e WSTG por classe |
+| [vxcontrol/pentagi](https://github.com/vxcontrol/pentagi) | MIT + EULA | `843dfeb4bfc809c09d1bc5022e567c602d8fc9dd` | 2026-10-22 | Black-box autônomo; nada que o ledger e o vocabulário de capacidades já não cubram |
+| [GH05TCREW/pentestagent](https://github.com/GH05TCREW/pentestagent) | MIT | `87d763a9c830597e9b8c1d56293300f6961beec2` | 2026-10-22 | Black-box em estágio inicial; nada aproveitável |
+| [bugbasesecurity/pentest-copilot](https://github.com/bugbasesecurity/pentest-copilot) | MIT | `cd512edd037a32ddb1df3caf2672915bd555daec` | 2026-10-22 | Assistente interativo de operador; nada aproveitável |
 
 ## Backlog consolidado
 
@@ -56,6 +71,18 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-22 | Modelo de confiança declarado pelo alvo (`SECURITY.md`) como insumo do recon | prompt | `RECONNAISSANCE.md` (Agent 1b) | hermes-agent | baixa | proposto |
 | SA-23 | Checklist concreto de guard de SSRF | prompt | `ATTACK-CLASSES.md:51` | openworker | baixa | proposto |
 | SA-24 | Classes de agente e tool: escape-hatch, auto-modificação, grant reutilizado, exfiltração composta | prompt | `AI-AND-LLM.md` | hexstrike-ai, openworker | baixa | proposto |
+| SA-25 | O que não refuta um candidato, e a assimetria entre `rejected` e `needs_validation` | prompt | `VALIDATION-AND-REPORTING.md` (prompt do verificador) | Strix, xalgorix, CyberStrikeAI | alta | proposto |
+| SA-26 | Tipo de evidência e caso de controle obrigatórios no `confirmed` | schema + script | `report-schema.json`, `finding-semantics.cjs`, `HUNTING.md`, `VALIDATION-AND-REPORTING.md` | pentest-ai, xalgorix, Decepticon, Pentest-Swarm-AI, PentestGPT | alta | proposto |
+| SA-27 | Mecanismo e impacto separados: o verificador rebaixa a alegação em vez de rejeitar o mecanismo provado | prompt | `VALIDATION-AND-REPORTING.md` (prompt do verificador) | NeuroSploit | alta | proposto |
+| SA-28 | Contra-evidência e condições de mudança de severidade no `confirmed` | schema + script | `report-schema.json`, `validate-findings.cjs`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon | média | proposto |
+| SA-29 | Matriz de autorização no recon: papel × ação × guard, com dominância do guard | prompt | `RECONNAISSANCE.md` (Agent 1b), `ATTACK-CLASSES.md` (Access control) | Shannon, xalgorix, NeuroSploit, mukul975, pentest-ai-agents | alta | proposto |
+| SA-30 | Inventário de invariantes de negócio por fluxo | prompt | `ATTACK-CLASSES.md` (Business logic) | Strix, xalgorix, mukul975 | média | proposto |
+| SA-31 | Escada de alcançabilidade para dependência com advisory conhecido | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | Strix, NeuroSploit, mukul975 | média | proposto |
+| SA-32 | Gates de verificação da correção proposta | prompt | `HUNTING.md`, `VALIDATION-AND-REPORTING.md` | Strix, Decepticon, pentest-ai-agents, Dark-Moon | média | proposto |
+| SA-33 | Regras próprias do run escopado num diff | prompt | `SKILL.md` (§ Run profiles and scope), `RECONNAISSANCE.md` | Strix, Decepticon | média | proposto |
+| SA-34 | Classes que sozinhas não são finding | prompt | `HUNTING.md` (Candidate gate), `ATTACK-CLASSES.md` (Obvious things) | xalgorix, Dark-Moon | média | proposto |
+| SA-35 | Detector de registro fabricado ou de placeholder | script | `validate-findings.cjs` | xalgorix | baixa | proposto |
+| SA-36 | Prioridade SSVC para dependência vulnerável, com snapshot KEV/EPSS fixado | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | mukul975 | baixa | proposto |
 
 ### Detalhe das ideias
 
@@ -83,6 +110,9 @@ O researcher do Mantis exige grep em todo o repositório pelo nome de uma funç�
 Na skill isso só aparece para memória (`MEMORY-SAFETY-AND-BINARY.md:12`); a proposta é generalizar em `HUNTING.md` (por exemplo, toda procedure que recebe um id precisa checar a posse).
 Reforços: incluir constantes de configuração e defaults de env relevantes para segurança (bind, debug, TLS, CORS, limites), rastreados até o sink que os consome; o hexstrike-ai loga `HEXSTRIKE_HOST` (default `127.0.0.1`, `hexstrike_server.py:99`), mas o `app.run(host="0.0.0.0", ...)` em `:17289` ignora esse valor (conferido nesta sessão).
 No caldera, a correção da CVE-2025-27364 precisou do mesmo sanitizador em dois call-sites de plugins diferentes.
+Strix (`strix/skills/analysis/source_aware_discovery.md` e `counterevidence.md`): um call-site irmão protegido nunca fecha um vulnerável, e cada instância alcançável se sustenta sozinha.
+Na skill, que consolida uma causa raiz num só candidato (`HUNTING.md:233`), isso vira regra de conteúdo: o candidato lista cada instância alcançável na `evidence`, e a correção cobre todas.
+Ao achar uma instância, varrer a família inteira do sink (todos os desserializadores, fábricas de parser XML, extrações de arquivo compactado).
 
 **SA-05, varredura adversarial.**
 O plan do Mantis inclui, com certa probabilidade, uma investigação numa área que o threat model considera segura, ignorando essa premissa.
@@ -96,11 +126,18 @@ Reforços:
 - Seguir bumps de submódulo e lockfile até o diff upstream, porque a correção da CVE do caldera entrou como um commit "repin" sem nenhuma palavra de segurança.
 - Usar o pickaxe (`git log -p -S "<símbolo>"`) também no verificador, para saber se um controle ausente foi removido de propósito ou se um fix foi revertido (hermes-agent, `AGENTS.md:48-50`).
 - Com clone raso, o histórico pode não existir: registrar isso como lacuna de cobertura.
+- Antes de caçar variantes, montar a base conhecida: `SECURITY.md`, CHANGELOG e commits de correção de segurança, cada advisory marcado como corrigido ou não no commit auditado; um finding que só repete um advisory já corrigido não entra (NeuroSploit, `agents_md/code/research_known_cve_dedup.md`).
+- Caracterizar cada correção (que controle entrou e onde ele é aplicado) e procurar o que ela deixou: call-site irmão sem o controle, checagem antes da decodificação, entrada equivalente por outro parser; a citação do código é a prova, não o scanner (NeuroSploit, `agents_md/code/research_patch_diff_variant.md`).
 
 **SA-07, export SARIF.**
 Converter `findings.json` em SARIF 2.1.0 para o GitHub code scanning.
 Um campo `cwe` opcional por finding preencheria `rules` e `taxa` (caldera anexa taxonomia por passo; o `web-pentest` do hermes-agent usa CWE por finding).
 ATT&CK não serve como taxonomia aqui.
+Reforços:
+- O mapeamento é declarado, nunca inferido do título: o regex de título para CWE de `engine/dedup.py` do pentest-ai mostra o erro a evitar; classe sem mapeamento fica em branco (Pentest-Swarm-AI, `internal/taxonomy/taxonomy.go`, só ideia).
+- Um finding "se relaciona com" um controle de ASVS ou WSTG; o relatório nunca declara conformidade (NeuroSploit, `neurosploit-rs/crates/harness/src/compliance.rs`).
+- `security-severity` em `properties` deixa o GitHub ordenar os alertas (NeuroSploit, `sarif.rs`; pentest-ai, `engine/sarif.py`).
+- Fixar a versão da taxonomia citada: o mukul975 já mapeia para o OWASP Top 10 2025, e o CyberStrike (AGPL, só ideia) carrega `owasp_id` e `cwe_ids` no frontmatter de cada skill WSTG 4.2.
 
 **SA-08, gate de conteúdo nos artefatos.**
 Hoje a skill só proíbe capturar o ambiente do auditor (`SKILL.md:84`); ela não diz o que fazer com um segredo ou um CPF que o hunter encontra no código, em seeds ou no histórico.
@@ -135,18 +172,22 @@ Fonte: modelo de fatos do caldera (`app/utility/base_planning_svc.py`, `app/obje
 Regra: denylists, scanners de padrão, redação de segredos e juízes LLM sobre texto influenciado pelo atacante são heurísticas; não refutam um candidato, e o bypass de uma heurística, sozinho, não é finding.
 Repetir a regra no passo de refutação do verificador, para impedir rejeição por "o regex bloqueia".
 Fonte: `SECURITY.md:58-69,137-153,249-262` do hermes-agent.
+Reforço: confiar na biblioteca também não é contra-evidência, porque o escape depende do contexto (um escaper de HTML nada faz em JS ou atributo, quem cita identificador SQL não cita valor, um join de caminho não é checagem de contenção); entra no SA-25 (Strix, `counterevidence.md`).
 
 **SA-13, proveniência da evidência.**
 Cada item de `evidence[]` e `conditions[]` ganha `origin` (`source_read`, `local_check`, `prior_run`, `architecture_summary`, `owner_statement`) ou `basis` (`source`, `local_observed`, `inferred`).
 O validador rejeita `confirmed` cuja condição decisiva, sink ou impacto dependa só de `prior_run`, `architecture_summary` ou `inferred` sem re-leitura atual.
 Difere do SA-01: o SA-01 checa se a citação existe; o SA-13 checa como o fato foi estabelecido.
 Fontes: `OriginType` em `app/objects/secondclass/c_fact.py:27` (caldera); seções "Observed/Hypothesis/Unknown" em `backend/agent/llm_provider.py:65-134` (ThreatPath).
+Reforços: evidência de execução é um trecho contíguo e exato do output capturado, paráfrase é descartada, output truncado nunca conclui, e saída não zero é evidência negativa válida (PentestGPT, `pentestgpt_agent/CONTEXT.md`, "Invariants"); a saída determinística de uma ferramenta pesa mais que o julgamento de um modelo, que precisa de corroboração (Pentest-Swarm-AI, `internal/swarm/quality/quality.go`, só ideia).
+O SA-26 cobre o nível da execução (que tipo de prova sustenta o `observed_result`); o SA-13 continua no nível de cada item de `evidence[]`.
 
 **SA-14, re-execução contrafactual da correção.**
 Para um `confirmed` com reprodução local, o verificador aplica a correção mínima proposta numa cópia descartável em `scratch/` (já permitida em `SKILL.md:40`) e repete a mesma checagem limitada.
 Se o resultado observado some, causa raiz e correção ficam provadas juntas; se persiste, o registro volta para revisão.
 Campo opcional `remediation.counterfactual_result`; sem sandbox, a etapa é pulada com o motivo registrado, sem rebaixar o veredito.
 Fonte: `tests/test_graph_ablation.py` do ThreatPath (remove uma aresta e verifica que o veredito muda).
+Reforço: é o gate 2 do SA-32, que acrescenta a revisão de bypass e o comportamento legítimo; os dois são implementados juntos.
 
 **SA-15, prova negativa do sandbox.**
 Hoje o recon diz *se* o SO consegue aplicar os controles, mas não prova que eles estão ativos.
@@ -160,6 +201,10 @@ Mini-repos fixture com vulnerabilidade plantada (procedure tRPC sem checagem de 
 Gate: nenhum `confirmed` nos gêmeos benignos e recall mínimo nos plantados, com holdout reservado e relatório datado.
 Hoje o CI só testa os validadores, não a qualidade do método; a execução custa modelo, então roda sob demanda.
 Fonte: `tests/corpora/LAYERED_CORPORA.md` e `scripts/validate_layered_corpora.py` do openworker; precedente no repo: `skills/ai-tells/tests/eval`.
+Reforços:
+- Além do gêmeo benigno, um gêmeo corrigido do fixture vulnerável precisa sair com zero `confirmed`, o que mostra que a correção era a única diferença (pentest-ai, `docs/benchmarks/precision.md`).
+- A rubrica de triagem é fixada antes da amostra, com semente fixa, teto de 15% para casos incertos (acima disso a rubrica está quebrada, não a ferramenta) e reavaliação cega 24 horas depois para medir a autodiscordância (pentest-ai, `benchmarks/results/2026-05-12/juice-shop/triage-rubric.md`).
+- O scorer roda offline contra respostas gravadas e, sob flag, contra o modelo (Pentest-Swarm-AI, `tests/llm_eval/harness.go`, só ideia); `deploy/lab/TARGETS.md` lista apps vulneráveis de propósito (NodeGoat, crAPI, VAmPI, DVGA) que servem como corpus de fonte.
 
 **SA-17, slot de injeção e argv re-tokenizado.**
 Identificar o slot (valor SQL, identificador SQL/`ORDER BY`, shell, segmento de path, URL de fetch, header, HTML, atributo de URL, `innerHTML`) e comparar com a defesa exigida para esse slot: a defesa certa no slot errado continua vulnerável.
@@ -182,6 +227,12 @@ Fonte: `app/api/rest_api.py:41-43` do caldera, por onde entrou a CVE-2025-27364.
 Se semgrep, gitleaks, `trivy fs` ou checkov já estiverem instalados e rodarem sem rede (regras locais, banco já em cache), a saída vai para `scratch/` e cada hit vira semente de ledger com disposição explícita.
 Hit de scanner é lead, não finding; ausência de hit nunca conta como cobertura; scanner que precisa baixar regras ou banco (`semgrep --config auto`, `npm audit`) fica proibido no run.
 Fontes: `security/skills/semgrep-review/SKILL.md` (openworker); conjunto "Cloud & Container Security" do hexstrike-ai.
+Reforços:
+- Uma passada por categoria (regras, AST, segredos, dependências), e a lista de caminhos que o scanner varreu vira o alvo das passadas seguintes (Strix, `strix/skills/custom/source_aware_sast.md`).
+- Registrar a idade do banco de vulnerabilidades; zero resultado num repositório com dependências é suspeito, não tranquilizador (Strix, `strix/skills/custom/dependency_cve_scanning.md`).
+- O ID da regra do scanner é a chave de junção do lead e nunca é renumerado (Shannon, `apps/worker/prompts/shared/exploitation/_sast-enrichment-procedure.txt`, só ideia).
+- Duas ferramentas independentes concordando no mesmo ponto sobem a prioridade do lead; hit de uma ferramenta só continua lead (Pentest-Swarm-AI, `internal/pipeline/cross_validate.go`, só ideia).
+- O hit de dependência segue a escada do SA-31.
 
 **SA-21, códigos de motivo fechados.**
 `unresolved[]` no ledger passa a `{code, detail}` com enum fechado (`sandbox_capability_missing`, `toolchain_missing`, `deployment_fact_unobservable`, `promotion_failed`, `budget_cannot_reserve_critics_and_validation`, `quick_profile_final_critic`, `out_of_scope_by_request`).
@@ -202,6 +253,85 @@ Em servidor MCP ou dispatcher de tools, a capacidade efetiva é a da tool mais a
 Outras classes: o agente reescreve a própria config, permissões ou skills; um grant aprovado uma vez é reutilizado fora do escopo; duas ações permitidas isoladamente (ler segredo, depois egress) compõem exfiltração (openworker, `tests/corpora/LAYERED_CORPORA.md`).
 Só importa se algum projeto-alvo tiver feature de LLM com ferramentas.
 
+**SA-25, o que não refuta.**
+O `rejected` já exige um `FAIL` que cite o `file:line` do controle (`VALIDATION-AND-REPORTING.md:64-73`), mas o verificador não tem a lista do que parece refutação e não é.
+Proposta: no passo 8 do prompt do verificador, uma refutação completa a frase "seguro porque `<controle>` em `<file:line>` faz `<X>` antes de `<sink>`, em todo caminho que o principal alcança".
+Não refutam: confiança genérica na biblioteca, controle em outro caminho, controle que roda tarde demais, controle que pode falhar aberto (try/except que engole, flag que o chamador sobrescreve, allowlist vazia por default), call-site irmão protegido, informação ausente, dificuldade de montar o ambiente, "o operador pode configurar" e "é interno" (isso reduz severidade, não apaga o finding).
+Assimetria: não conseguir reproduzir nunca é `rejected`; sem controle citável, o candidato vai para `needs_validation`.
+Fontes: `strix/skills/analysis/counterevidence.md` (Strix, Apache-2.0); "Verdict asymmetry" em `internal/agent/verifier.go` (xalgorix): veredito malformado vira inconclusivo, nunca rejeitado.
+Reforço: uma verificação que falhou fica registrada como fato negativo, para o próximo run não repetir a mesma tentativa (CyberStrikeAI, `skills/pentest-verification/SKILL.md`); na skill, isso já é o `rejected` mantido em `findings.json`.
+
+**SA-26, tipo de evidência e caso de controle.**
+O `execution.observed_result` é texto livre: nada diz que tipo de prova o sustenta, e nada mostra que o harness local conseguiria falhar.
+Proposta: `execution.evidence_kind` obrigatório, com enum fechado (`source_observation`, `local_differential`, `local_state_readback`, `local_artifact`, `sanitizer_report`, `rendered_policy`), e `execution.control` (`input`, `observed_result`) obrigatório em todo tipo menos `source_observation`.
+O controle passa pela mesma fronteira com uma entrada benigna ou um principal autorizado; se os dois resultados são iguais, o oráculo não discrimina e a prova é inválida, e o validador barra `control.observed_result` igual ao `observed_result`.
+No prompt do verificador, uma lista do que não é prova por classe: reflexão não é execução de script, um status de sucesso numa escrita não prova acesso (ler o estado de volta), uma resposta lenta isolada não prova injeção, e a prova obtida por outro mecanismo não prova este.
+Fontes: `OracleKind` em `engine/receipt.py` (pentest-ai), que recusa veredito verificado sem tipo de oráculo; regras 2, 3 e 5 de `buildVerifierPrompt` em `internal/agent/verifier.go` (xalgorix); controle negativo e "oráculo não discriminante" em `packages/decepticon/decepticon/agents/prompts/standard/finding_verifier.md` (Decepticon); "um harness que não pode falhar é inválido" em `docs/verification-oracles.md` (Pentest-Swarm-AI, só ideia); "anomalia é pista, não prova" no prompt do supervisor em `pentestgpt_agent/src/pentestgpt_agent/agents.py` (PentestGPT).
+
+**SA-27, mecanismo e impacto.**
+O agente encadeia "o controle falta, então o abuso é possível, então o impacto é plausível, então o impacto é fato", e o verificador que só tem aceitar ou rejeitar descarta o controle ausente porque a história contada era grande demais.
+Proposta: no prompt do verificador, separar o mecanismo (o que o código fez) do impacto (o que isso dá ao atacante).
+Mecanismo provado e impacto além do observado: reescrever título, descrição, `capabilities` e severidade até o resultado observado, e manter o registro; rejeitar só quando o próprio mecanismo é refutado.
+O teste: o finding sobrevive se a frase de impacto for apagada?
+Fonte: tabela de decisão em `neurosploit-rs/crates/harness/src/claims.rs` e `prosecutor.rs` (NeuroSploit, MIT), em que um rebaixamento nunca descarta.
+
+**SA-28, contra-evidência e condições de mudança.**
+O checklist de refutação registra o resultado de cada teste, mas não obriga a escrever o caso mais forte contra o finding nem o que mudaria a severidade.
+Proposta: `counterevidence` obrigatório no `confirmed` (a restrição mais forte achada e por que ela não neutraliza o finding, ou o que foi checado quando nada foi achado) e `severity.change_conditions` obrigatório (o fato concreto que subiria ou baixaria a severidade).
+Fontes: § "Before You File a Report" de `strix/skills/analysis/counterevidence.md` (Strix); `packages/decepticon/decepticon/tools/reporting/finding_epistemics.py` (Decepticon).
+
+**SA-29, matriz de autorização.**
+O Agent 1b mapeia principais e controles, mas não produz a tabela que o hunter de controle de acesso precisa.
+Proposta: o Agent 1b devolve, para cada ação sensível, os papéis que podem executá-la, o guard e o `file:line` do ponto de aplicação; cada célula sem guard ou com guard diferente do de uma ação irmã vira unidade do ledger.
+Um guard só conta se domina todo caminho até o efeito colateral e roda antes dele; checagem só na UI não conta.
+Eixos: horizontal (id ou dono vindo do request, não da sessão), vertical (rota de admin alcançável por papel comum) e de fluxo (passo pulável ou reordenável), mais autorização por campo e papel (mass assignment em `role`, `owner_id`, `balance`; campos GraphQL).
+Inferir a política pretendida do código, dos testes e da documentação, contrastando o guard correto de uma ação irmã com o ausente; se o guard pode estar num middleware fora da leitura, o candidato vai para `needs_validation`.
+Fontes: `apps/worker/prompts/vuln-authz.txt` e `recon.txt` (Shannon, só ideia); `agents_md/code/research_logic_authz_flaw.md` e `neurosploit-rs/crates/harness/src/authz_matrix.rs` (NeuroSploit); `internal/agent/authz_matrix.go` (xalgorix); `skills/detecting-broken-object-property-level-authorization/SKILL.md` (mukul975); `agents/bizlogic-hunter.md` (pentest-ai-agents), com conta desativada que mantém acesso à API e paridade de autorização entre API e UI.
+
+**SA-30, invariantes de negócio.**
+O bloco Business logic de `ATTACK-CLASSES.md` lista classes de falha, mas não manda inventariar as regras que cada fluxo precisa manter.
+Proposta: por fluxo crítico, escrever a regra pretendida e o campo que o atacante controla, e testar uma invariante por vez: conservação de valor, unicidade e idempotência, contador monotônico, exclusividade, ordem dos passos e janela de tempo.
+A prova é o estado persistido lido de volta, e os caminhos de estorno, cancelamento e edição entram junto com o caminho feliz.
+Fontes: `strix/skills/vulnerabilities/business_logic.md` (Strix); `internal/tools/skills/data/application-security/business-logic-testing/SKILL.md` (xalgorix); passo 1 de `skills/testing-for-business-logic-vulnerabilities/SKILL.md` (mukul975).
+
+**SA-31, alcançabilidade de dependência.**
+`SUPPLY-CHAIN-AND-RELEASE.md` diz que uma dependência vulnerável sozinha não é finding, mas não diz como subir dela até um finding.
+Proposta: uma escada de evidência por advisory, nunca por pacote: `unknown`, `not_imported`, `imported`, `vulnerable_symbol_used` (o símbolo citado pelo advisory aparece no código da aplicação) e `reachable_call_path` (só com ferramenta de call graph); cada degrau cita a prova, e `not_imported` nunca vira "não explorável".
+Do degrau `vulnerable_symbol_used` em diante, o candidato segue o trace normal da skill, de uma entrada não confiável até o símbolo.
+A versão vem do lockfile, e um CVE transitivo é atribuído à dependência direta que o traz, com a correção no nível dela (bump da direta ou `overrides`/`resolutions`).
+Sem banco local de advisories, a escada para em `needs_validation`.
+Fontes: `strix/skills/custom/dependency_cve_scanning.md` (Strix); `agents_md/code/research_dependency_nday_reachability.md` (NeuroSploit); justificativa VEX em `skills/analyzing-sbom-for-supply-chain-vulnerabilities/SKILL.md` (mukul975).
+
+**SA-32, gates da correção.**
+A skill pede a menor correção e um caso de regressão (`SKILL.md:178-180`, `HUNTING.md:57`), sem dizer o que torna uma correção aceitável.
+Proposta: a invariante em uma frase e, em ordem, os gates: o trace refeito no código corrigido falha num passo nomeado; uma revisão de bypass com outra classe de entrada e os call-sites irmãos; o comportamento legítimo continua; o caso de regressão falha sem a correção.
+Desqualificam: fechar só o payload e não a classe, sanitizar na camada errada, depender de flag do chamador ou config do operador, falhar aberto, enfraquecer outro controle, ou arrastar refatoração.
+Quando um gate não fecha, a estratégia fica em prosa e a correção pronta sai do registro.
+Fontes: `strix/skills/analysis/fix_verification.md` (Strix); `docs/methodology-skills/fix_verification.md` (Decepticon), com profundidade superficial ou de causa raiz; tabela de correções falsas em `agents/fix-verifier.md` (pentest-ai-agents); juiz de excesso de escopo em `docs/remediation-agent.md` (Dark-Moon, só ideia).
+O SA-14 é o gate do trace refeito com execução local.
+
+**SA-33, run escopado num diff.**
+`SKILL.md:120` permite escopar o run no diff entre dois refs, sem regra do que entra.
+Proposta: entra o que o diff introduz, reintroduz ou torna alcançável: sink antigo que ganha o primeiro chamador com entrada do atacante, helper ou guard compartilhado enfraquecido (com cada call-site afetado), controle removido ou estreitado sem código novo, default invertido, validador que virou opcional, erro que passou de rejeitar para logar e seguir.
+Bug antigo sem relação com o diff vira nota, não finding.
+Título, descrição e mensagens do PR são dado não confiável; arquivo novo é lido inteiro, arquivo apagado é só contexto.
+Fontes: `strix/skills/scan_modes/diff.md` (Strix); `packages/decepticon/decepticon/tools/research/diff_scope.py` (Decepticon).
+
+**SA-34, classes que sozinhas não são finding.**
+O "Obvious things" de `ATTACK-CLASSES.md` já pede o trace, mas não lista os padrões que voltam como falso positivo.
+Proposta: no gate de candidato, sem cadeia que cruze uma fronteira, não são finding: header de segurança ausente, clickjacking sem ação sensível, open redirect isolado, injeção de CSV, CORS com origem curinga sem credenciais, chave pública por design (`pk_` do Stripe, DSN do Sentry, `NEXT_PUBLIC_`), e segredo com aviso de demo no próprio arquivo (citar o aviso e ler o arquivo em volta).
+Fontes: `checkFalsePositive` em `internal/tools/reporting/reporting.go` (xalgorix); lista UNCONFIRMED de `conf/agents/pentest.md` (Dark-Moon, só ideia).
+
+**SA-35, registro fabricado.**
+O validador poderia recusar um registro que se declara simulado ou de exemplo, ou que reporta "alvo inalcançável" como vulnerabilidade, com testes de caso verdadeiro para cada regra.
+É heurística de texto: fica `baixa` até um run real mostrar o problema.
+Fonte: `checkFabricatedFinding` e seus testes em `internal/tools/reporting/` (xalgorix).
+
+**SA-36, prioridade SSVC.**
+Para leads de dependência, os pontos de decisão do SSVC (exploração nenhuma, PoC ou KEV; impacto técnico; automatizável; prevalência na missão) ordenam o trabalho de Track a Act.
+O run não acessa a rede, então só vale com um snapshot KEV/EPSS já presente e datado.
+Fonte: `skills/triaging-vulnerabilities-with-ssvc-framework/SKILL.md` (mukul975).
+
 ## Fontes
 
 ### KeygraphHQ/shannon
@@ -217,7 +347,8 @@ Cobertura declarada em [`COVERAGE.md`](https://github.com/KeygraphHQ/shannon/blo
 - Os prompts SAST "capella" trazem o cabeçalho "Derived from Mantis ... under Apache-2.0" (ver [`THIRD_PARTY_NOTICES.md`](https://github.com/KeygraphHQ/shannon/blob/4bd88c12a9096d0b78ceb2828729d12dca70fa60/THIRD_PARTY_NOTICES.md)), então as ideias úteis vêm do Mantis.
 - Já cobertos pela skill: dedupe (fingerprints), verificador independente, encadeamento e `needs_validation`.
 
-**Aproveitável:** SA-07.
+**Aproveitável:** SA-07; reforço em SA-20.
+Releitura em 2026-10-22, no mesmo commit: o método de autorização de `apps/worker/prompts/vuln-authz.txt` (hierarquia de papéis, candidatos horizontais, verticais e de fluxo, guard que só conta se domina todo caminho antes do efeito colateral) entra no SA-29, só como ideia.
 
 **Uso direto:** complemento dinâmico rodando à parte com `npx @keygraph/shannon@latest start -u <url> -r <repo>`.
 Requisitos lidos no README: Docker, Node.js 18+, chave de API de um provedor e verificação "cyber" no provedor; a partir da v1.9.0 não aceita assinatura do Claude Code.
@@ -314,6 +445,149 @@ Um planner encadeia as abilities por um modelo de fatos e relações: o comando 
 **Riscos:** o `conf/default.yml` traz `api_key_red: ADMIN123`, usuários `admin/admin`, `red/admin` e `blue/admin` e `host: 0.0.0.0`; o README recomenda `--insecure`.
 Subir isso na rede corporativa expõe um C2 com credenciais conhecidas, e rodar agentes na rede do empregador exige autorização formal e pode disparar EDR/SOC.
 
+### Rodada de 2026-10-22
+
+As fontes abaixo foram lidas remotamente com `gh api`, sem clone e sem executar nada, no commit do índice.
+Todas são ferramentas de pentest ou red team contra alvo vivo; o que serve é a engenharia de evidência, verificação e fechamento, nunca a exploração.
+
+### usestrix/strix
+
+Agentes de pentest com modo white-box: a metodologia vive em skills Markdown (`strix/skills/`), e os campos do relatório são validados em `strix/tools/reporting/tool.py`.
+
+**Não serve, e por quê:**
+
+- A prova padrão é dinâmica, contra a aplicação rodando; a skill só executa localmente em sandbox.
+- Os comandos de scanner tentam atualizar o banco pela rede antes de cair no cache.
+
+**Aproveitável:** SA-25, SA-28, SA-30, SA-31, SA-32, SA-33; reforços em SA-04, SA-12, SA-14 e SA-20.
+
+**Licença:** Apache-2.0: adaptar com atribuição e marcação das mudanças.
+
+### JoasASantos/NeuroSploit
+
+Harness autônomo multi-modelo em Rust, com modos black-box, white-box e grey-box; cada alegação precisa de recibo, um validador determinístico por CWE julga, e um "promotor de evidência" revisa.
+Os agentes de `agents_md/code/` trabalham só com o código-fonte e o histórico.
+
+**Não serve, e por quê:** `agents_md/chains/` e os agentes de infraestrutura são ofensivos.
+
+**Aproveitável:** SA-27; reforços em SA-06, SA-07, SA-29 e SA-31.
+
+**Licença:** MIT.
+
+### xalgorix/xalgorix
+
+Agente DAST autônomo em Go com metodologia de 22 fases; todo candidato passa por um verificador independente antes do relatório, e o código-fonte serve só para gerar pistas.
+
+**Não serve, e por quê:** a verificação roda contra alvo vivo.
+
+**Aproveitável:** SA-25, SA-26, SA-34, SA-35; reforços em SA-29 e SA-30.
+
+**Licença:** Apache-2.0; parte do catálogo de skills deriva do Strix (`internal/tools/skills/data/README.md`), então a proveniência é conferida por arquivo.
+
+### 0xSteph/pentest-ai
+
+Motor DAST em Python com a regra "no proof, no finding": um veredito verificado precisa nomear o oráculo que o provou (`engine/receipt.py`).
+
+**Não serve, e por quê:** as probes atacam URL viva, e o mapeamento de título para CWE por regex em `engine/dedup.py` é fraco.
+
+**Aproveitável:** SA-26; reforços em SA-07 e SA-16.
+
+**Licença:** MIT.
+
+### BitterSecurity/Decepticon
+
+Agente red team autônomo com middleware de regras de engajamento e verificador e relator separados.
+
+**Aproveitável:** SA-28, SA-32; reforços em SA-26 e SA-33.
+
+**Licença:** Apache-2.0.
+
+### 0xSteph/pentest-ai-agents
+
+Cerca de 50 prompts de subagente para Claude Code e um banco SQLite de findings em shell.
+
+**Não serve, e por quê:** a maior parte é recon, exploração e pós-exploração contra alvo vivo.
+
+**Aproveitável:** SA-32 (`agents/fix-verifier.md`); reforço em SA-29 (`agents/bizlogic-hunter.md`).
+
+**Licença:** MIT.
+
+### Armur-Ai/Pentest-Swarm-AI
+
+Enxame de agentes em Go sobre um blackboard, que embrulha cerca de 40 ferramentas de rede e nuvem e tem oráculos de verificação fora do modelo.
+
+**Aproveitável:** reforços em SA-07, SA-13, SA-16, SA-20 e SA-26.
+
+**Licença:** AGPL-3.0 (Community Edition, com CLA): só ideias.
+
+### GreyDGL/PentestGPT
+
+Ferramenta interativa legada, pipeline de CTF e um pacote novo `pentestgpt_agent/` (supervisor, executor e memória SQLite determinística) que o próprio `CONTEXT.md` declara ainda sem findings estruturados.
+
+**Aproveitável:** reforços em SA-13 e SA-26.
+
+**Licença:** MIT; `.agents/skills/` é vendorizado de terceiro e não é metodologia do projeto.
+
+### ASCIT31/Dark-Moon
+
+Plataforma de pentest autônoma com cerca de 50 agentes especialistas em Markdown e um LLM local atrás de um gateway de privacidade; a remediação é recurso pago, e só o documento está no repositório.
+
+**Aproveitável:** SA-34; reforço em SA-32.
+
+**Licença:** GPL-3.0: só ideias.
+
+### mukul975/Anthropic-Cybersecurity-Skills
+
+817 skills de um procedimento cada, mapeadas para ATT&CK e NIST CSF; largas e rasas, quase todas tutoriais de ferramenta com um `agent.py`.
+
+**Não serve, e por quê:** a maior parte duplica guias de ferramenta; o OWASP Risk Rating de `performing-web-application-vulnerability-triage` é genérico.
+
+**Aproveitável:** SA-36; reforços em SA-07, SA-29, SA-30 e SA-31.
+
+**Licença:** Apache-2.0 na raiz e em cada skill, sem arquivo NOTICE.
+
+### AIPentest/CyberStrikeAI
+
+Plataforma red team em Go com agentes Eino, tools MCP, memória de projeto, aprovação humana, C2 e WebShell.
+
+**Não serve, e por quê:** `agents/vulnerability-triage.md` manda o agente nunca questionar a autorização, e `skills/unlimited-attack-scope/` existe; nenhum texto de prompt deve ser copiado.
+
+**Aproveitável:** reforço em SA-25.
+
+**Licença:** Apache-2.0.
+
+### CyberStrikeus/CyberStrike
+
+Harness black-box de replay HTTP com cerca de 2,6 mil skills geradas para CIS, NIST, MITRE e OWASP WSTG 4.2.
+
+**Aproveitável:** reforço em SA-07.
+
+**Licença:** AGPL-3.0: só ideias.
+
+### vxcontrol/pentagi
+
+Plataforma black-box autônoma em Go com orquestrador, especialistas, vector store e grafo de conhecimento.
+
+**Não serve, e por quê:** o vocabulário fixo de nós e arestas da memória (`backend/pkg/templates/prompts/memorist.tmpl`) é a mesma ideia do vocabulário fechado de capacidades (SA-11), e o ledger já é a memória do alvo.
+
+**Licença:** MIT, mais um `EULA.md` de uso aceitável e redistribuição: só ideias.
+
+### GH05TCREW/pentestagent
+
+Equipe black-box de rede e web com orquestrador, notas, RAG e playbooks fixos.
+
+**Não serve, e por quê:** o grafo de notas e os status confirmado/potencial já existem na skill (SA-11 e os vereditos).
+
+**Licença:** MIT.
+
+### bugbasesecurity/pentest-copilot
+
+Assistente interativo de operador no navegador, com shells Kali, Burp/Caido e Mythic C2.
+
+**Não serve, e por quê:** não lê código-fonte, e o estado do prompt carrega credenciais cruas, o contrário do SA-08.
+
+**Licença:** MIT.
+
 ## Aplicabilidade nos projetos-alvo
 
 ### Perfil dos projetos
@@ -375,3 +649,9 @@ Ideias que não aparecem na tabela valem para os três projetos sem ressalva (in
 | SA-23 | `fetch(` em dezenas de arquivos nos três. |
 | SA-24 | Só se algum projeto tiver feature de LLM com tools. |
 | SA-07 | Só se o repositório tiver GitHub code scanning habilitado. |
+| SA-29 | A matriz sai direto das procedures tRPC (`publicProcedure`, `protectedProcedure`, `adminProcedure`) e das policies RLS por papel; o `service_role` nos três é uma célula própria. |
+| SA-30 | Fluxos de valor na venda e no negócios (preço, desconto, estorno) e de cálculo e emissão no IPTU. |
+| SA-31 | Os três têm lockfile npm; dependências que leem arquivo do usuário (xlsx, exceljs, pdfjs-dist, docxtemplater) são as primeiras da escada. |
+| SA-33 | Revisão de um PR dos três antes do merge, sem auditar o repositório inteiro. |
+| SA-34 | Chaves `NEXT_PUBLIC_*` do Supabase são públicas por design nos três; a chave `service_role` não é. |
+| SA-36 | Só com um snapshot KEV/EPSS baixado antes, fora do run. |
