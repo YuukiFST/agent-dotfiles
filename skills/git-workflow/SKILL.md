@@ -1,13 +1,21 @@
 ---
 name: git-workflow
-description: "Use when shipping a change through GitHub end to end — before the first commit, not at merge time. Covers opening the issue, naming the branch, sequencing commits, opening a PR that closes the issue, recording a review before merge, choosing merge vs rebase vs squash, and cleaning up after. Also covers reverting a merged mistake, forks vs standalone repos, and contributing to someone else's repo."
+description: "Ship a change through GitHub end to end, only when the user invokes /git-workflow: open the issue, name the branch, sequence commits, open a PR that closes the issue, record a review, merge the PR, then delete the dead branches, worktrees and leftover files on the machine. Also covers reverting a merged mistake, forks vs standalone repos, and contributing to someone else's repo."
+disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
-# Git workflow — issue → branch → PR → review → merge
+# Git workflow — issue → branch → PR → review → merge → cleanup
 
 The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit identity (§1), commit-message format (§2), push confirmation (§3), the AI-attribution ban (§4). **This skill does not restate them. Follow both.**
 
-**Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
+**User-invoked only.** The flow runs when the user invokes `/git-workflow` or asks to ship the change with it; a message that only talks about this skill (editing it, quoting a step) does not start it.
+That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 and 6 pass; it covers no other PR, and a merge that triggers a release or deploy still needs its own yes.
+A skill that points here for one convention (branch name, PR body) applies that convention only, and the merge and cleanup do not run.
+
+**Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change shipped through this skill, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
 
 ## The flow
 
@@ -21,7 +29,25 @@ The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit 
 5. **Review before merge — always.** Run the `interrogate` skill on the PR and post its verdict **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CODING_STANDARDS.md, "Boy Scout rule": a lint/test failure found along the way gets fixed).
 7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
-8. **After merge, remove the worktree, then delete the branch, then confirm the issue is closed.** git refuses to delete a branch still checked out in a worktree; removal steps are in global CODING_STANDARDS.md, "Leave no trace". `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
+   Before merging, fix and push every review finding marked Act on, then wait for step 6 to pass again on the new head commit.
+   Then merge it yourself: `gh-axi pr merge <n> --rebase` or `--merge`, without `--delete-branch`, since step 9 deletes branches in the order a worktree needs.
+   A merge that GitHub refuses (conflict, protection rule) stops the run: report the refusal and ask.
+8. **Confirm the issue is closed.** `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
+9. **Delete what the merge left dead, on every branch of the repo, not only this run's.** Work from the main checkout, never from inside a worktree you remove.
+    1. `git status --porcelain` must print nothing; then `git switch <default-branch>`, `git pull --ff-only` and `git fetch --prune`. Any of these failing stops the cleanup: report it and ask.
+    2. Only a local branch named `<type>/<issue-number>-<slug>` (step 2) can be dead; the default branch and long-lived branches (`develop`, `release/*`, `gh-pages`) never are.
+       It is dead when `gh pr view <branch> --json number,state,headRefOid,isCrossRepository` shows `MERGED`, `isCrossRepository` false, and the branch tip holds no commit beyond the PR head: `git fetch origin pull/<number>/head`, then `git merge-base --is-ancestor <branch> <headRefOid>` exits 0.
+       Judge by the PR, not `git branch --merged`: a rebase merge leaves local SHAs that look unmerged.
+       A branch with no PR is dead only when `git log <default-branch>..<branch>` prints nothing.
+       Any other branch (a PR closed unmerged, commits past the PR head, no PR and unlanded commits) is live work: keep it and name it in the report.
+    3. For each dead branch, in order: remove its worktree (global CODING_STANDARDS.md, "Leave no trace"), `git branch -D <branch>`, then `git push origin --delete <branch>` if the remote still has it and the repo is yours.
+       A worktree that refuses removal stays, with its branch, and goes in the report.
+    4. `git worktree list` marks a worktree whose directory is already gone as `prunable`: run `git worktree prune`.
+    5. Delete the leftover files this run created: scratch dirs and clones in OS temp, and the step 4 evidence files.
+       `git clean -n` lists the other untracked files in the checkout. Name them in the report and leave them, since they may be work in progress.
+       Build caches (`target/`, `node_modules/`) and package caches stay, as "Leave no trace" says.
+
+    Done when `git branch -vv` and `git worktree list` show no dead branch, and the report names each branch, worktree and file kept, with the reason.
 
 ## Shape of the work
 

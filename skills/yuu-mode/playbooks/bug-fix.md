@@ -13,6 +13,6 @@ A change that "might help" is a hypothesis: it ships only after evidence confirm
    A frozen regression test that already fails is the repro: go straight to the fix.
    A fix that crosses a module boundary gets `codebase-design` first; a visual or motion defect takes its fix's craft bar from `ui-polish`.
 5. Verify on the same surface: the original repro now passes.
-6. Order the commits so the failing repro lands before the fix (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user asked to ship.
+6. Order the commits so the failing repro lands before the fix (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** what broke, the root cause, the fix, how you verified it, with the failing-then-passing output verbatim.

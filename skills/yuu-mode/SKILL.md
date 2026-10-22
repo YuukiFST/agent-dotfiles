@@ -86,7 +86,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 
 | Task | Route |
 |------|-------|
-| Commit, branch, PR, merge | `git-workflow` |
+| Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
 | Drive a web page in a real browser | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |

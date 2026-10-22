@@ -12,6 +12,6 @@ A missing feature or a real bug found along the way is split out: the structural
    Grep every rename across code, strings and docs; renames miss usages there.
 6. Prove behavior is unchanged on the real artifact (`principle-prove-it-works`): the pin, plus an old-versus-new output diff for a larger reshape.
 7. A reshape you chose stays only if it lowers reader load somewhere; for one the user asked for that does not, say so with the evidence and ask before keeping or reverting.
-8. Commit in order: the subtraction, then the reshape, then any follow-on cleanup (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user asked to ship.
+8. Commit in order: the subtraction, then the reshape, then any follow-on cleanup (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** the structure that changed, the pin it held against, the equivalence proof, the reader-load delta, and what shipped versus what was reverted.

@@ -14,6 +14,6 @@ Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; t
    7. Do it cheaper.
 3. Fix one hypothesis at a time and measure after each (`principle-sequence-verifiable-units`); a change with no measured gain is reverted.
 4. Compare baseline and post-fix artifacts side by side. An inconclusive comparison is reported as inconclusive.
-5. Cite the measurement in the commit or PR body; ship through `git-workflow` when the user asked to ship.
+5. Cite the measurement in the commit or PR body; ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** baseline number, post-fix number, delta with units, and the artifact path.
