@@ -14,6 +14,26 @@ $UserHome = $env:USERPROFILE   # $HOME is a read-only automatic variable in Powe
 
 function Test-Cmd($name) { $null -ne (Get-Command $name -ErrorAction SilentlyContinue) }
 
+# PS 5.1 lacks ConvertFrom-Json -AsHashtable; the merge below needs dictionaries.
+function ConvertTo-HashtableCompat($Object) {
+  if ($null -eq $Object) { return $null }
+  if ($Object -is [System.Collections.IDictionary]) { return $Object }
+  if ($Object -is [System.Management.Automation.PSCustomObject]) {
+    $h = @{}
+    foreach ($p in $Object.PSObject.Properties) {
+      $v = $p.Value
+      if ($v -is [System.Management.Automation.PSCustomObject]) {
+        $v = ConvertTo-HashtableCompat $v
+      } elseif ($v -is [System.Collections.IEnumerable] -and $v -isnot [string]) {
+        $v = @($v | ForEach-Object { if ($_ -is [System.Management.Automation.PSCustomObject]) { ConvertTo-HashtableCompat $_ } else { $_ } })
+      }
+      $h[$p.Name] = $v
+    }
+    return $h
+  }
+  return $Object
+}
+
 # Archived stacks + REMOVED.txt, no copy. Mirrors prune_stale_skills() in sync-config.sh.
 function Remove-StaleSkills($Dest) {
   New-Item -ItemType Directory -Force -Path $Dest | Out-Null
@@ -167,12 +187,12 @@ function Sync-Pi {
   # settings.json is a MERGE, not a mirror: pi writes its own keys there
   # (lastChangelogVersion, auth state), so only the keys this repo owns are replaced.
   # Same split as sync_pi_agent() in sync-config.sh - keep the two in step.
-  $seed = Get-Content (Join-Path $piSrc "settings.json") -Raw | ConvertFrom-Json -AsHashtable
+  $seed = ConvertTo-HashtableCompat (Get-Content (Join-Path $piSrc "settings.json") -Raw | ConvertFrom-Json)
   $livePath = Join-Path $agent "settings.json"
   $fresh = -not (Test-Path $livePath)
   $live = @{}
   if (-not $fresh) {
-    $live = Get-Content $livePath -Raw | ConvertFrom-Json -AsHashtable
+    $live = ConvertTo-HashtableCompat (Get-Content $livePath -Raw | ConvertFrom-Json)
   }
   # Repo-owned keys - always converge on sync.
   foreach ($key in "theme", "enabledModels") {

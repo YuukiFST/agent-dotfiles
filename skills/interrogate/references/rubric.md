@@ -78,7 +78,7 @@ For each security finding, trace the input path through the code and show it.
 - User input flowing to dangerous sinks (SQL, shell, eval, innerHTML, file paths) without sanitization; path traversal through `..`, absolute paths or symlinks
 - Secret comparison that leaks timing (`==` on tokens or MACs instead of a constant-time compare)
 - Authentication/authorization gaps in new endpoints
-- Secrets in code, logs, or error messages
+- Secrets in code, logs, or error messages; a suspected real credential (API key, token, password, private key) in the diff is always `critical`, reported by location and kind, never by quoting its value. Placeholders and test fixtures are not credentials.
 - TOCTOU (time-of-check-time-of-use) in security-critical paths
 - Non-cryptographic randomness (`Math.random()`) for tokens, IDs or secrets
 - Prototype pollution or unsafe object merges of untrusted data
