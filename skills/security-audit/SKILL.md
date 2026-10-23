@@ -67,6 +67,7 @@ The parent creates and is the only writer of shared run files:
 - `REPORT.md`
 - `FINDINGS-DETAIL.md`
 - `NEEDS-VALIDATION.md`
+- `findings.sarif`, when the owner asks for code-scanning output
 
 Each hunter or verifier receives a unique root under `<output-dir>/agents/<agent-id>/`, with separate `scratch/` and `artifacts/` directories. Canonical agent IDs match `^[a-z0-9][a-z0-9_-]{0,63}$` and must not equal a Windows device name such as `con`, `prn`, `aux`, `nul`, `com1` through `com9`, or `lpt1` through `lpt9`. Lowercase IDs prevent case-fold collisions. The agent and every target-controlled process may write only to `scratch/`; retained `artifacts/` is parent-owned, is never exposed to the sandbox, and is writable only by trusted parent-side promotion code. Agents may not change shared files, target source, retained artifacts, or another agent's directory. Do not use `/tmp` or the host home directory as a writable fallback.
 
@@ -117,7 +118,7 @@ During full audit setup, pick a profile from the user's request or propose one f
 - **`standard`** — the workflow as written.
 - **`deep`** — for high-stakes or large targets. Split ledger units per subsystem and lifecycle mode, run critic waves to a clean pass, keep candidate validation and final record verification as separate fresh agents, and give `prior_covered_same_source` units an independent second pass.
 
-A **scoped run** audits a subset: named paths, one subsystem, one companion domain, or the diff between two source refs. Seed ledger units only for in-scope surfaces and record everything else as `out_of_scope` — never as `covered`. A scoped or `quick` run must present itself as partial coverage.
+A **scoped run** audits a subset: named paths, one subsystem, one companion domain, or the diff between two source refs. Seed ledger units only for in-scope surfaces and record everything else as `out_of_scope` — never as `covered`. A scoped or `quick` run must present itself as partial coverage. A run scoped to a diff reports only what the diff introduces, reintroduces, or makes reachable, under "Diff-scoped runs" in [RECONNAISSANCE.md](RECONNAISSANCE.md).
 
 Profiles change breadth and redundancy, never the evidence bar. Do not scale away the candidate gate, the source/local execution boundary, `needs_validation` discipline, schema validation, or independent verification of `confirmed` records.
 
@@ -146,7 +147,7 @@ For every candidate, name the lower-trust principal, accepted input or action, i
 
 ### Use bounded local evidence
 
-Static analysis establishes the source path. Sandboxed local tests resolve behavior when all execution controls are available: a minimal function harness, existing unit test, small parser fixture, dummy-tenant integration test, locally rendered configuration, or bounded isolated-loopback client. Stop at a wrong return value, unauthorized dummy record, sanitizer finding, policy difference, or other minimum effect. Do not extend the local check beyond the minimum boundary result or produce persistence, post-fault, or concealment material.
+Static analysis establishes the source path. Sandboxed local tests resolve behavior when all execution controls are available: a minimal function harness, existing unit test, small parser fixture, dummy-tenant integration test, locally rendered configuration, or bounded isolated-loopback client. Stop at a wrong return value, unauthorized dummy record, sanitizer finding, policy difference, or other minimum effect. Pair it with a control case through the same boundary, a benign input or an authorized principal whose result differs, so the check could have failed. Do not extend the local check beyond the minimum boundary result or produce persistence, post-fault, or concealment material.
 
 ### Respect source visibility
 
