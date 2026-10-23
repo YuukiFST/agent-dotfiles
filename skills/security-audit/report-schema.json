@@ -27,6 +27,11 @@
             "minLength": 1,
             "visibleContent": true
           },
+          "cwe": {
+            "type": "string",
+            "pattern": "^CWE-[1-9][0-9]*$",
+            "description": "The MITRE CWE identifier the root cause maps to. Leave it out when no weakness fits rather than guessing; export-sarif.cjs tags the result with it."
+          },
           "root_cause": {
             "type": "string",
             "minLength": 1,
@@ -279,6 +284,36 @@
                   "required": ["file_name", "fixed_code"],
                   "additionalProperties": false
                 }
+              },
+              "invariant": {
+                "type": "string",
+                "minLength": 1,
+                "visibleContent": true,
+                "description": "The security property the fix enforces, in one sentence. Required with nonempty code_changes."
+              },
+              "verification": {
+                "type": "array",
+                "description": "One entry per fix gate, required with nonempty code_changes. PASS: the gate was executed or traced through the patched source and holds. REASONED: argued from source without execution. NOT_RUN: not checked, with the reason. A fix that fails a gate carries no code_changes.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gate": {
+                      "type": "string",
+                      "enum": ["closure", "bypass_review", "preserved_behavior", "regression_case"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["PASS", "REASONED", "NOT_RUN"]
+                    },
+                    "detail": {
+                      "type": "string",
+                      "minLength": 1,
+                      "visibleContent": true
+                    }
+                  },
+                  "required": ["gate", "status", "detail"],
+                  "additionalProperties": false
+                }
               }
             },
             "required": ["strategy"],
@@ -379,6 +414,11 @@
             "type": "string",
             "minLength": 1,
             "visibleContent": true
+          },
+          "cwe": {
+            "type": "string",
+            "pattern": "^CWE-[1-9][0-9]*$",
+            "description": "The MITRE CWE identifier the root cause maps to. Leave it out when no weakness fits rather than guessing; export-sarif.cjs tags the result with it."
           },
           "claimed_root_cause": {
             "type": "string",

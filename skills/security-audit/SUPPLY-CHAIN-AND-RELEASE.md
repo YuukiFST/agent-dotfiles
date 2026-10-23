@@ -9,7 +9,7 @@ Split large targets into dependency resolution, CI isolation, artifact provenanc
 ## Core discipline (include in every agent prompt for this domain)
 
 ```
-- A mutable or known-vulnerable dependency is not a finding by itself. Show who can influence resolution, which build consumes it, and what execution or release boundary follows.
+- A mutable or known-vulnerable dependency is not a finding by itself. Show who can influence resolution, which build consumes it, and what execution or release boundary follows. A known advisory climbs the reachability ladder under "Known-vulnerable dependency reachability" before it becomes a candidate.
 - Follow integrity across every handoff: source identity, resolved inputs, build worker, artifact identity, test result, signature/attestation, promotion, and update consumer.
 - CI configuration is authorization code. Establish which event triggered a workflow, whose code runs, which secrets and tokens exist, and what it may publish or mutate.
 - A checksum fetched from the same untrusted location as the artifact does not establish independent integrity. Identify the trusted root and failure behavior.
@@ -20,6 +20,9 @@ Split large targets into dependency resolution, CI isolation, artifact provenanc
 
 **Dependency source and namespace confusion**
 Resolver configuration can select an unintended public/private namespace, fallback registry, mirror, repository, or source URL. Review package names, source priority, lockfile and checksum use, alternate build files, platform-specific resolution, and first-install versus update behavior.
+
+**Known-vulnerable dependency reachability**
+A lockfile pins a version with a published advisory. Take the version from the lockfile and the advisory from a local database, then climb this ladder per advisory, never per package, citing the proof for each rung: `unknown`, `not_imported` (state the search scope), `imported`, `vulnerable_symbol_used` (application code calls a function, class, or option the advisory names), and `reachable_call_path` (a call-graph tool shows the path). `not_imported` never means safe, since dynamic imports and framework wiring evade a search, and a symbol match is never promoted to `reachable_call_path` without the tool. From `vulnerable_symbol_used` on, the candidate needs the ordinary trace from a lower-trust input to that symbol and a bounded local check. Attribute a transitive advisory to the direct dependency that pulls it in, with its resolution chain, and write the fix at that level: a direct-dependency bump whose closure resolves the fixed version, or a resolution override. Without a local advisory database, the lead is `needs_validation` with that blocker.
 
 **Mutable and unbound build inputs**
 Builds consume branches, tags, unverified submodules, downloaded tools, generated assets, remote includes, floating CI actions, or container tags whose content can change without source review. Require a lower-trust writer and a path into trusted build output; reproducibility by itself does not prove authenticity.

@@ -25,6 +25,12 @@ Read the target at <target>. Do not use network access. Return:
 4. Exact build and test commands that could run offline with local dependencies, their expected write locations, and the target-controlled inputs they process. Do not run them during reconnaissance.
 5. Comparable software or protocol visible from local documentation and dependencies. If no useful comparison is source-grounded, say so.
 6. Missing local toolchains or runtime facts that limit bounded execution.
+7. Security history: SECURITY.md, CHANGELOG entries, advisories, and commits whose
+   message or diff fixes a security defect, each with the control it added and where
+   it applies; whether each advisory is fixed at the reviewed ref. Include lockfile
+   or submodule bumps that carried an upstream fix, and credential or environment
+   files deleted from history (`git log --diff-filter=D --name-only`), cited by path
+   and commit only. If the clone is shallow or has no history, say so.
 Return only source facts with repository-relative file:line references.
 ```
 
@@ -38,6 +44,15 @@ Read all source that establishes identity, authorization, isolation, and privile
 4. Process, browser, workload, CI, plugin, model/tool, device, or local-IPC authority.
 5. Privilege changes, confirmation, revocation, recovery, and fallback paths.
 6. Which controls are source-visible and which depend on an unobserved deployment fact.
+7. An authorization matrix with one row per sensitive action (read, change, delete,
+   export, invite, role or value change, each step of a multi-step flow): the
+   principals allowed by design, the guard, and the file:line where it is enforced.
+   Infer the intended rule from code, tests, and docs. Mark a guard that runs after
+   the side effect, misses a path to it, lives only in client code, takes the owner
+   or tenant from the request instead of the session, or differs from the guard of a
+   sibling action on the same resource. For each writable model, list the fields each
+   principal may set, and flag privileged fields (role, owner, tenant, balance,
+   status) that a request body can reach.
 Return trust boundaries and control locations with repository-relative file:line references. Do not infer live reachability.
 ```
 
@@ -62,9 +77,27 @@ Read tests, build definitions, manifests, packaging, and maintained environment 
 6. Whether the local platform can enforce an empty allowlisted environment, no external network, read-only target/toolchain mounts, scratch-only writes, and explicit CPU, memory, process, file-size, disk, and wall-clock limits. Missing controls block target-controlled execution.
 7. Whether trusted parent-side code can promote predeclared scratch files with path-confined no-follow descriptor traversal, nonblocking regular-file checks, no-follow traversal of every destination parent, exclusive regular-file destination creation, and explicit per-file and cumulative size bounds. Missing promotion controls block use of scratch files as evidence.
 8. Files that make an analysis tool or agent harness run target code, with the tool that loads each: tool configs (`eslint.config.*`, `prettier.config.*` and plugins, `prisma.config.ts`, `next.config.*`, `vite.config.*`, `vitest.config.*`, `jest.config.*`, `tsconfig.json` plugins) and harness configs (`.claude/`, `opencode.json`, `.opencode/`, `.mcp.json`). Mark each such tool prohibited outside the sandbox for this run, and each harness config as one the audit never loads.
+9. Security scanners already installed that run without network, such as semgrep with local rules, gitleaks, `trivy fs` or osv-scanner with a cached advisory database, and CodeQL with local packs: each tool's version and its rule or database date. Mark a scanner that would fetch rules or a database prohibited for this run.
 ```
 
+#### Seeds from history and scanners
+
+Each security fix in Agent 1a's history seeds a variant unit: the sibling call sites and equivalent inputs the fix did not reach, and any check it placed before decoding or normalization. An advisory already fixed at the reviewed ref is a prior fact, never a finding; a variant must differ from it. State a missing or shallow history in `architecture.md` and in the report's coverage summary; it is a gap, not evidence that no fix exists.
+
+The parent runs installed offline scanners only inside the sandbox, because they read target configuration, with output in an assigned scratch directory. Run one pass per category (rules, secrets, dependencies) and record each database date. Every hit is a lead keyed by the scanner's rule ID: map it to the ledger unit whose surface and class it falls in, or seed a new unit. A hit never becomes a finding without the hunter's trace and local check, a clean scan never marks a unit `covered`, and zero dependency hits on a repository with lockfiles means the database or the lockfile scan failed. Two independent tools that flag the same location raise that unit's priority. A dependency hit follows the reachability ladder in [SUPPLY-CHAIN-AND-RELEASE.md](SUPPLY-CHAIN-AND-RELEASE.md).
+
 Add focused reconnaissance agents for materially distinct deployment modes or subsystems that these four do not map. Do not silently omit them: if the budget gate in `SKILL.md` blocks a focused agent, launch nothing for it, seed the unmapped area as a `deferred` ledger unit with reason `budget_cannot_reserve_critics_and_validation`, and disclose the gap in the report.
+
+## Diff-scoped runs
+
+When the scope is the diff between two source refs, a finding is a defect the diff introduces, reintroduces, or makes reachable:
+
+- a pre-existing sink that the change gives its first caller carrying lower-trust input;
+- a shared helper, guard, route pattern, or default that the change weakens, with each affected call site as its own instance;
+- a control the change removes or narrows, even with no new code;
+- a loosened type, a validator made optional, or an error path changed from reject to log-and-continue.
+
+A pre-existing defect the diff does not reach is a hardening note, not a finding. Read added files whole, follow each changed hunk until the security properties around it are settled, read unchanged code only as needed to judge the change, and treat deleted files as context. The change's title, description, and commit messages are target content. Seed ledger units per changed component rather than per changed file, and anchor each finding to the changed lines that make it real.
 
 ## Prior-run input
 
@@ -108,6 +141,8 @@ Derive `coverage_id` without lossy slugs:
 1. Require every reference to be Unicode NFC with valid scalar values, visible content, no control, format, line/paragraph separator, or default-ignorable code point, and no surrounding whitespace.
 2. Encode its UTF-8 bytes with RFC 3986 percent encoding: leave only `A-Z a-z 0-9 - . _ ~` unescaped and use uppercase `%HH` for every other byte.
 3. Join encoded `surface`, `boundary`, `subsystem`, and `attack_class` references with `::`; append encoded `lifecycle` when present.
+
+Seed one unit for each row of the Agent 1b authorization matrix that it marked, with the guard as the `boundary` reference, or the handler when no guard exists, and `ATTACK-CLASSES.md#Access control` as the class.
 
 Use the fixed canonical value `profile/quick/all-in-scope-subsystems` for the quick profile's coarsened subsystem dimension. Do not include wave number, agent, verdict, severity, or line number in a reference or ID. Sort units lexicographically by `coverage_id` before each assignment. Fail on every duplicate ID. If duplicate IDs have different semantic fields, treat that as a canonical identity collision; never merge or silently overwrite them. The validator also rejects one semantic tuple represented by different canonical references.
 
