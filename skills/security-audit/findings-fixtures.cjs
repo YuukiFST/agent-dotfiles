@@ -1,6 +1,6 @@
 // One valid record per verdict, shared by the validator tests so a schema change updates one place.
 
-const { REFUTATION_CHECKS } = require("./finding-semantics.cjs");
+const { FIX_GATES, REFUTATION_CHECKS } = require("./finding-semantics.cjs");
 
 function checklist(overrides = {}) {
   return REFUTATION_CHECKS.map((check) => overrides[check] || { check, status: "PASS" });
@@ -39,7 +39,11 @@ function confirmed() {
       },
     },
     counterevidence: "The router requires a session before handle runs, but no ownership check follows on this path.",
-    remediation: { strategy: "Check ownership before the state change." },
+    remediation: {
+      strategy: "Check ownership before the state change.",
+      invariant: "Only the object's owner can change it.",
+      verification: FIX_GATES.map((gate) => ({ gate, status: "REASONED", detail: `The ${gate} gate was traced through the patched handle.` })),
+    },
     severity: {
       likelihood: { score: "medium", reason: "The operation is directly reachable." },
       impact: { score: "medium", reason: "The attacker changes one protected object." },

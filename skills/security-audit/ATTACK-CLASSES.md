@@ -124,7 +124,7 @@ Other agents hunt subtle bugs. This agent checks the basic exposures that are ea
 - Is there a `/debug`, `/admin`, `/test`, `/status`, `/health`, `/metrics`, `/env`, `/.env`, `/config` endpoint that is unprotected?
 - Are there any `.env`, `.env.local`, `credentials.json`, `*.pem`, `*.key` files checked into the repo?
 - Does the `.gitignore` actually cover secrets, uploads, and local config?
-- Are dependencies pinned? Are there known CVEs in the dependency tree? (check lockfiles)
+- Are dependencies pinned? Are there known CVEs in the dependency tree? (check lockfiles, then take each advisory up the reachability ladder in [SUPPLY-CHAIN-AND-RELEASE.md](SUPPLY-CHAIN-AND-RELEASE.md))
 - Are there any `eval()`, `exec()`, `child_process`, `Function()`, `vm.runInContext`, `import()` with dynamic input?
 - Are CORS headers set to `*` or overly permissive? Is `Access-Control-Allow-Credentials` combined with a wildcard origin?
 - Are cookies missing `HttpOnly`, `Secure`, or `SameSite` attributes?
