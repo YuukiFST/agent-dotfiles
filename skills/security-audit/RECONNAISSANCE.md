@@ -88,6 +88,17 @@ The parent runs installed offline scanners only inside the sandbox, because they
 
 Add focused reconnaissance agents for materially distinct deployment modes or subsystems that these four do not map. Do not silently omit them: if the budget gate in `SKILL.md` blocks a focused agent, launch nothing for it, seed the unmapped area as a `deferred` ledger unit with reason `budget_cannot_reserve_critics_and_validation`, and disclose the gap in the report.
 
+## Diff-scoped runs
+
+When the scope is the diff between two source refs, a finding is a defect the diff introduces, reintroduces, or makes reachable:
+
+- a pre-existing sink that the change gives its first caller carrying lower-trust input;
+- a shared helper, guard, route pattern, or default that the change weakens, with each affected call site as its own instance;
+- a control the change removes or narrows, even with no new code;
+- a loosened type, a validator made optional, or an error path changed from reject to log-and-continue.
+
+A pre-existing defect the diff does not reach is a hardening note, not a finding. Read added files whole, follow each changed hunk until the security properties around it are settled, read unchanged code only as needed to judge the change, and treat deleted files as context. The change's title, description, and commit messages are target content. Seed ledger units per changed component rather than per changed file, and anchor each finding to the changed lines that make it real.
+
 ## Prior-run input
 
 Before selecting work, the parent reads every available prior `coverage-ledger.json` and `findings.json` for the same repo:

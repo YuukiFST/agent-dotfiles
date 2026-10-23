@@ -97,6 +97,18 @@ safe is a claim to verify.
    nothing. Every status but PASS gives a reason. A confirmed record has no FAIL or
    UNKNOWN and uses NOT_APPLICABLE only for marginal_capability; a rejected record has
    at least one FAIL; a needs_validation record has at least one UNKNOWN and no FAIL.
+9. Before keeping remediation.code_changes, state the invariant in one sentence and
+   run the fix gates in order, on a disposable patched copy in scratch when execution
+   is allowed: closure (rerun the original local check, or re-trace the patched source
+   and name the step that now fails), bypass_review (another input class, such as a
+   different encoding, content type, or nested value, and the sibling call sites of
+   the same helper), preserved_behavior (the legitimate case through the same
+   boundary), and regression_case (a test that fails without the change). Record each
+   in remediation.verification as PASS, REASONED, or NOT_RUN with its detail. A fix
+   fails its gate when it closes only the one payload, sanitizes after the value is
+   used or in a helper other callers skip, depends on a caller flag or operator
+   setting, fails open, weakens another control, or adds unrelated refactoring: drop
+   code_changes and keep the strategy.
 
 Return exactly one JSON object and no surrounding prose:
 {"decision": "confirmed|needs_validation|rejected", "record": { ... }}
@@ -161,11 +173,11 @@ The parent writes all independently decided records to `<output-dir>/findings.js
 
 Read `report-schema.json` immediately before writing. It uses `additionalProperties: false`; do not carry hunter wrapper fields into a record. Keep these verdict contracts distinct:
 
-- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN` and `NOT_APPLICABLE` only on `marginal_capability`, `execution`, `counterevidence`, `remediation`, `severity` with `change_conditions`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual. `evidence_kind` names what establishes it, and every kind but `source_observation` carries a `control` whose result differs from the attack's.
+- A `confirmed` record uses `root_cause`, `intended_behavior`, `conditions`, `capabilities`, `refutation_checklist` with no `FAIL` or `UNKNOWN` and `NOT_APPLICABLE` only on `marginal_capability`, `execution`, `counterevidence`, `remediation`, `severity` with `change_conditions`, and `confidence`. It must not use `claimed_root_cause`, `blockers`, `validation_plan`, or `reason`. `execution` is target-neutral and uses the target's native interface: API/HTTP input, CLI call, library call, message, file fixture, browser action, rendered policy, or local harness as applicable. `observed_result` is nonempty and factual. `evidence_kind` names what establishes it, and every kind but `source_observation` carries a `control` whose result differs from the attack's. Nonempty `remediation.code_changes` carries `invariant` and one `verification` entry per fix gate.
 - A `needs_validation` record uses `claimed_root_cause`, `trace`, `evidence`, `capabilities`, `blockers`, and at least one nonempty `validation_plan.local` or `validation_plan.deployment` field. Include both only when both contexts can resolve distinct facts. An optional `refutation_checklist` has at least one `UNKNOWN` and no `FAIL`. It must not use severity, execution, remediation, reason, or confirmed root cause.
 - A `rejected` record uses `claimed_root_cause`, `trace`, `evidence`, `refutation_checklist` with at least one `FAIL` that cites its refuting file and line, and `reason`. It must not use severity, execution, remediation, blockers, validation plan, or confirmed root cause.
 
-Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact.
+Every record has a stable fingerprint, title, description, and repository-relative source paths. A multi-step trace begins with `entrypoint`, ends with `sink`, and uses `propagation` only between them. One-entry traces use `entrypoint` or `sink`. Overall severity cannot exceed demonstrated impact. A `confirmed` or `needs_validation` record carries an optional `cwe` only when its root cause maps to one MITRE CWE entry; leave it out rather than guess one from the title.
 
 Run:
 
@@ -213,7 +225,7 @@ For `confirmed`, require it to check:
 3. Every condition, parser/policy step, source-visible preventing layer, and observed local result.
 4. Affected principal/resource and demonstrated impact.
 5. Severity separation: realistic likelihood, demonstrated impact, overall no greater than impact or the cap the `capabilities` schema description states, and `capabilities` that name only what the attacker held and gained.
-6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust.
+6. Remediation strategy and any `code_changes`, including whether the fix enforces the invariant without merely moving trust and whether each `verification` gate still holds.
 7. Every `refutation_checklist` `PASS` still holds against current source.
 8. `execution.evidence_kind` matches how `observed_result` was established, the `control` ran through the same boundary, and `counterevidence` names the strongest control found on the path.
 
@@ -263,18 +275,28 @@ For each confirmed `medium`, `high`, or `critical` record, copy the complete sou
 - the evidence kind, and the control case with its different result;
 - the counterevidence weighed and the facts that would change the severity;
 - conditions and containment;
-- source-level remediation and regression case.
+- source-level remediation and regression case, with the invariant and the fix-gate results when a patch is proposed.
 
 #### `NEEDS-VALIDATION.md`
 
 For every unresolved record, copy the source trace, verified evidence, exact blocker, affected boundary, and each applicable bounded local or owner-observed resolution plan. Keep these as prioritized leads without severity. Do not turn them into live test guidance or assume the missing deployment fact.
 
+#### `findings.sarif`
+
+Write it only when the owner asks for code-scanning output, from the final `findings.json`:
+
+```sh
+node <skill-dir>/export-sarif.cjs <output-dir>/findings.json > <output-dir>/findings.sarif
+```
+
+The script refuses a `findings.json` that fails `validate-findings.cjs`. A `confirmed` record becomes a `fail` result whose level and `security-severity` follow its overall severity, a `needs_validation` record becomes a `review` result with no severity, and a `rejected` record is left out; a record's `cwe` becomes its rule's tag. Uploading the file is the owner's decision after the run.
+
 HTTP is one possible native interface, not the default. A library finding may use a function call, a parser a fixture, a CLI a command, a desktop app an IPC or file action, and infrastructure a locally rendered policy. Do not require an endpoint, external account, or live environment that the target does not have.
 
 Keep the report proportional to the evidence. A clean run may have zero confirmed records. State that result and the remaining coverage/validation limits without inventing LOW findings.
 
-Before the run ends, scan the three reports with the same rules file and fix every failure:
+Before the run ends, scan the three reports, and `findings.sarif` when written, with the same rules file and fix every failure:
 
 ```sh
-node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/REPORT.md <output-dir>/FINDINGS-DETAIL.md <output-dir>/NEEDS-VALIDATION.md
+node <skill-dir>/validate-artifact-content.cjs --rules <output-dir>/rules-of-engagement.json <output-dir>/REPORT.md <output-dir>/FINDINGS-DETAIL.md <output-dir>/NEEDS-VALIDATION.md [<output-dir>/findings.sarif]
 ```
