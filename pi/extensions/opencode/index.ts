@@ -11,6 +11,7 @@ import {
   type Model,
   type SimpleStreamOptions,
   type StopReason,
+  type ThinkingLevelMap,
 } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
@@ -25,14 +26,75 @@ const OPENCODE_MODELS: Array<{
   input: ("text" | "image")[];
   contextWindow: number;
   maxTokens: number;
+  thinkingLevelMap: ThinkingLevelMap;
 }> = [
   {
-    id: "muse-spark-1.3-contributor-free",
-    name: "Muse Spark 1.3 Free",
+    id: "deepseek-v4.1-flash-free",
+    name: "DeepSeek V4.1 Flash Free",
     reasoning: true,
     input: ["text", "image"],
+    contextWindow: 200000,
+    maxTokens: 32000,
+    thinkingLevelMap: {
+      off: null,
+      minimal: null,
+      low: "low",
+      medium: null,
+      high: "high",
+      xhigh: null,
+      max: "max",
+    },
+  },
+  {
+    id: "beam-free",
+    name: "Beam Free",
+    reasoning: true,
+    input: ["text"],
     contextWindow: 1048576,
     maxTokens: 131072,
+    thinkingLevelMap: {
+      off: null,
+      minimal: null,
+      low: "low",
+      medium: "medium",
+      high: "high",
+      xhigh: "xhigh",
+      max: "max",
+    },
+  },
+  {
+    id: "flint-40b-free",
+    name: "Flint 40B Free",
+    reasoning: true,
+    input: ["text"],
+    contextWindow: 262144,
+    maxTokens: 65536,
+    thinkingLevelMap: {
+      off: null,
+      minimal: null,
+      low: "low",
+      medium: "medium",
+      high: "high",
+      xhigh: "xhigh",
+      max: "max",
+    },
+  },
+  {
+    id: "glm-5.3-flash-free",
+    name: "GLM-5.3-Flash Free",
+    reasoning: true,
+    input: ["text", "image"],
+    contextWindow: 200000,
+    maxTokens: 32000,
+    thinkingLevelMap: {
+      off: null,
+      minimal: null,
+      low: "low",
+      medium: null,
+      high: "high",
+      xhigh: null,
+      max: "max",
+    },
   },
 ];
 const SESSION_FILE = path.join(
@@ -46,8 +108,8 @@ const NO_TOOLS_INSTRUCTION =
 
 const VARIANT_BY_THINKING: Record<string, string | undefined> = {
   off: undefined,
-  minimal: "minimal",
-  low: "minimal",
+  minimal: "low",
+  low: "low",
   medium: "medium",
   high: "high",
   xhigh: "max",
@@ -244,7 +306,12 @@ function streamOpenCode(
         .filter((part): part is string => Boolean(part && part.trim()))
         .join("\n\n");
 
-      const targetModel = `${PROVIDER_ID}/${model.id}`;
+      const variant = options?.reasoning
+        ? VARIANT_BY_THINKING[options.reasoning]
+        : undefined;
+      const targetModel = variant
+        ? `${PROVIDER_ID}/${model.id}#${variant}`
+        : `${PROVIDER_ID}/${model.id}`;
       const args = [
         "run",
         "--format",
@@ -256,10 +323,6 @@ function streamOpenCode(
       ];
       const sessionID = loadSessionID(model.id);
       if (sessionID) args.push("--session", sessionID);
-      const variant = options?.reasoning
-        ? VARIANT_BY_THINKING[options.reasoning]
-        : undefined;
-      if (variant) args.push("--variant", variant);
 
       const proc = spawn("opencode", args, {
         signal: options?.signal,
@@ -437,6 +500,7 @@ export default function (pi: ExtensionAPI) {
       input: m.input,
       contextWindow: m.contextWindow,
       maxTokens: m.maxTokens,
+      thinkingLevelMap: m.thinkingLevelMap,
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     })),
     streamSimple: streamOpenCode,
