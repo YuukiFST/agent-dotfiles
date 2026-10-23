@@ -241,6 +241,7 @@ function Sync-OpenCode {
   }
   Copy-Item "$Repo\GLOBAL.md" $agents -Force
   Sync-OpenCodeReviewers $oc
+  Sync-OpenCodeCommands $oc
 }
 
 # OpenCode's task tool takes no model, so each opencode row of skills/interrogate/reviewers.md
@@ -278,6 +279,58 @@ function Sync-OpenCodeReviewers($oc) {
     Set-Content -Path (Join-Path $dir "interrogate-reviewer-$n.md") -Value $agent -NoNewline
   }
   Write-Host "  wrote $n interrogate reviewer agent(s) to $dir"
+}
+
+# OpenCode V2 ignores the `metadata.opencode/slash` marker the skills carry, so a user-invoked
+# skill (opencode/autoinvoke false) is hidden from the model's list AND missing from the slash
+# menu, while Claude Code exposes the same skill as /<name>. One command file per such skill
+# restores that parity: its body loads the skill by id and forwards the arguments.
+# Mirrors sync_opencode_commands() in sync-config.sh.
+function Sync-OpenCodeCommands($oc) {
+  $dir = Join-Path $oc "commands"
+  New-Item -ItemType Directory -Force -Path $dir | Out-Null
+  # Repo-owned files carry this marker on line 2, so a command written by hand survives and a
+  # skill that stops being user-invoked drops its command.
+  $owner = "# agent-dotfiles: generated from skills/"
+  $written = @{}
+  foreach ($d in Get-ChildItem "$Repo\skills" -Directory) {
+    $skill = Join-Path $d.FullName "SKILL.md"
+    if (-not (Test-Path $skill)) { continue }
+    $lines = @(Get-Content $skill -Encoding UTF8)
+    if ($lines.Count -lt 2 -or $lines[0].Trim() -ne "---") { continue }
+    $desc = ""
+    $userInvoked = $false
+    for ($i = 1; $i -lt $lines.Count; $i++) {
+      $line = $lines[$i].TrimEnd()
+      if ($line.Trim() -eq "---") { break }
+      if ($desc -eq "" -and $line -match '^description:\s*(.*)$') { $desc = $Matches[1].Trim() }
+      if ($line -match '^\s*opencode/autoinvoke:\s*"?false"?\s*$') { $userInvoked = $true }
+    }
+    if (-not $userInvoked) { continue }
+    # A block scalar starts with > or |; single-quoting the indicator would ship ">" as the
+    # description, so such a skill falls back to the generic line.
+    if ($desc -match '^[>|]') { $desc = "" }
+    $desc = $desc.Trim('"')
+    $desc = ($desc -replace '\s+', ' ').Trim()
+    if ($desc -eq "") { $desc = "Run the $($d.Name) skill." }
+    # YAML single-quoted scalar: only ' needs escaping, and a backslash stays literal.
+    $desc = $desc -replace "'", "''"
+    $text = "---`n" +
+      "$owner$($d.Name)/SKILL.md by sync-config; edit the skill, not this file`n" +
+      "description: '$desc'`n" +
+      "---`n`n" +
+      "Load the ``$($d.Name)`` skill with the skill tool and follow it.`n`n" +
+      "`$ARGUMENTS`n"
+    [System.IO.File]::WriteAllText((Join-Path $dir "$($d.Name).md"), $text, (New-Object System.Text.UTF8Encoding($false)))
+    $written[$d.Name] = $true
+  }
+  Get-ChildItem $dir -Filter "*.md" | ForEach-Object {
+    if ($written.ContainsKey($_.BaseName)) { return }
+    # The marker sits on line 2, under the opening --- of the frontmatter.
+    $head = @(Get-Content $_.FullName -TotalCount 3 -Encoding UTF8)
+    if ($head | Where-Object { $_.StartsWith($owner) }) { Remove-Item $_.FullName -Force }
+  }
+  Write-Host "  wrote $($written.Count) opencode command(s) to $dir"
 }
 
 $targets = if ($Target -eq "all") {

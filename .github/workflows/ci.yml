@@ -59,6 +59,18 @@ jobs:
       - name: Run sync-config pi regression test
         run: bash scripts/test-sync-pi.sh
 
+  sync-opencode:
+    name: sync-config opencode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # OpenCode V2 ignores metadata.opencode/slash, so a user-invoked skill only reaches the
+      # slash menu through a generated commands/<id>.md. This pins that, the prune of the
+      # generator's own stale files, and that a hand-written command survives.
+      - name: Run sync-config opencode regression test
+        run: bash scripts/test-sync-opencode.sh
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest

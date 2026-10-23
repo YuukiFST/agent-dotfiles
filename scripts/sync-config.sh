@@ -148,6 +148,7 @@ sync_opencode() {
   fi
   cp "$repo/GLOBAL.md" "$oc/AGENTS.md"
   sync_opencode_reviewers "$oc"
+  sync_opencode_commands "$oc"
 }
 
 # OpenCode's task tool takes no model, so each opencode row of skills/interrogate/reviewers.md
@@ -189,6 +190,73 @@ sync_opencode_reviewers() { # $1 = opencode config dir
     } > "$dir/interrogate-reviewer-$n.md"
   done < <(tr -d '\r' < "$repo/skills/interrogate/reviewers.md")
   echo "  wrote $n interrogate reviewer agent(s) to $dir"
+}
+
+# OpenCode V2 ignores the metadata.opencode/slash marker the skills carry, so a user-invoked
+# skill (opencode/autoinvoke false) is hidden from the model's list AND missing from the slash
+# menu, while Claude Code exposes the same skill as /<name>. One command file per such skill
+# restores that parity: its body loads the skill by id and forwards the arguments.
+# Mirrors Sync-OpenCodeCommands in sync-config.ps1.
+sync_opencode_commands() { # $1 = opencode config dir
+  local dir="$1/commands" skill id desc line in_body autoinvoke n=0 f first generated=""
+  # Repo-owned files carry this marker on line 1, so a command written by hand survives and a
+  # skill that stops being user-invoked drops its command.
+  local owner='# agent-dotfiles: generated from skills/'
+  mkdir -p "$dir"
+  for skill in "$repo"/skills/*/SKILL.md; do
+    [ -f "$skill" ] || continue
+    id="$(basename "$(dirname "$skill")")"
+    desc="" autoinvoke=0 in_body=0
+    while IFS= read -r line; do
+      line="${line%$'\r'}"
+      if [ "$in_body" -eq 0 ]; then
+        if [ "$line" = "---" ]; then in_body=1; fi
+        continue
+      fi
+      if [ "$line" = "---" ]; then break; fi
+      case "$line" in
+        description:*)
+          if [ -z "$desc" ]; then desc="$(trim "${line#description:}")"; fi
+          ;;
+      esac
+      if [[ "$line" =~ ^[[:space:]]*opencode/autoinvoke: ]]; then
+        if [[ "$line" =~ \"?false\"?[[:space:]]*$ ]]; then autoinvoke=1; fi
+      fi
+    done < "$skill"
+    if [ "$autoinvoke" -eq 0 ]; then continue; fi
+    # A block scalar starts with > or |; single-quoting the indicator would ship ">" as the
+    # description, so such a skill falls back to the generic line.
+    case "$desc" in
+      ">"*|"|"*) desc="" ;;
+    esac
+    desc="${desc#\"}"; desc="${desc%\"}"
+    [ -n "$desc" ] || desc="Run the $id skill."
+    # YAML single-quoted scalar: only ' needs escaping, and a backslash stays literal.
+    desc="${desc//\'/\'\'}"
+    {
+      printf -- '---\n'
+      printf '%s%s/SKILL.md by sync-config; edit the skill, not this file\n' "$owner" "$id"
+      printf "description: '%s'\n" "$desc"
+      printf -- '---\n\nLoad the `%s` skill with the skill tool and follow it.\n\n$ARGUMENTS\n' "$id"
+    } > "$dir/$id.md"
+    generated="$generated $id"
+    n=$((n + 1))
+  done
+  for f in "$dir"/*.md; do
+    [ -f "$f" ] || continue
+    # The marker sits on line 2, under the opening --- of the frontmatter.
+    first="$(head -n 3 "$f")"
+    case "$first" in
+      *"$owner"*)
+        id="$(basename "$f" .md)"
+        case " $generated " in
+          *" $id "*) ;;
+          *) rm -f "$f" ;;
+        esac
+        ;;
+    esac
+  done
+  echo "  wrote $n opencode command(s) to $dir"
 }
 
 # Every harness shares these. Runs for all targets so the NixOS box (Cursor + pi
