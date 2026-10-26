@@ -41,7 +41,7 @@ For each finding, provide:
    - `warning`: Design concern, maintainability risk, or correctness issue that isn't immediately broken but will cause pain
 2. **Finding**: What the problem is, in concrete terms. Reference specific lines/functions.
 3. **Class**: the bug class in a few words ("unchecked exit code on a git call"), plus every other location in the code under review where the same class occurs, so the author fixes all of them at once.
-4. **Pre-existing**: `yes` when the flawed lines are not changed by the diff, else `no`.
+4. **Pre-existing**: `yes` when the bug is reachable on the base branch without this diff, else `no`; a bug in unchanged lines that this diff makes reachable or worse is `no`.
 5. **Evidence**: Why you believe this is a problem. Show your reasoning. Don't just assert.
 6. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
 

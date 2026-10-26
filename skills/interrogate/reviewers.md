@@ -1,7 +1,7 @@
 # Interrogate reviewers
 
-One row per reviewer; the `interrogate` skill reads the rows for the harness it runs in.
-Add rows to run more reviewers in parallel: reviewers on different model families catch different bugs.
+One row per reviewer; the `interrogate` skill reads the rows for the harness it runs in: only the first on a diff that is not risky, all of them on a risky one, so put the strongest row first.
+Add rows to run more reviewers in parallel on risky diffs: reviewers on different model families catch different bugs.
 
 | Harness | Model | Effort |
 |---------|-------|--------|

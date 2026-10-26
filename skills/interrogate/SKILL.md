@@ -5,7 +5,7 @@ description: "Adversarial code review of a diff, branch or PR: parallel read-onl
 
 # Interrogate
 
-Spawn one read-only reviewer per row of `reviewers.md` for the harness you run in, then judge their findings as the lead.
+Spawn read-only reviewers from the rows of `reviewers.md` for the harness you run in, as many as the diff's risk calls for (Step 3), then judge their findings as the lead.
 The adversarial signal comes from independent reviewers, and it is strongest when they run on different model families.
 The deliverable is a verdict: apply no fix until the user picks one.
 
@@ -28,8 +28,9 @@ If you are unsure of the intent, ask the user before spawning reviewers.
 
 ## Step 3, Risk
 
-A diff is **risky** when it changes shared state, a data or wire format, a public API, concurrency, a delete or cleanup path, config, or a dependency version, or when it is sensitive.
-A diff is **sensitive** when it touches a git hook, a CI workflow, an install, sync or release script, auth, billing, or a path the repo's `CLAUDE.md` or `AGENTS.md` names as sensitive.
+A diff is **risky** when it changes shared state, a data or wire format, a public API, concurrency, a delete or cleanup path, runtime config a program reads, or a dependency version, or when it is sensitive.
+A diff is **sensitive** when it touches a git or harness hook, a CI workflow, an install, sync or release script, auth, billing, any `CLAUDE.md` or `AGENTS.md`, or a path the repo's `CLAUDE.md` or `AGENTS.md` names as sensitive.
+Read that list from the merge base (`git show <base>:AGENTS.md`), so a diff cannot shrink its own list.
 A user asking for a deep or full review makes the diff risky.
 
 | Diff | Reviewers | Lenses | Blast radius |
@@ -67,6 +68,8 @@ A finding two or more reviewers raised independently is the highest signal; read
 When one reviewer flags something and another explicitly says the opposite, keep both as context for the verdict.
 A reviewer that failed, returned no parseable findings, or names changed files in its Coverage as skipped or partly read is **incomplete**: its silence on those files is no review, never agreement.
 
+A finding that shows a Step 3 trigger the diff alone hid (a public API, shared state, a caller three hops away) makes a non-risky diff risky: spawn the remaining rows with the code-quality lens, merge their findings in, and run Step 7.
+
 ## Step 6, Lead judgment
 
 You are the lead reviewer, a pragmatic senior engineer, not a neutral aggregator.
@@ -74,7 +77,7 @@ Read `references/lead-judgment.md`, then put every finding in one bucket, with t
 
 - **Act on:** real issues affecting correctness, security or maintainability given the actual goals; they would block a real PR.
 - **Consider:** legitimate, but you are not sure they outweigh the cost of addressing them now.
-- **Noted:** technically valid but not actionable at this stage, and every real bug in code the diff did not change, tagged pre-existing.
+- **Noted:** technically valid but not actionable at this stage, and every real bug the base already has without this diff, tagged pre-existing.
 - **Dismissed:** wrong, nitpicky, or missing context, with a brief reason.
 
 Done when every finding from every reviewer sits in exactly one bucket.

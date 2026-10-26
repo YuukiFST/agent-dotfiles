@@ -41,8 +41,9 @@ These are honest mistakes from reviewers working with limited information. Dismi
 
 ### Pre-existing Bugs
 
-A real bug in lines the diff did not change goes to Noted, tagged pre-existing; check the tag against the diff hunks or `git blame`.
+A real bug the base branch already has, reachable without this diff, goes to Noted, tagged pre-existing; check the tag against the diff and `git blame`.
 It neither blocks this PR as Act on nor gets dismissed as missing context, because the bug is real and dismissing it loses it.
+A bug in unchanged lines that this diff makes reachable or worse is not pre-existing: judge it like any other finding.
 
 ## When Reviewers Are Right
 
