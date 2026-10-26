@@ -36,15 +36,15 @@ Review the code through every lens in the rubric and the code-quality lens above
 
 For each finding, provide:
 
-1. **Severity**: `critical` | `warning` | `nit`
+1. **Severity**: `critical` | `warning`
    - `critical`: Would cause bugs, data loss, security issues, or fundamentally broken behavior
    - `warning`: Design concern, maintainability risk, or correctness issue that isn't immediately broken but will cause pain
-   - `nit`: Style, naming, minor improvement.
 2. **Finding**: What the problem is, in concrete terms. Reference specific lines/functions.
 3. **Evidence**: Why you believe this is a problem. Show your reasoning. Don't just assert.
 4. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
 
 A good finding references specific code, not vague concerns ("this could be better"). It distinguishes between "this is broken" and "I would have done this differently". It considers the stated intent. A finding that ignores the context of what's being built is a bad finding.
+Report no style-only finding (naming, formatting, a preferred idiom): it has no severity here.
 
 Do not restate what the code does without identifying a problem. Do not praise the code. If you find nothing wrong, say "no findings", fill in Coverage, and stop. An empty review is a valid outcome only when Coverage is complete: a changed file you could not read, input that arrived truncated, or context you needed and lacked makes the review incomplete, and Coverage says so.
 

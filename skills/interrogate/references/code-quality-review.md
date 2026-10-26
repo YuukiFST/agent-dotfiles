@@ -1,49 +1,23 @@
 # Code Quality Review
 
-Each reviewer applies this code-quality lens in addition to the rubric. It is a strict standard focused on implementation quality, maintainability, abstraction quality, and codebase health.
+Each reviewer applies this lens in addition to the rubric.
+A structural finding names the next change it makes harder or riskier; one that cannot name it is a preference, not a finding.
 
-Above all, be ambitious about code structure. Do not merely identify local cleanup. Actively search for "code judo" moves, restructurings that preserve behavior while making the implementation dramatically simpler, smaller, more direct, and more elegant.
-
-## Core Prompt
-
-Start from this baseline:
-
-> Perform a deep code quality audit of the current branch's changes.
-> Rethink how to structure / implement the changes to meaningfully improve code quality without impacting behavior.
-> Work to improve abstractions, modularity, reduce Spaghetti code, improve succinctness and legibility.
-> Be ambitious, if there is a clear path to improving the implementation that involves restructuring some of the codebase, go for it.
-> Be extremely thorough and rigorous. Measure twice, cut once.
+Not findings: naming, formatting, closure vs. class, a neater type, a few repeated lines, and any "I would have written it differently".
+An agent author pays a commit and another review cycle for each comment, so a style comment costs more than it returns.
 
 ## Dimensions
 
-Each dimension is stated once. Apply the ones that are relevant.
+Apply the ones that are relevant.
 
-0. **Be ambitious about structural simplification.** Do not stop at "this could be a bit cleaner." Look for reframings that make whole branches, helpers, modes, conditionals, or layers disappear. Assume a "code judo" move is often available. It uses the existing architecture more effectively and makes the change dramatically simpler. If you can delete complexity rather than rearrange it, push hard for that.
+1. **A file pushed past 500 lines.** The global CODING_STANDARDS.md splits a file over 500 lines before appending to it; a diff that crosses the line from below is a finding unless the file stays clearly organized for a structural reason.
+2. **Spaghetti growth.** A new ad-hoc conditional, scattered special case or one-off branch in an unrelated flow, where a dedicated helper, state machine or module would hold it.
+3. **Removable complexity.** A restructuring that deletes a branch, helper, mode or layer while keeping behavior; moving the same complexity elsewhere does not count.
+4. **Magic over boring.** Brittle or ad-hoc behavior, a generic mechanism hiding a simple data-shape assumption, or a pass-through wrapper that adds indirection and no clarity.
+5. **Type and boundary.** Optionality, `unknown`, `any` or casts where a typed boundary could exist, or a silent fallback papering over an unclear invariant.
+6. **Canonical layer.** Feature logic leaking into shared paths, implementation details leaking through an API, or a reimplementation of an existing helper, named with its `file:line`.
+7. **Orchestration.** Related updates that can leave state half-applied, or independent work serialized where the wait costs.
 
-1. **Do not let a PR push a file from under 500 lines to over 500 lines without a very strong reason.** The global CODING_STANDARDS.md splits a file past 500 lines before appending to it. Treat this as a strong smell. Prefer extracting helpers, subcomponents, or modules. If the diff crosses that threshold, ask whether the code should be decomposed first. Waive only for a compelling structural reason where the resulting file stays clearly organized.
-
-2. **Do not allow spaghetti growth in existing code.** Be suspicious of new ad-hoc conditionals, scattered special cases, or one-off branches inserted into unrelated flows. Treat "weird if statements in random places" as a design problem, not a style nit. Prefer pushing the logic into a dedicated helper, state machine, or module instead of tangling an existing path.
-
-3. **Bias toward cleaning the design, not just accepting working code.** If behavior can stay the same while the structure becomes meaningfully cleaner, push for the cleaner version. Prefer simplifications that remove moving pieces over refactors that spread the same complexity around.
-
-4. **Prefer direct, boring, maintainable code over hacky or magical code.** Treat brittle, ad-hoc, or "magic" behavior as a problem. Be skeptical of generic mechanisms that hide simple data-shape assumptions. Flag thin abstractions, identity wrappers, or pass-through helpers that add indirection without buying clarity.
-
-5. **Push on type and boundary cleanliness when it affects maintainability.** Question unnecessary optionality, `unknown`, `any`, or cast-heavy code when a clearer type boundary could exist. Prefer explicit typed models over loosely-shaped ad-hoc objects. If a branch leans on a silent fallback to paper over an unclear invariant, ask whether the boundary should be made explicit.
-
-6. **Keep logic in the canonical layer and reuse existing helpers.** Call out feature logic leaking into shared paths or implementation details leaking through APIs. Prefer existing canonical utilities over bespoke one-offs. Push code toward the right package, service, or module instead of normalizing drift.
-
-7. **Treat unnecessary sequential orchestration and non-atomic updates as design smells when the cleaner structure is obvious.** If independent work is serialized for no reason, ask whether it should run in parallel. If related updates can leave state half-applied, push for a more atomic structure. Do not over-index on micro-optimizations, but do flag avoidable orchestration complexity that makes the code more brittle.
-
-## Output Expectations
-
-Prioritize structural code-quality regressions and missed simplifications first, then spaghetti and branching complexity, then boundary, type, and file-size concerns, then smaller modularity and legibility issues.
+## Precedence
 
 When the repository's own `CLAUDE.md`, `AGENTS.md` or lint config sets a different threshold or convention, the repository wins over this lens.
-
-## Approval Bar
-
-Do not approve merely because behavior seems correct. Treat these as presumptive blockers unless the author can justify them: the PR keeps a lot of incidental complexity when a code-judo move would delete it. Pushes a file from below 500 lines to above 500 lines. Adds ad-hoc branching that tangles an existing flow. Scatters feature checks across shared code. Adds an unnecessary abstraction, wrapper, or cast-heavy contract, or duplicates an existing helper or puts logic in the wrong layer when there is a clear canonical home. If those conditions are not met, leave explicit, actionable feedback and push for a cleaner decomposition.
-
-## Review Tone
-
-Be direct, serious, and demanding about quality. Do not be rude, but do not soften major maintainability issues into mild suggestions. If the code is making the codebase messier, say so. If the implementation missed an obvious dramatic simplification, say that too. Do not be satisfied with "maybe rename this" when the real issue is structural.
