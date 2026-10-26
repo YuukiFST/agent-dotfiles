@@ -19,6 +19,8 @@ GIT_GENERATED_SUBJECT='^(Merge (branch|branches|remote-tracking branch|tag|commi
 validate_commit_message_file() {
   local msg_file="$1"
   local label="${2:-commit}"
+  # "no-format" skips only the Conventional Commits check; attribution is always checked.
+  local format_check="${3:-format}"
 
   if grep -qiE "$FORBIDDEN_TRAILER" "$msg_file"; then
     echo "ERRO: trailer proibido em $label." >&2
@@ -40,7 +42,8 @@ validate_commit_message_file() {
 
   subject="${subject%$'\r'}"
   # An empty message is git's to reject ("Aborting commit due to empty commit message").
-  if [ -z "$subject" ] || echo "$subject" | grep -qE "$GIT_GENERATED_SUBJECT"; then
+  if [ "$format_check" = "no-format" ] || [ -z "$subject" ] ||
+     echo "$subject" | grep -qE "$GIT_GENERATED_SUBJECT"; then
     return 0
   fi
   # ${#subject} counts bytes under the C locale hooks often run in; dropping UTF-8

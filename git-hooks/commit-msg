@@ -6,4 +6,13 @@ HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=validate-commit-message.sh
 source "$HOOK_DIR/validate-commit-message.sh"
 
-validate_commit_message_file "$MSG_FILE" "commit"
+# With core.hooksPath global this hook also runs in the throwaway repos a test suite builds in
+# the OS temp dir, whose fixture commits ("inicial") are not Conventional Commits. A repo with no
+# remote publishes nothing, and pre-push checks the format before anything leaves, so the format
+# check waits for a remote; the attribution check runs everywhere.
+format_check="format"
+if [ -z "$(git remote 2>/dev/null)" ]; then
+  format_check="no-format"
+fi
+
+validate_commit_message_file "$MSG_FILE" "commit" "$format_check"
