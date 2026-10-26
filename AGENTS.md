@@ -12,6 +12,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 - **Seeds are machine-owned:** `settings.json` (Claude Code, `sync-config.ps1` only) is written only when absent, and in `pi/settings.json` the `defaultProvider`, `defaultModel` and `defaultThinkingLevel` keys apply on first install only.
   Once written, the live value belongs to the machine and a sync leaves it alone; the rest of pi's `settings.json` is a merge in which `enabledModels`, `theme` and `packages` converge from the repo and pi-owned keys like `lastChangelogVersion` survive.
 - **Commits and pushes follow `rules/git.md`** (hooks in `git-hooks/`).
+- **Sensitive paths** for `interrogate`, besides hooks, CI and scripts: `rules/`, `GLOBAL.md`, `CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md`, since every session on every machine loads them.
 
 ## Machines
 

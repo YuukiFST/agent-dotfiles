@@ -12,7 +12,7 @@ metadata:
 The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit identity (§1), commit-message format (§2), push confirmation (§3), the AI-attribution ban (§4). **This skill does not restate them. Follow both.**
 
 **User-invoked only.** The flow runs when the user invokes `/git-workflow` or asks to ship the change with it; a message that only talks about this skill (editing it, quoting a step) does not start it.
-That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 and 6 pass; it covers no other PR, and a merge that triggers a release or deploy still needs its own yes.
+That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 and 6 pass; it covers no other PR, and a merge that triggers a release or deploy, or lands a PR the review marks sensitive, still needs its own yes.
 A skill that points here for one convention (branch name, PR body) applies that convention only, and the merge and cleanup do not run.
 
 **Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change shipped through this skill, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
@@ -27,6 +27,7 @@ A skill that points here for one convention (branch name, PR body) applies that 
    No runnable check: write **Not verified** and why. Open it as a draft if the work spans sessions.
    Then confirm GitHub linked it: `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){pullRequest(number:<pr>){closingIssuesReferences(first:5){nodes{number}}}}}'` lists the issue. Empty list: the merge will not close it, so step 8 closes it by hand. #105 and #107 in agent-dotfiles had `Closes #N` on line one and still never linked.
 5. **Review before merge — always.** Run the `interrogate` skill on the PR and post its verdict **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
+   A verdict that marks the diff sensitive holds the merge: show the user the verdict and wait for their go-ahead, since an agent's review is not a human approval.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CODING_STANDARDS.md, "Boy Scout rule": a lint/test failure found along the way gets fixed).
 7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
    Before merging, fix and push every review finding marked Act on, then wait for step 6 to pass again on the new head commit.
