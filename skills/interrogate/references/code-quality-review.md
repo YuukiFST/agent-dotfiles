@@ -1,6 +1,6 @@
 # Code Quality Review
 
-Each reviewer applies this lens in addition to the rubric.
+Each reviewer on a risky diff applies this lens in addition to the rubric.
 A structural finding names the next change it makes harder or riskier; one that cannot name it is a preference, not a finding.
 
 Not findings: naming, formatting, closure vs. class, a neater type, a few repeated lines, and any "I would have written it differently".
