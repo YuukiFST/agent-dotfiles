@@ -1,0 +1,51 @@
+name: Upstream skills
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency: upstreams
+
+jobs:
+  report:
+    name: Report upstream drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # One open upstream-drift issue carries the latest report: edited while drift
+      # remains, closed once every pin is current and ui-polish routes every reference.
+      # A row that could not be checked still lands in the issue, then fails the run.
+      - name: Check pinned upstreams and ui-polish references
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body="$RUNNER_TEMP/body.md"
+          {
+            echo "Refresh each source below as the header of \`skills/UPSTREAMS.tsv\` describes;"
+            echo "\`bash scripts/check-upstreams.sh <skill>\` reprints one locally."
+            echo
+          } > "$body"
+          status=0
+          bash scripts/check-upstreams.sh --markdown >> "$body" || status=$?
+          refs="$(UI_REFS="$RUNNER_TEMP/ui-refs" bash skills/ui-polish/update-refs.sh 2>&1)" || refs="update-refs.sh failed:"$'\n'"$refs"
+          refs_drift="$(grep -E '^(UNROUTED|MISSING|update-refs.sh failed)' <<<"$refs" || true)"
+          if [ -n "$refs_drift" ]; then
+            printf '\n## ui-polish references\n\nFix in `skills/ui-polish/`, see step 3 of `AGENTS.md`.\n\n```\n%s\n```\n' "$refs_drift" >> "$body"
+          fi
+
+          gh label create upstream-drift --color FBCA04 --description "A vendored skill's upstream changed" --force >/dev/null
+          issue="$(gh issue list --label upstream-drift --state open --json number --jq '.[0].number // empty')"
+          if [ "$status" -eq 0 ] && [ -z "$refs_drift" ]; then
+            [ -z "$issue" ] || gh issue close "$issue" --comment "Every pinned upstream is current and ui-polish routes every reference."
+          elif [ -n "$issue" ]; then
+            gh issue edit "$issue" --body-file "$body"
+          else
+            gh issue create --title "Upstream skills changed" --label upstream-drift --body-file "$body"
+          fi
+          [ "$status" -ne 1 ]
