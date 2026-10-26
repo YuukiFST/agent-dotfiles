@@ -23,17 +23,18 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Typography: scale, wrapping, tabular nums, truncation | `REFS/jakubkrehel-skills/skills/better-typography/` |
 | Colors: tokens, ramps, measured contrast | `REFS/jakubkrehel-skills/skills/better-colors/` |
 | Polish: concentric radius, optical alignment, surfaces, icons, enter/exit | `REFS/jakubkrehel-skills/skills/better-ui/` |
+| Materials: translucent chrome, material weight, vibrancy, scroll edge effects, dim versus separate | `REFS/emilkowalski-skills/skills/apple-design/SKILL.md` (**Materials & depth**); `prefers-reduced-transparency` and vestibular triggers in its **Reduced motion & accessibility** |
 | Motion bar: ten standards, escalation triggers, exact curves and durations | `REFS/emilkowalski-skills/skills/review-animations/` (`STANDARDS.md` has the values) |
 | Motion build: the gate, then the decision order | `REFS/emilkowalski-skills/skills/animate/` (`RECIPES.md` has code) |
 | Motion opportunities: where motion is missing, with restraint | `REFS/emilkowalski-skills/skills/find-animation-opportunities/SKILL.md` |
 | Motion performance: frame budget, composite-only properties, CSS vs WAAPI vs rAF, `will-change`, jank diagnosis | `REFS/emilkowalski-skills/skills/animation-performance/SKILL.md` (causes in **Phase 2: Diagnose**, fixes in **The Symptom Table**) |
-| Motion codebase audit: the hunt checklist across every animation in an app | `REFS/emilkowalski-skills/skills/improve-animations/` (`AUDIT.md` has the checklist) |
+| Motion codebase audit: the hunt checklist across every animation in an app | `REFS/emilkowalski-skills/skills/improve-animations/` (`AUDIT.md` has the checklist; its plan flow and `PLAN-TEMPLATE.md` are replaced by [audit.md](audit.md) step 5) |
 | Motion names: vague description to exact term ("the bouncy popover thing") | `REFS/emilkowalski-skills/skills/animation-vocabulary/SKILL.md` (**Glossary**) |
-| Gesture and physical motion: 1:1 drag, interruptibility, velocity handoff, momentum, rubber-banding, materials | `REFS/emilkowalski-skills/skills/apple-design/SKILL.md` (**Quick Reference** has the values; its Typography section yields to `better-typography`), plus `emil-design-eng/SKILL.md` **Gesture and Drag Interactions** for the web mechanics |
+| Gesture and physical motion: 1:1 drag, interruptibility, velocity handoff, momentum, rubber-banding | `REFS/emilkowalski-skills/skills/apple-design/SKILL.md` (**Quick Reference** has the values; its Typography section yields to `better-typography`), plus `emil-design-eng/SKILL.md` **Gesture and Drag Interactions** for the web mechanics |
 | React Native / Expo motion: threads, Reanimated, Gesture Handler, haptics, on-device stutter | `REFS/emilkowalski-skills/skills/animate-expo/` (`RECIPES.md` has code); when it applies is recon step 1 |
 | Worst-case data: realistic break values, failure signatures, truncate vs wrap vs clamp | `REFS/emilkowalski-skills/skills/break-ui/` (`CATALOG.md` has the values) |
 | Mobile feel: viewport, tap, safe areas, sticky hover | `REFS/emilkowalski-skills/skills/mobile-native/SKILL.md` |
-| Library pick: curated list per task, charts included | `REFS/emilkowalski-skills/skills/pick-ui-library/SKILL.md` |
+| Library pick: curated list per task, charts included, hand-rolled mismatches | `REFS/emilkowalski-skills/skills/pick-ui-library/SKILL.md` (**Common mismatches to catch** is the review check) |
 | Sonner toasts: setup, styling ladder, troubleshooting | `REFS/emilkowalski-skills/skills/ask-sonner/` (`API.md` has the props) |
 | Design to code: Figma or image source, token mapping, deviation report | `REFS/jakubkrehel-skills/skills/build-design/` (`figma.md` has the MCP calls) |
 | Component states: every state the code reaches, mock data at the data boundary, switcher | `REFS/jakubkrehel-skills/skills/state-machine/` (`switcher.md` has the spec) |
@@ -41,23 +42,20 @@ The references stay upstream on purpose. Copying them into this skill would free
 | Stress harness: scenario axes, one page, one look | `REFS/jakubkrehel-skills/skills/break/` (`scenarios.md`) |
 | Consolidation: severity scale, escalation triggers, cap, cheaper-fix ladder, report format | `REFS/jakubkrehel-skills/skills/better-interface/` (`review-format.md`) |
 | Change review: scope resolution, blast radius, removed signals, finding status | `REFS/jakubkrehel-skills/skills/interface-review/` (`scope-resolution.md`, `removed-signals.md`) |
-| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**Decorative stacking**, **Component and template repetition**, **Fake proof**, **Use the Removal Test**; the rest of its **What to Flag** repeats an owner above). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s. Proof the code marks as mock or the build made up is `HIGH` as misleading; proof on an existing screen with no traceable source is a question for the user, never a removal. |
+| Design slop: reflex defaults, decorative stacking, card and template repetition, fake proof, reference mismatch, the removal test | `REFS/mengto-skills/agent-skills/ui/no-ai-design-slop/` (`ARTICLE.md` has the pattern catalog, read by section) and `REFS/mengto-skills/agent-skills/ui/audit-ai-design-slop/SKILL.md` (**Boundaries**, **Decorative stacking**, **Component and template repetition**, **Fake proof**, **Use the Removal Test**; the rest of its **What to Flag** is owned by a domain above or reached through `ARTICLE.md`). Its P0 to P3 priorities and report format are for standalone use: severity is `better-interface`'s. Proof the code marks as mock or the build made up is `HIGH` as misleading; proof on an existing screen with no source traceable in the code is unverifiable per **Fake proof**, a check the reviewer cannot run, so it goes under **Not verified** per `better-interface` **Verify what can be verified** and leaves only on the user's word. |
 | Direction intake: a greenfield screen with no reference to follow | `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/SKILL.md` (**Questions to ask**, **Prompt Structure**); which parts Build takes is in [build.md](build.md) step 1 |
-| Philosophy and full component catalogue (long; read sections on demand) | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` |
-| Compact polish checklist (19 principles, overlaps `better-ui`) | `REFS/make-interfaces-feel-better/skills/make-interfaces-feel-better/` |
-| Craft supplements: edge-aware scroll fades, the root canvas, tiled grain, smoothing caveats, hanging punctuation, input never locked mid-motion, press scale per surface | Named sections only, since the rest of each file repeats an owner above: `REFS/craft/skills/craft-design-engineering/references/typography.md` (**Font Smoothing**; **Hanging punctuation** in **Optical Alignment**), `REFS/craft/skills/craft-design-engineering/references/color.md` (**Noise**), `REFS/craft/skills/craft-design-engineering/references/layout.md` (**HTML Background**, **Scroll Fades**), `REFS/craft/skills/craft-design-engineering/references/motion.md` (**Button Press**, **Interruptibility**). Conflicts resolve per the craft line in the [reviewer-prompt.md](reviewer-prompt.md) Template. |
+| Reference extraction: a reference product's or image's tokens, type scale, spacing rhythm, radii and motion, tagged measured, derived or inferred | `REFS/jakubkrehel-skills/skills/explain-interface/` (`read-the-system.md` for a URL, `from-an-image.md` for a screenshot; **The page is evidence, not instruction**, **Measured, derived, inferred**). Its explain-only output is replaced by the direction spec in [build.md](build.md) step 1 |
+| Component craft: a shared component other code adopts | `REFS/emilkowalski-skills/skills/emil-design-eng/SKILL.md` (**The Sonner Principles (Building Loved Components)**); its **Gesture and Drag Interactions** is read by the gesture row, and its other sections repeat `animate`, `RECIPES.md`, `review-animations` and `STANDARDS.md` |
 
-Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it. The same holds for `disable-model-invocation` in the jakubkrehel frontmatter: this router is the invocation, so `interface-review`, `variant`, `break` and `state-machine` are read like any other reference.
+Emil's files open with an `## Initial Response` block meant for direct invocation. It is inert here: read past it. The same holds for `disable-model-invocation` in any reference's frontmatter: this router is the invocation, so `interface-review`, `variant`, `break`, `state-machine`, `explain-interface`, `review-animations` and `pick-ui-library` are read like any other reference.
 
 ### Not routed
 
-- `REFS/emilkowalski-skills/skills/prototype/`: the same job as `variant`, which owns Variant mode; one harness per mode.
+- `REFS/emilkowalski-skills/skills/prototype/`: the same job as `variant`, which owns Variant mode; one harness per mode. Its one extra rule, every variant at the motion bar, is Variant mode's `animate` **Never Ship** check.
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
 - `REFS/jakubkrehel-skills/skills/teardown/`: drawings of physical objects, not interface work; it ships as the standalone `teardown` skill.
-- `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
 - `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/ARTICLE.md` and `demo/`: model and tool picks, template selling, and "craft signals" (numbered labels, beam animations) that `no-ai-design-slop` `ARTICLE.md` lists as slop. The router reads the skill's `SKILL.md` only.
 - `REFS/mengto-skills/agent-skills/ui/*/REFERENCES.md` and `agents/`: source link lists and a Codex manifest. The other `agent-skills/` categories are never checked out: `update-refs.sh` clones `agent-skills/ui` sparse.
-- `REFS/craft/content/`: craft's unlaunched drafts. A launched concept lands in a craft `references/` file; a file this table does not cite prints as `UNROUTED`.
 
 ## Step 0: Recon (every mode)
 
@@ -66,7 +64,7 @@ Before any reference is read, establish the project facts. They go into every su
 1. **Stack and styling system**: framework, CSS approach, component library, motion library, chart library, from `package.json` and the root layout. React Native or Expo → `animate-expo` replaces `animate`, `animation-performance` and `mobile-native` everywhere in this skill (Build, Visualize, Motion and the motion reviewer), and the **mobile** trigger is off. Jank mode runs `animate-expo` **6. Keep it off the JS thread**, **Setup that silently breaks motion** and **120fps** in place of the `animation-performance` Workflow. The browser checks below do not reach a native screen: say so, and mark those checks Not verified.
 2. **Tokens**: the global stylesheet (`globals.css`, theme file, Tailwind config). Note radius, spacing, easing, duration and color tokens by name.
 3. **Shared components**: the project's own primitives (buttons, dialogs, tables, filters, charts, empty/error/loading states). A fix reuses them before adding markup.
-4. **Project conventions**: `CLAUDE.md`, `AGENTS.md`, design-system docs. Hard rules there (a banned library, a mandated wrapper) are constraints, not findings.
+4. **Project conventions**: `CONTRIBUTING.md`, `CODING_STANDARDS.md`, `AGENTS.md`, `CLAUDE.md`, a design-system doc, Storybook docs and interface ADRs; name which exist. Per `better-interface` **Recon before judgment**, a documented convention settles taste and is never itself a finding, but it never excuses an escalation trigger or a domain rule: that finding is reported once against the guideline or token that causes it. Hard tooling rules there (a banned library, a mandated wrapper) bind every fix.
 5. **Supported viewports and personality**: mobile-first or desktop tool; playful product or crisp dashboard. Motion severity and density depend on it.
 6. **Preview and gates**: the dev URL, login route if any, and the project's verification commands (typecheck, lint, test, lighthouse), and, before the first edit, the baseline every motion review diffs against: the SHA `git stash create` prints (`HEAD` when it prints nothing), plus `git status --porcelain` for untracked files.
 7. **Conditional triggers**, one yes/no each, because each yes switches on a reviewer or a reference below:
@@ -84,7 +82,8 @@ Pick one from the request. State it in one line before starting, with the depth 
 
 | Request shape | Mode | Procedure |
 | --- | --- | --- |
-| "Improve / polish / redesign / review this page or component", "it looks generic / AI-made" | **Audit** | [audit.md](audit.md) |
+| "Improve / polish / redesign this page or component", "it looks generic / AI-made" | **Audit** | [audit.md](audit.md) |
+| "Review / audit this page or component" with no ask to change it | **Audit**, read-only | [audit.md](audit.md) steps 1 to 4, then the step 7 report with every row `open`: a review request edits nothing, per `better-interface` **Review without mutating by default**. The fixes run only when the user asks for them. |
 | "Create / build this screen, flow, component or dashboard" | **Build** | [build.md](build.md) |
 | "Build this from the Figma / this mockup / this screenshot" | **Design** | Read `build-design/SKILL.md` and `figma.md`, and follow its five steps: the design decides, every value maps to a project token. Before its **Report and stop**, run [audit.md](audit.md) steps 1 to 4 on the build, at the frames' widths and over every state the code reaches (step 2 is build-design's comparison screenshots, one per frame width). Sort each kept finding into `build-design`'s report: the design breaks a rule → **Domain conflicts**, with its owner; a state the design does not draw → **Missing states**; anything else is outside the piece and dropped. Apply none without the user's word. |
 | "Visualize this data" / "a chart / KPI for X" in an existing screen | **Visualize** | [visualize.md](visualize.md). A whole new screen of charts is Build, which runs visualize.md for its chart parts. |
@@ -92,7 +91,7 @@ Pick one from the request. State it in one line before starting, with the depth 
 | "Toasts appear twice / sit behind the modal / ignore dark mode", Sonner setup or styling | **Toast** | Read `ask-sonner/SKILL.md`; `API.md` for an exact prop. Styling follows its escalation ladder, in the project's tokens. |
 | "Animate X" / "add motion" / "this feels static" / "what could animate here?" | **Motion** | [motion.md](motion.md): `find-animation-opportunities` sweeps a scope with no named target, `animate` builds what survives its gate, a fresh `review-animations` reviewer approves or blocks. Zero lines is a valid outcome. |
 | "This animation stutters / drops frames / is janky" | **Jank** | Read `animation-performance/SKILL.md` and run its **Workflow** through the Phase 3 report: what animates, the cause from **Phase 2: Diagnose**, the fix from **The Symptom Table**, and the Verified field. The user asked for smooth motion, so that request is the "when asked": apply the fixes, each naming its cause. A performance trace (`chrome-devtools-axi`) under CPU throttle is partial evidence only; a finding it cannot settle stays "needs a device recording". |
-| "Show me options for this UI" | **Variant** | Read `variant/SKILL.md` + `picker.md`: three structurally different answers behind a picker on the real page. |
+| "Show me options for this UI" | **Variant** | Read `variant/SKILL.md` + `picker.md`: three variants, each a different position on one primary axis, behind a picker on the real page. Also read the owner skill its axis table names for the chosen axis, and `animate` **Never Ship** when a variant moves. The promoted variant is built properly and then runs the review gate ([audit.md](audit.md) step 6). |
 | "Show every state of this component" / "I want to work on its loading/empty/error looks" | **States** | Read `state-machine/SKILL.md` + `switcher.md` and follow it: a throwaway page, mock data at the data boundary, a grouped switcher, handed over and left up until the user says done. |
 | "Stress-test this component" / "try the worst case" | **Break** | [break.md](break.md): jakubkrehel `break` harness filled with emilkowalski `break-ui` worst-case values. |
 | "Review this diff / branch / PR / my uncommitted changes" | **Change** | [change.md](change.md). Read-only; fixes only when the user asks. |
@@ -107,7 +106,7 @@ Audit runs at one of three depths. Read the depth from the request; default is `
 | --- | --- | --- | --- |
 | `quick` | "quick pass", "just the obvious" | accessibility, polish, motion, plus slop when the request calls the UI generic or AI-made; conditional ones only when the request names them | 1 |
 | `standard` | any other improve request | the default set plus every conditional reviewer recon switched on | 1 |
-| `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard` plus the `improve-animations` hunt checklist for the motion reviewer; inventory, apply policy and rounds per [audit.md](audit.md) **Exhaustive** | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
+| `exhaustive` | "ao máximo", "everything", "every component", "make it as good as it can be" | `standard`, with the inventory, apply policy and rounds per [audit.md](audit.md) **Exhaustive** | until a round has no HIGH or MEDIUM and nothing carried, at most 3 |
 
 ## Domain reviewers (fan-out)
 
@@ -115,16 +114,16 @@ A review of a screen runs one read-only subagent per domain, in parallel, each h
 
 - Prompt template: [reviewer-prompt.md](reviewer-prompt.md). Fill TASK, CONTEXT (recon block, scope files, preview URL) and the domain's reference paths.
 - Default set: accessibility, layout, writing, typography, colors, polish, motion, slop (eight).
-- Conditional set, added per recon step 7: **worst case** → worst-case reviewer; **gesture** → gesture reviewer; **mobile** → mobile reviewer; **data viz** → data-viz reviewer.
+- Conditional set, added per recon step 7: **worst case** → worst-case reviewer; **gesture** → gesture reviewer; **mobile** → mobile reviewer; **data viz** → data-viz reviewer; **sonner** → the polish reviewer also reads `ask-sonner/SKILL.md` and `API.md`.
 - Subagent type `general-purpose` in Claude Code, or the harness's equivalent read-only worker. Reviewers return findings only, no edits.
 - A domain whose reference is missing on disk is `Not reviewed`, named in the report. Never rebuild its rules from memory or hand it to a neighbour.
-- Consolidation stays in the main thread: read `better-interface/SKILL.md` (**Rank by user impact**, **Prefer the cheaper fix**, **Consolidate systemic findings**, **Verify what can be verified**) and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). Re-read the cited line of every finding before keeping it.
+- Consolidation stays in the main thread: read `better-interface/SKILL.md` (**Evidence, not taste**, **Use domain skills as the sources of truth**, **Verify what can be verified**, **Require evidence**, **Rank by user impact**, **Prefer the cheaper fix**, **Consolidate systemic findings**) and `review-format.md`, then merge to one ranked table under its severity scale, its cap of 15, and its cheaper-fix ladder (delete, platform, reuse, correct value, add). A finding two reviewers both return goes to the owner of the underlying rule, with the side effects in its **Why** cell. Re-read the cited line of every finding before keeping it.
 
 ## Evidence
 
 Every finding and every claim of improvement cites `path:line` and, where rendering decides it, a browser observation. The browser on this machine is `chrome-devtools-axi` (`open`, `snapshot`, `screenshot`, `eval`, `console`); read `chrome-devtools-axi <command> --help` before use.
 
-Minimum browser pass for a screen: screenshot at desktop width and at 320px, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. A check that cannot run is reported as **Not verified**, never inferred.
+Minimum browser pass for a screen: screenshot at desktop width and at 320px, one at 200% zoom, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. Add the RTL mirror when the project ships a right-to-left locale and the dark appearance when it has one (`better-layout` and `better-colors` **Reporting**). A check that cannot run is reported as **Not verified**, never inferred.
 
 ## Before you finish
 
@@ -145,6 +144,7 @@ Minimum browser pass for a screen: screenshot at desktop width and at 320px, `sn
 | A component on the inventory with no reviewer verdict | Re-dispatch for it, or list it as Not reviewed |
 | A chart styled with the library's default palette or font | Series colors and type from the project's tokens per [visualize.md](visualize.md) |
 | A Figma value hit with an arbitrary utility or a raw hex | Map it to a token per `build-design`, or ask when rounding shows |
+| A review-only request answered with edits | Revert them; report the table and wait for the user to ask for the fixes |
 | "Improved" claimed from source alone | Before/after screenshot, or mark Not verified |
 | Project gates skipped after edits | Run the recon step 6 commands and report their output |
 | `update-refs.sh` printed `UNROUTED` or `MISSING` and nobody heard | Name each line to the user as a follow-up for the agent-dotfiles repo |
