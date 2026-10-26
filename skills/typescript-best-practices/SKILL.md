@@ -7,7 +7,7 @@ metadata:
   opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
-<!-- Source: https://github.com/cursor/plugins/tree/main/pstack/skills/typescript-best-practices pinned at 0317eb8 (MIT, notice in LICENSE); principle skill names carry this repo's principle- prefix -->
+<!-- Source: https://github.com/cursor/plugins/tree/main/pstack/skills/typescript-best-practices (MIT, notice in LICENSE); principle skill names carry this repo's principle- prefix -->
 
 # TypeScript best practices
 

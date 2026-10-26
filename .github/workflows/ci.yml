@@ -101,6 +101,16 @@ jobs:
       - name: Run the validator tests
         run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs skills/security-audit/validate-citations.test.cjs skills/security-audit/validate-artifact-content.test.cjs skills/security-audit/finding-semantics.test.cjs skills/security-audit/chain-findings.test.cjs skills/security-audit/export-sarif.test.cjs
 
+  check-upstreams:
+    name: check-upstreams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A stub gh serves canned API output; the weekly upstreams.yml run is the live check.
+      - name: Run check-upstreams end-to-end tests
+        run: bash scripts/test-check-upstreams.sh
+
   skill-frontmatter:
     name: Skill frontmatter
     runs-on: ubuntu-latest

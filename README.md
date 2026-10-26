@@ -62,6 +62,7 @@ Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rul
 | Path | What |
 |------|------|
 | `skills/` | `yuu-mode` and the skills it loads, one folder each |
+| `skills/UPSTREAMS.tsv` | Upstream source and reviewed commit of each vendored skill, checked weekly by `scripts/check-upstreams.sh` |
 | `GLOBAL.md` | Global instructions, loaded every session |
 | `CODING_STANDARDS.md` | Rules for editing a project, read when `GLOBAL.md` points to it |
 | `PROMPT_ENGINEERING.md` | Prompt design, debugging, evals and maintenance, read when `rules/prompting.md` points to it |

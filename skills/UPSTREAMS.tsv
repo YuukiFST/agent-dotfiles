@@ -1,0 +1,58 @@
+# Upstream sources of vendored and adapted skills, one row per source path.
+# Columns (tab-separated): skill, GitHub repo, path in that repo ("." = whole repo),
+# pinned commit = the last upstream commit already reviewed for this skill.
+# This file is the only place a pin lives; Source comments and SOURCES.md only credit.
+#
+# scripts/check-upstreams.sh lists every row with commits on its path past the pin,
+# and .github/workflows/upstreams.yml runs it weekly into one upstream-drift issue.
+# Refresh a reported row: read the compare link it prints, limited to the row's path,
+# port what fits the local adaptation (local divergences win), then move the pin to
+# the latest commit the report named. A row with nothing worth porting gets its pin
+# moved too, so the next report stays quiet.
+# ui-polish has no rows: it reads its references from live clones (update-refs.sh).
+ai-copywriter	mikiarlo3/ai-copywriter	.	08b53b1
+ai-tells	akitaonrails/my-skills	humanizer	8a7d0e5
+ai-tells	petergyang/no-ai-slop	.	000650b
+ai-tells	cursor/plugins	pstack/skills/unslop	70b2dc8
+anatomy	wheresryan22/anatomy	.	e6600ff
+chrome-devtools-axi	kunchenguid/chrome-devtools-axi	skills/chrome-devtools-axi	75dd6ca
+code-simplifier	anthropics/claude-plugins-official	plugins/code-simplifier/agents/code-simplifier.md	ceb9b72
+codebase-design	mattpocock/skills	skills/engineering/codebase-design	697d4ce
+create-verification-skill	cursor/plugins	pstack/skills/create-verification-skill	c49b37a
+domain-modeling	mattpocock/skills	skills/engineering/domain-modeling	697d4ce
+find-skills	vercel-labs/skills	skills/find-skills	773fb2c
+grilling	mattpocock/skills	skills/productivity/grilling	bfdaef8
+handoff	mattpocock/skills	skills/productivity/handoff	0f5e033
+improve	shadcn/improve	skills/improve	bd0aff9
+improve-codebase-architecture	mattpocock/skills	skills/engineering/improve-codebase-architecture	697d4ce
+interrogate	cursor/plugins	pstack/skills/interrogate	99743e9
+interrogate	cursor/plugins	pstack/skills/blast-radius	df58112
+interrogate	openclaw/agent-skills	skills/autoreview	4f587b6
+maintain-verification-skill	cursor/plugins	pstack/skills/maintain-verification-skill	6714489
+principle-attack-the-premise	cursor/plugins	pstack/skills/principle-attack-the-premise	e8d856f
+principle-boundary-discipline	cursor/plugins	pstack/skills/principle-boundary-discipline	d7cde2b
+principle-error-design	dmmulroy/cf-workflow-pool	docs/errors.md	e78cc4c
+principle-explain-the-number	cursor/plugins	pstack/skills/principle-explain-the-number	23e4138
+principle-fix-root-causes	cursor/plugins	pstack/skills/principle-fix-root-causes	e8d856f
+principle-make-operations-idempotent	cursor/plugins	pstack/skills/principle-make-operations-idempotent	24bd6eb
+principle-model-the-domain	cursor/plugins	pstack/skills/principle-model-the-domain	d7cde2b
+principle-prove-it-works	cursor/plugins	pstack/skills/principle-prove-it-works	b0b9c7a
+principle-sequence-verifiable-units	cursor/plugins	pstack/skills/principle-sequence-verifiable-units	70b2dc8
+principle-type-system-discipline	cursor/plugins	pstack/skills/principle-type-system-discipline	d7cde2b
+prototype	mattpocock/skills	skills/engineering/prototype	6bcbcb0
+research	mattpocock/skills	skills/engineering/research	697d4ce
+rust-best-practices	google/styleguide	rustguide.md	2ac1584
+security-audit	cloudflare/security-audit-skill	skills/security-audit	c1c8a8c
+security-bounty-hunter	affaan-m/everything-claude-code	skills/security-bounty-hunter	db7f2a6
+security-review	affaan-m/everything-claude-code	skills/security-review	db7f2a6
+setup-matt-pocock-skills	mattpocock/skills	skills/engineering/setup-matt-pocock-skills	c66bdee
+show-me	humanlayer/skills	plugins/show-me	6ab9013
+teach	mattpocock/skills	skills/productivity/teach	aa024cb
+technical-writing	cursor/plugins	pstack/skills/technical-writing	00b14f1
+test-audit	openclaw/openclaw	.agents/skills/test-audit	80930af
+typescript-best-practices	cursor/plugins	pstack/skills/typescript-best-practices	0317eb8
+web-perf	cloudflare/skills	skills/web-perf	41e0d19
+web-perf	addyosmani/web-quality-skills	skills/performance	afa8da9
+web-perf	addyosmani/web-quality-skills	skills/core-web-vitals	afa8da9
+writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054def
+yuu-mode	cursor/plugins	pstack/skills/poteto-mode	364a77e
