@@ -53,7 +53,7 @@ Emil's files open with an `## Initial Response` block meant for direct invocatio
 
 - `REFS/emilkowalski-skills/skills/prototype/`: the same job as `variant`, which owns Variant mode; one harness per mode.
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
-- `REFS/jakubkrehel-skills/skills/technical-drawing/`: drawings of physical objects, not interface work, and its viewer installs packages.
+- `REFS/jakubkrehel-skills/skills/teardown/`: drawings of physical objects, not interface work; it ships as the standalone `teardown` skill.
 - `REFS/jakubkrehel-skills/skills/explain-interface/`: studies someone else's site, never asked for here.
 - `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/ARTICLE.md` and `demo/`: model and tool picks, template selling, and "craft signals" (numbered labels, beam animations) that `no-ai-design-slop` `ARTICLE.md` lists as slop. The router reads the skill's `SKILL.md` only.
 - `REFS/mengto-skills/agent-skills/ui/*/REFERENCES.md` and `agents/`: source link lists and a Codex manifest. The other `agent-skills/` categories are never checked out: `update-refs.sh` clones `agent-skills/ui` sparse.

@@ -14,7 +14,9 @@ ROUTER="$(dirname "$0")/SKILL.md"
 mkdir -p "$REFS"
 while read -r name url sparse; do
   dir="$REFS/$name"
+  before=""
   if [ -d "$dir/.git" ]; then
+    before="$(git -C "$dir" rev-parse HEAD)"
     git -C "$dir" pull -q --ff-only
   elif [ -n "$sparse" ]; then
     git clone -q --depth 1 --filter=blob:none --sparse "$url" "$dir"
@@ -23,7 +25,13 @@ while read -r name url sparse; do
   fi
   # Every run, so a full clone, a clone cut short or a changed path converges.
   [ -z "$sparse" ] || git -C "$dir" sparse-checkout set "$sparse"
-  printf '%-28s %s %s\n' "$name" "$(git -C "$dir" rev-parse --short HEAD)" "$(git -C "$dir" log -1 --format=%cs)"
+  printf '%-28s %s %s' "$name" "$(git -C "$dir" rev-parse --short HEAD)" "$(git -C "$dir" log -1 --format=%cs)"
+  # A pull that moved HEAD names its range, so a rule changed under an unchanged heading shows too.
+  if [ -n "$before" ] && [ "$before" != "$(git -C "$dir" rev-parse HEAD)" ]; then
+    printf ', %s new commits: git -C %s log -p %s..HEAD' \
+      "$(git -C "$dir" rev-list --count "$before..HEAD")" "$dir" "${before:0:7}"
+  fi
+  echo
 done <<'REPOS'
 jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
