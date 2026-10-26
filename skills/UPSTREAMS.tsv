@@ -47,6 +47,7 @@ security-bounty-hunter	affaan-m/everything-claude-code	skills/security-bounty-hu
 security-review	affaan-m/everything-claude-code	skills/security-review	db7f2a6
 setup-matt-pocock-skills	mattpocock/skills	skills/engineering/setup-matt-pocock-skills	c66bdee
 show-me	humanlayer/skills	plugins/show-me	6ab9013
+teardown	jakubkrehel/skills	skills/teardown	592aedc
 teach	mattpocock/skills	skills/productivity/teach	aa024cb
 technical-writing	cursor/plugins	pstack/skills/technical-writing	00b14f1
 test-audit	openclaw/openclaw	.agents/skills/test-audit	80930af

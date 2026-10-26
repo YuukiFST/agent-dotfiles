@@ -42,6 +42,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Teach me a concept within this workspace | `teach` |
 | Research a question against primary sources, gather docs or API facts | `research` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
+| Technical illustration of a physical object or of how it works inside: exploded view, teardown, cutaway, assembly sheet | `teardown` |
 
 ### Build
 
