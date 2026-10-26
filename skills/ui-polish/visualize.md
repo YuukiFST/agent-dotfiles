@@ -15,15 +15,15 @@ Write before any code:
 
 Done when: the question fits one sentence and every field and state has a line.
 
-## 2. Pick the form
-
-The form comes, in this order, from the project's existing view of the same kind of data, from the design source when there is one, or from the user: ask with the question from step 1 and the forms the installed chart library offers, and take the pick. A value the reader looks up or copies stays a table, numbers aligned to the end (`better-layout` `grouping-and-alignment.md`) in tabular figures (`better-typography` **Tabular numbers on changing values**). Several views on one screen run in reading order of importance (`better-layout` **Order by importance**).
-
-Done when: each question from step 1 has a form and names where it came from.
-
-## 3. Pick the library
+## 2. Pick the library
 
 Read `package.json` and recon's shared components first: a chart library the project has wins. Only for a gap, read `pick-ui-library/SKILL.md` **Charts** and take its pick, streaming data included.
+
+## 3. Pick the form
+
+The form comes, in this order, from the project's existing view of the same kind of data, from the design source when there is one, or from the user: ask with the question from step 1, offering a table and the forms the step 2 library draws, and take the pick. A table form sets numbers aligned to the end (`better-layout` `grouping-and-alignment.md`) in tabular figures (`better-typography` **Tabular numbers on changing values**). Several views on one screen run in reading order of importance (`better-layout` **Order by importance**).
+
+Done when: each question from step 1 has a form and names where it came from.
 
 ## 4. Style it in the project's system
 
@@ -37,7 +37,7 @@ The library's default palette, font and gridlines are replaced by the project's 
 
 ## 5. Make it readable without sight and without a mouse
 
-Read `better-accessibility/SKILL.md`, `screen-readers.md` (**Alt text**, **SVG**) and `hit-areas.md`. A meaningful chart SVG gets `role="img"` and a label stating the meaning it adds. A tooltip that carries a value is keyboard-reachable (`better-layout` **Hint at hidden content**). A point or bar the user can select has a hit area at the minimum the reference sets, larger than the mark when the mark is thin.
+Read `better-accessibility/SKILL.md`, `screen-readers.md` (**Alt text**, **SVG**) and `hit-areas.md`. The chart gets a short summary as its accessible name and the full data as a table or text nearby, per the Complex (chart, diagram) row of **Alt text**; an inline SVG carries that name per **SVG**. A tooltip that carries a value is keyboard-reachable (`better-layout` **Hint at hidden content**). A point or bar the user can select has a hit area at the minimum the reference sets, larger than the mark when the mark is thin.
 
 ## 6. Decide the motion
 

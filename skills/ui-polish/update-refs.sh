@@ -13,7 +13,7 @@ set -euo pipefail
 REFS="${UI_REFS:-$HOME/.claude/ui-refs}"
 ROUTER="$(dirname "$0")/SKILL.md"
 mkdir -p "$REFS"
-roots=()
+roots=() repos=()
 while read -r name url sparse; do
   dir="$REFS/$name"
   before=""
@@ -34,7 +34,7 @@ while read -r name url sparse; do
       "$(git -C "$dir" rev-list --count "$before..HEAD")" "$dir" "${before:0:7}"
   fi
   echo
-  roots+=("$dir/${sparse:-skills}")
+  roots+=("$dir/${sparse:-skills}") repos+=("$dir")
 done <<'REPOS'
 jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
@@ -45,6 +45,7 @@ drift=0
 for root in "${roots[@]}"; do
   [ -d "$root" ] || { echo "No upstream skills found under $root"; drift=1; continue; }
   for skill in "$root"/*/; do
+    [ -d "$skill" ] || continue
     rel="${skill#"$REFS"/}"
     if ! grep -qF "$rel" "$ROUTER"; then
       echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
@@ -52,16 +53,19 @@ for root in "${roots[@]}"; do
     fi
   done
 done
-for ref in "${roots[@]/%//*/references/*.md}"; do
-  [ -e "$ref" ] || continue
-  rel="${ref#"$REFS"/}"
-  if ! grep -qF "$rel" "$ROUTER"; then
-    echo "UNROUTED $rel: route its gap-filling sections in the ui-polish reference table, or name it under Not routed"
-    drift=1
-  fi
+for root in "${roots[@]}"; do
+  for ref in "$root"/*/references/*.md; do
+    [ -e "$ref" ] || continue
+    rel="${ref#"$REFS"/}"
+    if ! grep -qF "$rel" "$ROUTER"; then
+      echo "UNROUTED $rel: route its gap-filling sections in the ui-polish reference table, or name it under Not routed"
+      drift=1
+    fi
+  done
 done
+listed() { local repo; for repo in "${repos[@]}"; do [[ "$REFS/$1" == "$repo"/* ]] && return 0; done; return 1; }
 for cited in $(grep -ohE 'REFS/[A-Za-z0-9._/-]+' "$(dirname "$ROUTER")"/*.md | sort -u); do
-  if [ ! -e "$REFS/${cited#REFS/}" ]; then
+  if [ ! -e "$REFS/${cited#REFS/}" ] || ! listed "${cited#REFS/}"; then
     echo "MISSING $cited: upstream renamed or removed it; repoint SKILL.md"
     drift=1
   fi
@@ -92,8 +96,8 @@ resolve_token() { # sets target_of[$1] to the skill dir or REFS/ file it names, 
   [ -n "${target_of[$1]+set}" ] && return 0
   local found="" dir
   if [[ "$1" == REFS/* ]]; then
-    [ -e "$REFS/${1#REFS/}" ] && found="$REFS/${1#REFS/}"
-  elif [[ "$1" == */* && -e "$REFS/$1" ]]; then
+    [ -e "$REFS/${1#REFS/}" ] && listed "${1#REFS/}" && found="$REFS/${1#REFS/}"
+  elif [[ "$1" == */* && -e "$REFS/$1" ]] && listed "$1"; then
     found="$REFS/$1"
   else
     for dir in "${roots[@]/%//${1%%/*}}"; do [ -d "$dir" ] && found="$dir"; done

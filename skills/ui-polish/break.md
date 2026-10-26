@@ -47,7 +47,7 @@ Diagnose each break against `break-ui` **Failure signatures**: the signature nam
 - Fix is the signature's fix in the project's tokens and idiom, with the `path:line` it lands on.
 - Owner is the domain reference whose rules diagnose it (`better-layout`, `better-typography`, `better-writing`, `better-accessibility`, `better-colors`, `better-ui`).
 
-Then, per `break-ui` **Required Output Format**: **Decisions for you** (breaks with more than one right answer, one line each with a recommendation) and **What held up**. Close with the harness URL, the scenarios on it (RTL and mixed-direction text among them when the product ships a right-to-left locale, per `scenarios.md`), the environment modes for the user to toggle per `scenarios.md` **Environment** (dark, zoom 200%, reduced motion, each where the project supports it), and `fix all` / `fix 1, 3`.
+Then, per `break-ui` **Required Output Format**: **Decisions for you** (breaks with more than one right answer, one line each with a recommendation) and **What held up**. Close with the harness URL, the scenarios on it (RTL and mixed-direction text among them when the text can come from users or locales the team does not write in, the `break/scenarios.md` **Content shape** cue), the environment modes for the user to toggle per `scenarios.md` **Environment** (dark, zoom 200%, reduced motion, each where the project supports it), and `fix all` / `fix 1, 3`.
 
 ## 7. Fix on request
 
