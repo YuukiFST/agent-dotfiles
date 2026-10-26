@@ -79,5 +79,35 @@ check block 'Merge fixes for the dashboard.'
 check allow "$(printf '# commit.template comment\n\nfeat: subject below a comment')"
 check allow 'fixup! feat: dashboard de consumo'
 
+# --- regression: the global commit-msg hook in a repo with no remote ---
+# A project's test suite builds throwaway repos in the OS temp dir and commits "inicial" there;
+# with core.hooksPath global, the format check failed those suites. With no remote nothing can be
+# published (pre-push checks the format before anything leaves), so only attribution is checked.
+hook_case() {
+  local expected="$1" with_remote="$2" subject="$3"
+  local repo actual="allow"
+  repo="$(mktemp -d)"
+  git -C "$repo" init -q
+  if [ "$with_remote" = "remote" ]; then
+    git -C "$repo" remote add origin https://example.invalid/r.git
+  fi
+  printf '%s\n' "$subject" > "$repo/.git/COMMIT_EDITMSG"
+  (cd "$repo" && bash "$HOOK_DIR/commit-msg" .git/COMMIT_EDITMSG) >/dev/null 2>&1 || actual="block"
+  rm -rf "$repo"
+  if [ "$actual" = "$expected" ]; then
+    pass=$((pass + 1))
+  else
+    fail=$((fail + 1))
+    echo "FALHOU (commit-msg, $with_remote): esperado $expected, obtido $actual" >&2
+    echo "        assunto: $subject" >&2
+  fi
+}
+hook_case allow no-remote 'inicial'
+hook_case block no-remote 'feat: dashboard feito com Claude'
+hook_case block no-remote 'feat: novo endpoint
+Co-Authored-By: Someone <someone@example.com>'
+hook_case block remote 'inicial'
+hook_case allow remote 'feat: dashboard de consumo'
+
 echo "ok: $pass | falhas: $fail"
 [ "$fail" -eq 0 ]

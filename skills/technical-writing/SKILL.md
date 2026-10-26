@@ -6,7 +6,7 @@ metadata:
   opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
-<!-- Source: https://github.com/cursor/plugins/tree/main/pstack/skills/technical-writing pinned at 00b14f1 (MIT, notice in LICENSE); unslop references point at ai-tells, which absorbed it -->
+<!-- Source: https://github.com/cursor/plugins/tree/main/pstack/skills/technical-writing (MIT, notice in LICENSE); unslop references point at ai-tells, which absorbed it -->
 
 # Technical writing
 

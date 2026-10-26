@@ -3,7 +3,7 @@ name: rust-best-practices
 description: Rust best practices from Google's Rust style guide. Use when reading, editing or reviewing any .rs file.
 paths: ["**/*.rs"]
 ---
-<!-- Source: https://github.com/google/styleguide/blob/gh-pages/rustguide.md pinned at 2ac1584 (CC BY 3.0, notice in LICENSE). Condensed and adapted: Chromium-, Fuchsia- and Android-only rules dropped, examples moved to references/patterns.md with their syntax errors fixed. -->
+<!-- Source: https://github.com/google/styleguide/blob/gh-pages/rustguide.md (CC BY 3.0, notice in LICENSE). Condensed and adapted: Chromium-, Fuchsia- and Android-only rules dropped, examples moved to references/patterns.md with their syntax errors fixed. -->
 
 # Rust best practices
 
