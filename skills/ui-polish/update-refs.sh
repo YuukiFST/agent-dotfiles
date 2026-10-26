@@ -5,8 +5,9 @@
 # Idempotent: run on a fresh machine or to refresh existing clones. A repo with a
 # third column is cloned sparse, that subdirectory only. A clone left in REFS by a
 # repo dropped from the list is ignored, never read.
-# Ends with two drift checks: UNROUTED for an upstream skill, or a file in its
-# references/ dir, that SKILL.md neither routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
+# Ends with two drift checks: UNROUTED for an upstream skill, a file in its
+# references/ dir, or a concept draft under a repo's content/, that no file of
+# this skill routes or excludes, MISSING for a REFS/ path any file of this skill cites that
 # upstream no longer has, or a **bold** section name no upstream heading or label
 # still carries. All surface on the next pull instead of mid-task.
 set -euo pipefail
@@ -39,6 +40,7 @@ done <<'REPOS'
 jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
 mengto-skills https://github.com/MengTo/Skills agent-skills/ui
+craft https://github.com/gustavo-fior/craft
 REPOS
 
 drift=0
@@ -47,7 +49,7 @@ for root in "${roots[@]}"; do
   for skill in "$root"/*/; do
     [ -d "$skill" ] || continue
     rel="${skill#"$REFS"/}"
-    if ! grep -qF "$rel" "$ROUTER"; then
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
       echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
       drift=1
     fi
@@ -57,8 +59,18 @@ for root in "${roots[@]}"; do
   for ref in "$root"/*/references/*.md; do
     [ -e "$ref" ] || continue
     rel="${ref#"$REFS"/}"
-    if ! grep -qF "$rel" "$ROUTER"; then
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
       echo "UNROUTED $rel: route its gap-filling sections in the ui-polish reference table, or name it under Not routed"
+      drift=1
+    fi
+  done
+done
+for repo in "${repos[@]}"; do
+  for draft in "$repo"/content/*/*.mdx; do
+    [ -e "$draft" ] || continue
+    rel="${draft#"$REFS"/}"
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
+      echo "UNROUTED $rel: route the parts no reference contradicts, or name it under Not routed"
       drift=1
     fi
   done
@@ -90,7 +102,7 @@ done < <(grep -ohE '^ *([0-9]+\.|-) \*\*[^*]+\*\*|\| \*\*[^*]+\*\* \|' "$SKILL_D
 while IFS= read -r heading; do
   heading="${heading%$'\r'}"; local_heading["${heading,,}"]=1
 done < <(grep -ohE '^#{1,6} .*' "$SKILL_DIR"/*.md | sed -E 's/^#+ +//; s/^[0-9]+\. +//; s/ \(.*\)$//' || true)
-labels_in() { grep -rhE --include='*.md' '^#{1,6} |\*\*' "$@" 2>/dev/null || true; }
+labels_in() { grep -rhE --include='*.md' --include='*.mdx' '^#{1,6} |\*\*' "$@" 2>/dev/null || true; }
 upstream_labels="$(labels_in "${roots[@]}")"
 resolve_token() { # sets target_of[$1] to the skill dir or REFS/ file it names, or empty
   [ -n "${target_of[$1]+set}" ] && return 0
