@@ -74,7 +74,7 @@ Read `references/lead-judgment.md`, then put every finding in one bucket, with t
 
 - **Act on:** real issues affecting correctness, security or maintainability given the actual goals; they would block a real PR.
 - **Consider:** legitimate, but you are not sure they outweigh the cost of addressing them now.
-- **Noted:** technically valid but not actionable at this stage.
+- **Noted:** technically valid but not actionable at this stage, and every real bug in code the diff did not change, tagged pre-existing.
 - **Dismissed:** wrong, nitpicky, or missing context, with a brief reason.
 
 Done when every finding from every reviewer sits in exactly one bucket.
@@ -96,7 +96,7 @@ Risky or not risky, with the trigger; sensitive or not, with the paths that made
 - Reviewer [label]: [model], [effort], [N findings], [complete, or incomplete with the files it missed], plus any fallback taken.
 
 ### Act On
-Each: description, which reviewers raised it, why it matters.
+Each: description, bug class with every location it occurs, which reviewers raised it, why it matters.
 
 ### Consider
 Each: description, which reviewers raised it, the tradeoff.

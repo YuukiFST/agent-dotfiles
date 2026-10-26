@@ -40,8 +40,10 @@ For each finding, provide:
    - `critical`: Would cause bugs, data loss, security issues, or fundamentally broken behavior
    - `warning`: Design concern, maintainability risk, or correctness issue that isn't immediately broken but will cause pain
 2. **Finding**: What the problem is, in concrete terms. Reference specific lines/functions.
-3. **Evidence**: Why you believe this is a problem. Show your reasoning. Don't just assert.
-4. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
+3. **Class**: the bug class in a few words ("unchecked exit code on a git call"), plus every other location in the code under review where the same class occurs, so the author fixes all of them at once.
+4. **Pre-existing**: `yes` when the flawed lines are not changed by the diff, else `no`.
+5. **Evidence**: Why you believe this is a problem. Show your reasoning. Don't just assert.
+6. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
 
 A good finding references specific code, not vague concerns ("this could be better"). It distinguishes between "this is broken" and "I would have done this differently". It considers the stated intent. A finding that ignores the context of what's being built is a bad finding.
 Report no style-only finding (naming, formatting, a preferred idiom): it has no severity here.
@@ -58,6 +60,8 @@ Return your findings as a structured list:
 ### 1. [Severity] Short title
 **Location**: file:line or function name
 **Finding**: What's wrong
+**Class**: Bug class, and its other locations
+**Pre-existing**: yes | no
 **Evidence**: Why this matters
 **Suggestion**: (optional) What to do instead
 
