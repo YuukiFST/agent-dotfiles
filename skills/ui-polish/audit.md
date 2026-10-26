@@ -24,17 +24,17 @@ Done when: every reviewer returned a findings table or an explicit "No actionabl
 
 ## 4. Consolidate
 
-Read `better-interface/SKILL.md` (**Rank by user impact** through **Verify what can be verified**) and `review-format.md`. Merge the reviewer tables:
+Read the `better-interface` sections that [SKILL.md](SKILL.md) **Domain reviewers** names for consolidation, and `review-format.md`. Merge the reviewer tables:
 
-- Verify each finding at its cited line. Drop what does not reproduce or is a documented project decision.
+- Verify each finding at its cited line. Drop what does not reproduce, and a taste finding a documented project convention settles; a trigger or domain-rule violation the convention causes stays, reported once against the convention or token (recon step 4).
 - One root cause per row, all locations listed. Escalation triggers first. Cap 15; say how many the cap excluded.
 - Propose the cheapest fix that works (delete, platform, reuse, correct value, add).
 
-Present the table. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply HIGH and MEDIUM, list LOW as follow-up.
+Present the table. A review-only request ends here with the step 7 report. If the user is present and the fixes are many or invasive, stop for selection. Autonomous run: apply every row, since an improve request asked for the findings to be implemented (`better-interface` **Review without mutating by default**).
 
 ## 5. Apply
 
-Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes, a polish finding on motion included, take their exact values from `review-animations/STANDARDS.md`; gesture fixes from `apple-design` **Quick Reference**; overflow fixes from `break-ui` **Failure signatures**; polish values from `better-ui` siblings; a craft-only concept (scroll fade, grain, root canvas, press per surface) from the craft section its finding cites. A slop finding is fixed by removal, or by the smallest correction in the project's system when removal loses a job, per `audit-ai-design-slop` **Use the Removal Test**. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
+Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes, a polish finding on motion included, take their exact values from `review-animations/STANDARDS.md`, except an icon swap, whose values only `better-ui` `icon-transitions.md` **Motion** gives; gesture fixes take the spring from `review-animations/STANDARDS.md` **Springs** and the behaviour from `apple-design` **Quick Reference**; translucent surfaces from `apple-design` **Materials & depth**; overflow fixes from `break-ui` **Failure signatures**; polish values from `better-ui` siblings. A slop finding is fixed by removal, or by the smallest correction in the project's system when removal loses a job, per `audit-ai-design-slop` **Use the Removal Test**. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
 
 Done when: every applied row is checked off in the table with the file touched.
 
@@ -48,14 +48,14 @@ Done when: gates pass, both after-screenshots exist, no HIGH finding remains ope
 
 ## 7. Report
 
-The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths.
+The `review-format.md` structure: scope and coverage, the findings table with a status per row (applied / open / follow-up / rejected with reason), verification with exact commands, verdict. Point at the before/after screenshot paths.
 
 ## Exhaustive
 
 The request asked for everything ("ao máximo", "every component"), so the work runs in rounds over a fixed inventory instead of one capped pass. Everything else in steps 1 to 7 holds.
 
 - **Inventory (step 1).** One line per distinct component file the route renders, with the states it reaches and whether it renders data it does not author. A shared primitive (button, icon, input) gets one line however often it appears. The inventory and its count go into every reviewer prompt, and every reviewer returns a verdict line per component.
-- **Apply policy (step 4).** No stop for selection: the request already chose. Apply HIGH and MEDIUM, plus every LOW whose fix sits on the first four rungs of the ladder (delete, platform, reuse, correct value). A LOW that needs **Add** is `follow-up`.
+- **Apply policy (step 4).** No stop for selection: the request already chose. Apply every row.
 - **Carry-over (step 4).** The cap of 15 bounds a round's table, not the work. Rows past the cap are `carried` and lead the next round's table.
 - **Rounds (after step 6).** The after-screenshots become the next round's before, and steps 3 to 6 run again over the whole inventory. Each reviewer prompt carries the earlier rounds' rows with their status. An `applied` row that still reproduces comes back as `Fix incomplete`; `rejected` and `follow-up` rows are not proposed again.
 - **Stop.** A round ends the loop when its consolidated table has no HIGH or MEDIUM and nothing is carried. Round 3 ends it regardless; every row still open is listed as follow-up, except an open HIGH, which leads the report and keeps step 6 not done. Say which condition ended it.

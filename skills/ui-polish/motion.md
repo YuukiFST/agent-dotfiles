@@ -21,9 +21,9 @@ Then, by request:
 
 ## 2. Build
 
-Read `animate/SKILL.md` and `RECIPES.md`. Each row runs `animate` **The Build Sequence** in order; a named target from step 1 runs its gate (steps 1 and 2) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set.
+Read `animate/SKILL.md` and `RECIPES.md`. Each row runs `animate` **The Build Sequence** in order; a named target from step 1 first runs `find-animation-opportunities` **The Gate** (frequency, purpose, speed, function) here, and a row from the sweep already passed it. Start from the recipe that matches the component. Curves and durations are the project's tokens where they exist, the values in `animate` where they do not, never a third set. Content stays visible in a complete static first frame, without JavaScript, and reduced motion shows a stable final state, per `no-ai-design-slop` `ARTICLE.md` **Motion and Scroll**.
 
-**gesture** on the row (drag, swipe, sheet, carousel, slider) → read the gesture row's references before building it: drag, flick and sheet motion is springs and velocity, not duration and curve. **mobile** on → apply `mobile-native/SKILL.md` to the touched elements.
+**gesture** on the row (drag, swipe, sheet, carousel, slider) → read the gesture row's references before building it: drag, flick and sheet motion is springs and velocity, not duration and curve, with the spring `RECIPES.md` **Drag to dismiss** settles on (`review-animations/STANDARDS.md` **Springs**) and the behaviour from `apple-design` **Quick Reference**: velocity handoff, projection, rubber-band, interruption from the live value. On Expo, the gesture build is `animate-expo` **5. Timing or spring**, **7. Press, not hover** and its `RECIPES.md` **Bottom sheet you can drag to dismiss**. **mobile** on → apply `mobile-native/SKILL.md` to the touched elements.
 
 Done when: every row is built or rejected by the gate with its reason, each built row carries `animate` **Output** (gate result, ingredients, what to feel-check), and **Never Ship** reads clean against the diff.
 
@@ -39,11 +39,11 @@ The author does not grade its own motion.
    - Inventory block: keep only its earlier-rounds line, with each earlier row and its status (`fixed`, `follow-up`). Round 1 says "round 1".
    - Delete the Change and Visualize brief blocks.
    - OUTPUT gains a last line for the motion reviewer: `Verdict: Approve | Block (<rows that block>)`, decided by `review-animations` **Part 2 — Verdict**. Approve only when its Approve criteria all hold.
-3. **Close the round** on the motion reviewer's Verdict line, never on the author's reading of the table. Approve with no HIGH or MEDIUM row open → done. Otherwise fix every blocking, HIGH and MEDIUM row, with the project's token where one exists and the `STANDARDS.md` value where none does; gesture rows take `apple-design` **Quick Reference**. LOW rows are follow-ups. Then run the round again from 1.
+3. **Close the round** on the motion reviewer's Verdict line, never on the author's reading of the table. Approve with no HIGH row open → done; the other rows are follow-ups. Otherwise fix every row the Verdict names and every HIGH row, with the project's token where one exists and the `STANDARDS.md` value where none does, except an icon swap, which keeps `better-ui` `icon-transitions.md` **Motion**; gesture rows take the `review-animations/STANDARDS.md` **Springs** spring and the `apple-design` **Quick Reference** behaviour. Then run the round again from 1.
 
 Three rounds at most; a Block left after round 3 leads the report. Feel that code cannot settle (a spring's bounce, a crossfade) is listed under **Not verified** with `animate`'s feel-check, never claimed.
 
-Done when: a round closed on Approve with no HIGH or MEDIUM open, or round 3 ended, and every evidence check ran or is marked Not verified.
+Done when: a round closed on Approve with no HIGH open, or round 3 ended, and every evidence check ran or is marked Not verified.
 
 ## 4. Report
 

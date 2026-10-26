@@ -6,7 +6,7 @@ Read `REFS/jakubkrehel-skills/skills/interface-review/SKILL.md`, `scope-resoluti
 
 ## 1. Resolve the change scope
 
-Resolve the target per `interface-review` **Resolve the change scope first**: the merge-base range before the working tree, untracked files included, lockfiles, snapshots and generated output excluded and named. A pull request is fetched into `refs/remotes/pr/<n>` and read with `git show`; `git checkout`, `git switch`, `gh pr checkout` and `git stash` stay unused.
+Resolve the target per `interface-review` **Resolve the change scope first**: the merge-base range plus the uncommitted changes, each counted, untracked files included, lockfiles, snapshots and generated output excluded and named. A pull request is fetched into `refs/remotes/pr/<n>` and read with `git show`; `git checkout`, `git switch`, `gh pr checkout` and `git stash` stay unused.
 
 No change to review → `interface-review` **With no change, ask rather than invent one**: state the facts, offer the open PR, the last commit by SHA, a named target, or a whole-screen Audit, and wait.
 
@@ -22,7 +22,7 @@ Done when: the surface list and the intent line exist.
 
 Dispatch per `SKILL.md` **Domain reviewers**, filling the Change block of [reviewer-prompt.md](reviewer-prompt.md). Scope files are the changed files plus the expanded surfaces, cited at the head ref. A domain with no evidence in the change gets no reviewer and is `Not reviewed: no evidence in the change scope`.
 
-Rendered evidence is opt-in: only with a cheap preview or on request, in an isolated `git worktree add` removed afterwards. Otherwise visual claims are **Not verified**.
+Rendered evidence is opt-in: only with a cheap preview or on request, per `interface-review` **Never mutate the working tree**. A `working` or `branch` target renders in place, since the checkout already is the head; any other target renders in an isolated `git worktree add`, removed afterwards. Otherwise visual claims are **Not verified**.
 
 Done when: every dispatched reviewer returned a table with a status on every row, or an explicit "No actionable findings".
 
