@@ -6,8 +6,8 @@
 # third column is cloned sparse, that subdirectory only. A clone left in REFS by a
 # repo dropped from the list is ignored, never read.
 # Ends with two drift checks: UNROUTED for an upstream skill, a file in its
-# references/ dir, or a concept draft under a repo's content/, that SKILL.md
-# neither routes nor excludes, MISSING for a REFS/ path any file of this skill cites that
+# references/ dir, or a concept draft under a repo's content/, that no file of
+# this skill routes or excludes, MISSING for a REFS/ path any file of this skill cites that
 # upstream no longer has, or a **bold** section name no upstream heading or label
 # still carries. All surface on the next pull instead of mid-task.
 set -euo pipefail
@@ -49,7 +49,7 @@ for root in "${roots[@]}"; do
   for skill in "$root"/*/; do
     [ -d "$skill" ] || continue
     rel="${skill#"$REFS"/}"
-    if ! grep -qF "$rel" "$ROUTER"; then
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
       echo "UNROUTED $rel: add a row to the ui-polish reference table or a line under Not routed"
       drift=1
     fi
@@ -59,7 +59,7 @@ for root in "${roots[@]}"; do
   for ref in "$root"/*/references/*.md; do
     [ -e "$ref" ] || continue
     rel="${ref#"$REFS"/}"
-    if ! grep -qF "$rel" "$ROUTER"; then
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
       echo "UNROUTED $rel: route its gap-filling sections in the ui-polish reference table, or name it under Not routed"
       drift=1
     fi
@@ -69,7 +69,7 @@ for repo in "${repos[@]}"; do
   for draft in "$repo"/content/*/*.mdx; do
     [ -e "$draft" ] || continue
     rel="${draft#"$REFS"/}"
-    if ! grep -qF "$rel" "$ROUTER"; then
+    if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
       echo "UNROUTED $rel: route the parts no reference contradicts, or name it under Not routed"
       drift=1
     fi

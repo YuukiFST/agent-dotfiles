@@ -33,7 +33,7 @@ The library's default palette, font and gridlines are replaced by the project's 
 - **Type** (`better-typography`): the project's font on axes, labels and tooltips; **Tabular numbers on changing values** on every figure; **Truncate with a way back** for long category names.
 - **Text** (`better-writing`, read `SKILL.md` and `patterns.md`): numbers, units, dates and currency per **Locale formatting**; plurals per **Plurals and placeholders**; the empty state per **Empty states point forward**.
 - **Layout** (`better-layout`): the chart aligns to the same edges as the cards around it (**Align to shared edges**), and it reflows at 320px without horizontal scrolling per `better-accessibility` **Survive zoom and text resize**.
-- **Line and ranking** (craft drafts): a line over bounded data takes a monotone curve per `REFS/craft/content/data/curve-smoothing.mdx` **Overshoot on bounded data** and **Choosing**; a ranked list follows `REFS/craft/content/data/living-charts.mdx` **Ranked lists**.
+- **Line** (craft drafts that contradict none of the three repos; read only the named parts): a line over bounded data takes a monotone curve per `REFS/craft/content/data/curve-smoothing.mdx` **Overshoot on bounded data** and **Choosing** (`d3.line().curve(d3.curveMonotoneX)` in d3), with the data dots visible while the chart is built; a streaming chart keeps its y axis fixed to a known range, per the Usage of `REFS/craft/content/data/living-charts.mdx`.
 - **Surface** (`better-ui`): the chart's container uses the project's card surface, radius and shadow, the same as its neighbours.
 
 ## 5. Make it readable without sight and without a mouse
@@ -42,7 +42,7 @@ Read `better-accessibility/SKILL.md`, `screen-readers.md` (**Alt text**, **SVG**
 
 ## 6. Decide the motion
 
-Read `find-animation-opportunities/SKILL.md` **The Gate**, especially **4. Function**: data the user reads or acts on does not move for style. A transition between two data states (a filter change) ships only when it clears all four checks, within the durations in `review-animations/STANDARDS.md`, with reduced motion handled. Streaming or frequently refetched data → read `animation-performance/SKILL.md` and keep updates composite-only and off React state per frame (**React: Don't Animate Through State**).
+Read `find-animation-opportunities/SKILL.md` **The Gate**, especially **4. Function**: data the user reads or acts on does not move for style. A transition between two data states (a filter change) ships only when it clears all four checks, within the durations in `review-animations/STANDARDS.md`, with reduced motion handled. Streaming or frequently refetched data → read `animation-performance/SKILL.md` and keep updates composite-only and off React state per frame (**React: Don't Animate Through State**). A ranked list whose rows reorder on a live update slides each row to its new slot per `REFS/craft/content/data/living-charts.mdx` **Ranked lists**, once it clears The Gate, with reduced motion handled.
 
 ## 7. Build every state, then review
 
