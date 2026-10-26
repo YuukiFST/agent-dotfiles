@@ -34,11 +34,16 @@ This is the most common false positive in code review. A finding that amounts to
 ### Missing Context Signals
 
 Watch for findings that reveal the reviewer didn't understand the context:
-- Suggesting changes to code the author didn't write or modify
 - Flagging patterns that are consistent with the rest of the codebase (the reviewer just doesn't know that)
 - Recommending approaches that conflict with constraints you know about
 
 These are honest mistakes from reviewers working with limited information. Dismiss them gracefully.
+
+### Pre-existing Bugs
+
+A real bug the base branch already has, reachable without this diff, goes to Noted, tagged pre-existing; check the tag against the diff and `git blame`.
+It neither blocks this PR as Act on nor gets dismissed as missing context, because the bug is real and dismissing it loses it.
+A bug in unchanged lines that this diff makes reachable or worse is not pre-existing: judge it like any other finding.
 
 ## When Reviewers Are Right
 
