@@ -14,11 +14,13 @@ ai-copywriter	mikiarlo3/ai-copywriter	.	08b53b1
 ai-tells	akitaonrails/my-skills	humanizer	8a7d0e5
 ai-tells	petergyang/no-ai-slop	.	000650b
 ai-tells	cursor/plugins	pstack/skills/unslop	70b2dc8
-anatomy	wheresryan22/anatomy	.	e6600ff
+anatomy	wheresryan22/anatomy	.	1482e84
 chrome-devtools-axi	kunchenguid/chrome-devtools-axi	skills/chrome-devtools-axi	75dd6ca
 code-simplifier	anthropics/claude-plugins-official	plugins/code-simplifier/agents/code-simplifier.md	ceb9b72
 codebase-design	mattpocock/skills	skills/engineering/codebase-design	697d4ce
 create-verification-skill	cursor/plugins	pstack/skills/create-verification-skill	c49b37a
+dimensional-drawing	enesozturk/dimensional-drawing	skills/dimensional-drawing	5c45743
+dimensional-drawing-motion	enesozturk/dimensional-drawing	skills/dimensional-drawing-motion	5c45743
 domain-modeling	mattpocock/skills	skills/engineering/domain-modeling	697d4ce
 find-skills	vercel-labs/skills	skills/find-skills	773fb2c
 grilling	mattpocock/skills	skills/productivity/grilling	bfdaef8
