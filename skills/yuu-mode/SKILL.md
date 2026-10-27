@@ -52,6 +52,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | New or changed behavior | `playbooks/feature.md` |
 | Build, polish, redesign, animate or review a web UI (screen, component, flow, chart) | `ui-polish` |
 | Behavior-preserving restructure: rename, extract, inline, dedupe, move | `playbooks/refactoring.md` |
+| Port or rewrite code from another language in Rust | `rust-port` |
 | Simplify code just written | `code-simplifier` |
 | Design a module interface, a seam, a deep module | `codebase-design` |
 | Scan a codebase for deepening opportunities | `improve-codebase-architecture` |
@@ -67,6 +68,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Task | Route |
 |------|-------|
 | Review a diff, branch or PR; "what could this break" | `interrogate` |
+| Review Rust code for idiom, API design, error handling or safety | `rust-review` |
 | Write, change or audit tests | `test-audit` |
 | Security review or audit of existing code | `security-audit` |
 | Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
