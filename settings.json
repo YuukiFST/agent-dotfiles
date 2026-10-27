@@ -22,7 +22,8 @@
       "NotebookEdit",
       "DesignSync",
       "RemoteTrigger",
-      "PushNotification"
+      "PushNotification",
+      "Agent(caveman:cavecrew-builder)"
     ],
     "defaultMode": "auto"
   },
