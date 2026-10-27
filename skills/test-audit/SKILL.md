@@ -35,6 +35,14 @@ add it yet:
 4. Does it need a production seam (export, flag, wrapper, injection hook) that no
    production caller needs? If yes, move the test to the real boundary instead.
 
+Pick the test's shape from the claim it protects. A claim over every input (a
+parser, a serializer round-trip, an ordering or idempotence law) gets a
+property test or a fuzz target at that interface, printing the failing seed
+and the shrunk input. A rewrite or optimization of behavior an older or simpler
+implementation already has gets a differential test: both run on the same
+generated inputs and their outputs must match, with the reference kept in test
+support as the oracle. Any other claim gets an example test.
+
 Then check the test against every [junk pattern](#junk-patterns); a match fails
 the gate unless the [retention bar](#retention-bar) names the contract it
 independently guards. A test that would break under behavior-preserving
@@ -61,6 +69,9 @@ matches one, and audits hunt for existing tests that do.
 - tests whose only purpose is preserving test-only exports, globals, or wrappers;
 - dead production code whose only callers are tests;
 - expected values produced by the helper or renderer under test;
+- golden, snapshot or expect output a reviewer cannot read: an unlabeled dump,
+  a whole object graph, unstable ordering, or unmasked timestamps, ids and
+  paths, so its diff hides the behavior change;
 - mocks that implement the asserted behavior, or one identical mock standing in
   for different APIs;
 - fixtures that supply the receipt, admission, or callback ordering the owner
@@ -127,6 +138,8 @@ config, migration, storage, security, platform, default, prompt-byte, generated
 cross-language, package, release, or architecture contract. Also keep:
 
 - call ordering when order is observable behavior;
+- a reference implementation in test support that a differential test uses as
+  its oracle;
 - regressions with a credible failure mode;
 - source inspection when it is the cheapest independent guard: it fails when
   the contract changes (the user-facing key, byte, or path) and survives an

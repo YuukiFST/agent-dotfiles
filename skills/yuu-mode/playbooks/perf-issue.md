@@ -13,6 +13,7 @@ Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; t
    6. Do it concurrently.
    7. Do it cheaper.
 3. Fix one hypothesis at a time and measure after each (`principle-sequence-verifiable-units`); a change with no measured gain is reverted.
+   A rewrite of a hot path keeps the old version as a differential oracle (`test-audit`), so the speedup ships with output proven unchanged.
 4. Compare baseline and post-fix artifacts side by side. An inconclusive comparison is reported as inconclusive.
 5. Cite the measurement in the commit or PR body; ship through `git-workflow` when the user invoked `/git-workflow`.
 

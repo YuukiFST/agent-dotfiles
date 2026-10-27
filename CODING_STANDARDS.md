@@ -22,6 +22,8 @@ Skill `test-audit` gates every new or changed test; these add what it lacks.
   A flaky or base-red one gets the Boy Scout fix, keeping every assertion it makes.
 - **CI runs the suite:** a project whose CI does not run the E2E suite on every PR gets that job as its own commit in the next bug-fix PR, or proposed in a repo the user does not own; a test only an agent remembers to run guards nothing.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
+  Shape it for a reader: labeled lines in a stable order, only the fields the contract names, timestamps, ids and paths masked, so its diff reads as the behavior change.
+  A changed golden is accepted only after its diff is read against the intent, and the report says what changed in it.
 - **One command, headless:** the suite seeds itself and needs no manual step, unshipped config or secret.
 
 ## Code
@@ -36,7 +38,7 @@ The reader is an LLM: token cost, tool-call latency and output quality are techn
 - **Types tell the truth:** what the compiler can't prove gets validated; no `any`, `@ts-ignore`, or `as X` over an invariant, and always-set fields are non-optional.
   A known value keeps its type: widening it to `unknown` or a generic record and casting it back later fabricates the evidence the type carried; parse only what crosses a boundary.
   An assertion the type system cannot avoid carries, directly above it, a `SAFETY:` comment proving the runtime type, a `Verified by:` line naming an E2E test that reaches the asserted path, and, where the linter flags it, the narrowest suppression for that rule on that line; the report names each new assertion, and one with no such test as unverified.
-- **Inject dependencies** (constructor/parameter) so a test swaps in a named fake; fakes stand in for external I/O only.
+- **Inject dependencies** (constructor/parameter) so a test swaps in a named fake; fakes stand in for external I/O only, and the clock, timers and randomness count as external I/O, so a test runs deterministic and in milliseconds.
 - **Formatter decides style** (`prettier`/`ruff`/`gofmt`/`cargo fmt`/`rubocop -A`): run it and move on.
 - **The project's linter outranks this file:** where its config covers a rule here (file length, nesting depth, `any`), the config wins; where it lacks one, propose the lint rule instead of leaning on this text.
 - **Structured (JSON) logs** for debug/observability; plain text only for user-facing CLI output.
