@@ -54,6 +54,8 @@ Can you tell that this code works from reading it?
 - Are there assertions/invariants that would catch regressions?
 - If this is a bug fix: is there a test for the bug?
 - If this touches an integration boundary: is the full path tested?
+- Reward hacking: did the diff turn a check green by weakening the check? Look for a test deleted, skipped or marked flaky, an assertion loosened, a golden or snapshot regenerated in the same diff as the logic it captures, a broad catch, or a cast or lint suppression where a check failed. Each one needs a reason tied to the intent; without one, report it with its location.
+- When the diff changes a golden, snapshot or expect output, read that output diff beside the logic diff: is the new behavior the one the intent asks for?
 - Check the real thing, not a proxy. If the code checks liveness via file mtime or cached state instead of reading the actual value, that's a verification gap.
 - For delegated or async work: does the code verify actual output artifacts, or does it trust self-reports and summaries?
 
