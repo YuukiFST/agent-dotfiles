@@ -43,7 +43,9 @@ principle-sequence-verifiable-units	cursor/plugins	pstack/skills/principle-seque
 principle-type-system-discipline	cursor/plugins	pstack/skills/principle-type-system-discipline	d7cde2b
 prototype	mattpocock/skills	skills/engineering/prototype	6bcbcb0
 research	mattpocock/skills	skills/engineering/research	697d4ce
-rust-best-practices	google/styleguide	rustguide.md	2ac1584
+rust-best-practices	morganlinton/BeautifulRust	skills/rust-best-practices	c6f56d2
+rust-port	morganlinton/BeautifulRust	skills/rust-port	c6f56d2
+rust-review	morganlinton/BeautifulRust	skills/rust-review	c6f56d2
 security-audit	cloudflare/security-audit-skill	skills/security-audit	c1c8a8c
 security-bounty-hunter	affaan-m/everything-claude-code	skills/security-bounty-hunter	db7f2a6
 security-review	affaan-m/everything-claude-code	skills/security-review	db7f2a6
