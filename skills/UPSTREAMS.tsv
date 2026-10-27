@@ -70,4 +70,5 @@ yuu-mode	cursor/plugins	pstack/skills/poteto-mode	364a77e
 ./rtk	rtk-ai/rtk	CHANGELOG.md	91dd9ce	master
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
 YuukiFST/caveman-lean	JuliusBrussee/caveman	skills/caveman	d262ab3
+YuukiFST/caveman-lean	JuliusBrussee/caveman	src/plugins/opencode	9b68f7e
 YuukiFST/ponytail-subagent	DietrichGebert/ponytail	skills/ponytail/SKILL.md	09c434a
