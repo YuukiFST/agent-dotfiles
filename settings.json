@@ -22,8 +22,7 @@
       "NotebookEdit",
       "DesignSync",
       "RemoteTrigger",
-      "PushNotification",
-      "Agent(caveman:cavecrew-builder)"
+      "PushNotification"
     ],
     "defaultMode": "auto"
   },
@@ -76,16 +75,16 @@
     "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\tisao\\.claude\\hooks\\caveman-statusline.ps1\""
   },
   "enabledPlugins": {
-    "caveman@caveman": true,
+    "caveman-lean@caveman-lean": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "ponytail-subagent@ponytail-subagent": true
   },
   "extraKnownMarketplaces": {
-    "caveman": {
+    "caveman-lean": {
       "source": {
         "source": "github",
-        "repo": "JuliusBrussee/caveman"
+        "repo": "YuukiFST/caveman-lean"
       }
     },
     "claude-plugins-official": {

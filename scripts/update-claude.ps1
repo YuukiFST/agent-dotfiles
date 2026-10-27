@@ -27,7 +27,7 @@ npm install -g chrome-devtools-axi@latest gh-axi@latest
 # updated by their own scripts there. Nothing else to refresh here.
 
 Write-Host "[4/4] Claude Code plugins"
-foreach ($p in "caveman@caveman") {
+foreach ($p in "caveman-lean@caveman-lean", "ponytail-subagent@ponytail-subagent") {
   claude plugin update $p
 }
 

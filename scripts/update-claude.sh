@@ -19,9 +19,7 @@ npm install -g chrome-devtools-axi@latest gh-axi@latest
 # not a Claude Code dependency.
 
 echo "[4/4] Claude Code plugins"
-# SC2043: single-element loop is intentional extension point (more plugins may be added)
-# shellcheck disable=SC2043
-for p in caveman@caveman; do
+for p in caveman-lean@caveman-lean ponytail-subagent@ponytail-subagent; do
   claude plugin update "$p" || true
 done
 
