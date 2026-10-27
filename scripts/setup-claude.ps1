@@ -22,10 +22,10 @@ Write-Host "[4/5] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
 Write-Host "[5/5] Plugins"
-foreach ($m in "JuliusBrussee/caveman", "anthropics/claude-plugins-official", "YuukiFST/ponytail-subagent") {
+foreach ($m in "YuukiFST/caveman-lean", "anthropics/claude-plugins-official", "YuukiFST/ponytail-subagent") {
   claude plugin marketplace add $m
 }
-claude plugin install caveman@caveman
+claude plugin install caveman-lean@caveman-lean
 claude plugin install ponytail-subagent@ponytail-subagent
 
 Write-Host "Done. Restart Claude Code."

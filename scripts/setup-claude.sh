@@ -22,10 +22,10 @@ echo "[4/5] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
 echo "[5/5] Plugins"
-for m in JuliusBrussee/caveman anthropics/claude-plugins-official YuukiFST/ponytail-subagent; do
+for m in YuukiFST/caveman-lean anthropics/claude-plugins-official YuukiFST/ponytail-subagent; do
   claude plugin marketplace add "$m" || true
 done
-claude plugin install caveman@caveman || true
+claude plugin install caveman-lean@caveman-lean || true
 claude plugin install ponytail-subagent@ponytail-subagent || true
 
 case ":$PATH:" in *":$bin:"*) ;; *) echo "Note: add $bin to PATH";; esac
