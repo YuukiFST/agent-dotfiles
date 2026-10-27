@@ -2,13 +2,13 @@
 
 ## 1. User identity
 
-NEVER commit without knowing whose identity to use — the identity configured on this machine may belong to someone else (shared or work PC).
+Commit under the machine's git identity, without asking: `git config user.name` and `git config user.email`, read inside the repo so a repo-local value wins over the global one.
 
-- **Already told in this conversation:** if the user has stated the name/email to commit under at any point in the current session, reuse it for every commit in that session — do NOT ask again.
-- **Not yet told:** before the first commit, read the current git identity (`git config user.name` / `git config user.email`), show it, and ask: "Commit as <name> <email>, or a different identity?" Wait for the answer — never commit on the configured identity without explicit confirmation, even if one is set.
+- **Identity unset:** when either value is empty, ask the user for the name and email before the first commit, and use the answer for every commit in the session.
+- **User named another identity:** when the user states a name/email to commit under in this conversation, use it for every commit in the session.
 - **Harness account ≠ user:** the email of the account logged into the harness (e.g. a `userEmail` context entry) belongs to whoever owns the subscription, not to the user at the keyboard. Identity comes only from git config and the user's answer; never show, suggest, or attribute work to the harness account email.
 
-Set author **and** committer to the chosen identity. Never hardcode an email address in this file.
+Set author **and** committer to that identity. Never hardcode an email address in this file.
 
 ## 2. Commit messages
 
