@@ -108,6 +108,23 @@ ERROR    current  o/current:: row needs 4 tab-separated columns
 0 of 3 upstream sources changed past their pin, 3 could not be checked.
 EOF
 
+# Targets beyond skills: a ./path in this repo (checked for existence), a downstream
+# GitHub repo (nothing local to check), and an optional 5th column naming the branch.
+mkdir -p "$WORK/present"
+serve 'repos/o/rel/commits/fffffff' <<<'2026-07-01T00:00:00Z'
+serve 'repos/o/rel/commits?since=2026-07-01T00:00:00Z&per_page=100&path=CHANGELOG.md&sha=master' \
+  <<<'1111111 2026-07-09 chore(master): release 2.0.0'
+printf '%s\n' $'./present\to/current\tskills/current\taaaaaaa' $'./absent\to/current\tskills/current\taaaaaaa' \
+  $'o/downstream\to/current\tskills/current\taaaaaaa' $'./present\to/rel\tCHANGELOG.md\tfffffff\tmaster\r' \
+  > "$UPSTREAMS_FILE"
+expect targets-beyond-skills 1 <<'EOF'
+ERROR    ./absent  o/current:skills/current: no ./absent in this repo; fix or drop the row
+CHANGED  ./present  o/rel CHANGELOG.md: 1 commits past fffffff, latest 1111111 (2026-07-09)
+  https://github.com/o/rel/compare/fffffff...1111111
+    1111111 2026-07-09 chore(master): release 2.0.0
+1 of 4 upstream sources changed past their pin, 1 could not be checked.
+EOF
+
 expect no-match 0 nosuchskill <<'EOF'
 No row matched: nosuchskill.
 EOF

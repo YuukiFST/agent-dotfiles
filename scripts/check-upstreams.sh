@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# List the vendored skills whose upstream changed past the commit pinned in
-# skills/UPSTREAMS.tsv (refresh procedure in that file's header).
-# Usage: check-upstreams.sh [--markdown] [skill...]
+# List the vendored skills, hooks and plugins whose upstream changed past the
+# commit pinned in skills/UPSTREAMS.tsv (refresh procedure in that file's header).
+# Usage: check-upstreams.sh [--markdown] [target...]
 # Exit: 0 every checked row is current, 2 at least one row changed, 1 a row could
-# not be checked (no such skill dir, or repo or pin gone upstream).
+# not be checked (local target gone, or repo or pin gone upstream).
 # Needs an authenticated gh; UPSTREAMS_FILE points it at another manifest.
 set -uo pipefail
 
 manifest="${UPSTREAMS_FILE:-$(cd "$(dirname "$0")/.." && pwd)/skills/UPSTREAMS.tsv}"
 skills_dir="$(dirname "$manifest")"
+repo_root="$(dirname "$skills_dir")"
 format=text
 if [ "${1:-}" = --markdown ]; then format=markdown; shift; fi
 max_listed=10
@@ -46,13 +47,23 @@ report_change() { # $1 = skill, $2 = repo, $3 = path, $4 = pin, $5 = newline-sep
   [ "$format" = text ] || echo
 }
 
-check_row() { # $1 = skill, $2 = repo, $3 = path, $4 = pin
-  local source="$2:$3" pin_date query commits
-  [ -d "$skills_dir/$1" ] || { report_error "$1" "$source" "no skills/$1 directory; fix or drop the row"; return; }
+missing_target() { # $1 = target; prints why a local target is gone, nothing otherwise
+  case "$1" in
+    ./*) [ -e "$repo_root/${1#./}" ] || echo "no $1 in this repo" ;;
+    */*) ;; # a downstream GitHub repo: nothing local to check
+    *) [ -d "$skills_dir/$1" ] || echo "no skills/$1 directory" ;;
+  esac
+}
+
+check_row() { # $1 = target, $2 = repo, $3 = path, $4 = pin, $5 = branch (empty = default)
+  local source="$2:$3" missing pin_date query commits
+  missing="$(missing_target "$1")"
+  [ -z "$missing" ] || { report_error "$1" "$source" "$missing; fix or drop the row"; return; }
   pin_date="$(gh api "repos/$2/commits/$4" --jq .commit.committer.date 2>&1)" \
     || { report_error "$1" "$source" "pin $4 not found upstream: ${pin_date##*$'\n'}"; return; }
   query="since=$pin_date&per_page=100"
   [ "$3" = . ] || query="$query&path=$3"
+  [ -z "$5" ] || query="$query&sha=$5"
   commits="$(gh api --paginate "repos/$2/commits?$query" \
     --jq ".[] | select(.sha | startswith(\"$4\") | not) | \"\(.sha[:7]) \(.commit.committer.date[:10]) \(.commit.message | split(\"\n\")[0])\"" 2>&1)" \
     || { report_error "$1" "$source" "commit list failed: ${commits##*$'\n'}"; return; }
@@ -60,13 +71,13 @@ check_row() { # $1 = skill, $2 = repo, $3 = path, $4 = pin
 }
 
 [ -f "$manifest" ] || { echo "No manifest at $manifest" >&2; exit 1; }
-while IFS=$'\t' read -r skill repo path pin _ || [ -n "$skill" ]; do
-  skill="${skill%$'\r'}"; pin="${pin%$'\r'}"
-  case "$skill" in ''|'#'*) continue ;; esac
-  if [ $# -gt 0 ] && [[ " $* " != *" $skill "* ]]; then continue; fi
+while IFS=$'\t' read -r target repo path pin branch _ || [ -n "$target" ]; do
+  target="${target%$'\r'}"; pin="${pin%$'\r'}"; branch="${branch%$'\r'}"
+  case "$target" in ''|'#'*) continue ;; esac
+  if [ $# -gt 0 ] && [[ " $* " != *" $target "* ]]; then continue; fi
   checked=$((checked + 1))
-  if [ -z "$pin" ]; then report_error "$skill" "$repo:$path" "row needs 4 tab-separated columns"; continue; fi
-  check_row "$skill" "$repo" "$path" "$pin"
+  if [ -z "$pin" ]; then report_error "$target" "$repo:$path" "row needs 4 tab-separated columns"; continue; fi
+  check_row "$target" "$repo" "$path" "$pin" "$branch"
 done < "$manifest"
 
 summary="$changed of $checked upstream sources changed past their pin, $failed could not be checked."
