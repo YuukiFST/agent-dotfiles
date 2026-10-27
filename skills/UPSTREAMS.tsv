@@ -1,6 +1,9 @@
-# Upstream sources of vendored and adapted skills, one row per source path.
-# Columns (tab-separated): skill, GitHub repo, path in that repo ("." = whole repo),
-# pinned commit = the last upstream commit already reviewed for this skill.
+# Upstream sources of vendored and adapted skills, hooks and plugins, one row per source path.
+# Columns (tab-separated): target, GitHub repo, path in that repo ("." = whole repo),
+# pinned commit = the last upstream commit already reviewed for this target,
+# and an optional branch when the path changes on a branch other than the default.
+# A target is a skill (its dir under skills/), a path in this repo written ./path,
+# or a downstream GitHub repo written owner/name.
 # This file is the only place a pin lives; Source comments and SOURCES.md only credit.
 #
 # scripts/check-upstreams.sh lists every row with commits on its path past the pin,
@@ -63,3 +66,8 @@ web-perf	addyosmani/web-quality-skills	skills/performance	afa8da9
 web-perf	addyosmani/web-quality-skills	skills/core-web-vitals	afa8da9
 writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054def
 yuu-mode	cursor/plugins	pstack/skills/poteto-mode	364a77e
+./hooks	JuliusBrussee/caveman	src/hooks	d262ab3
+./rtk	rtk-ai/rtk	CHANGELOG.md	576348e	master
+YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
+YuukiFST/caveman-lean	JuliusBrussee/caveman	skills/caveman	d262ab3
+YuukiFST/ponytail-subagent	DietrichGebert/ponytail	skills/ponytail/SKILL.md	09c434a
