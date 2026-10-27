@@ -67,7 +67,7 @@ web-perf	addyosmani/web-quality-skills	skills/core-web-vitals	afa8da9
 writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054def
 yuu-mode	cursor/plugins	pstack/skills/poteto-mode	364a77e
 ./hooks	JuliusBrussee/caveman	src/hooks	d262ab3
-./rtk	rtk-ai/rtk	CHANGELOG.md	576348e	master
+./rtk	rtk-ai/rtk	CHANGELOG.md	91dd9ce	master
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
 YuukiFST/caveman-lean	JuliusBrussee/caveman	skills/caveman	d262ab3
 YuukiFST/ponytail-subagent	DietrichGebert/ponytail	skills/ponytail/SKILL.md	09c434a
