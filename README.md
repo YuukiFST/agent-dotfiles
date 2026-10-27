@@ -8,7 +8,7 @@ It runs in Claude Code and OpenCode, and in pi as `/skill:yuu-mode`.
 ```
 
 Each task's reply opens with the route it took (`route: playbooks/bug-fix.md`) and then works through that route's steps until the result is verified.
-UI work goes to `ui-polish`, reviews to `interrogate`, visual explanations to `anatomy`; the full table is in [`skills/yuu-mode/SKILL.md`](skills/yuu-mode/SKILL.md).
+UI work goes to `ui-polish`, reviews to `interrogate`, diagrams to `show-me`; the full table is in [`skills/yuu-mode/SKILL.md`](skills/yuu-mode/SKILL.md).
 Say "new task" to switch subjects mid-session.
 
 ## Install

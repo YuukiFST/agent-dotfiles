@@ -37,9 +37,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Task | Route |
 |------|-------|
 | How does X work, why is Y built this way, should we do X or Y (read-only) | `playbooks/investigation.md` |
-| Explain an idea visually: a figure, illustration or interactive explainer of how a system, algorithm or component works | `anatomy` |
 | Quick diagram or code-shape sketch of the topic or diff in this session | `show-me` |
-| Teach me a concept within this workspace | `teach` |
 | Research a question against primary sources, gather docs or API facts | `research` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
 | Technical illustration of a physical object or of how it works inside: exploded view, teardown, cutaway, assembly sheet | `teardown` |
@@ -80,10 +78,9 @@ A casual question or one-line answer gets answered directly, with no route line 
 
 | Task | Route |
 |------|-------|
-| Marketing copy, UI text, titles, posts | `ai-copywriter` |
 | Make prose read less AI-written, or audit a draft | `ai-tells` |
 | A skill, `AGENTS.md` or `CLAUDE.md` | `writing-for-agents` |
-| Train a project `CLAUDE.md` on its transcripts | `backpass` |
+| Edit an existing skill, keep it in sync with code it describes, or put a bloated or drifted skill on a diet | `skill-diet` |
 
 ### Ship and operate
 
