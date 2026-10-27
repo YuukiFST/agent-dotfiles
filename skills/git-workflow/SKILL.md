@@ -64,7 +64,7 @@ Verified against [Profile contributions reference](https://docs.github.com/en/ac
 - Issues, pull requests and discussions register only when opened **in a standalone repository, not a fork**.
 - Commits register only when **all** of: the author e-mail is associated with the GitHub account; the repo is standalone, not a fork; the commit is on the **default branch or `gh-pages`**; and you are a collaborator/org member, forked it, or opened a PR or issue in it.
 
-The e-mail condition binds directly to `rules/git.md` §1: committing under an identity that is not linked to the account silently detaches every commit from it. Verify the identity before the first commit in a repo.
+The e-mail condition binds directly to `rules/git.md` §1: committing under an identity that is not linked to the account silently detaches every commit from it. §1 commits under the machine's git config, so its `user.email` must be an e-mail linked to the GitHub account.
 
 Not documented either way: whether a review you submit on **your own** PR registers. Do not build any assumption on it — step 5 stands on the review being recorded where a human can read it, not on what it registers as.
 
