@@ -15,7 +15,7 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
    At the end of the pass, run the check: keep the pass if the progress measure moved, committed when step 1 confirmed an identity, and revert the whole pass if it did not, so a failing repro and the fix it waits on stand or fall together.
    A change that only "might help" is reverted, not left to ride; order the units with `principle-sequence-verifiable-units`.
    Done when the iteration has its row in the todo list: what changed, and the measure and the predicate before and after.
-4. Mid-run discoveries are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.
+4. Mid-run discoveries that support the goal are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.
    Fix each on its own local branch, list the branch in the reply, and return to the predicate; opening its PR follows the Autonomy section.
    A question only the user can answer, a product or preference call no experiment settles, becomes a row in the todo list, and work continues on whatever does not depend on it.
 5. Stop when the predicate holds.
