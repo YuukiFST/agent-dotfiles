@@ -51,6 +51,7 @@ Can you tell that this code works from reading it?
 
 - Are there tests? Do they test behavior or implementation details?
 - The project's testing rule decides which tests a change owes: under the global CODING_STANDARDS.md that is an E2E test through the outermost interface, so a missing unit test is not a finding there.
+- Does each new test trace to a source the user owns, named in the PR body or the commit that adds it: a bug they reported or confirmed, acceptance criteria quoted from them, or the behavior before the change? Under the global CODING_STANDARDS.md ("Human authority"), one whose only source is the agent's reading of the task is a finding.
 - Are there assertions/invariants that would catch regressions?
 - If this is a bug fix: is there a test for the bug?
 - If this touches an integration boundary: is the full path tested?

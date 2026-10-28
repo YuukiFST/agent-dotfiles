@@ -14,7 +14,10 @@ Skill `test-audit` gates every new or changed test; these add what it lacks.
 
 - **E2E only:** every test you write drives the outermost interface the caller touches (browser flow, HTTP request, CLI run, a library's public API); unit and integration tests are written only when the user asks for one.
   A lower-layer test from your own reading of the task restates the implementation and costs tokens without lifting the resolve rate.
-- **Every bug fix ships its regression test:** a behavior bug the user reports or you fix gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code for the bug's reason, passes after the fix and stays in the suite.
+- **Human authority:** a committed test traces to a source the user owns: a bug they reported or confirmed, acceptance criteria quoted from them, or the pre-change behavior (characterization, differential oracle).
+  One sourced only from your reading of the task shares your code's blind spots, so it stays scratch, out of the commit unless the user approves it.
+  The commit adding a test quotes its source, which decides code versus test when it goes red; the report lists each new test's source and each red test's verdict (bug back, spec changed, test wrong).
+- **Every bug fix ships its regression test:** a behavior bug the user reports or confirms gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code for the bug's reason, passes after the fix and stays in the suite.
   Its name carries `regression` plus the issue ref or the symptom, so grep finds the frozen set and a later failure says which bug came back.
   A bug with no deterministic E2E repro (race, performance) gets none: say so in the report instead of shipping a flaky test.
 - **Regression tests are frozen:** one red on your branch and green on the base means your change brought its bug back, so fix the code.

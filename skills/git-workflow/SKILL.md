@@ -23,6 +23,7 @@ A skill that points here for one convention (branch name, PR body) applies that 
 2. **Branch per issue.** `<type>/<issue-number>-<slug>` — `feat/42-dashboard-consumo`, `fix/57-token-expiry`. Types match Conventional Commits (`rules/git.md` §2).
 3. **Atomic commits.** One logical change per commit. Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected. Read the diff before committing it, not after.
 4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified: the output of the check that proves the issue's acceptance criteria, run on the PR's head commit and trimmed to the decisive lines, with secrets, tokens, personal data and home paths redacted, so the reviewer checks the outcome before reading the diff.
+   A PR adding tests lists each one with its source (global CODING_STANDARDS.md, "Human authority"), so the reviewer settles the expected behavior before reading the code.
    A PR touching five or more files adds a **Reading order**: the files in the order a reviewer should read them, one line each on what changed there and why it comes at that point.
    UI work adds a screenshot or recording with `gh pr create --attach '<file>#<alt>'` or `gh pr edit <n> --attach` (gh-axi has no attach flag; evidence paths stay git-ignored, never committed); a later push reruns the check and updates the body.
    No runnable check: write **Not verified** and why. Open it as a draft if the work spans sessions.

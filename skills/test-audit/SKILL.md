@@ -22,7 +22,7 @@ integration test lands only when the user asks for one; this skill's audit
 mode still applies to the ones that already exist. For a test you write, the
 "owner boundary" and "strongest boundary" below mean that outermost interface.
 
-Before adding any test, answer four questions; a missing answer means do not
+Before adding any test, answer five questions; a missing answer means do not
 add it yet:
 
 1. What observable behavior, invariant, or independent contract does it protect?
@@ -34,6 +34,11 @@ add it yet:
    near-duplicate test; consolidate duplicated setup in the same change.
 4. Does it need a production seam (export, flag, wrapper, injection hook) that no
    production caller needs? If yes, move the test to the real boundary instead.
+5. Whose words state the expected behavior? A bug the user reported or
+   confirmed, acceptance criteria quoted from their request or issue, or the
+   behavior before the change. A test whose only source is your own reading of
+   the task stays out of the commit until the user approves it (global
+   CODING_STANDARDS.md, "Human authority").
 
 Pick the test's shape from the claim it protects. A claim over every input (a
 parser, a serializer round-trip, an ordering or idempotence law) gets a
