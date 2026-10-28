@@ -58,6 +58,8 @@ Bug regression tests must fail on the pre-fix code for the intended reason and
 pass after the owner-boundary repair. A regression test that never demonstrably
 failed proves the mock, not the fix. One regression at the owner boundary
 covers the bug; do not replay the same scenario at every layer it crosses.
+Each one lives in its own `regression` file, and the CI step in
+[REGRESSION-GUARD.md](REGRESSION-GUARD.md) keeps it frozen.
 
 ## Junk patterns
 

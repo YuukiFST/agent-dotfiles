@@ -18,12 +18,14 @@ Skill `test-audit` gates every new or changed test; these add what it lacks.
   One sourced only from your reading of the task shares your code's blind spots, so it stays scratch, out of the commit unless the user approves it.
   The commit adding a test quotes its source, which decides code versus test when it goes red; the report lists each new test's source and each red test's verdict (bug back, spec changed, test wrong).
 - **Every bug fix ships its regression test:** a behavior bug the user reports or confirms gets one E2E test that reproduces it as the end user hits it, fails on the pre-fix code for the bug's reason, passes after the fix and stays in the suite.
-  Its name carries `regression` plus the issue ref or the symptom, so grep finds the frozen set and a later failure says which bug came back.
+  It and its golden live in their own files named with `regression` plus the issue ref or the symptom, so grep and the CI guard find the frozen set and a later failure says which bug came back.
   A bug with no deterministic E2E repro (race, performance) gets none: say so in the report instead of shipping a flaky test.
 - **Regression tests are frozen:** one red on your branch and green on the base means your change brought its bug back, so fix the code.
   Skipping, deleting, loosening one or regenerating its golden needs the user's approval; a behavior change the user asked for that contradicts one counts as approval, and the report names the test.
   A flaky or base-red one gets the Boy Scout fix, keeping every assertion it makes.
 - **CI runs the suite:** a project whose CI does not run the E2E suite on every PR gets that job as its own commit in the next bug-fix PR, or proposed in a repo the user does not own; a test only an agent remembers to run guards nothing.
+- **CI guards the frozen set:** landed like the suite job, the step in `test-audit`'s `REGRESSION-GUARD.md` fails a PR that changes a `regression` file until it carries the `regression-change-approved` label.
+  Only the user adds the label: ask with the test and the reason, a flake fix included.
 - **Golden artifact:** each E2E run leaves a golden file, HTTP transcript, screenshot or log that the same one command regenerates, and the check is a diff against it.
   Shape it for a reader: labeled lines in a stable order, only the fields the contract names, timestamps, ids and paths masked, so its diff reads as the behavior change.
   A changed golden is accepted only after its diff is read against the intent, and the report says what changed in it.
