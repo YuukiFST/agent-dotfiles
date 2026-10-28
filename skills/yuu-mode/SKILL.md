@@ -30,7 +30,7 @@ The user says to leave yuu-mode: drop this file's rules for the rest of the sess
    When tool calls come between, the final message opens with the current route line.
 3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, and, when the task ships a change, the smallest change you expect to meet it.
    Keep working without waiting for a confirmation; when the evidence rules out the change the user asked for, show that evidence and stop.
-   The same restatement opens every subagent brief, the why of a PR body, and the final message, except after a fully specified one-line edit.
+   The same restatement goes into the context of every subagent brief (a template a routed skill prescribes keeps its own order), and opens the why of a PR body and the final message, except after a fully specified one-line edit.
 4. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
 A casual question or one-line answer gets answered directly, with no route line, restatement or todo list.
