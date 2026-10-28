@@ -41,6 +41,11 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Research a question against primary sources, gather docs or API facts | `research` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
 | Technical illustration of a physical object or of how it works inside: exploded view, teardown, cutaway, assembly sheet | `teardown` |
+| Interactive isometric SVG figure that explains an idea as a physical object | `anatomy` |
+| Apple-style dimensional drawing, spec sheet or redline of a component | `dimensional-drawing` |
+| Animate a finished dimensional drawing sheet into a motion film | `dimensional-drawing-motion` |
+| Explain how `helmsman` works or whether to use it | `helmsman-explain` |
+| Teach the user a new skill or concept | `teach` |
 
 ### Build
 
@@ -51,6 +56,9 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Build, polish, redesign, animate or review a web UI (screen, component, flow, chart) | `ui-polish` |
 | Behavior-preserving restructure: rename, extract, inline, dedupe, move | `playbooks/refactoring.md` |
 | Port or rewrite code from another language in Rust | `rust-port` |
+| Write or change Rust code | `rust-best-practices` |
+| Write or change TypeScript code | `typescript-best-practices` |
+| Add auth, user input handling, secrets, API endpoints or payment code | `security-review` |
 | Simplify code just written | `code-simplifier` |
 | Design a module interface, a seam, a deep module | `codebase-design` |
 | Scan a codebase for deepening opportunities | `improve-codebase-architecture` |
@@ -79,6 +87,9 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Task | Route |
 |------|-------|
 | Make prose read less AI-written, or audit a draft | `ai-tells` |
+| New marketing copy, titles, microcopy, CTAs, LinkedIn or strategic blog posts | `ai-copywriter` |
+| Docs, RFCs, readmes or other technical prose | `technical-writing` |
+| Improve a project `CLAUDE.md` from its own session transcripts | `backpass` |
 | A skill, `AGENTS.md` or `CLAUDE.md` | `writing-for-agents` |
 | Edit an existing skill, keep it in sync with code it describes, or put a bloated or drifted skill on a diet | `skill-diet` |
 
