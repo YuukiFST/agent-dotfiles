@@ -21,8 +21,9 @@ First, read the record of past corrections:
 - recent commits and reverts (`git log`, `git log --grep=Revert`);
 - PR review comments (`gh-axi pr view <n> --reviews --comments`);
 - the agent instruction files (`AGENTS.md`, `CLAUDE.md`, `.claude/rules/`) and comments that explain workarounds;
-- the user's corrections in this repo's Claude Code transcripts, `~/.claude/projects/<slug>/*.jsonl`, where `<slug>` is the repo path with every `:`, `\` and `/` turned into `-`.
+- the user's corrections in this repo's Claude Code transcripts: the `~/.claude/projects/*/*.jsonl` files whose `"cwd"` field is the repo root (`git rev-parse --show-toplevel`) or a path under it, written as the native path JSON-escaped (`C:\\Users\\...` on Windows).
   Hand the transcript sweep to a read-only explore subagent and keep only its list of corrections, each with its transcript id.
+  No matching transcript (no `~/.claude/projects` on a pi or OpenCode machine, or none for this repo): say so in the Reply instead of counting zero corrections.
 
 Group the mistakes into classes. A class counts once it has happened twice.
 
@@ -39,6 +40,6 @@ Then fix the most frequent classes now, one commit each, under `~/.claude/rules/
 
 ## Keep the rule table
 
-Last, keep a table in the repo's `AGENTS.md` (its `CLAUDE.md` when it has no `AGENTS.md`) that pairs each rule with what enforces it. When the user corrects you, fix the mistake and add the rule. If the rule was already there and nothing enforces it, that's a repeat, so fix it at the highest level in the same change. Drop a rule once its mistake can't happen.
+Last, keep a table in the repo's `AGENTS.md` (its `CLAUDE.md` when it has no `AGENTS.md`) that pairs each rule with what enforces it. Head the table with a line every later session loads: a correction whose rule is already in this table with nothing enforcing it is a repeat, fixed at the highest level in the same change. When the user corrects you, fix the mistake and add the rule. If the rule was already there and nothing enforces it, that's a repeat, so fix it at the highest level in the same change. Drop a rule once its mistake can't happen.
 
 **Reply:** each class with its evidence, the level you picked, and why a higher level didn't work.
