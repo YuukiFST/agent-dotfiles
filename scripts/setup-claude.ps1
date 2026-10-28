@@ -15,8 +15,8 @@ Write-Host "[2/5] rtk"
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 & "$PSScriptRoot\sync-config.ps1" | Out-Null
 
-Write-Host "[3/5] fff MCP"
-& "$PSScriptRoot\install-fff.ps1"
+Write-Host "[3/5] fff MCP (retired, unregister)"
+& "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host "[4/5] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi

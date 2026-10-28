@@ -18,8 +18,8 @@ Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.ex
 Remove-Item -Recurse -Force $tmp
 & "$Bin\rtk.exe" --version
 
-Write-Host "[2/4] fff MCP"
-& "$PSScriptRoot\install-fff.ps1"
+Write-Host "[2/4] fff MCP (retired, unregister)"
+& "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host "[3/4] npm globals (chrome-devtools-axi, gh-axi)"
 npm install -g chrome-devtools-axi@latest gh-axi@latest

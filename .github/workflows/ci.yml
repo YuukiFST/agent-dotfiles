@@ -65,8 +65,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Skill /name commands must not be shadowed by generated wrappers, and the fff MCP merge
-      # must keep every other key of a commented opencode.jsonc.
+      # Skill /name commands must not be shadowed by generated wrappers, and removing the retired
+      # fff MCP server must keep every other key of a commented opencode.jsonc.
       - name: Run sync-config opencode test
         run: bash scripts/test-sync-opencode.sh
 

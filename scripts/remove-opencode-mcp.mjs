@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Add or replace one local MCP server in OpenCode's global config, leaving every other key alone.
-// Shared by install-fff.ps1 and install-fff.sh.
+// Remove one MCP server from OpenCode's global config, leaving every other key alone.
+// Shared by remove-fff.ps1 and remove-fff.sh.
 //
-// Usage: node scripts/set-opencode-mcp.mjs <name> <command> [args...]
+// Usage: node scripts/remove-opencode-mcp.mjs <name>
 //
 // opencode.json(c) is machine-owned (providers, models, other MCP servers), so only mcp.<name>
 // changes. OpenCode accepts comments and trailing commas in it and JSON.stringify keeps neither,
@@ -11,30 +11,26 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const [name, ...command] = process.argv.slice(2);
-if (!name || command.length === 0) {
-  console.error("usage: set-opencode-mcp.mjs <name> <command> [args...]");
+const [name, ...extra] = process.argv.slice(2);
+if (!name || extra.length > 0) {
+  console.error("usage: remove-opencode-mcp.mjs <name>");
   process.exit(2);
 }
 
-// OpenCode reads both names from its global dir and merges them; edit the one already there.
+// OpenCode reads both names from its global dir and merges them; edit each one that has the key.
 const dir = path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config"), "opencode");
-const file =
-  ["opencode.json", "opencode.jsonc"].map((f) => path.join(dir, f)).find((f) => fs.existsSync(f)) ??
-  path.join(dir, "opencode.json");
-const text = fs.existsSync(file) ? fs.readFileSync(file, "utf8").replace(/^﻿/, "") : "";
-const config = text.trim() ? JSON.parse(stripJsonc(text)) : { $schema: "https://opencode.ai/config.json" };
-
-const entry = { type: "local", command, enabled: true };
-if (JSON.stringify(config.mcp?.[name]) === JSON.stringify(entry)) {
-  console.log(`  OpenCode mcp.${name} already set in ${file}`);
-  process.exit(0);
+for (const file of ["opencode.json", "opencode.jsonc"].map((f) => path.join(dir, f))) {
+  if (!fs.existsSync(file)) continue;
+  const text = fs.readFileSync(file, "utf8").replace(/^﻿/, "");
+  if (!text.trim()) continue;
+  const config = JSON.parse(stripJsonc(text));
+  if (!config.mcp || !(name in config.mcp)) continue;
+  delete config.mcp[name];
+  if (Object.keys(config.mcp).length === 0) delete config.mcp;
+  if (!fs.existsSync(`${file}.bak`)) fs.copyFileSync(file, `${file}.bak`);
+  fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+  console.log(`  OpenCode mcp.${name} removed from ${file}`);
 }
-config.mcp = { ...config.mcp, [name]: entry };
-if (text.trim() && !fs.existsSync(`${file}.bak`)) fs.copyFileSync(file, `${file}.bak`);
-fs.mkdirSync(dir, { recursive: true });
-fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
-console.log(`  OpenCode mcp.${name} set in ${file}`);
 
 // JSONC to JSON: drop // and /* */ comments, then commas before a closing bracket,
 // both only outside string literals.

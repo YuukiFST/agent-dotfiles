@@ -28,8 +28,8 @@ foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagen
 Write-Host "[5/6] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
-Write-Host "[6/6] fff MCP"
-& "$PSScriptRoot\install-fff.ps1"
+Write-Host "[6/6] fff MCP (retired, unregister)"
+& "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host @"
 
@@ -37,6 +37,6 @@ Done. Restart OpenCode.
 
 - Global instructions: ~/.config/opencode/AGENTS.md (copy of GLOBAL.md)
 - Skills: ~/.agents/skills - OpenCode loads that dir natively, no second copy
-- ~/.config/opencode/opencode.json(c) holds per-machine MCP/provider state: only its mcp.fff key is set,
+- ~/.config/opencode/opencode.json(c) holds per-machine MCP/provider state: only the retired mcp.fff key is removed,
   and the first rewrite keeps the original as opencode.json(c).bak
 "@
