@@ -65,3 +65,5 @@ thermo-nuclear-code-quality-review
 brainstorming
 writing-plans
 executing-plans
+# 3D product icon skill, unused; dropped.
+specimen
