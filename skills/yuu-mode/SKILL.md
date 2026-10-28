@@ -76,6 +76,7 @@ A casual question or one-line answer gets answered directly, with no route line 
 | Review a diff, branch or PR; "what could this break" | `interrogate` |
 | Review Rust code for idiom, API design, error handling or safety | `rust-review` |
 | Write, change or audit tests | `test-audit` |
+| Agents keep repeating the same mistakes in a repo; make each class impossible | `correct` |
 | Security review or audit of existing code | `security-audit` |
 | Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
 | Survey a codebase and write plans for other agents | `improve` |
