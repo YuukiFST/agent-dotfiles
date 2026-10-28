@@ -28,9 +28,12 @@ The user says to leave yuu-mode: drop this file's rules for the rest of the sess
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
    When tool calls come between, the final message opens with the current route line.
-3. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
+3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, and, when the task ships a change, the smallest change you expect to meet it.
+   Keep working without waiting for a confirmation; when the evidence rules out the change the user asked for, show that evidence and stop.
+   The same restatement opens every subagent brief, the why of a PR body, and the final message, except after a fully specified one-line edit.
+4. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
-A casual question or one-line answer gets answered directly, with no route line and no todo list.
+A casual question or one-line answer gets answered directly, with no route line, restatement or todo list.
 
 ### Understand
 
