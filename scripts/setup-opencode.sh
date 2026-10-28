@@ -29,8 +29,8 @@ done
 echo "[5/6] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
-echo "[6/6] fff MCP"
-bash "$(dirname "$0")/install-fff.sh"
+echo "[6/6] fff MCP (retired, unregister)"
+bash "$(dirname "$0")/remove-fff.sh"
 
 cat <<'EOF'
 
@@ -38,7 +38,7 @@ Done. Restart OpenCode.
 
 - Global instructions: ~/.config/opencode/AGENTS.md (copy of GLOBAL.md)
 - Skills: ~/.agents/skills — OpenCode loads that dir natively, no second copy
-- ~/.config/opencode/opencode.json(c) holds per-machine MCP/provider state: only its mcp.fff key is set,
+- ~/.config/opencode/opencode.json(c) holds per-machine MCP/provider state: only the retired mcp.fff key is removed,
   and the first rewrite keeps the original as opencode.json(c).bak
 
 NixOS: `npm install -g` needs a writable prefix (npm config set prefix ~/.npm-global,

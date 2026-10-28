@@ -1,6 +1,5 @@
 {
   "packages": [
-    "npm:@ff-labs/pi-fff",
     "npm:@howaboua/pi-cache-hit-predictor",
     {
       "source": "npm:pine-of-glass",

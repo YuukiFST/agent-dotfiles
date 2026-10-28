@@ -15,8 +15,8 @@ rtk init -g
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 "$(dirname "$0")/sync-config.sh" claude >/dev/null
 
-echo "[3/5] fff MCP"
-bash "$(dirname "$0")/install-fff.sh"
+echo "[3/5] fff MCP (retired, unregister)"
+bash "$(dirname "$0")/remove-fff.sh"
 
 echo "[4/5] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi

@@ -10,8 +10,8 @@ echo "[1/4] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
 rtk --version
 
-echo "[2/4] fff MCP"
-bash "$(dirname "$0")/install-fff.sh"
+echo "[2/4] fff MCP (retired, unregister)"
+bash "$(dirname "$0")/remove-fff.sh"
 
 echo "[3/4] npm globals (chrome-devtools-axi, gh-axi)"
 npm install -g chrome-devtools-axi@latest gh-axi@latest

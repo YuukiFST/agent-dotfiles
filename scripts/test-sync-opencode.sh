@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # E2E test for the OpenCode side of a sync: generated skill command wrappers go so each skill's
-# native /name command shows, and set-opencode-mcp.mjs adds mcp.fff to a commented opencode.jsonc
-# without losing the user's other keys.
+# native /name command shows, and remove-opencode-mcp.mjs drops the retired mcp.fff from a commented
+# opencode.jsonc without losing the user's other keys.
 # Run: bash scripts/test-sync-opencode.sh
 set -uo pipefail
 
@@ -20,7 +20,7 @@ for skill in ui-polish brainstorming; do
 done
 printf -- '---\ndescription: "mine"\n---\nDeploy.\n' > "$oc/commands/deploy.md"
 
-# Comments, a trailing comma, // inside a string and another MCP server the user owns.
+# Comments, a trailing comma, // inside a string, the retired fff entry and another MCP server the user owns.
 cat > "$oc/opencode.jsonc" <<'EOF'
 {
   // provider set by hand on this machine
@@ -28,6 +28,7 @@ cat > "$oc/opencode.jsonc" <<'EOF'
   "model": "anthropic/claude-sonnet-4-5", /* keep */
   "mcp": {
     "other": { "type": "local", "command": ["other-mcp", "--flag"], "enabled": true },
+    "fff": { "type": "local", "command": ["fff-mcp"], "enabled": true },
   },
 }
 EOF
@@ -49,18 +50,15 @@ expect "generated wrapper for a deleted skill removed" test ! -e "$oc/commands/b
 expect "hand-written command kept" test -e "$oc/commands/deploy.md"
 
 for run in 1 2; do
-  expect "set-opencode-mcp run $run exits 0" node "$SCRIPTS/set-opencode-mcp.mjs" fff fff-mcp-test
+  expect "remove-opencode-mcp run $run exits 0" node "$SCRIPTS/remove-opencode-mcp.mjs" fff
 done
 expect "edits the existing opencode.jsonc, creates no opencode.json" test ! -e "$oc/opencode.json"
-expect "mcp.fff points at the binary" config_has "$oc/opencode.jsonc" \
-  'JSON.stringify(c.mcp.fff) === JSON.stringify({ type: "local", command: ["fff-mcp-test"], enabled: true })'
-expect "the user's MCP server and model survive" config_has "$oc/opencode.jsonc" \
-  'c.mcp.other.command[1] === "--flag" && c.model === "anthropic/claude-sonnet-4-5" && c.$schema.startsWith("https://")'
+expect "mcp.fff removed" config_has "$oc/opencode.jsonc" '!("fff" in c.mcp)'
+expect "the user's MCP server and model survive" config_has "$oc/opencode.jsonc"   'c.mcp.other.command[1] === "--flag" && c.model === "anthropic/claude-sonnet-4-5" && c.$schema.startsWith("https://")'
 expect "original kept as .bak" cmp -s "$WORK/original.jsonc" "$oc/opencode.jsonc.bak"
 
 rm -rf "$oc"
-expect "no config yet: run exits 0" node "$SCRIPTS/set-opencode-mcp.mjs" fff fff-mcp-test
-expect "no config yet: opencode.json created with mcp.fff" config_has "$oc/opencode.json" 'c.mcp.fff.command[0] === "fff-mcp-test"'
-expect "no config yet: no .bak" test ! -e "$oc/opencode.json.bak"
+expect "no config yet: run exits 0" node "$SCRIPTS/remove-opencode-mcp.mjs" fff
+expect "no config yet: creates nothing" test ! -e "$oc/opencode.json"
 
 [ "$fail" -eq 0 ]
