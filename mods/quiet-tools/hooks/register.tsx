@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import { isNarration, isQuietNotification, rememberNarration } from './narration'
-import { countLabel, emptyCounts, kindOf, summarize } from './summary'
+import { countLabel, emptyCounts, footerFor, kindOf, summarize } from './summary'
 
 const calls = atom({ plugin: 'quiet-tools', key: 'calls' } as const, 0)
 const footers = atom({ plugin: 'quiet-tools', key: 'footers' } as const, {})
@@ -107,15 +107,15 @@ export const register: Register = on => {
     return <Box />
   })
 
-  // A turn with no stored footer (one before the mod loaded) keeps the engine's line.
-  on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    const lines = (await read($, footers))[String(e.props.durationMs)]
+  // The row's durationMs can drift from turn.complete's; a turn with no footer near it draws nothing.
+  on('ui.render', { component: 'TurnDuration' }, async ($, e) => {
+    const lines = footerFor(await read($, footers), e.props.durationMs)
+    const { Box, Text } = $.ui.resolve(e)
 
     if (lines === undefined) {
-      return next(e)
+      return <Box />
     }
 
-    const { Box, Text } = $.ui.resolve(e)
 
     return (
       <Box flexDirection="column">

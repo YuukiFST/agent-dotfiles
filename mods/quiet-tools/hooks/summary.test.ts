@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { emptyCounts, kindOf, modelLabel, summarize } from './summary'
+import { emptyCounts, footerFor, kindOf, modelLabel, summarize } from './summary'
 
 test('footer with counts, model, speed and interruption', () => {
   const counts = { command: 60, edit: 17, read: 5, tool: 4 }
@@ -23,4 +23,12 @@ test('one read and one edit use the singular', () => {
   const counts = { ...emptyCounts(), read: 1, edit: 1, [kindOf('Grep')]: 2 }
 
   expect(summarize({ counts, model: '', durationMs: 1000, outputTokens: 0, reason: 'answer' })).toEqual(['+ 1 edit, 1 read, 2 tools', '1.0s'])
+})
+
+test('footer lookup tolerates a small duration drift and gives up beyond it', () => {
+  const all = { '1493000': ['+ 8 commands'], '10000': ['+ 1 tool'] }
+
+  expect(footerFor(all, 1493000)).toEqual(['+ 8 commands'])
+  expect(footerFor(all, 1494200)).toEqual(['+ 8 commands'])
+  expect(footerFor(all, 1600000)).toBeUndefined()
 })

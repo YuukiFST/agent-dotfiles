@@ -55,3 +55,21 @@ export const summarize = (s: TurnStats) => {
   ].filter(Boolean)
   return counts.length > 0 ? [`+ ${counts.join(', ')}`, footer.join(' · ')] : [footer.join(' · ')]
 }
+
+const FOOTER_TOLERANCE_MS = 5000
+
+// Exact key first, else the stored turn whose duration is nearest within the tolerance.
+export const footerFor = (all: Readonly<Record<string, readonly string[]>>, durationMs: number) => {
+  const exact = all[String(durationMs)]
+
+  if (exact !== undefined) {
+    return exact
+  }
+
+  const nearest = Object.keys(all)
+    .map(Number)
+    .filter(key => Math.abs(key - durationMs) <= FOOTER_TOLERANCE_MS)
+    .sort((a, b) => Math.abs(a - durationMs) - Math.abs(b - durationMs))[0]
+
+  return nearest === undefined ? undefined : all[String(nearest)]
+}
