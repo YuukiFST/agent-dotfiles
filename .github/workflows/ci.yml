@@ -70,6 +70,11 @@ jobs:
       - name: Run sync-config opencode test
         run: bash scripts/test-sync-opencode.sh
 
+      # OpenCode 2 loads the TUI half of a plugin only from cli.json; adding one must keep the
+      # machine's other keys and stay a no-op on a rerun.
+      - name: Run add-opencode-tui-plugin test
+        run: bash scripts/test-add-opencode-tui-plugin.sh
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
