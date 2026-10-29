@@ -1,19 +1,12 @@
 import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
+import { isNarration, isQuietNotification, rememberNarration } from './narration'
 import { countLabel, emptyCounts, kindOf, summarize } from './summary'
 
 const calls = atom({ plugin: 'quiet-tools', key: 'calls' } as const, 0)
 const footers = atom({ plugin: 'quiet-tools', key: 'footers' } as const, {})
-
-const MARKDOWN = /\.(md|mdx|markdown)$/i
-
-// Edits to Markdown files keep the engine's row and diff; code edits collapse like any other call.
-const touchesMarkdown = (value: unknown, key: 'file_path' | 'filePath') => {
-  const path = typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[key] : undefined
-
-  return typeof path === 'string' && MARKDOWN.test(path)
-}
+const narrations = atom({ plugin: 'quiet-tools', key: 'narrations' } as const, [])
 
 export const register: Register = on => {
   // Main-loop turn stats; a reload mid-turn starts them over, which only skews that turn's footer.
@@ -38,6 +31,42 @@ export const register: Register = on => {
     return next(e)
   }).catch(($, e, next) => next(e))
 
+  // Forwards the stream untouched; only reads the finished step to learn which text was narration.
+  on('turn.step', async function* ($, e, next) {
+    const response = yield* next(e)
+
+    if (e.agentId === undefined && response.toolUses.length > 0) {
+      try {
+        await update($, narrations, all => rememberNarration(all, response.answer))
+      } catch {
+        // A failed write only leaves this narration visible.
+      }
+    }
+
+    return response
+  })
+
+  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
+    if (e.props.isSummary !== true && !isNarration(e.props.text, await read($, narrations))) {
+      return next(e)
+    }
+
+    const { Box } = $.ui.resolve(e)
+
+    return <Box />
+  })
+
+  // "Background command ... completed" and "Monitor event: ..." rows; ctrl+o still shows them.
+  on('ui.render', { component: 'UserMessage' }, ($, e, next) => {
+    if (e.props.origin.kind !== 'task-notification' || e.props.isExpanded || !isQuietNotification(e.props.task?.status)) {
+      return next(e)
+    }
+
+    const { Box } = $.ui.resolve(e)
+
+    return <Box />
+  })
+
   // turn.complete text would show under the plugin names; the footer is drawn in the TurnDuration row instead.
   on('turn.complete', async ($, e, next) => {
     const result = await next(e)
@@ -50,9 +79,9 @@ export const register: Register = on => {
     return result
   })
 
-  // A successful or running call draws nothing; errors, interruptions and Markdown edits keep the engine's row.
+  // A successful or running call draws nothing; errors and interruptions keep the engine's row.
   on('ui.render', { component: 'ToolUse' }, ($, e, next) => {
-    if (e.props.isErrored || e.props.isInterrupted || touchesMarkdown(e.props.input, 'file_path')) {
+    if (e.props.isErrored || e.props.isInterrupted) {
       return next(e)
     }
 
@@ -62,7 +91,7 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'ToolResult' }, ($, e, next) => {
-    if (e.props.isErrored || touchesMarkdown(e.props.output, 'filePath')) {
+    if (e.props.isErrored) {
       return next(e)
     }
 
