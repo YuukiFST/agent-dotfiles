@@ -16,20 +16,11 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(await ui.find({ text: 'ls' })).toBeUndefined()
   })
 
-  test(`${surface}: markdown edit keeps the engine row`, async ($, on) => {
-    on('ui.render', { component: 'ToolUse' }, ($, e) => {
-      const { Text } = $.ui.resolve(e)
+  test(`${surface}: markdown write is hidden like any other call`, async $ => {
+    const md = { ...ok, tool: 'Write', input: { file_path: 'docs/NUCLEO.md', content: '# Núcleo do kit' } }
+    const ui = await $.ui.mount({ plugin: 'quiet-tools', surface, component: 'ToolUse', props: md, requestId: 't2' })
 
-      return <Text>engine row</Text>
-    })
-
-    const md = { ...ok, tool: 'Edit', input: { file_path: 'docs/README.md', old_string: 'a', new_string: 'b' } }
-    const code = { ...md, input: { ...md.input, file_path: 'src/app.ts' } }
-    const mdRow = await $.ui.mount({ plugin: 'quiet-tools', surface, component: 'ToolUse', props: md, requestId: 't2' })
-    const codeRow = await $.ui.mount({ plugin: 'quiet-tools', surface, component: 'ToolUse', props: code, requestId: 't3' })
-
-    expect(await mdRow.find({ text: 'engine row' })).toBeDefined()
-    expect(await codeRow.find({ text: 'engine row' })).toBeUndefined()
+    expect(await ui.find({ text: 'NUCLEO' })).toBeUndefined()
   })
 
   test(`${surface}: spinner shows only the call count`, async $ => {
@@ -67,4 +58,51 @@ test('terminal: turn footer replaces the duration line', async ($, on) => {
 
   expect(await ui.find({ text: 'Opus 5.5 · 40.5s · 38.3 tok/s' })).toBeDefined()
   expect(await ui.find({ text: 'Baked for 40s' })).toBeUndefined()
+})
+
+test('terminal: narration between tool calls is hidden, the final answer stays', async ($, on) => {
+  on('ui.render', { component: 'AssistantMessage' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+
+    return <Text>{e.props.text}</Text>
+  })
+  on('turn.step', async function* ($, e) {
+    const toolUses = e.index === 0 ? [{ id: 'tu1', name: 'Bash', input: { command: 'ls' } }] : []
+    const answer = e.index === 0 ? 'Supabase de pé. Subindo banco de teste.' : 'Merge feito.'
+
+    return { turnId: e.turnId, index: e.index, answer, toolUses, stopReason: 'end_turn', usage: null }
+  })
+
+  for (const index of [0, 1]) {
+    const stream = $.turn.step({ turnId: 'turn-1', index, model: 'claude-opus-5-5', messageCount: 1 })
+    for await (const _ of stream) {
+      // drain
+    }
+  }
+
+  const mount = (text: string, requestId: string) =>
+    $.ui.mount({ plugin: 'quiet-tools', surface: 'terminal', component: 'AssistantMessage', props: { text, isFirstOfReply: true }, requestId })
+
+  expect(await (await mount('Supabase de pé. Subindo banco de teste.', 'a1')).find({ text: 'Supabase' })).toBeUndefined()
+  expect(await (await mount('Merge feito.', 'a2')).find({ text: 'Merge feito.' })).toBeDefined()
+})
+
+test('terminal: completed task notification is hidden, a failed one stays', async ($, on) => {
+  on('ui.render', { component: 'UserMessage' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+
+    return <Text>{e.props.text}</Text>
+  })
+
+  const mount = (status: string, requestId: string) =>
+    $.ui.mount({
+      plugin: 'quiet-tools',
+      surface: 'terminal',
+      component: 'UserMessage',
+      props: { text: `Background command ${status}`, origin: { kind: 'task-notification' }, isExpanded: false, task: { status } },
+      requestId,
+    })
+
+  expect(await (await mount('completed', 'u1')).find({ text: 'Background command' })).toBeUndefined()
+  expect(await (await mount('failed', 'u2')).find({ text: 'Background command failed' })).toBeDefined()
 })
