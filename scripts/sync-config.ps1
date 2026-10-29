@@ -146,6 +146,14 @@ function Sync-Claude {
     Copy-Item $_.FullName (Join-Path "$Claude\hooks" $_.Name) -Force
   }
 
+  # mods/ — copied over, never replaced: Claude Code writes each mod's .claude-plugin/types/
+  # itself, and the mod's tsconfig.json extends it.
+  Get-ChildItem "$Repo\mods" -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+    $dest = Join-Path "$Claude\mods" $_.Name
+    New-Item -ItemType Directory -Force -Path $dest | Out-Null
+    Copy-Item "$($_.FullName)\*" $dest -Recurse -Force
+  }
+
   # settings.json is a SEED, not a mirror. Claude Code rewrites this file itself (model,
   # effortLevel, theme via /config) and other tools merge into it (herdr adds a SessionStart
   # hook), so overwriting a live one silently throws away state this repo does not track.
