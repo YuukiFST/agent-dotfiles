@@ -7,15 +7,18 @@ import { countLabel, emptyCounts, footerFor, kindOf, summarize } from './summary
 const calls = atom({ plugin: 'quiet-tools', key: 'calls' } as const, 0)
 const footers = atom({ plugin: 'quiet-tools', key: 'footers' } as const, {})
 const narrations = atom({ plugin: 'quiet-tools', key: 'narrations' } as const, [])
+const answers = atom({ plugin: 'quiet-tools', key: 'answers' } as const, [])
 
 export const register: Register = on => {
   // Main-loop turn stats; a reload mid-turn starts them over, which only skews that turn's footer.
   let counts = emptyCounts()
   let tools = 0
+  let turnNarrations: string[] = []
 
   on('turn.start', async ($, e, next) => {
     counts = emptyCounts()
     tools = 0
+    turnNarrations = []
     await update($, calls, () => 0)
 
     return next(e)
@@ -36,6 +39,7 @@ export const register: Register = on => {
     const response = yield* next(e)
 
     if (e.agentId === undefined && response.toolUses.length > 0) {
+      turnNarrations.push(response.answer)
       try {
         await update($, narrations, all => rememberNarration(all, response.answer))
       } catch {
@@ -46,8 +50,11 @@ export const register: Register = on => {
     return response
   })
 
+  // A block that is also part of a turn's answer stays, so a short answer repeated from a narration shows.
   on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
-    if (e.props.isSummary !== true && !isNarration(e.props.text, await read($, narrations))) {
+    const hidden = isNarration(e.props.text, await read($, narrations)) && !isNarration(e.props.text, await read($, answers))
+
+    if (e.props.isSummary !== true && !hidden) {
       return next(e)
     }
 
@@ -74,6 +81,13 @@ export const register: Register = on => {
     if (e.agentId === undefined) {
       const lines = summarize({ counts, model: e.usage?.model ?? '', durationMs: e.durationMs, outputTokens: e.usage?.output_tokens ?? 0, reason: e.reason })
       await update($, footers, all => ({ ...all, [String(e.durationMs)]: lines }))
+
+      // An empty final step means the last narration was the answer (a summary, then TodoWrite).
+      const answer = e.answer.trim() !== '' ? e.answer : turnNarrations.at(-1)
+
+      if (answer !== undefined) {
+        await update($, answers, all => rememberNarration(all, answer))
+      }
     }
 
     return result
