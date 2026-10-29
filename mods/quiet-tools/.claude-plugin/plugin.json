@@ -1,0 +1,6 @@
+{
+  "name": "quiet-tools",
+  "version": "0.1.0",
+  "description": "Collapse tool rows to a count; keep errors visible",
+  "types": "./types/index.d.ts"
+}

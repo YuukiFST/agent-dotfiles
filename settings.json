@@ -72,13 +72,15 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\tisao\\.claude\\hooks\\caveman-statusline.ps1\""
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\tisao\\.claude\\hooks\\statusline.ps1\""
   },
   "enabledPlugins": {
     "caveman-lean@caveman-lean": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "ponytail-subagent@ponytail-subagent": true
+    "ponytail-subagent@ponytail-subagent": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": false
   },
   "extraKnownMarketplaces": {
     "caveman-lean": {
@@ -110,13 +112,15 @@
       "effortLevel": "low"
     },
     "claude-opus-5-5": {
-      "effortLevel": "high"
+      "effortLevel": "medium"
     },
     "claude-haiku-5-5": {
       "effortLevel": "xhigh"
     }
   },
   "autoUpdatesChannel": "latest",
+  "switchModelsOnFlag": false,
+  "verbose": false,
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "autoCompactEnabled": true,

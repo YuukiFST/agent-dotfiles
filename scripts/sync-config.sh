@@ -269,6 +269,12 @@ case "$target" in
       rm -f "$claude/dreaming.md"
     fi
     sync_skills "$claude/skills"
+    # Copied over, never replaced: Claude Code writes each mod's .claude-plugin/types/.
+    for mod in "$repo"/mods/*/; do
+      [ -d "$mod" ] || continue
+      mkdir -p "$claude/mods/$(basename "$mod")"
+      cp -R "$mod." "$claude/mods/$(basename "$mod")/"
+    done
     sync_shared
     ;;
   cursor)
