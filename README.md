@@ -54,7 +54,7 @@ Each setup script installs or updates what its harness needs, such as rtk and th
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
-Its setup script also installs the [caveman-lean](https://github.com/YuukiFST/caveman-lean) and [ponytail-subagent](https://github.com/YuukiFST/ponytail-subagent) plugins, which Claude Code gets from `setup-claude`.
+Its setup script also installs the [caveman-lean](https://github.com/YuukiFST/caveman-lean) and [ponytail-subagent](https://github.com/YuukiFST/ponytail-subagent) plugins, which Claude Code gets from `setup-claude`, plus the [goal-mode](https://github.com/prevalentWare/opencode-goal-plugin) plugin that adds `/goal`, persistent objectives and a goal sidebar to OpenCode.
 Every skill is a `/name` command in OpenCode too, with no command file per skill.
 Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rules > User Rules by hand after each edit.
 

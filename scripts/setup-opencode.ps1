@@ -18,12 +18,15 @@ Write-Host "[3/6] rtk (+ OpenCode plugin)"
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 & "$PSScriptRoot\sync-config.ps1" opencode | Out-Null
 
-Write-Host "[4/6] caveman-lean + ponytail-subagent (OpenCode plugins)"
+Write-Host "[4/6] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
 # `plugin add` skips a plugin already in opencode.jsonc without updating it, so `update` follows.
-foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagent") {
+foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagent", "@prevalentware/opencode-goal-plugin") {
   opencode plugin add $p
   opencode plugin update $p
 }
+# OpenCode 2 loads a plugin's TUI half (sidebar, palette) only from cli.json, which `plugin add`
+# never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
+node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
 
 Write-Host "[5/6] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
