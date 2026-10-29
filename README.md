@@ -69,7 +69,7 @@ Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rul
 | `PROMPT_ENGINEERING.md` | Prompt design, debugging, evals and maintenance, read when `rules/prompting.md` points to it |
 | `rules/` | Git and prompting rules |
 | `hooks/`, `git-hooks/` | Session hooks and the `commit-msg` and `pre-push` gates |
-| `mods/` | Claude Code mods (function-hook plugins), copied to `~/.claude/mods` |
+| `mods/` | Claude Code mods (function-hook plugins), copied to `~/.claude/mods`; `ponytail-notice` logs a line in the main thread when a subagent gets the Ponytail ruleset |
 | `scripts/` | Install, sync and `git-safe-commit.sh` |
 | `settings.json` | Claude Code seed, written only when absent |
 | `pi/` | pi config |
