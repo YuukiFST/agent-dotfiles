@@ -1,0 +1,5 @@
+{
+  "name": "ponytail-notice",
+  "version": "0.1.0",
+  "description": "Log a line in the main thread when a subagent gets the Ponytail ruleset"
+}
