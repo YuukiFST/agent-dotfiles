@@ -113,8 +113,8 @@ test('terminal: completed task notification is hidden, a failed one stays', asyn
   expect(await (await mount('failed', 'u2')).find({ text: 'Background command failed' })).toBeDefined()
 })
 
-// Runs one main-loop turn: a step per answer, each with a tool call except the last, then turn.complete.
-const runTurn = async ($: any, on: any, turnId: string, steps: string[]) => {
+// Runs a main-loop turn's steps, each with a tool call except the last; the caller completes the turn.
+const runSteps = async ($: any, on: any, turnId: string, steps: string[]) => {
   on('turn.step', async function* ($: any, e: any) {
     const last = e.index === steps.length - 1
     const toolUses = last ? [] : [{ id: `tu${e.index}`, name: 'TodoWrite', input: {} }]
@@ -133,22 +133,37 @@ const runTurn = async ($: any, on: any, turnId: string, steps: string[]) => {
       // drain
     }
   }
-  await $.turn.complete({ answer: steps.at(-1), durationMs: 1000, isAborted: false, turnId, reason: 'answer' })
 }
+
+const complete = ($: any, turnId: string, answer: string, reason = 'answer') =>
+  $.turn.complete({ answer, durationMs: 1000, isAborted: reason === 'aborted', turnId, reason })
 
 const assistantRow = ($: any, text: string, requestId: string) =>
   $.ui.mount({ plugin: 'quiet-tools', surface: 'terminal', component: 'AssistantMessage', props: { text, isFirstOfReply: true }, requestId })
 
 test('terminal: a final answer that also appears inside a narration stays', async ($, on) => {
-  await runTurn($, on, 'turn-1', ['Merge feito. Agora limpando as branches.', 'Merge feito.'])
+  await runSteps($, on, 'turn-1', ['Merge feito. Agora limpando as branches.', 'Merge feito.'])
+  await complete($, 'turn-1', 'Merge feito.')
 
   expect(await (await assistantRow($, 'Merge feito.', 'a1')).find({ text: 'Merge feito.' })).toBeDefined()
   expect(await (await assistantRow($, 'Merge feito. Agora limpando as branches.', 'a2')).find({ text: 'limpando' })).toBeUndefined()
 })
 
-test('terminal: a summary before a last tool call stays when the final step is empty', async ($, on) => {
-  await runTurn($, on, 'turn-1', ['Lendo os arquivos.', 'Resumo: PR mergeado.', ''])
+test('terminal: a summary before the last tool calls shows once the turn completes', async ($, on) => {
+  await runSteps($, on, 'turn-1', ['Lendo os arquivos.', 'Resumo: PR mergeado.', '', ''])
+  const summary = await assistantRow($, 'Resumo: PR mergeado.', 'a1')
 
-  expect(await (await assistantRow($, 'Resumo: PR mergeado.', 'a1')).find({ text: 'Resumo' })).toBeDefined()
+  expect(await summary.find({ text: 'Resumo' })).toBeUndefined()
+
+  await complete($, 'turn-1', '')
+
+  expect(await summary.find({ text: 'Resumo' })).toBeDefined()
   expect(await (await assistantRow($, 'Lendo os arquivos.', 'a2')).find({ text: 'Lendo' })).toBeUndefined()
+})
+
+test('terminal: an interrupted turn keeps its last narration hidden', async ($, on) => {
+  await runSteps($, on, 'turn-1', ['Rodando os testes.', ''])
+  await complete($, 'turn-1', '', 'aborted')
+
+  expect(await (await assistantRow($, 'Rodando os testes.', 'a1')).find({ text: 'Rodando' })).toBeUndefined()
 })

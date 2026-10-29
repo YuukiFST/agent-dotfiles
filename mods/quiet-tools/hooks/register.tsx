@@ -10,15 +10,16 @@ const narrations = atom({ plugin: 'quiet-tools', key: 'narrations' } as const, [
 const answers = atom({ plugin: 'quiet-tools', key: 'answers' } as const, [])
 
 export const register: Register = on => {
-  // Main-loop turn stats; a reload mid-turn starts them over, which only skews that turn's footer.
+  // Main-loop turn state; a reload mid-turn starts it over, which skews that turn's footer and can leave
+  // a summary written before its last tool call hidden.
   let counts = emptyCounts()
   let tools = 0
-  let turnNarrations: string[] = []
+  let lastNarration = ''
 
   on('turn.start', async ($, e, next) => {
     counts = emptyCounts()
     tools = 0
-    turnNarrations = []
+    lastNarration = ''
     await update($, calls, () => 0)
 
     return next(e)
@@ -39,7 +40,10 @@ export const register: Register = on => {
     const response = yield* next(e)
 
     if (e.agentId === undefined && response.toolUses.length > 0) {
-      turnNarrations.push(response.answer)
+      if (response.answer.trim() !== '') {
+        lastNarration = response.answer
+      }
+
       try {
         await update($, narrations, all => rememberNarration(all, response.answer))
       } catch {
@@ -79,15 +83,19 @@ export const register: Register = on => {
     const result = await next(e)
 
     if (e.agentId === undefined) {
+      // A finished turn with an empty final step answered in its last narration (a summary, then TodoWrite);
+      // an interrupted or failed one did not.
+      const answer = e.answer.trim() !== '' ? e.answer : e.reason === 'answer' ? lastNarration : ''
+
+      // Written before the footer, so a failed footer write cannot leave the answer hidden.
+      try {
+        await update($, answers, all => rememberNarration(all, answer))
+      } catch {
+        // A failed write only leaves an answer that repeats a narration hidden.
+      }
+
       const lines = summarize({ counts, model: e.usage?.model ?? '', durationMs: e.durationMs, outputTokens: e.usage?.output_tokens ?? 0, reason: e.reason })
       await update($, footers, all => ({ ...all, [String(e.durationMs)]: lines }))
-
-      // An empty final step means the last narration was the answer (a summary, then TodoWrite).
-      const answer = e.answer.trim() !== '' ? e.answer : turnNarrations.at(-1)
-
-      if (answer !== undefined) {
-        await update($, answers, all => rememberNarration(all, answer))
-      }
     }
 
     return result
