@@ -13,6 +13,7 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
    No event to watch: `loop` with a fixed interval sized to when the result is worth re-checking.
 3. Each iteration runs the secondary route's steps as its body, so copy them into the todo list under this step (bug-fix: repro, root cause, fix, verify).
    At the end of the pass, run the check: keep the pass if the progress measure moved, committed when step 1 confirmed an identity, and revert the whole pass if it did not, so a failing repro and the fix it waits on stand or fall together.
+   Progress made by deleting, skipping or loosening a test or check, or by adding a suppression, does not count: revert that pass too.
    A change that only "might help" is reverted, not left to ride; order the units with `principle-sequence-verifiable-units`.
    Done when the iteration has its row in the todo list: what changed, and the measure and the predicate before and after.
 4. Mid-run discoveries that support the goal are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.
