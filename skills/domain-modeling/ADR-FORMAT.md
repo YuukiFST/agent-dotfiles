@@ -4,6 +4,8 @@ ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slu
 
 Create the `docs/adr/` directory lazily — only when the first ADR is needed.
 
+A repo that already keeps ADRs elsewhere or in another shape (another directory, an `.adr-dir` file, other numbering or headings) keeps its own convention: continue its sequence and format instead of starting a second one.
+
 ## Template
 
 ```md
@@ -25,6 +27,8 @@ Only include these when they add genuine value. Most ADRs won't need them.
 ## Numbering
 
 Scan `docs/adr/` for the highest existing number and increment by one.
+
+A decision that changes gets a new ADR that marks the old one superseded; the old file stays.
 
 ## When to offer an ADR
 
