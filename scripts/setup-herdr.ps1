@@ -56,6 +56,6 @@ Write-Host @"
 Done. Restart Herdr UI.
 
 - Settings: %APPDATA%\herdr\config-gpui.local.toml (keys from herdr/config-gpui.toml)
-- Themes: %APPDATA%\herdr\themes - Ioskeley Dark
+- Themes: %APPDATA%\herdr\themes - Vercel Dark
 - Check: herdr-gpui config check, with a window open to check the font too
 "@

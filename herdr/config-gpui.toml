@@ -5,9 +5,9 @@
 # arguments. One key per line, tables as [name]; no inline tables.
 
 layout = 'comfortable-rounded'
-# Ioskeley Dark, from the colors of ahatem.github.io/IoskeleyMono; the files are
-# herdr/themes/, copied to %APPDATA%\herdr\themes.
-theme = '~/AppData/Roaming/herdr/themes/ioskeley-dark'
+# Vercel Dark from vercel.com/geist/terminal; the files are herdr/themes/,
+# copied to %APPDATA%\herdr\themes.
+theme = '~/AppData/Roaming/herdr/themes/vercel-dark'
 
 [backdrop]
 opacity = 1.0
