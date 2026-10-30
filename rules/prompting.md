@@ -11,15 +11,17 @@ Changing an existing prompt (the change ships with eval cases), designing an age
 3. INSTRUCTIONS — Definition of done ("tests pass"), when to stop and ask, output format. No "think step by step": the model already reasons before replying.
 ```
 
+Over 20k tokens of data the order flips: CONTEXT first, then TASK and INSTRUCTIONS (rule 1).
+
 Bad: "Fix this bug."
 Good: "Read `calculateTotal` in `src/billing.ts`. Trace negative quantity through callers. Output the minimal diff."
 
 ## Writing rules (ordered by priority)
 
 1. **Task first, except over long data.** State what to do before providing data. Stable context (rules, schemas) before dynamic data (logs, code).
-   Long data (20k+ tokens of documents, logs or diffs) goes at the top instead, with the task, instructions and output format after it: Anthropic's long-context tips report up to 30% better answers with the query at the end.
+   Over 20k tokens of documents, logs or diffs, the stable context stays on top, the long data follows it, and the task, instructions and output format come last: Anthropic's long-context tips report up to 30% better answers with the query at the end.
 2. **Use delimiters.** XML tags or markdown headers separate instructions from content. Prevents context bleeding.
-3. **Output format upfront.** "JSON only", "just the diff", "file:line references."
+3. **Output format upfront** (after the long data in rule 1's long-data case). "JSON only", "just the diff", "file:line references."
 4. **Few-shot for complex tasks.** One correct input/output pair > paragraphs of explanation. Show an existing pattern from the codebase.
 5. **Anti-hallucination guardrails.** "State if uncertain", "cite file:line", "insufficient data → say so."
    **Information withholding** is the flip side of hallucination: a defensive instruction ("never give wrong info") can beat the accuracy instruction and make the model go silent. Fix: "Give accurate information. If uncertain, state what you checked and why you're uncertain."
