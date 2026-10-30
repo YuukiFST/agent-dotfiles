@@ -33,7 +33,7 @@ Per `break` **Build the harness page**: one scratch route inside the app, the re
 
 ## 5. Look once
 
-Per `break` **Look once**: one load with `chrome-devtools-axi`, every scenario skimmed, each visible break noted under its label in a single edit. No browser at hand → hand over the URL and skip the look; a predicted break is not a finding.
+Per `break` **Look once**: one load with `browser-harness`, every scenario skimmed, each visible break noted under its label in a single edit. No browser at hand → hand over the URL and skip the look; a predicted break is not a finding.
 
 Diagnose each break against `break-ui` **Failure signatures**: the signature names the cause and the fix. A long string gets a per-field decision from **Truncate, wrap, or clamp**.
 
