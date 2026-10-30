@@ -5,16 +5,17 @@
 # arguments. One key per line, tables as [name]; no inline tables.
 
 layout = 'comfortable-rounded'
-# Vercel Dark / Light from vercel.com/geist/terminal, following the system
-# appearance; the files are herdr/themes/, copied to %APPDATA%\herdr\themes.
-theme = 'light:~/AppData/Roaming/herdr/themes/vercel-light,dark:~/AppData/Roaming/herdr/themes/vercel-dark'
+# Ioskeley Dark, from the colors of ahatem.github.io/IoskeleyMono; the files are
+# herdr/themes/, copied to %APPDATA%\herdr\themes.
+theme = '~/AppData/Roaming/herdr/themes/ioskeley-dark'
 
 [backdrop]
 opacity = 1.0
 
 [terminal]
-# GeistMono Nerd Font Mono, installed by setup-herdr.ps1. DirectWrite names it
-# by its typographic family, GDI as GeistMono NFM.
-family = 'GeistMono Nerd Font Mono'
+# Ioskeley Mono Term Nerd Font Mono, installed by setup-herdr.ps1; its family
+# name has no typographic variant, so DirectWrite and GDI agree on it.
+# GeistMono NFM, also installed there, covers what it lacks.
+family = 'IoskeleyMonoTerm Nerd Font Mono'
 fallback = ['GeistMono NFM']
 size = 14
