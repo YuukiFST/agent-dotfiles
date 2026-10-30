@@ -61,7 +61,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Port or rewrite code from another language in Rust | `rust-port` |
 | Write or change Rust code | `rust-best-practices` |
 | Write or change TypeScript code | `typescript-best-practices` |
-| Add auth, user input handling, secrets, API endpoints or payment code | `security-review` |
+| Add auth, user input handling, secrets, API endpoints or payment code | `security-audit` |
 | Simplify code just written | `code-simplifier` |
 | Design a module interface, a seam, a deep module | `codebase-design` |
 | Scan a codebase for deepening opportunities | `improve-codebase-architecture` |
@@ -81,7 +81,6 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Write, change or audit tests | `test-audit` |
 | Agents keep repeating the same mistakes in a repo; make each class impossible | `correct` |
 | Security review or audit of existing code | `security-audit` |
-| Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
 | Survey a codebase and write plans for other agents | `improve` |
 | Stress-test a plan or idea | `grilling` |
 | Measure whether a change to a user-invoked skill or a playbook alters agent behavior | `playbooks/eval.md` |

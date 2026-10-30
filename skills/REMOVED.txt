@@ -67,3 +67,6 @@ writing-plans
 executing-plans
 # 3D product icon skill, unused; dropped.
 specimen
+# Vendored from affaan-m/everything-claude-code, dropped; security-audit covers both.
+security-review
+security-bounty-hunter
