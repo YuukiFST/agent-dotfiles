@@ -14,7 +14,7 @@ The stop rules in the Autonomy section of `../SKILL.md` still hold; everything t
 3. Each iteration runs the secondary route's steps as its body, so copy them into the todo list under this step (bug-fix: repro, root cause, fix, verify).
    At the end of the pass, run the check: keep the pass if the progress measure moved, committed when step 1 confirmed an identity, and revert the whole pass if it did not, so a failing repro and the fix it waits on stand or fall together.
    Progress made by deleting, skipping or loosening a check the predicate or progress measure reads, or by adding a suppression, does not count, so revert that pass too, unless the removal is what the secondary route is for (a `test-audit` sweep).
-   A test whose expected value looks wrong is the user's call (`~/.claude/CODING_STANDARDS.md`, "Human authority"), so it becomes a question row as in step 4.
+   A test whose expected value looks wrong is the user's call (`~/.claude/CODING_STANDARDS.md`, "Human authority"), so it becomes a question row as in step 4, unless the change the user asked for is what contradicts it: that counts as approval, so update it and name it in the reply.
    A change that only "might help" is reverted, not left to ride; order the units with `principle-sequence-verifiable-units`.
    Done when the iteration has its row in the todo list: what changed, and the measure and the predicate before and after.
 4. Mid-run discoveries that support the goal are yours: a broken skill (Non-negotiables in `../SKILL.md`), a related bug, a flaky check, a tooling failure.

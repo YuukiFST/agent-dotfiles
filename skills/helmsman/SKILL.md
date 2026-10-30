@@ -87,7 +87,7 @@ If you catch yourself writing "which would you prefer" about one of them, you ha
 
 The project costs **zero** to build and run unless the human says otherwise.
 Choose open-source dependencies, local or self-hosted services, and free tiers whose limits the product stays well inside at the scale the product decisions describe.
-A paid service the human named, a budget the human stated, or a paid service an existing repo already uses is a given and replaces zero.
+A paid service the human named, a budget the human stated, or a paid service an existing repo already uses, at its current plan, is a given and replaces zero; a higher tier or new spend on it is still a **Money** escalation.
 
 Prices and free-tier limits come from the vendor's pricing page read this session, through a `research` ticket, never from memory.
 When no free option meets a product decision, that is a **Money** escalation carrying two options: the cheapest paid route with its monthly cost, and the product cut that keeps the project free.
