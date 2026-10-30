@@ -1,6 +1,6 @@
 ---
 name: helmsman
-description: Start a project from one prompt - the human answers a few product questions, the agent decides everything technical at zero cost, charts the decisions as a shared map, writes the spec and build tickets, and hands over the command that builds it.
+description: Start a project, or a feature too big for one session, from one prompt - the human answers a few product questions, the agent decides everything technical at zero cost, charts the decisions as a shared map, writes the spec and build tickets, and hands over the command that builds it.
 disable-model-invocation: true
 metadata:
   opencode/slash: "true"
@@ -73,6 +73,7 @@ Ticket the product decision it depends on, and block yourself on it.
 The first prompt is a **brief**.
 Anything it pins down is a **given**: a stack, a hosting platform, a paid API, a budget, a deadline, a target device.
 Record each given in the map's **Notes** and build on it; a given replaces your own choice, even the boring default, and you neither re-decide it nor ask about it.
+In an existing repo the repo is part of the brief: its stack, layout, build and test commands and conventions, read from the manifest, CI and `CONTEXT.md`, are givens too.
 The human can add givens at any point by saying so; they land in **Notes** the same way.
 A given returns to the human only when it contradicts another given or a product decision, as a `po` ticket naming the conflict.
 

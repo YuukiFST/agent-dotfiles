@@ -31,7 +31,7 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 
 ## Implementation decisions
 
-<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
+<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape and how a deploy is undone, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
 
 ## Testing decisions
 
@@ -82,6 +82,7 @@ Done when all of these hold, each failure with its fix:
 
 - every user story is covered by at least one ticket's acceptance criteria; an uncovered story gets a ticket, or an existing ticket's criteria grow to cover it;
 - no ticket contradicts a `locks:` clause or a given; a ticket that does is re-sliced to respect it;
+- two tickets that can run in parallel and meet at an interface (an API shape, a schema, an event) find it pinned in **Implementation decisions**; one left open is pinned there before the tickets publish, so parallel implementers don't each invent it;
 - no ticket depends on a service outside the budget; one that does gets a **Money** `po` ticket that blocks it.
 
 ## 4. Hand over

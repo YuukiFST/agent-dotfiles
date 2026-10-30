@@ -2,7 +2,7 @@
 
 Reached from `/helmsman <map> --build`, in a fresh session.
 The goal is the whole spec working on one **integration branch**, every build ticket closed, and a reviewed pull request waiting for the human.
-The human answered the product questions and the map holds every technical decision, so this phase runs alone: the commit identity is the one thing it asks.
+The human answered the product questions and the map holds every technical decision, so this phase runs alone: the commit identity, and what to do with uncommitted changes, are the only things it asks.
 
 The build tickets are a **task graph**, not a list: there is always a **frontier** of tickets whose blockers are all closed.
 Talk to subagents through **context pointers** (the spec, the ticket, the map, a commit) rather than pasted copies.
@@ -10,12 +10,12 @@ Talk to subagents through **context pointers** (the spec, the ticket, the map, a
 ## Steps
 
 1. **Load.** Read the map's **Notes** and **Technical decisions**, the spec, and the open build tickets (the spec's children labelled `helmsman:build`). Done when you can name the frontier.
-2. **Confirm the commit identity** per `~/.claude/rules/git.md`, the only question this phase asks up front. Ask it alone, then work without the human.
+2. **Confirm the commit identity** per `~/.claude/rules/git.md`. When `git status --porcelain` shows uncommitted changes, ask in the same message whether to commit, stash or leave them, since the build's commits must not absorb them. These are the only questions this phase asks up front; then work without the human.
 3. **Prepare the workspace.** When the directory is not a repo yet, `git init` and make an initial commit on the default branch, so branches and worktrees have a base. Create the integration branch off the default branch, named per `git-workflow`: `feat/<spec-number>-<slug>`, or `feat/<effort-slug>` on the local tracker, where the spec has no number. A session resuming the build checks out the existing integration branch instead.
 4. **Build the walking skeleton** (the first build ticket) alone, before anything else: every other ticket builds on it.
 5. **Work the frontier.** Claim each frontier ticket and hand it to an **implementer subagent** in its own worktree, on its own branch off the integration branch; independent tickets run in parallel in the background. A harness without subagents works the frontier one ticket at a time, inline. Each implementer:
    - builds the ticket to its acceptance criteria, with E2E tests at the interface the spec's testing decisions name, per `~/.claude/CODING_STANDARDS.md`;
-   - gets the project's tests, lint and typecheck green;
+   - gets the project's tests, lint and typecheck green, and runs the down path of each schema migration it adds once;
    - commits per `~/.claude/rules/git.md`, merges the integration branch tip into its own branch, and reports what it verified.
 6. **Land each ticket.** Merge the finished branch into the integration branch, rerun the suite, and close the ticket with a comment saying what now works and how it was verified. Then remove its worktree and delete its branch, in the removal order of "Leave no trace" in `~/.claude/CODING_STANDARDS.md`; a worktree that refuses stays and goes in the report. Recompute the frontier and dispatch the newly unblocked tickets.
 7. **Handle gaps without stopping.**
@@ -26,7 +26,7 @@ Talk to subagents through **context pointers** (the spec, the ticket, the map, a
 8. **Review and open the PR.** When no build ticket is left, push the integration branch and open a pull request (a merge request on GitLab) to the default branch that closes the spec and its build tickets, per `git-workflow`. Run `/interrogate` on it with the spec as the statement of intent, fix what it says to act on, rerun the suite, and record the verdict on the PR. On the local tracker, with no remote, skip the PR and report the branch.
 9. **Leave no trace.** Every worktree, dev server and scratch directory this session created is removed or stopped, or named in the report with the reason it stays.
 
-Merging into the default branch and going live are the human's calls; the phase ends at a reviewed PR, with the deploy command from the spec ready in the report.
+Merging into the default branch and going live are the human's calls; the phase ends at a reviewed PR, with the deploy command, the command that undoes it, and the smoke check to run right after it (a health URL, the critical flow) ready in the report.
 
 ## Stopping
 
