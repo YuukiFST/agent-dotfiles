@@ -1,6 +1,6 @@
 ---
 name: helmsman
-description: Start a project from one prompt - the human answers a few product questions, the agent decides everything technical at zero cost, charts the decisions as a shared map, writes the spec and build tickets, and hands over the command that builds it.
+description: Start a project, or a feature too big for one session, from one prompt - the human answers a few product questions, the agent decides everything technical at zero cost, charts the decisions as a shared map, writes the spec and build tickets, and hands over the command that builds it.
 disable-model-invocation: true
 metadata:
   opencode/slash: "true"
@@ -73,6 +73,7 @@ Ticket the product decision it depends on, and block yourself on it.
 The first prompt is a **brief**.
 Anything it pins down is a **given**: a stack, a hosting platform, a paid API, a budget, a deadline, a target device.
 Record each given in the map's **Notes** and build on it; a given replaces your own choice, even the boring default, and you neither re-decide it nor ask about it.
+In an existing repo the repo is part of the brief: its stack, layout, build and test commands, conventions, and the hosting and services it already uses, read from the manifest, CI and `CONTEXT.md`, are givens too.
 The human can add givens at any point by saying so; they land in **Notes** the same way.
 A given returns to the human only when it contradicts another given or a product decision, as a `po` ticket naming the conflict.
 
@@ -86,7 +87,7 @@ If you catch yourself writing "which would you prefer" about one of them, you ha
 
 The project costs **zero** to build and run unless the human says otherwise.
 Choose open-source dependencies, local or self-hosted services, and free tiers whose limits the product stays well inside at the scale the product decisions describe.
-A paid service the human named, or a budget the human stated, is a given and replaces zero.
+A paid service the human named, a budget the human stated, or a paid service an existing repo already uses, at its current plan, is a given and replaces zero; a higher tier or new spend on it is still a **Money** escalation.
 
 Prices and free-tier limits come from the vendor's pricing page read this session, through a `research` ticket, never from memory.
 When no free option meets a product decision, that is a **Money** escalation carrying two options: the cheapest paid route with its monthly cost, and the product cut that keeps the project free.

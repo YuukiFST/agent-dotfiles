@@ -7,12 +7,13 @@ A change that "might help" is a hypothesis: it ships only after evidence confirm
    Ask the user to reproduce only with a specific reason that surface is out of reach, after driving it as far as it goes; a bug that won't fire gets a synthesized trigger, tighter conditions or instrumentation.
    Done when you hold the failing output.
 2. Read `principle-fix-root-causes`. Binary-search the cause: list the hypotheses, seed them with `git log` and `git blame` on the area, and each pass take the split that cuts the most remaining space, get runtime evidence, eliminate.
+   A regression with a known-good ref can be bisected (`git bisect run <repro command>`) in a worktree of its own, once the repro command exits non-zero there on the bad ref and 0 on the known-good one; end with `git bisect reset` and remove the worktree. The first bad commit seeds the hypotheses.
    Done when one mechanism survives, confirmed at runtime.
 3. Two fixes sharing one premise failed the same check: read `principle-attack-the-premise` before a third.
 4. Write the repro as a failing end-to-end test (`test-audit` gates it), then the smallest fix the evidence justifies.
    A frozen regression test that already fails is the repro: go straight to the fix.
    A fix that crosses a module boundary gets `codebase-design` first; a visual or motion defect takes its fix's craft bar from `ui-polish`.
-5. Verify on the same surface: the original repro now passes.
+5. Remove the probes and debug logging steps 1 and 2 added, keeping only what the fix needs at runtime, then verify on the same surface: the original repro now passes.
 6. Order the commits so the failing repro lands before the fix (`principle-sequence-verifiable-units`); ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** what broke, the root cause, the fix, how you verified it, with the failing-then-passing output verbatim.
