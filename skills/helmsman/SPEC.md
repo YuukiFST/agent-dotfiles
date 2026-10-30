@@ -56,6 +56,7 @@ Break the spec into **tracer bullets**: each ticket cuts a narrow but complete p
 
 - **The first ticket is the walking skeleton**: the project scaffold, the test harness running one E2E test, lint and typecheck, and, when the spec has hosting, the deploy configuration with the production build verified locally. Every other ticket is blocked by it.
   The deploy itself is never a build ticket: going live is the human's go, so BUILD.md hands it over in its final report.
+  In an existing repo whose harness already runs (tests, lint, typecheck, deploy configuration), the first ticket is instead the thinnest end-to-end slice through that harness, and every other ticket is blocked by it the same way.
 - Then one ticket per user-facing flow, smallest useful flow first, each blocked only by the tickets that genuinely gate it, so independent flows can be built in parallel.
 - A wide mechanical change across an existing codebase runs as expand, migrate in batches, contract, each its own ticket.
 
@@ -82,7 +83,7 @@ Done when all of these hold, each failure with its fix:
 
 - every user story is covered by at least one ticket's acceptance criteria; an uncovered story gets a ticket, or an existing ticket's criteria grow to cover it;
 - no ticket contradicts a `locks:` clause or a given; a ticket that does is re-sliced to respect it;
-- two tickets that can run in parallel and meet at an interface (an API shape, a schema, an event) find it pinned in **Implementation decisions**; one left open is pinned there before the tickets publish, so parallel implementers don't each invent it;
+- two tickets that can run in parallel and meet at an interface (an API shape, a schema, an event) find it pinned in **Implementation decisions** by a closed `dev` ticket; one left open gets a `dev` decision ticket on the map that blocks both, so Advance settles and locks it before parallel implementers each invent it;
 - no ticket depends on a service outside the budget; one that does gets a **Money** `po` ticket that blocks it.
 
 ## 4. Hand over

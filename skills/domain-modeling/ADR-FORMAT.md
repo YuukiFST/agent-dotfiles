@@ -26,9 +26,9 @@ Only include these when they add genuine value. Most ADRs won't need them.
 
 ## Numbering
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+Scan the repo's ADR directory (`docs/adr/` by default) for the highest existing number and increment by one.
 
-A decision that changes gets a new ADR that marks the old one superseded; the old file stays.
+A decision that changes gets a new ADR, and the old one gets the **Status** `superseded by ADR-NNNN`; the old file stays.
 
 ## When to offer an ADR
 

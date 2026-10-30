@@ -25,7 +25,7 @@ Two defaults hold for every effort until the human's own words override them: th
 | [Advance](#2-advance-helmsman-map) | `/helmsman <map>` | none |
 | [Review](#3-review-helmsman-map---review) | `/helmsman <map> --review` | one batch of answers |
 | Spec | runs inside Advance once nothing is left to decide | none |
-| [Build](#4-build-helmsman-map---build) | `/helmsman <map> --build` | confirming the commit identity once |
+| [Build](#4-build-helmsman-map---build) | `/helmsman <map> --build` | confirming the commit identity once, and any uncommitted changes of theirs |
 
 Chart, Advance and Review are **planning**: each ticket resolves a decision, and they produce decisions, not code.
 The pull to just write the code is the signal you've reached the edge of the map: write the spec and build tickets, then hand over `--build`.
@@ -73,7 +73,7 @@ Ticket the product decision it depends on, and block yourself on it.
 The first prompt is a **brief**.
 Anything it pins down is a **given**: a stack, a hosting platform, a paid API, a budget, a deadline, a target device.
 Record each given in the map's **Notes** and build on it; a given replaces your own choice, even the boring default, and you neither re-decide it nor ask about it.
-In an existing repo the repo is part of the brief: its stack, layout, build and test commands and conventions, read from the manifest, CI and `CONTEXT.md`, are givens too.
+In an existing repo the repo is part of the brief: its stack, layout, build and test commands, conventions, and the hosting and services it already uses, read from the manifest, CI and `CONTEXT.md`, are givens too.
 The human can add givens at any point by saying so; they land in **Notes** the same way.
 A given returns to the human only when it contradicts another given or a product decision, as a `po` ticket naming the conflict.
 
@@ -358,7 +358,7 @@ Pick it from the tracker **as it stands after this session's writes**, taking th
 | State | Next command | Their time |
 |---|---|---|
 | an unclaimed frontier `dev` ticket exists | `/helmsman <map>` | none: start it and walk away |
-| an unblocked, unclaimed build ticket exists | `/helmsman <map> --build` | ~1 min to confirm the commit identity, then none |
+| an unblocked, unclaimed build ticket exists | `/helmsman <map> --build` | ~1 min to confirm the commit identity (and any uncommitted changes), then none |
 | an open `po` ticket exists | `/helmsman <map> --review` | ~<n> min, one round per five open questions |
 | no open decision ticket, and fog left or no spec yet | `/helmsman <map>` | none: it graduates the fog, or writes the spec and build tickets |
 | every build ticket closed | no command: the pull request link, to review and merge | the review |

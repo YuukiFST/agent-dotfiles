@@ -9,7 +9,7 @@
    A new or changed error, its message or its public shape follows `principle-error-design`.
 4. Settle the design: a change crossing a module boundary, or one with several valid shapes, goes through `codebase-design`; an empirical fork goes to `prototype`; only a product call no experiment settles goes to the user.
    A choice that is hard to undo (data model, wire format, public API, migration) gets a read-only subagent before the first edit: give it the proposal and the constraints it must meet, never your conclusion, and ask how the proposal breaks them.
-   A finding that comes from a misread constraint means the constraint was unclear: rewrite it and rerun, three runs at most.
+   A valid finding revises the proposal, and one that comes from a misread constraint means the constraint was unclear, so rewrite it; either way rerun, three runs at most, and findings still open after that go to the Reply's open decisions.
    A feature touching auth, user input, secrets or payments also runs `security-audit`.
 5. Build slice by slice, in small units each verified before the next (`principle-sequence-verifiable-units`).
    UI parts follow `ui-polish`; new tests pass `test-audit`.
