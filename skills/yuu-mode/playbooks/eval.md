@@ -19,7 +19,7 @@ Its description or trigger, which matters against the skills it competes with, a
       From Git Bash, `MSYS_NO_PATHCONV=1` keeps the leading `/` from becoming a Windows path and `cygpath -w` hands Claude Code a path it can open; drop both elsewhere.
       Use `plan` as the mode when the behavior under test is read-only, so the run cannot edit its working dir.
    4. Grade it (step 4) and clean it up (step 5) before the next run starts.
-   Done when each arm has its runs with `is_error: false`; a run with `is_error: true` (`subtype: "error_max_budget_usd"` when it hit the cap) is inconclusive and runs again, and so is one whose `permission_denials` lists a call a rubric criterion depends on: fix the permission mode or allowlist before that rerun, since the same settings deny it again.
+   Done when each arm has its runs with `is_error: false`; a run with `is_error: true` (`subtype: "error_max_budget_usd"` when it hit the cap) is inconclusive and runs again. A run whose `permission_denials` lists a call a rubric criterion depends on makes every run of both arms inconclusive: fix the permission mode or allowlist, since the same settings deny it again, then rerun both arms.
 4. Grade from the transcripts named by the run's `session_id`; the newest transcript by mtime is your own session.
    `find ~/.claude/projects -name '<session_id>.jsonl'` gives the main transcript, and the calls its subagents made sit in `<that dir>/<session_id>/subagents/agent-*.jsonl`.
    Tool calls are the `type: "tool_use"` entries of `message.content` on `type: "assistant"` lines: check the files read, the skills invoked and the reply against each criterion.

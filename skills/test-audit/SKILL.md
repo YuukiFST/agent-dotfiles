@@ -27,9 +27,9 @@ add it yet:
 
 1. What observable behavior, invariant, or independent contract does it protect?
 2. What credible regression makes it fail? Once the test exists, prove it by a
-   run: invert the change it guards in place (stash uncommitted work first,
-   never discard it), watch the test fail for that reason, then restore. A test
-   that stays green protects nothing.
+   run: invert the change it guards in place, watch the test fail for that
+   reason, then undo exactly that inversion; the change itself is never
+   stashed or discarded. A test that stays green protects nothing.
 3. Why does existing coverage not already catch that failure? Each contract has
    one primary test owner at the strongest boundary; another layer needs its
    own distinct risk, such as a transport or lifecycle failure the owner cannot

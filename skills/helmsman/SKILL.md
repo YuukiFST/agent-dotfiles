@@ -25,7 +25,7 @@ Two defaults hold for every effort until the human's own words override them: th
 | [Advance](#2-advance-helmsman-map) | `/helmsman <map>` | none |
 | [Review](#3-review-helmsman-map---review) | `/helmsman <map> --review` | one batch of answers |
 | Spec | runs inside Advance once nothing is left to decide | none |
-| [Build](#4-build-helmsman-map---build) | `/helmsman <map> --build` | confirming the commit identity once, and any uncommitted changes of theirs |
+| [Build](#4-build-helmsman-map---build) | `/helmsman <map> --build` | confirming the commit identity once |
 
 Chart, Advance and Review are **planning**: each ticket resolves a decision, and they produce decisions, not code.
 The pull to just write the code is the signal you've reached the edge of the map: write the spec and build tickets, then hand over `--build`.
@@ -87,7 +87,7 @@ If you catch yourself writing "which would you prefer" about one of them, you ha
 
 The project costs **zero** to build and run unless the human says otherwise.
 Choose open-source dependencies, local or self-hosted services, and free tiers whose limits the product stays well inside at the scale the product decisions describe.
-A paid service the human named, or a budget the human stated, is a given and replaces zero.
+A paid service the human named, a budget the human stated, or a paid service an existing repo already uses is a given and replaces zero.
 
 Prices and free-tier limits come from the vendor's pricing page read this session, through a `research` ticket, never from memory.
 When no free option meets a product decision, that is a **Money** escalation carrying two options: the cheapest paid route with its monthly cost, and the product cut that keeps the project free.
@@ -358,7 +358,7 @@ Pick it from the tracker **as it stands after this session's writes**, taking th
 | State | Next command | Their time |
 |---|---|---|
 | an unclaimed frontier `dev` ticket exists | `/helmsman <map>` | none: start it and walk away |
-| an unblocked, unclaimed build ticket exists | `/helmsman <map> --build` | ~1 min to confirm the commit identity (and any uncommitted changes), then none |
+| an unblocked, unclaimed build ticket exists | `/helmsman <map> --build` | ~1 min to confirm the commit identity, then none |
 | an open `po` ticket exists | `/helmsman <map> --review` | ~<n> min, one round per five open questions |
 | no open decision ticket, and fog left or no spec yet | `/helmsman <map>` | none: it graduates the fog, or writes the spec and build tickets |
 | every build ticket closed | no command: the pull request link, to review and merge | the review |

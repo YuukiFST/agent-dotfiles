@@ -7,7 +7,7 @@ A change that "might help" is a hypothesis: it ships only after evidence confirm
    Ask the user to reproduce only with a specific reason that surface is out of reach, after driving it as far as it goes; a bug that won't fire gets a synthesized trigger, tighter conditions or instrumentation.
    Done when you hold the failing output.
 2. Read `principle-fix-root-causes`. Binary-search the cause: list the hypotheses, seed them with `git log` and `git blame` on the area, and each pass take the split that cuts the most remaining space, get runtime evidence, eliminate.
-   A regression with a known-good ref and a repro command that exits non-zero runs `git bisect run <repro command>` first, in a worktree of its own (`git worktree add`), ending with `git bisect reset`; the first bad commit seeds the hypotheses.
+   A regression with a known-good ref can be bisected (`git bisect run <repro command>`) in a worktree of its own, once the repro passes there on that ref; end with `git bisect reset` and remove the worktree. The first bad commit seeds the hypotheses.
    Done when one mechanism survives, confirmed at runtime.
 3. Two fixes sharing one premise failed the same check: read `principle-attack-the-premise` before a third.
 4. Write the repro as a failing end-to-end test (`test-audit` gates it), then the smallest fix the evidence justifies.

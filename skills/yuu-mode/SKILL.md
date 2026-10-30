@@ -116,7 +116,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 - **Observe before you ask.** A "which approach" fork whose answer you could see by running something (behavior, timing, layout, output) gets a `prototype` or a quick run, and the result decides.
   Ask the user only for a product or preference call no experiment settles.
 - **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `chrome-devtools-axi` for web UIs, a real CLI run, or `curl` for a service.
-  A web run passes when the flow completes and, on each page it visits (`console` and `network` list the current page only), no console error shows that the same flow did not show before the change, and no request fails or repeats unless the flow means it to.
+  A web run passes when the flow completes and, on each page it visits (`console` and `network` list the current page only), no console error shows that a run of the same flow, captured before the first edit, did not show, and no request fails or repeats unless the flow means it to.
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.
 - **Prose that ships** (PR body, docs, commit body): an `ai-tells` pass before it goes out.
