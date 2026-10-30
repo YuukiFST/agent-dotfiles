@@ -75,7 +75,7 @@ Disk is finite and a Rust `target/` reaches gigabytes in a day: a session ends w
 
 ## Project hygiene
 
-- **Generated files** (CHANGELOG.md, anything marked auto-generated) change only through their generator.
+- **Generated files** (a CHANGELOG.md a release tool writes, anything marked auto-generated) change only through their generator; a changelog kept by hand is edited by hand.
 - **README leads with the problem** it solves (one sentence, top); stack and architecture go in `docs/`.
 - **Uniform entry points:** the same command does the same thing across projects (`bin/deploy`, tag-release, layout), so an agent runs "deploy" without guessing.
 - **Second occurrence → encode:** a class of problem seen twice (style, API misuse, missing check), or a PR rejected for an unwritten convention, gets a proposal to encode it, cheapest enforceable option first: a type, a lint rule, a test, a hook or CI step.
