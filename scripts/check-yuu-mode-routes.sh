@@ -27,7 +27,7 @@ report() {
 
 # Drop the trailing pipe a row may or may not have, so $NF is the route cell either way.
 routes="$(tr -d '\r' < "$router" |
-  awk -F'|' '/^[[:space:]]*\|/ { sub(/[[:space:]]*\|?[[:space:]]*$/, ""); print $NF }' |
+  awk -F'|' '/^[ \t]*[|]/ { sub(/[ \t]*[|]?[ \t]*$/, ""); print $NF }' |
   grep -o '`[^`]*`' | tr -d '`' | sort -u)"
 
 while IFS= read -r route; do
