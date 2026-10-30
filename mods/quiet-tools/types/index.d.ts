@@ -3,14 +3,17 @@ export type Calls = number
 // Footer lines per turn, keyed by the turn's durationMs as TurnDuration reports it.
 export type Footers = Record<string, readonly string[]>
 
-// Answers of main-loop steps that also called tools, newest last.
-export type Narrations = readonly string[]
+// What one segment (the tools and thinking between two texts) ran, keyed by its first tool_use_id.
+export type Segments = Record<string, Readonly<Record<'command' | 'edit' | 'thought' | 'read' | 'tool', number>>>
 
-// Final answers of main-loop turns, newest last; a block found here is never hidden as narration.
-export type Answers = readonly string[]
+// Each main-loop tool_use_id to the first tool_use_id of its segment, where the segment line draws.
+export type Heads = Record<string, string>
+
+// The segment of the running turn that can still grow; null between turns.
+export type Active = string | null
 
 declare module 'claude-code' {
   interface PluginState {
-    'quiet-tools': { calls: Calls; footers: Footers; narrations: Narrations; answers: Answers }
+    'quiet-tools': { calls: Calls; footers: Footers; segments: Segments; heads: Heads; active: Active }
   }
 }
