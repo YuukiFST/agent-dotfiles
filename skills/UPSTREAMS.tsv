@@ -3,7 +3,9 @@
 # pinned commit = the last upstream commit already reviewed for this target,
 # and an optional branch when the path changes on a branch other than the default.
 # A target is a skill (its dir under skills/), a path in this repo written ./path,
-# or a downstream GitHub repo written owner/name.
+# or a downstream GitHub repo written owner/name. A watch row targets ./skills and
+# tracks a whole upstream collection, so a skill not vendored yet shows up too;
+# its refresh is deciding whether to vendor what changed.
 # This file is the only place a pin lives; Source comments and SOURCES.md only credit.
 #
 # scripts/check-upstreams.sh lists every row with commits on its path past the pin,
@@ -51,8 +53,6 @@ rust-best-practices	morganlinton/BeautifulRust	skills/rust-best-practices	c6f56d
 rust-port	morganlinton/BeautifulRust	skills/rust-port	c6f56d2
 rust-review	morganlinton/BeautifulRust	skills/rust-review	c6f56d2
 security-audit	cloudflare/security-audit-skill	skills/security-audit	c1c8a8c
-security-bounty-hunter	affaan-m/everything-claude-code	skills/security-bounty-hunter	db7f2a6
-security-review	affaan-m/everything-claude-code	skills/security-review	db7f2a6
 setup-matt-pocock-skills	mattpocock/skills	skills/engineering/setup-matt-pocock-skills	c66bdee
 show-me	humanlayer/skills	plugins/show-me	6ab9013
 skill-diet	nicobailon/skill-diet	.	5f41df1
@@ -66,6 +66,8 @@ web-perf	addyosmani/web-quality-skills	skills/performance	afa8da9
 web-perf	addyosmani/web-quality-skills	skills/core-web-vitals	afa8da9
 writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054def
 yuu-mode	cursor/plugins	pstack/skills/poteto-mode	c742dd6
+./skills	cursor/plugins	pstack	c742dd6
+./skills	morganlinton/BeautifulRust	skills	3385ca7
 ./hooks	JuliusBrussee/caveman	src/hooks	d262ab3
 ./rtk	rtk-ai/rtk	CHANGELOG.md	91dd9ce	master
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
