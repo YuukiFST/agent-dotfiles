@@ -87,6 +87,7 @@ For each security finding, trace the input path through the code and show it.
 - Prototype pollution or unsafe object merges of untrusted data
 - Insecure defaults: debug on, CORS wildcard, stack traces or internal paths in production errors
 - A dependency pinned to a version with a known vulnerability
+- A version bump that neither the PR body nor a commit message explains (what changed between the old and new pins); a bulk bump of unrelated packages; a lockfile change the manifest does not explain
 
 ## Error Handling
 

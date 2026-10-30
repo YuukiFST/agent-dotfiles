@@ -129,3 +129,29 @@ jobs:
 
       - name: Validate every SKILL.md frontmatter
         run: bash scripts/check-skill-frontmatter.sh
+
+  skill-routes-and-links:
+    name: Skill routes and links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # yuu-mode quietly takes the next-best route when a routed skill is missing, so a
+      # dead or missing route never fails at runtime (issue #279).
+      - name: Run check-yuu-mode-routes regression tests
+        run: bash scripts/test-check-yuu-mode-routes.sh
+
+      - name: Check yuu-mode routes against skills/
+        run: bash scripts/check-yuu-mode-routes.sh
+
+      # skill-diet's checker resolves every relative link and #anchor in a skill's .md files.
+      - name: Check links in every skill
+        run: |
+          status=0
+          for dir in skills/*/; do
+            out="$(node skills/skill-diet/scripts/eval.mjs check "$dir")" || { printf '%s\n%s\n' "$dir" "$out"; status=1; }
+          done
+          exit "$status"
