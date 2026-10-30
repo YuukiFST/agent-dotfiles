@@ -2,7 +2,8 @@
 
 Measure whether a change to a user-invoked skill or a playbook changes what an agent does: the deliverable is a verdict on the variant, not the change itself.
 Each run is a headless `claude -p` session invoked as `/kit:<name>`, graded from its transcripts, never from what its reply says it did.
-A model-invoked skill's description or trigger, and the global `CLAUDE.md`, `rules/` and `CODING_STANDARDS.md`, get no variant arm from this setup: say so and stop rather than issue a verdict.
+A model-invoked skill's description or content goes to `skill-diet`'s before/after eval instead (`../../skill-diet/references/eval.md`), whose adapter shows the agent that one skill and logs whether it loads it.
+The global `CLAUDE.md`, `rules/` and `CODING_STANDARDS.md` get no variant arm from either setup: say so and stop rather than issue a verdict.
 
 1. Frame the variant under test, the baseline it replaces (usually `main`), the model alias every run uses, and the behavior that counts as success.
    Write 3-6 rubric criteria a transcript can settle (a file read, a skill invoked, a line in the reply); the rubric lives only in your session.
@@ -18,7 +19,7 @@ A model-invoked skill's description or trigger, and the global `CLAUDE.md`, `rul
       From Git Bash, `MSYS_NO_PATHCONV=1` keeps the leading `/` from becoming a Windows path and `cygpath -w` hands Claude Code a path it can open; drop both elsewhere.
       Use `plan` as the mode when the behavior under test is read-only, so the run cannot edit its working dir.
    4. Grade it (step 4) and clean it up (step 5) before the next run starts.
-   Done when each arm has its runs with `is_error: false`; a run with `is_error: true` (`subtype: "error_max_budget_usd"` when it hit the cap) is inconclusive and runs again.
+   Done when each arm has its runs with `is_error: false`; a run with `is_error: true` (`subtype: "error_max_budget_usd"` when it hit the cap) is inconclusive and runs again, and so is one whose `permission_denials` is not empty, since a denied tool call means the run never did what the rubric checks.
 4. Grade from the transcripts named by the run's `session_id`; the newest transcript by mtime is your own session.
    `find ~/.claude/projects -name '<session_id>.jsonl'` gives the main transcript, and the calls its subagents made sit in `<that dir>/<session_id>/subagents/agent-*.jsonl`.
    Tool calls are the `type: "tool_use"` entries of `message.content` on `type: "assistant"` lines: check the files read, the skills invoked and the reply against each criterion.
