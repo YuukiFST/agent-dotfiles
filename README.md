@@ -51,7 +51,7 @@ From the clone, run the setup script for your harness. It is idempotent, so reru
 | Cursor | | `bash scripts/setup-cursor.sh` |
 | Herdr UI | `pwsh -File scripts/setup-herdr.ps1` | |
 
-Each setup script installs or updates what its harness needs, such as rtk and the axi CLIs, then syncs the config.
+Each setup script installs or updates what its harness needs, such as rtk, the axi CLIs and browser-harness, then syncs the config.
 For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH, plus Herdr UI when `herdr-gpui` is) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
