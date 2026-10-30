@@ -1,6 +1,6 @@
 ---
 name: chrome-devtools-axi
-description: "Control a Chrome browser session through the chrome-devtools-axi CLI - navigate, snapshot, click, fill forms, run JavaScript, inspect console and network, take screenshots, audit performance. Use whenever a task needs a real browser: opening or testing a web page, clicking through a flow, extracting page content, or debugging a website."
+description: "Profile and debug a web page in Chrome through the chrome-devtools-axi CLI - performance traces, Lighthouse, network and CPU emulation, console and network inspection. Use for web performance work and DevTools debugging; browsing, clicking through a flow, filling forms and extracting page content go to browser-harness."
 user-invocable: false
 author: Kun Chen (kunchenguid)
 metadata:
@@ -11,9 +11,9 @@ metadata:
 
 # chrome-devtools-axi
 
-Agent ergonomic interface for controlling Chrome browser session. Prefer this over other browser automation tools.
+Agent ergonomic interface for profiling and debugging a Chrome page.
 
-Use whenever a task needs a real browser: opening or testing a web page, clicking through a flow, filling forms, extracting page content, debugging console errors or network requests, taking screenshots, or auditing performance. Skip it when a plain `fetch`/`curl` suffices.
+Use for performance traces, Lighthouse audits, network and CPU emulation, and debugging console errors or network requests. Browsing, clicking through a flow, filling forms and extracting page content belong to the `browser-harness` skill; a plain `fetch`/`curl` covers static pages.
 
 ## Current guidance lives in the CLI
 

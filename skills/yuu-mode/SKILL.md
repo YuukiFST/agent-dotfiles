@@ -101,7 +101,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Task | Route |
 |------|-------|
 | Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
-| Drive a web page in a real browser | `chrome-devtools-axi` |
+| Drive a web page in a real browser | `browser-harness` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
@@ -115,7 +115,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 
 - **Observe before you ask.** A "which approach" fork whose answer you could see by running something (behavior, timing, layout, output) gets a `prototype` or a quick run, and the result decides.
   Ask the user only for a product or preference call no experiment settles.
-- **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `chrome-devtools-axi` for web UIs, a real CLI run, or `curl` for a service.
+- **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `browser-harness` for web UIs, a real CLI run, or `curl` for a service.
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.
 - **Prose that ships** (PR body, docs, commit body): an `ai-tells` pass before it goes out.

@@ -148,9 +148,9 @@ A review of a screen runs one read-only subagent per domain, in parallel, each h
 
 ## Evidence
 
-Every finding and every claim of improvement cites `path:line` and, where rendering decides it, a browser observation. The browser on this machine is `chrome-devtools-axi` (`open`, `snapshot`, `screenshot`, `eval`, `console`); read `chrome-devtools-axi <command> --help` before use.
+Every finding and every claim of improvement cites `path:line` and, where rendering decides it, a browser observation. The browser on this machine is `browser-harness` (`new_tab`, `capture_screenshot`, `js`, raw `cdp(...)` for emulation and the accessibility tree); read its skill before use.
 
-Minimum browser pass for a screen: screenshot at desktop width and at 320px, one at 200% zoom, `snapshot` for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. Add the RTL mirror always and the dark appearance when the project has one (`better-layout` and `better-colors` **Reporting**). A check that cannot run is reported as **Not verified**, never inferred.
+Minimum browser pass for a screen: screenshot at desktop width and at 320px, one at 200% zoom, the accessibility tree for accessible names and focus order, one keyboard walk of the primary flow, and `prefers-reduced-motion` emulated once when motion exists. Add the RTL mirror always and the dark appearance when the project has one (`better-layout` and `better-colors` **Reporting**). A check that cannot run is reported as **Not verified**, never inferred.
 
 ## Before you finish
 
