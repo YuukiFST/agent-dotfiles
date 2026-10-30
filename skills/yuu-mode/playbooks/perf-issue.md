@@ -15,6 +15,6 @@ Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; t
 3. Fix one hypothesis at a time and measure after each (`principle-sequence-verifiable-units`); a change with no measured gain is reverted.
    A rewrite of a hot path keeps the old version as a differential oracle (`test-audit`), so the speedup ships with output proven unchanged.
 4. Compare baseline and post-fix artifacts side by side. An inconclusive comparison is reported as inconclusive.
-5. Cite the measurement in the commit or PR body; ship through `git-workflow` when the user invoked `/git-workflow`.
+5. Cite the measurement in the commit or PR body, with every attempt listed there, reverted ones included (idea, baseline to result, kept or reverted), so a dead idea is not tried again; ship through `git-workflow` when the user invoked `/git-workflow`.
 
 **Reply:** baseline number, post-fix number, delta with units, and the artifact path.
