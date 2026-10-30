@@ -35,8 +35,8 @@ A user asking for a deep or full review makes the diff risky.
 
 | Diff | Reviewers | Lenses | Blast radius |
 |------|-----------|--------|--------------|
-| Not risky | First row for your harness | `rubric.md` | Only when an Act on finding stands or falls on runtime behavior |
-| Risky | Every row for your harness | `rubric.md` and `code-quality-review.md` | Always |
+| Not risky | First row for your harness | `references/rubric.md` | Only when an Act on finding stands or falls on runtime behavior |
+| Risky | Every row for your harness | `references/rubric.md` and `references/code-quality-review.md` | Always |
 
 Done when you can name the trigger that made the diff risky, and each sensitive path, or say none fired.
 
