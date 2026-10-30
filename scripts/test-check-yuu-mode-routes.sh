@@ -82,6 +82,36 @@ tree task-cell-only alpha beta <<'EOF'
 EOF
 check block task-cell-only
 
+# --- A row without a trailing pipe still has its last cell checked: block ---
+tree no-trailing-pipe alpha <<'EOF'
+| Ask about `alpha` | `gone`
+| Do it | `alpha` |
+EOF
+check block no-trailing-pipe
+
+# --- An indented row is still a route row: block ---
+tree indented alpha <<'EOF'
+| Do it | `alpha` |
+  | Indented | `gone` |
+EOF
+check block indented
+
+# --- A playbook step naming a skill listed in REMOVED.txt: block ---
+tree removed-in-playbook alpha <<'EOF'
+| Do it | `alpha` |
+| A defect | `playbooks/bug-fix.md` |
+EOF
+printf '# deleted skills\nold-skill  # merged into alpha\n' > "$WORK/removed-in-playbook/REMOVED.txt"
+echo '2. Read `old-skill` before the fix.' > "$WORK/removed-in-playbook/yuu-mode/playbooks/bug-fix.md"
+check block removed-in-playbook
+
+# --- REMOVED.txt names nothing yuu-mode mentions: pass ---
+tree removed-unmentioned alpha <<'EOF'
+| Do it | `alpha` |
+EOF
+printf 'old-skill\n' > "$WORK/removed-unmentioned/REMOVED.txt"
+check allow removed-unmentioned
+
 # --- No yuu-mode router at all: block ---
 mkdir -p "$WORK/no-router/alpha"
 : > "$WORK/no-router/alpha/SKILL.md"

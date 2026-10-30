@@ -7,7 +7,9 @@
 # dead route nobody sees. Every skill except principle-* (they fire on their own
 # descriptions) and yuu-mode itself has a route (PR #259).
 # A route is a backticked name in the last cell of a table row: a skill's directory name,
-# or playbooks/<name>.md under yuu-mode.
+# or playbooks/<name>.md under yuu-mode. A skill named only in prose or a playbook step is
+# no route, so those get the narrower check that no name listed in REMOVED.txt appears
+# backticked anywhere under yuu-mode.
 set -uo pipefail
 
 root="${1:-skills}"
@@ -23,7 +25,10 @@ report() {
   failed=1
 }
 
-routes="$(tr -d '\r' < "$router" | awk -F'|' '/^\|/ { print $(NF-1) }' | grep -o '`[^`]*`' | tr -d '`' | sort -u)"
+# Drop the trailing pipe a row may or may not have, so $NF is the route cell either way.
+routes="$(tr -d '\r' < "$router" |
+  awk -F'|' '/^[[:space:]]*\|/ { sub(/[[:space:]]*\|?[[:space:]]*$/, ""); print $NF }' |
+  grep -o '`[^`]*`' | tr -d '`' | sort -u)"
 
 while IFS= read -r route; do
   [ -n "$route" ] || continue
@@ -41,6 +46,15 @@ for file in "$root"/*/SKILL.md; do
   esac
   grep -qxF "$name" <<< "$routes" || report "$root/$name: no route in $router"
 done
+
+removed="$root/REMOVED.txt"
+if [ -f "$removed" ]; then
+  while IFS= read -r name; do
+    if hits="$(grep -rnF -- "\`$name\`" "$root/yuu-mode")"; then
+      report "$hits"$'\n'"  names $name, which $removed lists as deleted"
+    fi
+  done < <(sed 's/#.*//' "$removed" | tr -d '\r' | awk 'NF { print $1 }')
+fi
 
 [ "$failed" -eq 0 ] && echo "yuu-mode routes ok ($(grep -c . <<< "$routes") routes)"
 exit "$failed"
