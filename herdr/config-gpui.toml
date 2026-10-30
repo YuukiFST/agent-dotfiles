@@ -1,0 +1,20 @@
+# Herdr UI settings this repo owns. sync-config.ps1 herdr passes each key to
+# `herdr-gpui config set`, so keys the app writes itself (dialog "do not ask
+# again" choices) stay in config-gpui.local.toml.
+# Strings use single quotes: PowerShell 5.1 drops double quotes inside native
+# arguments. One key per line, tables as [name]; no inline tables.
+
+layout = 'comfortable-rounded'
+# Vercel Dark / Light from vercel.com/geist/terminal, following the system
+# appearance; the files are herdr/themes/, copied to %APPDATA%\herdr\themes.
+theme = 'light:~/AppData/Roaming/herdr/themes/vercel-light,dark:~/AppData/Roaming/herdr/themes/vercel-dark'
+
+[backdrop]
+opacity = 1.0
+
+[terminal]
+# GeistMono Nerd Font Mono, installed by setup-herdr.ps1. DirectWrite names it
+# by its typographic family, GDI as GeistMono NFM.
+family = 'GeistMono Nerd Font Mono'
+fallback = ['GeistMono NFM']
+size = 14

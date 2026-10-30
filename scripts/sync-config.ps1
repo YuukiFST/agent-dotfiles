@@ -3,10 +3,10 @@
 # from this repo into the harness dirs on a Windows machine.
 # Shared by every setup-*.ps1 / update-*.ps1 so "git pull + update" always propagates config.
 #
-# Usage: sync-config.ps1 [claude|pi|opencode|all]
+# Usage: sync-config.ps1 [claude|pi|opencode|herdr|all]
 #   default is `claude` so the historical `pwsh -File scripts/sync-config.ps1` keeps working.
-#   `all` syncs every harness found on PATH.
-param([ValidateSet("claude", "pi", "opencode", "all")][string]$Target = "claude")
+#   `all` syncs every harness found on PATH, and Herdr UI when herdr-gpui is.
+param([ValidateSet("claude", "pi", "opencode", "herdr", "all")][string]$Target = "claude")
 $ErrorActionPreference = "Stop"
 
 $Repo = Split-Path $PSScriptRoot -Parent
@@ -321,24 +321,54 @@ function Sync-OpenCodeReviewers($oc) {
   Write-Host "  wrote $n interrogate reviewer agent(s) to $dir"
 }
 
+# %APPDATA%\herdr - Herdr UI. Themes are copied over; each key of herdr/config-gpui.toml goes
+# through `herdr-gpui config set`, which validates it, so keys the app writes itself stay.
+function Sync-Herdr {
+  $src = Join-Path $Repo "herdr"
+  $themes = Join-Path $env:APPDATA "herdr\themes"
+  New-Item -ItemType Directory -Force -Path $themes | Out-Null
+  Copy-Item "$src\themes\*" $themes -Force
+
+  # Line grammar: blank, # comment, [table], or key = value on one line.
+  $table = ""
+  $n = 0
+  foreach ($line in Get-Content (Join-Path $src "config-gpui.toml")) {
+    $row = $line.Trim()
+    if ($row -eq "" -or $row.StartsWith("#")) { continue }
+    if ($row -match '^\[([\w.-]+)\]$') { $table = "$($Matches[1])."; continue }
+    if ($row -notmatch '^([\w-]+)\s*=\s*(.+)$') {
+      Write-Warning "herdr/config-gpui.toml: unusable line, not synced: $line"
+      continue
+    }
+    $key = "$table$($Matches[1])"
+    herdr-gpui config set $key $Matches[2] | Out-Null
+    if ($LASTEXITCODE -ne 0) { Write-Warning "herdr-gpui refused $key (exit $LASTEXITCODE)"; continue }
+    $n++
+  }
+  Write-Host "  set $n Herdr UI setting(s), themes copied to $themes"
+}
+
 $targets = if ($Target -eq "all") {
-  @("claude", "pi", "opencode") | Where-Object {
+  @("claude", "pi", "opencode", "herdr") | Where-Object {
     switch ($_) {
       "claude" { Test-Cmd claude }
       "pi" { Test-Cmd pi }
       "opencode" { Test-Cmd opencode }
+      "herdr" { Test-Cmd herdr-gpui }
     }
   }
 } else { @($Target) }
 
-if (-not $targets) { throw "no harness found on PATH (claude / pi / opencode)" }
+if (-not $targets) { throw "no harness found on PATH (claude / pi / opencode / herdr-gpui)" }
 
-Sync-Shared
+# Herdr UI reads none of the shared rules or skills.
+if ($targets | Where-Object { $_ -ne "herdr" }) { Sync-Shared }
 foreach ($t in $targets) {
   switch ($t) {
     "claude" { Sync-Claude }
     "pi" { Sync-Pi }
     "opencode" { Sync-OpenCode }
+    "herdr" { Sync-Herdr }
   }
 }
 

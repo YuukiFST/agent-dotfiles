@@ -49,9 +49,10 @@ From the clone, run the setup script for your harness. It is idempotent, so reru
 | pi | `pwsh -File scripts/setup-pi.ps1` | `bash scripts/setup-pi.sh` |
 | OpenCode | `pwsh -File scripts/setup-opencode.ps1` | `bash scripts/setup-opencode.sh` |
 | Cursor | | `bash scripts/setup-cursor.sh` |
+| Herdr UI | `pwsh -File scripts/setup-herdr.ps1` | |
 
 Each setup script installs or updates what its harness needs, such as rtk and the axi CLIs, then syncs the config.
-For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH) or `bash scripts/sync-config.sh <harness>` (one per run).
+For config only, run `pwsh -File scripts/sync-config.ps1 all` (every harness on PATH, plus Herdr UI when `herdr-gpui` is) or `bash scripts/sync-config.sh <harness>` (one per run).
 Skills land in `~/.claude/skills` for Claude Code and in `~/.agents/skills` for OpenCode, pi and Cursor.
 OpenCode also gets `~/.config/opencode/AGENTS.md` and the interrogate reviewer agents generated from `skills/interrogate/reviewers.md`.
 Its setup script also installs the [caveman-lean](https://github.com/YuukiFST/caveman-lean) and [ponytail-subagent](https://github.com/YuukiFST/ponytail-subagent) plugins, which Claude Code gets from `setup-claude`, plus the [goal-mode](https://github.com/prevalentWare/opencode-goal-plugin) plugin that adds `/goal`, persistent objectives and a goal sidebar to OpenCode.
@@ -73,4 +74,5 @@ Cursor keeps User Rules outside files, so paste `GLOBAL.md` into Customize > Rul
 | `scripts/` | Install, sync and `git-safe-commit.sh` |
 | `settings.json` | Claude Code seed, written only when absent |
 | `pi/` | pi config |
+| `herdr/` | Herdr UI settings (`config-gpui.toml`) and terminal themes: Vercel Dark / Light from [Geist Terminal](https://vercel.com/geist/terminal), and 0oz; `setup-herdr.ps1` also installs GeistMono Nerd Font Mono |
 | `AGENTS.md` | Instructions for an agent working on this repo, imported by the root `CLAUDE.md` |
