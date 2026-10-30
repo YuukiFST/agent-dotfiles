@@ -39,7 +39,7 @@ Your refinement process:
 1. Identify the recently modified code sections
 2. Analyze for opportunities to improve elegance and consistency
 3. Apply project-specific best practices and coding standards
-4. Run the project's tests, lint and typecheck before and after the refinement; a check that was green and turns red means the refinement is fixed or reverted
+4. Run the project's tests, lint and typecheck before and after the refinement; a check that was green and turns red means the refinement is fixed or reverted, never the test: a refinement that needs a test edit changed behavior
 5. Verify the refined code is simpler and more maintainable
 6. Document only significant changes that affect understanding
 
