@@ -371,14 +371,14 @@ A session that stopped because a resolution **contradicts a product decision** h
 
 The one session where the human talks, and the only questions they get are product questions that passed the ask test.
 
-1. **Read the brief.** Pull out the destination, the people it serves, and every given. Done when each given is written down for **Notes**.
+1. **Read the brief.** Pull out the problem it solves, the people it serves, the destination, and every given. Done when each given is written down for **Notes**.
 2. **Draft the product yourself.** Write the destination, the users, the core flows and their rules as you would build them. Answer every gap yourself, then run the ask test on each answer; most become assumptions. Done when every gap is either an assumption or a question that passed the ask test.
-3. **Ask the first round.** Open with the destination in two to four lines of their language, so the human can correct the whole picture at once; then the questions; then the **Assumed** list. Wait for the answer.
+3. **Ask the first round.** Open with your restatement, in two to four lines of their language: the problem and who has it, the goals that will show it is solved, and the destination you would build, so the human can correct the whole picture at once, the why as well as the what; then the questions; then the **Assumed** list. Wait for the answer.
 4. **Ask further rounds** only for questions the last answers unlocked that pass the ask test, within the cap. Done when no open question passes the ask test, or the cap is hit.
 5. **Create the map** (label `helmsman:map`) with Destination, Notes, Product decisions, and Assumed filled in, and the fog sketched into **Not yet specified**. Record the vocabulary in `CONTEXT.md` through `/domain-modeling`.
 6. **Create the tickets you can specify now** as child issues, sorted by the product-owner test, including every technical question you already know you owe yourself. Wire blocking edges in a **second pass**, once every issue has an id.
 7. **Fire the research subagents**: one `/research` subagent per `research` ticket, in parallel (see [Ticket methods](#ticket-methods) for where findings go).
-8. **Tell the human** in their language what the map says and that the rest is technical and yours, so they can step away. Then **continue straight into [Advance](#2-advance-helmsman-map)** in this same session.
+8. **Tell the human** in their language what the map says, opening with the problem and goals as the answers left them, and that the rest is technical and yours, so they can step away; a correction to that restatement is handled like a veto, as a `po` ticket that routes to a review (see [The ask test](#the-ask-test)). Then **continue straight into [Advance](#2-advance-helmsman-map)** in this same session.
 
 If drafting shows the whole project fits one session with nothing left to decide, skip the cascade: write the spec straight away (step 0 of Advance).
 
