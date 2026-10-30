@@ -1,70 +1,96 @@
 import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
-import { isNarration, isQuietNotification, rememberNarration } from './narration'
-import { countLabel, emptyCounts, footerFor, kindOf, summarize } from './summary'
+import { isQuietNotification } from './narration'
+import { countLabel, emptyCounts, footerFor, kindOf, segmentRow, summarize } from './summary'
 
 const calls = atom({ plugin: 'quiet-tools', key: 'calls' } as const, 0)
 const footers = atom({ plugin: 'quiet-tools', key: 'footers' } as const, {})
-const narrations = atom({ plugin: 'quiet-tools', key: 'narrations' } as const, [])
-const answers = atom({ plugin: 'quiet-tools', key: 'answers' } as const, [])
+const segments = atom({ plugin: 'quiet-tools', key: 'segments' } as const, {})
+const heads = atom({ plugin: 'quiet-tools', key: 'heads' } as const, {})
+const active = atom({ plugin: 'quiet-tools', key: 'active' } as const, null)
 
 export const register: Register = on => {
-  // Main-loop turn state; a reload mid-turn starts it over, which skews that turn's footer and can leave
-  // a summary written before its last tool call hidden.
-  let counts = emptyCounts()
+  // Main-loop turn state; a reload mid-turn starts it over, so that turn's next call opens a new segment.
   let tools = 0
-  let lastNarration = ''
+  let head: string | null = null
+  let opensSegment = true
+  let pendingThoughts = 0
 
   on('turn.start', async ($, e, next) => {
-    counts = emptyCounts()
     tools = 0
-    lastNarration = ''
+    head = null
+    opensSegment = true
+    pendingThoughts = 0
     await update($, calls, () => 0)
+    await update($, active, () => null)
 
     return next(e)
   }).catch(($, e, next) => next(e))
 
+  // A step's text closes the segment before it; its first tool call opens the next one.
   on('tool.call', async ($, e, next) => {
     if (e.agentId === undefined) {
       tools += 1
-      counts[kindOf(e.tool)] += 1
+
+      if (opensSegment || head === null) {
+        head = e.tool_use_id
+        opensSegment = false
+        const thoughts = pendingThoughts
+        pendingThoughts = 0
+        const id = head
+        await update($, segments, all => ({ ...all, [id]: { ...emptyCounts(), thought: thoughts } }))
+        await update($, active, () => id)
+      }
+
+      const id = head
+      const kind = kindOf(e.tool)
+      await update($, heads, all => ({ ...all, [e.tool_use_id]: id }))
+      await update($, segments, all => ({ ...all, [id]: { ...emptyCounts(), ...all[id], [kind]: (all[id]?.[kind] ?? 0) + 1 } }))
       await update($, calls, () => tools)
     }
 
     return next(e)
   }).catch(($, e, next) => next(e))
 
-  // Forwards the stream untouched; only reads the finished step to learn which text was narration.
+  // Forwards the stream untouched, counting thinking blocks; thinking joins the open segment, or the next one
+  // when the turn has none yet.
   on('turn.step', async function* ($, e, next) {
-    const response = yield* next(e)
+    const stream = next(e)
+    const thinking = new Set<number>()
+    let chunk = await stream.next()
 
-    if (e.agentId === undefined && response.toolUses.length > 0) {
-      if (response.answer.trim() !== '') {
-        lastNarration = response.answer
+    while (chunk.done !== true) {
+      if (chunk.value.kind === 'thinking') {
+        thinking.add(chunk.value.index)
       }
 
+      yield chunk.value
+      chunk = await stream.next()
+    }
+
+    const response = chunk.value
+
+    if (e.agentId !== undefined) {
+      return response
+    }
+
+    if (head === null) {
+      pendingThoughts += thinking.size
+    } else if (thinking.size > 0) {
+      const id = head
       try {
-        await update($, narrations, all => rememberNarration(all, response.answer))
+        await update($, segments, all => ({ ...all, [id]: { ...emptyCounts(), ...all[id], thought: (all[id]?.thought ?? 0) + thinking.size } }))
       } catch {
-        // A failed write only leaves this narration visible.
+        // A failed write only undercounts this segment's thoughts.
       }
+    }
+
+    if (response.answer.trim() !== '') {
+      opensSegment = true
     }
 
     return response
-  })
-
-  // A block that is also part of a turn's answer stays, so a short answer repeated from a narration shows.
-  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
-    const hidden = isNarration(e.props.text, await read($, narrations)) && !isNarration(e.props.text, await read($, answers))
-
-    if (e.props.isSummary !== true && !hidden) {
-      return next(e)
-    }
-
-    const { Box } = $.ui.resolve(e)
-
-    return <Box />
   })
 
   // "Background command ... completed" and "Monitor event: ..." rows; ctrl+o still shows them.
@@ -83,33 +109,30 @@ export const register: Register = on => {
     const result = await next(e)
 
     if (e.agentId === undefined) {
-      // A finished turn with an empty final step answered in its last narration (a summary, then TodoWrite);
-      // an interrupted or failed one did not.
-      const answer = e.answer.trim() !== '' ? e.answer : e.reason === 'answer' ? lastNarration : ''
-
-      // Written before the footer, so a failed footer write cannot leave the answer hidden.
-      try {
-        await update($, answers, all => rememberNarration(all, answer))
-      } catch {
-        // A failed write only leaves an answer that repeats a narration hidden.
-      }
-
-      const lines = summarize({ counts, model: e.usage?.model ?? '', durationMs: e.durationMs, outputTokens: e.usage?.output_tokens ?? 0, reason: e.reason })
+      await update($, active, () => null)
+      const lines = summarize({ model: e.usage?.model ?? '', durationMs: e.durationMs, outputTokens: e.usage?.output_tokens ?? 0, reason: e.reason })
       await update($, footers, all => ({ ...all, [String(e.durationMs)]: lines }))
     }
 
     return result
   })
 
-  // A successful or running call draws nothing; errors and interruptions keep the engine's row.
-  on('ui.render', { component: 'ToolUse' }, ($, e, next) => {
-    if (e.props.isErrored || e.props.isInterrupted) {
-      return next(e)
+  // A call that heads a segment draws its line; errors and interruptions keep the engine's row too.
+  on('ui.render', { component: 'ToolUse' }, async ($, e, next) => {
+    const line = segmentRow([e.props.tool_use_id], await read($, heads), await read($, segments), await read($, active))
+    const { Box, Text } = $.ui.resolve(e)
+    const row = e.props.isErrored || e.props.isInterrupted ? await next(e) : null
+
+    if (line === null) {
+      return row ?? <Box />
     }
 
-    const { Box } = $.ui.resolve(e)
-
-    return <Box />
+    return (
+      <Box flexDirection="column">
+        <Text dimColor>{line}</Text>
+        {row}
+      </Box>
+    )
   })
 
   on('ui.render', { component: 'ToolResult' }, ($, e, next) => {
@@ -122,11 +145,16 @@ export const register: Register = on => {
     return <Box />
   })
 
-  // "Read 3 files, ran 2 shell commands" and "Worked for 31s": the footer carries both now.
-  on('ui.render', { component: 'ToolGroup' }, ($, e) => {
-    const { Box } = $.ui.resolve(e)
+  // ctrl+o (or --verbose) unfolds a group into its calls; folded, it draws its segment's line or nothing.
+  on('ui.render', { component: 'ToolGroup' }, async ($, e, next) => {
+    if (e.props.isExpanded) {
+      return next(e)
+    }
 
-    return <Box />
+    const line = segmentRow(e.props.calls.map(call => call.tool_use_id), await read($, heads), await read($, segments), await read($, active))
+    const { Box, Text } = $.ui.resolve(e)
+
+    return line === null ? <Box /> : <Text dimColor>{line}</Text>
   })
 
   // The row's durationMs can drift from turn.complete's; a turn with no footer near it draws nothing.
@@ -137,7 +165,6 @@ export const register: Register = on => {
     if (lines === undefined) {
       return <Box />
     }
-
 
     return (
       <Box flexDirection="column">
