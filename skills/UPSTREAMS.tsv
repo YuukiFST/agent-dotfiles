@@ -59,6 +59,7 @@ security-audit	cloudflare/security-audit-skill	skills/security-audit	c1c8a8c
 setup-matt-pocock-skills	mattpocock/skills	skills/engineering/setup-matt-pocock-skills	c66bdee
 show-me	humanlayer/skills	plugins/show-me	6ab9013
 skill-diet	nicobailon/skill-diet	.	5f41df1
+stageshow	benjitaylor/skills	stageshow	8020574
 teardown	jakubkrehel/skills	skills/teardown	592aedc
 teach	mattpocock/skills	skills/productivity/teach	aa024cb
 technical-writing	cursor/plugins	pstack/skills/technical-writing	00b14f1
