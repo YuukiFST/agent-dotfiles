@@ -2,11 +2,12 @@
 
 Every fix ties to a measurement; reading source is not measuring.
 Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; this playbook covers the rest.
+A project with `.perf/ratchet.json` takes its baseline and its final gate from `perf-ratchet`, so the fix also proves no other metric got worse.
 
 1. Capture a baseline on the real workload plus a profile or trace of it, and vet it and every later number with `principle-explain-the-number`.
 2. Ground the hypotheses in that profile or trace, then try the performance mantras cheapest first, stopping at the first that meets the target:
    1. Don't do it: stop work whose result nothing uses.
-   2. Do it, but don't do it again.
+   2. Do it, but don't do it again. A new cache comes only after the redesign in `perf-ratchet`'s `techniques.md` failed to win the time back.
    3. Do it less.
    4. Do it later.
    5. Do it when they're not looking.
