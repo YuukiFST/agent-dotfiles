@@ -77,13 +77,24 @@ A finding that shows a Step 3 trigger the diff alone hid (a public API, shared s
 
 ## Step 6, Prove
 
-A runtime finding is one whose Proof is anything but `judgment`; a reviewer's pasted output is a self-report, so rerun each one yourself.
+Class each finding by the rubric section it came from, whatever its Proof field says: **runtime** for Correctness, Security, Error Handling, Performance, API Contracts and the docs-drift check; **judgment** for Scope, Root Causes, Structural Integrity, the rest of Verification, Complexity Budget and the code-quality lens.
+Read `references/lead-judgment.md` first and skip each runtime finding its filters dismiss or tag pre-existing; rerun the rest, since a reviewer's pasted output is a self-report (in the no-subagent fallback, your own pass's run counts).
 
-- Run the command against the code under review: in place when it writes nothing outside OS temp, otherwise in a scratch worktree from `git worktree add "$(mktemp -d)" <ref>`, at the PR's head commit for a PR, or at `HEAD` followed by `git diff HEAD | git -C <worktree> apply` and a copy of the untracked files for local work; remove it with `git worktree remove` when done.
-- A runtime finding that arrived without a command gets the cheapest one you can write, at level 4 (Ran) of `references/blast-radius.md`.
-- Mark each runtime finding **proven** when the run shows the failure and the failure breaks the intent, **refuted** when the run shows the intended behavior, or **unproven** with the reason no run fits here (a race, a production-only service, a run the session cannot afford).
+- **Proof bar:** a grep of the real file proves docs drift; any other runtime finding needs a run of the real code, level 4 (Ran) of `references/blast-radius.md`, and one that arrived without a command gets the cheapest such run you can write.
+- **Where:** in place only when the scope is the current working tree and the command writes nothing outside OS temp; otherwise in a scratch worktree, removed on every path, the failing run included:
 
-Done when every runtime finding carries one mark, with the command and the output it printed.
+  ```bash
+  wt=$(mktemp -d)
+  git worktree add --detach "$wt" <ref>   # a PR: git fetch origin pull/<n>/head, ref FETCH_HEAD; local work: HEAD
+  # local work only: bring over the uncommitted and untracked changes
+  git diff --binary HEAD > "$wt.patch"; if [ -s "$wt.patch" ]; then git -C "$wt" apply "$wt.patch"; fi
+  git ls-files --others --exclude-standard -z | tar --null -T - -cf - | tar -C "$wt" -xf -
+  # run the proof inside "$wt", then:
+  git worktree remove --force "$wt"; rm -f "$wt.patch"
+  ```
+- **Mark** each rerun finding **proven** when the run shows the failure and the failure breaks the intent, **refuted** when the run shows the intended behavior, or **unproven** with the reason no run fits here (a race, a production-only service, a run the session cannot afford).
+
+Done when every runtime finding is skipped by a filter or carries one mark with its command and output, and `git worktree list` shows no scratch worktree.
 
 ## Step 7, Lead judgment
 
@@ -111,19 +122,19 @@ Otherwise write "not risky" with the reason and stop.
 Risky or not risky, with the trigger; sensitive or not, with the paths that made it so.
 
 ### Reviewers
-- Reviewer [label]: [model], [effort], [N findings, P proven, R refuted], [complete, or incomplete with the files it missed], plus any fallback taken.
+- Reviewer [label]: [model], [effort], [N findings, P proven, R refuted, U unproven], [complete, or incomplete with the files it missed], plus any fallback taken.
 
 ### Act On
 Each: description, bug class with every location it occurs, which reviewers raised it, why it matters, and the proving command with its output (or "judgment").
 
 ### Consider
-Each: description, which reviewers raised it, the tradeoff; a Scope finding also carries the quoted request and the question the user answers.
+Each: description, which reviewers raised it, the tradeoff; a Scope finding also carries the quoted request and the question the user answers, and an unproven runtime finding the run that would settle it.
 
 ### Noted
 Brief list.
 
 ### Dismissed
-Each with a brief rationale.
+Each with a brief rationale; a refuted finding with its command and output.
 
 ### Agreement Map
 Where reviewers agreed and diverged, and what that pattern tells us; omit with a single reviewer.
