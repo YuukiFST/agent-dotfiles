@@ -58,6 +58,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | A reported defect, failing test, crash or wrong output | `playbooks/bug-fix.md` |
 | New or changed behavior | `playbooks/feature.md` |
 | Build, polish, redesign, animate or review a web UI (screen, component, flow, chart) | `ui-polish` |
+| Faux product UI for a marketing page: a mocked app screen, feature card, bento grid or animated cursor demo | `stageshow` |
 | Behavior-preserving restructure: rename, extract, inline, dedupe, move | `playbooks/refactoring.md` |
 | Port or rewrite code from another language in Rust | `rust-port` |
 | Write or change Rust code | `rust-best-practices` |
