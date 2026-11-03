@@ -37,9 +37,12 @@ Exit: 0 all pass or skip, 1 any fail, 2 usage error.`,
 Compares, byte for byte, what the sync scripts copy with what is live, for every live dir
 that exists on this machine:
   rules/ vs ~/.claude/rules (full mirror: extra live files count)
+  hooks/*, mods/<name>/ vs ~/.claude/hooks, ~/.claude/mods (copied over: extras ignored)
   CODING_STANDARDS.md, PROMPT_ENGINEERING.md vs ~/.claude/
   GLOBAL.md vs ~/.claude/CLAUDE.md, ~/.pi/agent/AGENTS.md, ~/.config/opencode/AGENTS.md
   skills/<name>/ vs ~/.claude/skills, ~/.agents/skills; names in REMOVED.txt still live
+Text files compare with CRLF folded to LF; files .gitignore drops (__pycache__) are skipped.
+Not covered: settings.json (seeded once, machine-owned) and the rtk config.
 Prints only drift, then one summary line. Fix drift with the sync command in AGENTS.md.
 Exit: 0 no drift, 1 drift.`,
   skill: `agent-cli skill <name> [--json]
@@ -67,16 +70,48 @@ function listFiles(dir, base = dir, out = []) {
   return out;
 }
 
-// Returns null when the trees match, else { missing, extra, differs } relative paths.
-function compareTrees(src, dest, { countExtra }) {
+function gitLines(args, input) {
+  try {
+    const out = execFileSync('git', args, { cwd: REPO, encoding: 'utf8', input, stdio: ['pipe', 'pipe', 'ignore'] });
+    return out.split('\0').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+// Repo side of a sync: tracked and untracked files under repoRel, minus what .gitignore drops
+// (a checkout's __pycache__ is a local artifact, not payload).
+function repoFiles(repoRel) {
+  const prefix = repoRel.endsWith('/') ? repoRel : repoRel + '/';
+  const listed = gitLines(['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', prefix]);
+  if (!listed.length) return listFiles(path.join(REPO, repoRel));
+  return listed.filter((f) => fs.existsSync(path.join(REPO, f))).map((f) => f.slice(prefix.length));
+}
+
+// Text compares with CRLF folded to LF: the checkout's line endings follow core.autocrlf,
+// so the same commit synced from two checkouts differs only in CR bytes.
+function sameContent(fileA, fileB) {
+  const a = fs.readFileSync(fileA);
+  const b = fs.readFileSync(fileB);
+  if (a.equals(b)) return true;
+  if (a.includes(0) || b.includes(0)) return false;
+  const lf = (buf) => buf.toString('latin1').replace(/\r\n/g, '\n');
+  return lf(a) === lf(b);
+}
+
+// Returns null when the live copy matches repoRel, else { missing, extra, differs } relative paths.
+function compareTrees(repoRel, dest, { countExtra }) {
   if (!fs.existsSync(dest)) return { absent: true };
-  const a = new Set(listFiles(src));
+  const src = path.join(REPO, repoRel);
+  const a = new Set(repoFiles(repoRel));
   const b = new Set(listFiles(dest));
   const missing = [...a].filter((f) => !b.has(f));
-  const extra = countExtra ? [...b].filter((f) => !a.has(f)) : [];
-  const differs = [...a].filter(
-    (f) => b.has(f) && !fs.readFileSync(path.join(src, f)).equals(fs.readFileSync(path.join(dest, f))),
-  );
+  let extra = countExtra ? [...b].filter((f) => !a.has(f)) : [];
+  if (extra.length) {
+    const ignored = new Set(gitLines(['check-ignore', '-z', '--no-index', '--stdin'], extra.map((f) => `${repoRel}/${f}`).join('\0') + '\0'));
+    extra = extra.filter((f) => !ignored.has(`${repoRel}/${f}`));
+  }
+  const differs = [...a].filter((f) => b.has(f) && !sameContent(path.join(src, f), path.join(dest, f)));
   return missing.length + extra.length + differs.length ? { missing, extra, differs } : null;
 }
 
@@ -207,30 +242,42 @@ function cmdDrift(json) {
   const claude = path.join(HOME, '.claude');
   let checked = 0;
   if (fs.existsSync(claude)) {
-    const d = compareTrees(path.join(REPO, 'rules'), path.join(claude, 'rules'), { countExtra: true });
+    const d = compareTrees('rules', path.join(claude, 'rules'), { countExtra: true });
     checked++;
     if (d) issues.push({ what: 'rules/', live: tilde(path.join(claude, 'rules')), detail: describeTreeDrift(d) });
+    // mods/ (Claude Code only) is copied over, never mirrored, and Claude Code writes
+    // .claude-plugin/types/ itself, so extra live files are not drift.
+    const modsDir = path.join(REPO, 'mods');
+    const liveMods = fs.existsSync(path.join(claude, 'mods'));
+    const mods = liveMods && fs.existsSync(modsDir) ? fs.readdirSync(modsDir, { withFileTypes: true }).filter((e) => e.isDirectory()) : [];
+    for (const mod of mods) {
+      checked++;
+      const m = compareTrees(`mods/${mod.name}`, path.join(claude, 'mods', mod.name), { countExtra: false });
+      if (m) issues.push({ what: `mods/${mod.name}`, live: tilde(path.join(claude, 'mods')), detail: describeTreeDrift(m) });
+    }
   }
+  const hooksDir = path.join(REPO, 'hooks');
+  const hooks = fs.existsSync(hooksDir) && fs.existsSync(claude) ? repoFiles('hooks').filter((f) => !f.includes('/')) : [];
   const files = [
     ['CODING_STANDARDS.md', path.join(claude, 'CODING_STANDARDS.md')],
     ['PROMPT_ENGINEERING.md', path.join(claude, 'PROMPT_ENGINEERING.md')],
     ['GLOBAL.md', path.join(claude, 'CLAUDE.md')],
     ['GLOBAL.md', path.join(HOME, '.pi', 'agent', 'AGENTS.md')],
     ['GLOBAL.md', path.join(HOME, '.config', 'opencode', 'AGENTS.md')],
+    ...hooks.map((f) => [`hooks/${f}`, path.join(claude, 'hooks', f)]),
   ];
   for (const [src, dest] of files) {
     if (!fs.existsSync(path.dirname(dest))) continue;
     checked++;
     if (!fs.existsSync(dest)) issues.push({ what: src, live: tilde(dest), detail: 'not installed' });
-    else if (!fs.readFileSync(path.join(REPO, src)).equals(fs.readFileSync(dest)))
-      issues.push({ what: src, live: tilde(dest), detail: 'differs' });
+    else if (!sameContent(path.join(REPO, src), dest)) issues.push({ what: src, live: tilde(dest), detail: 'differs' });
   }
   const skills = repoSkills();
   const removed = removedSkills().filter((n) => !skills.includes(n));
   for (const dir of LIVE_SKILL_DIRS) {
     for (const name of skills) {
       checked++;
-      const d = compareTrees(path.join(REPO, 'skills', name), path.join(dir, name), { countExtra: true });
+      const d = compareTrees(`skills/${name}`, path.join(dir, name), { countExtra: true });
       if (d) issues.push({ what: `skills/${name}`, live: tilde(dir), detail: describeTreeDrift(d) });
     }
     for (const name of removed)
@@ -319,7 +366,7 @@ function cmdSkill(args, json) {
     upstreams: upstreamPins(name),
     inRemovedList: removedSkills().includes(name),
     live: LIVE_SKILL_DIRS.map((d) => {
-      const drift = compareTrees(dir, path.join(d, name), { countExtra: true });
+      const drift = compareTrees(`skills/${name}`, path.join(d, name), { countExtra: true });
       return { dir: tilde(d), state: drift ? describeTreeDrift(drift) : 'in sync' };
     }),
   };
