@@ -20,7 +20,10 @@ ai-tells	akitaonrails/my-skills	humanizer	8a7d0e5
 ai-tells	petergyang/no-ai-slop	.	000650b
 ai-tells	cursor/plugins	pstack/skills/unslop	70b2dc8
 anatomy	wheresryan22/anatomy	.	1482e84
+browser-harness	browser-use/browser-harness	SKILL.md	c24e507
+browser-harness	browser-use/browser-harness	.	c24e507
 chrome-devtools-axi	kunchenguid/chrome-devtools-axi	skills/chrome-devtools-axi	75dd6ca
+chrome-devtools-axi	kunchenguid/chrome-devtools-axi	.	5a23296
 code-simplifier	anthropics/claude-plugins-official	plugins/code-simplifier/agents/code-simplifier.md	ceb9b72
 codebase-design	mattpocock/skills	skills/engineering/codebase-design	697d4ce
 correct	cursor/plugins	pstack/skills/correct	e5136d8

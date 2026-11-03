@@ -4,21 +4,21 @@
 # Unix equivalent: scripts/setup-opencode.sh
 $ErrorActionPreference = "Stop"
 
-Write-Host "[1/6] opencode (npm, latest)"
+Write-Host "[1/7] opencode (npm, latest)"
 # Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
 # script is documented as the updater. Skipping it when opencode is on PATH would never update.
 npm install -g opencode-ai@latest
 opencode --version
 
-Write-Host "[2/6] Config (AGENTS.md + skills + rules)"
+Write-Host "[2/7] Config (AGENTS.md + skills + rules)"
 & "$PSScriptRoot\sync-config.ps1" opencode
 
-Write-Host "[3/6] rtk (+ OpenCode plugin)"
+Write-Host "[3/7] rtk (+ OpenCode plugin)"
 & "$PSScriptRoot\install-rtk.ps1" -OpenCode
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 & "$PSScriptRoot\sync-config.ps1" opencode | Out-Null
 
-Write-Host "[4/6] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
+Write-Host "[4/7] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
 # `plugin add` skips a plugin already in opencode.jsonc without updating it, so `update` follows.
 foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagent", "@prevalentware/opencode-goal-plugin") {
   opencode plugin add $p
@@ -28,10 +28,13 @@ foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagen
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
 
-Write-Host "[5/6] gh-axi + chrome-devtools-axi"
+Write-Host "[5/7] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
-Write-Host "[6/6] fff MCP (retired, unregister)"
+Write-Host "[6/7] browser-harness"
+& "$PSScriptRoot\install-browser-harness.ps1"
+
+Write-Host "[7/7] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host @"
