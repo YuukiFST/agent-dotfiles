@@ -23,6 +23,8 @@ Reviewers, especially adversarial ones, tend to fill their review. If they don't
 
 "What if someone passes null here?" is only a finding if the caller can actually pass null. Trace the call site. If the input is validated upstream or the type system prevents it, dismiss the finding. Reviewers working from a diff can't always see the full call chain. You can.
 
+The run from Step 6 settles a runtime finding: an argued one reads as convincing whether or not it is true, so it reaches Act on only when proven. A judgment finding has no run, and its bar is the lens it came from: a structural finding names the next change it makes harder, a Scope finding quotes the request it departs from.
+
 ### Premature Abstraction Warnings
 
 Reviewers often suggest extracting functions, adding interfaces, or creating abstractions. Does this code need to change in a second way? If not, the abstraction is premature. Simple inline code that works beats a clean abstraction that's overkill for the current scope.
