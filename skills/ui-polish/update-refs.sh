@@ -41,6 +41,7 @@ jakubkrehel-skills https://github.com/jakubkrehel/skills
 emilkowalski-skills https://github.com/emilkowalski/skills
 mengto-skills https://github.com/MengTo/Skills agent-skills/ui
 craft https://github.com/gustavo-fior/craft
+unslop https://github.com/heydamir/unslop skills
 REPOS
 
 drift=0

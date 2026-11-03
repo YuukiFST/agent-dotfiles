@@ -31,7 +31,7 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 
 ## Implementation decisions
 
-<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
+<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape and how a deploy is undone, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
 
 ## Testing decisions
 
@@ -56,7 +56,9 @@ Break the spec into **tracer bullets**: each ticket cuts a narrow but complete p
 
 - **The first ticket is the walking skeleton**: the project scaffold, the test harness running one E2E test, lint and typecheck, and, when the spec has hosting, the deploy configuration with the production build verified locally. Every other ticket is blocked by it.
   The deploy itself is never a build ticket: going live is the human's go, so BUILD.md hands it over in its final report.
+  In an existing repo, the first ticket is instead the thinnest end-to-end slice through the harness it already has, adding only the skeleton pieces it lacks, and every other ticket is blocked by it the same way.
 - Then one ticket per user-facing flow, smallest useful flow first, each blocked only by the tickets that genuinely gate it, so independent flows can be built in parallel.
+  Two flows that meet at an interface (an API shape, a schema, an event) that **Implementation decisions** leaves open are not built in parallel: the one sliced earlier blocks the later one, which keeps the edges free of cycles, and settles the interface as a technical gap (BUILD.md step 7), so two implementers never each invent it.
 - A wide mechanical change across an existing codebase runs as expand, migrate in batches, contract, each its own ticket.
 
 Each ticket's body:

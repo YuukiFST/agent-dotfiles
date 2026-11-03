@@ -19,6 +19,16 @@ Does the code actually do what the intent says it should?
 
 When you find a potential bug, trace the execution path. Don't just flag "this could be nil". Show the call chain that makes it nil.
 
+## Scope
+
+Does every change trace to something the user asked for?
+
+- Each hunk maps to a quoted user request, directly or as an edit that request requires (its callers, its tests, the docs that describe it); name the hunks that map to neither (an unrequested feature, refactor, default or cleanup).
+- A request reinterpreted: two requests that clash and the diff silently picks one, or a request narrowed or widened from its wording.
+
+Report each one as a decision the user owes, quoting the request it departs from.
+A request the diff leaves unmet, or meets only in part, is a Correctness finding, not a Scope one.
+
 ## Root Causes vs. Symptoms
 
 Is the code fixing the actual problem or papering over a symptom?
@@ -59,6 +69,8 @@ Can you tell that this code works from reading it?
 - When the diff changes a golden, snapshot or expect output, read that output diff beside the logic diff: is the new behavior the one the intent asks for?
 - Check the real thing, not a proxy. If the code checks liveness via file mtime or cached state instead of reading the actual value, that's a verification gap.
 - For delegated or async work: does the code verify actual output artifacts, or does it trust self-reports and summaries?
+- A claim in the PR body or a commit message ("fixes X", "faster", "no behavior change") with no command output, test or measurement behind it is a finding: name the run that would prove it.
+- Docs drift: grep the repo's docs, READMEs, skills and agent instructions for each identifier, flag, path or behavior the diff changes; a doc that still describes the old one and is absent from the diff is a finding at its file:line.
 
 ## Complexity Budget
 
@@ -87,6 +99,7 @@ For each security finding, trace the input path through the code and show it.
 - Prototype pollution or unsafe object merges of untrusted data
 - Insecure defaults: debug on, CORS wildcard, stack traces or internal paths in production errors
 - A dependency pinned to a version with a known vulnerability
+- A version bump that neither the PR body nor a commit message explains (what changed between the old and new pins); a bulk bump of unrelated packages; a lockfile change the manifest does not explain
 
 ## Error Handling
 

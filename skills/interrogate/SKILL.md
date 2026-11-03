@@ -24,6 +24,10 @@ Done when you can name every changed file and say why each context file is inclu
 ## Step 2, Intent
 
 State the intent in one paragraph, drawn from the user's message, the commit messages, the PR body and the code.
+Beside it, quote the user's own requests verbatim: each message of this session that asked for or changed the work under review (a review command is not one), cut to its request sentences, without logs, articles or code pasted into it.
+A message that accepts or points to earlier text ("go with your recommendation") is quoted together with that text, labelled as the agent's.
+No such message in the session: quote the issue or spec the work links. No source at all: write "none available", and reviewers skip the Scope lens.
+Reviewers check your paraphrase against these quotes, so a misread intent surfaces instead of passing through every reviewer.
 If you are unsure of the intent, ask the user before spawning reviewers.
 
 ## Step 3, Risk
@@ -35,8 +39,8 @@ A user asking for a deep or full review makes the diff risky.
 
 | Diff | Reviewers | Lenses | Blast radius |
 |------|-----------|--------|--------------|
-| Not risky | First row for your harness | `rubric.md` | Only when an Act on finding stands or falls on runtime behavior |
-| Risky | Every row for your harness | `rubric.md` and `code-quality-review.md` | Always |
+| Not risky | First row for your harness | `references/rubric.md` | Only when an Act on finding stands or falls on runtime behavior |
+| Risky | Every row for your harness | `references/rubric.md` and `references/code-quality-review.md` | Always |
 
 Done when you can name the trigger that made the diff risky, and each sensitive path, or say none fired.
 
@@ -44,7 +48,7 @@ Done when you can name the trigger that made the diff risky, and each sensitive 
 
 Read `reviewers.md` and take the rows Step 3 calls for, in order; label them Reviewer A, B, and so on.
 Fill `references/reviewer-prompt.md` once and send that same prompt to every reviewer.
-Paste text into it, not paths or commands: the intent, the diff output, and the full contents of each lens Step 3 calls for; on a diff that is not risky, drop the template's Code Quality Lens section.
+Paste text into it, not paths or commands: the intent, the user's verbatim requests, the PR body and commit messages when they exist, the diff output, and the full contents of each lens Step 3 calls for; on a diff that is not risky, drop the template's Code Quality Lens section.
 OpenCode reviewers have no shell, and the skill's own files sit outside the repo under review, so a reviewer cannot fetch any of it.
 Launch all reviewers in a single message so they run in parallel.
 
@@ -102,7 +106,7 @@ Risky or not risky, with the trigger; sensitive or not, with the paths that made
 Each: description, bug class with every location it occurs, which reviewers raised it, why it matters.
 
 ### Consider
-Each: description, which reviewers raised it, the tradeoff.
+Each: description, which reviewers raised it, the tradeoff; a Scope finding also carries the quoted request and the question the user answers.
 
 ### Noted
 Brief list.

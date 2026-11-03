@@ -28,9 +28,10 @@ The user says to leave yuu-mode: drop this file's rules for the rest of the sess
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
    When tool calls come between, the final message opens with the current route line.
-3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, and, when the task ships a change, the smallest change you expect to meet it.
+3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, what stays out of scope, and, when the task ships a change, the smallest change you expect to meet it.
    Keep working without waiting for a confirmation; when the evidence rules out the change the user asked for, show that evidence and stop.
-   The same restatement goes into the context of every subagent brief (a template a routed skill prescribes keeps its own order), and opens the why of a PR body and the final message, except after a fully specified one-line edit.
+   The same restatement goes into the context of every subagent brief beside the user's requests quoted verbatim (a reply like "go with your recommendation" quoted with the text it accepts), so a subagent works from the source and not only from your reading of it (a template a routed skill prescribes keeps its own order).
+   It also opens the why of a PR body and the final message, except after a fully specified one-line edit.
 4. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
 A casual question or one-line answer gets answered directly, with no route line, restatement or todo list.
@@ -61,16 +62,17 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Port or rewrite code from another language in Rust | `rust-port` |
 | Write or change Rust code | `rust-best-practices` |
 | Write or change TypeScript code | `typescript-best-practices` |
-| Add auth, user input handling, secrets, API endpoints or payment code | `security-review` |
+| Add auth, user input handling, secrets, API endpoints or payment code | `security-audit` |
 | Simplify code just written | `code-simplifier` |
 | Design a module interface, a seam, a deep module | `codebase-design` |
 | Scan a codebase for deepening opportunities | `improve-codebase-architecture` |
 | Pin down domain terms, record an architecture decision | `domain-modeling` |
 | Settle a design or behavior question with a throwaway build | `prototype` |
-| A whole new project from a loose idea | `helmsman` |
+| A whole new project from a loose idea, or a feature too big for one session | `helmsman` |
 | Slow web page, Core Web Vitals, Lighthouse score | `web-perf` |
 | Slow desktop app launch | `optimizing-startup` |
 | Any other measured slowness | `playbooks/perf-issue.md` |
+| Performance baselines that must never regress, or a project with `.perf/ratchet.json` | `perf-ratchet` |
 
 ### Review
 
@@ -81,7 +83,6 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Write, change or audit tests | `test-audit` |
 | Agents keep repeating the same mistakes in a repo; make each class impossible | `correct` |
 | Security review or audit of existing code | `security-audit` |
-| Hunt for bounty-worthy vulnerabilities | `security-bounty-hunter` |
 | Survey a codebase and write plans for other agents | `improve` |
 | Stress-test a plan or idea | `grilling` |
 | Measure whether a change to a user-invoked skill or a playbook alters agent behavior | `playbooks/eval.md` |
@@ -103,6 +104,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 |------|-------|
 | Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
 | Drive a web page in a real browser | `browser-harness` |
+| Performance trace, Lighthouse audit or DevTools debugging of a page | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
 | Hand the work to another session | `handoff` |
@@ -117,6 +119,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 - **Observe before you ask.** A "which approach" fork whose answer you could see by running something (behavior, timing, layout, output) gets a `prototype` or a quick run, and the result decides.
   Ask the user only for a product or preference call no experiment settles.
 - **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `browser-harness` for web UIs, a real CLI run, or `curl` for a service.
+  A web run passes when the flow completes and, on each page it visits, no console error shows that a run of the same flow, captured before the first edit or from a worktree at the base ref, did not show, and no request fails or repeats unless the flow means it to.
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.
 - **Prose that ships** (PR body, docs, commit body): an `ai-tells` pass before it goes out.
@@ -145,5 +148,7 @@ Asked whether to do something or shown an approach, give your real judgment; "th
 ## Reply
 
 Every claim carries its evidence (file:line, command output) or a label: measured, inferred, or guess.
+Each passing check also names what it leaves unproven (a path it never runs, a surface it never touched).
+A task that shipped a change lists the decisions you made that the user never stated: a default picked, something left out of scope, a request reinterpreted where two clashed.
 Link only artifacts you produced or read this session.
 Each playbook's **Reply** line names what that playbook adds.
