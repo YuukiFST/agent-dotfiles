@@ -106,6 +106,28 @@ jobs:
       - name: Run the validator tests
         run: node --test skills/security-audit/validate-findings.test.cjs skills/security-audit/validate-coverage-ledger.test.cjs skills/security-audit/validate-citations.test.cjs skills/security-audit/validate-artifact-content.test.cjs skills/security-audit/finding-semantics.test.cjs skills/security-audit/chain-findings.test.cjs skills/security-audit/export-sarif.test.cjs
 
+  perf-ratchet:
+    name: perf-ratchet (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # count.mjs tests skip without Valgrind, which runs on Linux only.
+      - name: Install valgrind
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+      # probe.mjs reads /proc on Linux and Win32_Process on Windows, so each OS
+      # runs its own sampler.
+      - name: Run the ratchet, probe and count end-to-end tests
+        run: node --test skills/perf-ratchet/scripts/ratchet.test.mjs
+
   check-upstreams:
     name: check-upstreams
     runs-on: ubuntu-latest
