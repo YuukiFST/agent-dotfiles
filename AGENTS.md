@@ -6,6 +6,8 @@ Asked to "sync", "set up", or "reach parity", you make the machine you run on ma
 `GLOBAL.md`, `CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md` at the repo root are **payloads** (the user's global instructions, copied into harness config dirs by the scripts), not instructions for working on this repo.
 This file is; the root `CLAUDE.md` only imports it, because by default Claude Code skips `AGENTS.md` when a `CLAUDE.md` or `CLAUDE.local.md` sits in the working directory or above.
 
+**Orient with `bin/agent-cli` first:** it runs the CI jobs locally (`check`), compares the repo with the live dirs (`drift`), reports one skill's route, pins and sync state (`skill <name>`) and the git state a commit needs (`state`); reach for it before reading those files or composing those commands.
+
 ## Hard rules
 
 - **Edit here, sync there:** config changes land in this repo; the live dirs (`~/.claude`, `~/.agents`, `~/.pi/agent`) change only through a sync script.
@@ -35,7 +37,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
    Sync never runs it, and the clones sit outside every skills dir on purpose so none of their frontmatter reaches a session.
    Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/` (a route or a **Not routed** entry in `SKILL.md`, a repointed path or section citation, or a local term defined) and the script rerun.
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
-   1. `diff -rq rules ~/.claude/rules` prints nothing, `cmp CODING_STANDARDS.md ~/.claude/CODING_STANDARDS.md` and `cmp PROMPT_ENGINEERING.md ~/.claude/PROMPT_ENGINEERING.md` pass, and every `skills/<name>/` exists in the harness's skills dir (`~/.claude/skills` for Claude Code, `~/.agents/skills` for pi and OpenCode).
+   1. `bin/agent-cli drift` prints `summary: 0 drift`: rules, payload files and every `skills/<name>/` match their live copies byte for byte, and no `REMOVED.txt` skill is still live.
    2. `browser-harness --version` prints a version, and `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       A snapshot failure means Chrome is missing, not that the repo drifted.
       browser-harness reaches the user's Chrome only after a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, which `browser-harness --doctor` reports as `daemon alive`.

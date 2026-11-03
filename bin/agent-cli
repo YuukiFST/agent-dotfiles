@@ -1,0 +1,450 @@
+#!/usr/bin/env node
+// agent-cli: one place for the lookups and commands agents repeated across sessions in this repo.
+// Output is terse and written for an agent; every subcommand takes --json and --help.
+// Each subcommand exists because transcripts showed it hand-rolled in many sessions (see skills/agent-cli).
+'use strict';
+
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { spawn, execFileSync } = require('child_process');
+
+const REPO = path.resolve(__dirname, '..');
+const HOME = os.homedir();
+const slash = (p) => p.split(path.sep).join('/');
+// HOME may arrive with either separator on Windows (Git Bash rewrites USERPROFILE), so compare normalized.
+const tilde = (p) => (slash(p).startsWith(slash(HOME)) ? '~' + slash(p).slice(slash(HOME).length) : slash(p));
+
+const HELP = {
+  main: `agent-cli <command> [--json]
+
+  check [job...]   run the CI jobs from .github/workflows/ci.yml locally, in parallel
+  drift            compare the repo payload with the live harness dirs it syncs to
+  skill <name>     one skill's frontmatter, yuu-mode route, upstream pin and live sync state
+  state            branch, upstream, dirty files, commit identity, worktrees, last commit
+
+Run agent-cli <command> --help for details.`,
+  check: `agent-cli check [job...] [--list] [--json]
+
+Runs every run: step of .github/workflows/ci.yml (sudo install steps skipped), one job per
+process, jobs in parallel, steps in order, stopping a job at its first failing step.
+Prints PASS/FAIL/SKIP per job and the last lines of a failing step. SKIP means a step
+needed a command missing on this machine (bash's "command not found"): not a pass.
+  job...   job ids to run (default: all); --list prints the ids and their steps
+Exit: 0 all pass or skip, 1 any fail, 2 usage error.`,
+  drift: `agent-cli drift [--json]
+
+Compares, byte for byte, what the sync scripts copy with what is live, for every live dir
+that exists on this machine:
+  rules/ vs ~/.claude/rules (full mirror: extra live files count)
+  hooks/*, mods/<name>/ vs ~/.claude/hooks, ~/.claude/mods (copied over: extras ignored)
+  CODING_STANDARDS.md, PROMPT_ENGINEERING.md vs ~/.claude/
+  GLOBAL.md vs ~/.claude/CLAUDE.md, ~/.pi/agent/AGENTS.md, ~/.config/opencode/AGENTS.md
+  skills/<name>/ vs ~/.claude/skills, ~/.agents/skills; names in REMOVED.txt still live
+Text files compare with CRLF folded to LF; files .gitignore drops (__pycache__) are skipped.
+Not covered: settings.json (seeded once, machine-owned) and the rtk config.
+Prints only drift, then one summary line. Fix drift with the sync command in AGENTS.md.
+Exit: 0 no drift, 1 drift.`,
+  skill: `agent-cli skill <name> [--json]
+
+Prints, for skills/<name>: file count, description, how it is invoked (model or user-only,
+with the OpenCode marker pair), its yuu-mode route rows, its UPSTREAMS.tsv pins, whether it
+is listed in REMOVED.txt, and its state in each live skills dir.
+Exit: 0 found, 1 unknown name (close matches listed), 2 usage error.`,
+  state: `agent-cli state [--json]
+
+The git orientation rules/git.md needs before a commit, in one call: current branch and
+its upstream with ahead/behind counts, changed files, the commit identity read inside the
+repo (user.name, user.email; "UNSET" means ask the user), worktrees, and the last commit.
+Exit: 0, or 1 outside a git repo.`,
+};
+
+// ---------- shared helpers ----------
+
+function listFiles(dir, base = dir, out = []) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) listFiles(p, base, out);
+    else out.push(path.relative(base, p).split(path.sep).join('/'));
+  }
+  return out;
+}
+
+function gitLines(args, input) {
+  try {
+    const out = execFileSync('git', args, { cwd: REPO, encoding: 'utf8', input, stdio: ['pipe', 'pipe', 'ignore'] });
+    return out.split('\0').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+// Repo side of a sync: tracked and untracked files under repoRel, minus what .gitignore drops
+// (a checkout's __pycache__ is a local artifact, not payload).
+function repoFiles(repoRel) {
+  const prefix = repoRel.endsWith('/') ? repoRel : repoRel + '/';
+  const listed = gitLines(['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', prefix]);
+  if (!listed.length) return listFiles(path.join(REPO, repoRel));
+  return listed.filter((f) => fs.existsSync(path.join(REPO, f))).map((f) => f.slice(prefix.length));
+}
+
+// Text compares with CRLF folded to LF: the checkout's line endings follow core.autocrlf,
+// so the same commit synced from two checkouts differs only in CR bytes.
+function sameContent(fileA, fileB) {
+  const a = fs.readFileSync(fileA);
+  const b = fs.readFileSync(fileB);
+  if (a.equals(b)) return true;
+  if (a.includes(0) || b.includes(0)) return false;
+  const lf = (buf) => buf.toString('latin1').replace(/\r\n/g, '\n');
+  return lf(a) === lf(b);
+}
+
+// Returns null when the live copy matches repoRel, else { missing, extra, differs } relative paths.
+function compareTrees(repoRel, dest, { countExtra }) {
+  if (!fs.existsSync(dest)) return { absent: true };
+  const src = path.join(REPO, repoRel);
+  const a = new Set(repoFiles(repoRel));
+  const b = new Set(listFiles(dest));
+  const missing = [...a].filter((f) => !b.has(f));
+  let extra = countExtra ? [...b].filter((f) => !a.has(f)) : [];
+  if (extra.length) {
+    const ignored = new Set(gitLines(['check-ignore', '-z', '--no-index', '--stdin'], extra.map((f) => `${repoRel}/${f}`).join('\0') + '\0'));
+    extra = extra.filter((f) => !ignored.has(`${repoRel}/${f}`));
+  }
+  const differs = [...a].filter((f) => b.has(f) && !sameContent(path.join(src, f), path.join(dest, f)));
+  return missing.length + extra.length + differs.length ? { missing, extra, differs } : null;
+}
+
+function describeTreeDrift(d) {
+  if (d.absent) return 'not installed';
+  const parts = [];
+  if (d.differs.length) parts.push(`differs: ${d.differs.slice(0, 3).join(', ')}${d.differs.length > 3 ? ` +${d.differs.length - 3}` : ''}`);
+  if (d.missing.length) parts.push(`missing: ${d.missing.slice(0, 3).join(', ')}${d.missing.length > 3 ? ` +${d.missing.length - 3}` : ''}`);
+  if (d.extra.length) parts.push(`extra: ${d.extra.slice(0, 3).join(', ')}${d.extra.length > 3 ? ` +${d.extra.length - 3}` : ''}`);
+  return parts.join('; ');
+}
+
+function repoSkills() {
+  return fs
+    .readdirSync(path.join(REPO, 'skills'), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort();
+}
+
+function removedSkills() {
+  const f = path.join(REPO, 'skills', 'REMOVED.txt');
+  if (!fs.existsSync(f)) return [];
+  return fs
+    .readFileSync(f, 'utf8')
+    .split(/\r?\n/)
+    .map((l) => l.replace(/#.*/, '').trim())
+    .filter(Boolean);
+}
+
+const LIVE_SKILL_DIRS = [path.join(HOME, '.claude', 'skills'), path.join(HOME, '.agents', 'skills')].filter((d) =>
+  fs.existsSync(d),
+);
+
+// ---------- check ----------
+
+// Parses the subset of GitHub Actions YAML that ci.yml uses: jobs at indent 2, steps as
+// "- " items at indent 6, keys at indent 8, run: as one line or a "|" block.
+function parseWorkflow(file) {
+  const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+  const jobs = [];
+  let inJobs = false;
+  let job = null;
+  let step = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^jobs:\s*$/.test(line)) { inJobs = true; continue; }
+    if (!inJobs || !line.trim() || line.trim().startsWith('#')) continue;
+    const jobId = line.match(/^  ([\w-]+):\s*$/);
+    if (jobId) { job = { id: jobId[1], steps: [] }; jobs.push(job); step = null; continue; }
+    if (!job) continue;
+    const stepStart = line.match(/^ {6}- (.*)$/);
+    if (stepStart) { step = { name: null, run: null }; job.steps.push(step); }
+    const kv = (stepStart ? stepStart[1] : step && line.match(/^ {8}(\S.*)$/)?.[1]) || null;
+    if (!kv || !step) continue;
+    const m = kv.match(/^(name|run):\s*(.*)$/);
+    if (!m) continue;
+    if (m[1] === 'name') { step.name = m[2]; continue; }
+    if (m[2] !== '|') { step.run = m[2]; continue; }
+    const block = [];
+    while (i + 1 < lines.length && (/^ {10}/.test(lines[i + 1]) || !lines[i + 1].trim())) block.push(lines[++i].slice(10));
+    step.run = block.join('\n').trim();
+  }
+  for (const j of jobs) j.steps = j.steps.filter((s) => s.run && !/^sudo\s/.test(s.run));
+  return jobs.filter((j) => j.steps.length);
+}
+
+function runStep(cmd) {
+  return new Promise((resolve) => {
+    const child = spawn('bash', ['-c', cmd], { cwd: REPO, env: process.env });
+    let out = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (out += d));
+    child.on('close', (code) => resolve({ code, out }));
+    child.on('error', (err) => resolve({ code: 127, out: `bash: ${err.message}` }));
+  });
+}
+
+async function runJob(job) {
+  const started = Date.now();
+  const missing = new Set();
+  for (const s of job.steps) {
+    const { code, out } = await runStep(s.run);
+    for (const m of out.matchAll(/([\w.+-]+): (?:command )?not found/g)) missing.add(m[1]);
+    if (code === 0) continue;
+    const seconds = +((Date.now() - started) / 1000).toFixed(1);
+    if (missing.size) return { job: job.id, status: 'skip', seconds, missing: [...missing], step: s.name };
+    const tail = out.trimEnd().split(/\r?\n/).slice(-12).join('\n');
+    return { job: job.id, status: 'fail', seconds, step: s.name || s.run.slice(0, 60), exit: code, tail };
+  }
+  const seconds = +((Date.now() - started) / 1000).toFixed(1);
+  return { job: job.id, status: 'pass', seconds, missing: [...missing] };
+}
+
+async function cmdCheck(args, json) {
+  const jobs = parseWorkflow(path.join(REPO, '.github', 'workflows', 'ci.yml'));
+  if (args.includes('--list')) {
+    if (json) return print(json, jobs);
+    for (const j of jobs) console.log(`${j.id}: ${j.steps.map((s) => s.name || s.run.slice(0, 50)).join(' | ')}`);
+    return 0;
+  }
+  const wanted = args.filter((a) => !a.startsWith('-'));
+  const unknown = wanted.filter((w) => !jobs.some((j) => j.id === w));
+  if (unknown.length) {
+    console.error(`unknown job: ${unknown.join(', ')}; jobs: ${jobs.map((j) => j.id).join(', ')}`);
+    return 2;
+  }
+  const started = Date.now();
+  const results = await Promise.all(jobs.filter((j) => !wanted.length || wanted.includes(j.id)).map(runJob));
+  const total = +((Date.now() - started) / 1000).toFixed(1);
+  const count = (s) => results.filter((r) => r.status === s).length;
+  if (json) print(true, { results, pass: count('pass'), fail: count('fail'), skip: count('skip'), seconds: total });
+  else {
+    for (const r of results) {
+      if (r.status === 'pass') console.log(`PASS ${r.job} ${r.seconds}s`);
+      if (r.status === 'skip') console.log(`SKIP ${r.job}: missing ${r.missing.join(', ')} (step: ${r.step})`);
+      if (r.status === 'fail') console.log(`FAIL ${r.job} ${r.seconds}s, step "${r.step}" exit ${r.exit}\n${r.tail.replace(/^/gm, '  ')}`);
+    }
+    console.log(`summary: ${count('pass')} pass, ${count('fail')} fail, ${count('skip')} skip (${total}s)`);
+  }
+  return count('fail') ? 1 : 0;
+}
+
+// ---------- drift ----------
+
+function cmdDrift(json) {
+  const issues = [];
+  const claude = path.join(HOME, '.claude');
+  let checked = 0;
+  if (fs.existsSync(claude)) {
+    const d = compareTrees('rules', path.join(claude, 'rules'), { countExtra: true });
+    checked++;
+    if (d) issues.push({ what: 'rules/', live: tilde(path.join(claude, 'rules')), detail: describeTreeDrift(d) });
+    // mods/ (Claude Code only) is copied over, never mirrored, and Claude Code writes
+    // .claude-plugin/types/ itself, so extra live files are not drift.
+    const modsDir = path.join(REPO, 'mods');
+    const liveMods = fs.existsSync(path.join(claude, 'mods'));
+    const mods = liveMods && fs.existsSync(modsDir) ? fs.readdirSync(modsDir, { withFileTypes: true }).filter((e) => e.isDirectory()) : [];
+    for (const mod of mods) {
+      checked++;
+      const m = compareTrees(`mods/${mod.name}`, path.join(claude, 'mods', mod.name), { countExtra: false });
+      if (m) issues.push({ what: `mods/${mod.name}`, live: tilde(path.join(claude, 'mods')), detail: describeTreeDrift(m) });
+    }
+  }
+  const hooksDir = path.join(REPO, 'hooks');
+  const hooks = fs.existsSync(hooksDir) && fs.existsSync(claude) ? repoFiles('hooks').filter((f) => !f.includes('/')) : [];
+  const files = [
+    ['CODING_STANDARDS.md', path.join(claude, 'CODING_STANDARDS.md')],
+    ['PROMPT_ENGINEERING.md', path.join(claude, 'PROMPT_ENGINEERING.md')],
+    ['GLOBAL.md', path.join(claude, 'CLAUDE.md')],
+    ['GLOBAL.md', path.join(HOME, '.pi', 'agent', 'AGENTS.md')],
+    ['GLOBAL.md', path.join(HOME, '.config', 'opencode', 'AGENTS.md')],
+    ...hooks.map((f) => [`hooks/${f}`, path.join(claude, 'hooks', f)]),
+  ];
+  for (const [src, dest] of files) {
+    if (!fs.existsSync(path.dirname(dest))) continue;
+    checked++;
+    if (!fs.existsSync(dest)) issues.push({ what: src, live: tilde(dest), detail: 'not installed' });
+    else if (!sameContent(path.join(REPO, src), dest)) issues.push({ what: src, live: tilde(dest), detail: 'differs' });
+  }
+  const skills = repoSkills();
+  const removed = removedSkills().filter((n) => !skills.includes(n));
+  for (const dir of LIVE_SKILL_DIRS) {
+    for (const name of skills) {
+      checked++;
+      const d = compareTrees(`skills/${name}`, path.join(dir, name), { countExtra: true });
+      if (d) issues.push({ what: `skills/${name}`, live: tilde(dir), detail: describeTreeDrift(d) });
+    }
+    for (const name of removed)
+      if (fs.existsSync(path.join(dir, name))) issues.push({ what: `skills/${name}`, live: tilde(dir), detail: 'in REMOVED.txt but still live' });
+  }
+  if (json) print(true, { drift: issues, checked, liveSkillDirs: LIVE_SKILL_DIRS.map(tilde) });
+  else {
+    for (const i of issues) console.log(`DRIFT ${i.what} -> ${i.live}: ${i.detail}`);
+    console.log(`summary: ${issues.length} drift in ${checked} targets (skill dirs: ${LIVE_SKILL_DIRS.map(tilde).join(', ') || 'none'})`);
+  }
+  return issues.length ? 1 : 0;
+}
+
+// ---------- skill ----------
+
+function frontmatter(file) {
+  const text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+  const m = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!m) return {};
+  const fm = {};
+  const lines = m[1].split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const kv = lines[i].match(/^\s*([\w/.-]+|"[^"]+"):\s*(.*)$/);
+    if (!kv) continue;
+    const key = kv[1].replace(/"/g, '');
+    let val = kv[2].trim();
+    if (val === '>' || val === '|' || val === '>-' || val === '|-') {
+      const block = [];
+      while (i + 1 < lines.length && /^\s{2,}\S/.test(lines[i + 1])) block.push(lines[++i].trim());
+      val = block.join(' ');
+    }
+    fm[key] = val.replace(/^["']|["']$/g, '');
+  }
+  return fm;
+}
+
+function yuuRoutes(name) {
+  const router = path.join(REPO, 'skills', 'yuu-mode', 'SKILL.md');
+  if (!fs.existsSync(router)) return [];
+  let section = '';
+  const rows = [];
+  for (const line of fs.readFileSync(router, 'utf8').split(/\r?\n/)) {
+    const h = line.match(/^###\s+(.*)/);
+    if (h) section = h[1];
+    if (!line.startsWith('|')) continue;
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    if (cells.length < 2 || !new RegExp('`' + name + '`').test(cells[cells.length - 1])) continue;
+    rows.push({ section, task: cells[0], route: cells[cells.length - 1] });
+  }
+  return rows;
+}
+
+function upstreamPins(name) {
+  const f = path.join(REPO, 'skills', 'UPSTREAMS.tsv');
+  if (!fs.existsSync(f)) return [];
+  return fs
+    .readFileSync(f, 'utf8')
+    .split(/\r?\n/)
+    .filter((l) => l && !l.startsWith('#'))
+    .map((l) => l.split('\t'))
+    .filter((c) => c[0] === name)
+    .map(([, repo, sub, pin, branch]) => ({ repo, path: sub, pin, branch: branch || null }));
+}
+
+function cmdSkill(args, json) {
+  const name = args.find((a) => !a.startsWith('-'));
+  if (!name) { console.error(HELP.skill); return 2; }
+  const skills = repoSkills();
+  if (!skills.includes(name)) {
+    const close = skills.filter((s) => s.includes(name) || name.includes(s));
+    console.error(`no skills/${name}${close.length ? `; did you mean: ${close.join(', ')}` : ''}`);
+    return 1;
+  }
+  const dir = path.join(REPO, 'skills', name);
+  const fm = frontmatter(path.join(dir, 'SKILL.md'));
+  const userOnly = fm['disable-model-invocation'] === 'true';
+  const ocPair = fm['opencode/slash'] === 'true' && fm['opencode/autoinvoke'] === 'false';
+  const info = {
+    name,
+    path: `skills/${name}`,
+    files: listFiles(dir).length,
+    description: fm.description || null,
+    invocation: userOnly ? 'user-only' : 'model',
+    opencodeMarkers: userOnly ? (ocPair ? 'ok' : 'missing opencode/slash+autoinvoke pair') : null,
+    routes: yuuRoutes(name),
+    upstreams: upstreamPins(name),
+    inRemovedList: removedSkills().includes(name),
+    live: LIVE_SKILL_DIRS.map((d) => {
+      const drift = compareTrees(`skills/${name}`, path.join(d, name), { countExtra: true });
+      return { dir: tilde(d), state: drift ? describeTreeDrift(drift) : 'in sync' };
+    }),
+  };
+  if (json) return print(true, info);
+  const desc = info.description && info.description.length > 160 ? info.description.slice(0, 157) + '...' : info.description;
+  console.log(`skill: ${name}  ${info.path} (${info.files} files)`);
+  console.log(`description: ${desc || 'MISSING'}`);
+  console.log(`invocation: ${info.invocation}${info.opencodeMarkers ? `, opencode markers ${info.opencodeMarkers}` : ''}`);
+  const routeNote = name.startsWith('principle-') ? 'none (principle-* fire on their descriptions)' : 'none';
+  console.log(`route: ${info.routes.length ? info.routes.map((r) => `${r.section} | ${r.task}`).join(' ; ') : routeNote}`);
+  console.log(`upstream: ${info.upstreams.length ? info.upstreams.map((u) => `${u.repo} ${u.path} @${u.pin.slice(0, 7)}${u.branch ? ` (${u.branch})` : ''}`).join(' ; ') : 'none (local skill)'}`);
+  if (info.inRemovedList) console.log('WARNING: also listed in skills/REMOVED.txt');
+  console.log(`live: ${info.live.length ? info.live.map((l) => `${l.dir} ${l.state}`).join('; ') : 'no live skills dir on this machine'}`);
+  return 0;
+}
+
+// ---------- state ----------
+
+function git(args) {
+  try {
+    return execFileSync('git', args, { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function cmdState(json) {
+  const branch = git(['branch', '--show-current']);
+  if (branch === null) { console.error(`not a git repo: ${REPO}`); return 1; }
+  const upstream = git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
+  const counts = upstream ? git(['rev-list', '--left-right', '--count', 'HEAD...@{u}']) : null;
+  const [ahead, behind] = counts ? counts.split(/\s+/).map(Number) : [null, null];
+  const changed = (git(['status', '--porcelain']) || '').split('\n').filter(Boolean);
+  const worktrees = (git(['worktree', 'list', '--porcelain']) || '')
+    .split('\n\n')
+    .filter(Boolean)
+    .map((block) => ({
+      path: slash(block.match(/^worktree (.*)$/m)?.[1] || ''),
+      branch: block.match(/^branch refs\/heads\/(.*)$/m)?.[1] || (/^detached$/m.test(block) ? '(detached)' : null),
+    }));
+  const info = {
+    branch: branch || '(detached)',
+    upstream,
+    ahead,
+    behind,
+    changed,
+    identity: { name: git(['config', 'user.name']) || 'UNSET', email: git(['config', 'user.email']) || 'UNSET' },
+    worktrees,
+    lastCommit: git(['log', '-1', '--format=%h %s']),
+  };
+  if (json) return print(true, info);
+  console.log(`branch: ${info.branch}${upstream ? ` -> ${upstream} (ahead ${ahead}, behind ${behind})` : ' (no upstream)'}`);
+  console.log(`changed: ${changed.length ? `${changed.length} (${changed.slice(0, 5).map((l) => l.trim()).join(', ')}${changed.length > 5 ? ', ...' : ''})` : 'clean'}`);
+  console.log(`identity: ${info.identity.name} <${info.identity.email}>`);
+  console.log(`worktrees: ${worktrees.map((w) => `${w.branch} ${w.path}`).join(' ; ')}`);
+  console.log(`last: ${info.lastCommit || 'no commits'}`);
+  return 0;
+}
+
+// ---------- main ----------
+
+function print(json, value) {
+  console.log(JSON.stringify(value, null, 2));
+  return 0;
+}
+
+async function main(argv) {
+  const json = argv.includes('--json');
+  const args = argv.filter((a) => a !== '--json');
+  const cmd = args[0];
+  const rest = args.slice(1);
+  if (!cmd || cmd === '--help' || cmd === '-h' || cmd === 'help') { console.log(HELP.main); return cmd ? 0 : 2; }
+  if (!HELP[cmd] || cmd === 'main') { console.error(`unknown command: ${cmd}\n\n${HELP.main}`); return 2; }
+  if (rest.includes('--help') || rest.includes('-h')) { console.log(HELP[cmd]); return 0; }
+  if (cmd === 'check') return cmdCheck(rest, json);
+  if (cmd === 'drift') return cmdDrift(json);
+  if (cmd === 'state') return cmdState(json);
+  return cmdSkill(rest, json);
+}
+
+main(process.argv.slice(2)).then((code) => process.exit(code));
