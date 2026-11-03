@@ -37,18 +37,18 @@ printf '%s' "$out" | node -e '
 '
 check "primeira edicao injeta o arquivo inteiro, abaixo de 10.000 caracteres" $?
 
-[ -z "$(gate '{"session_id":"s1"}')" ]
-check "segunda edicao da sessao nao injeta de novo" $?
+if [ -z "$(gate '{"session_id":"s1"}')" ]; then rc=0; else rc=1; fi
+check "segunda edicao da sessao nao injeta de novo" "$rc"
 
-[ -n "$(gate '{"session_id":"s1","agent_id":"sub-1"}')" ]
-check "subagente da mesma sessao recebe a propria injecao" $?
+if [ -n "$(gate '{"session_id":"s1","agent_id":"sub-1"}')" ]; then rc=0; else rc=1; fi
+check "subagente da mesma sessao recebe a propria injecao" "$rc"
 
 gate '{"session_id":"s1"}' --reset
-[ -n "$(gate '{"session_id":"s1"}')" ]
-check "depois de --reset (compaction) injeta de novo" $?
+if [ -n "$(gate '{"session_id":"s1"}')" ]; then rc=0; else rc=1; fi
+check "depois de --reset (compaction) injeta de novo" "$rc"
 
-[ -z "$(gate 'not json')" ]
-check "stdin invalido nao imprime nada" $?
+if [ -z "$(gate 'not json')" ]; then rc=0; else rc=1; fi
+check "stdin invalido nao imprime nada" "$rc"
 
 edit() { # $1 = session id, $2 = file_path as a JSON string body
   gate "$(printf '{"session_id":"%s","tool_input":{"file_path":"%s"}}' "$1" "$2")"
@@ -66,8 +66,8 @@ check "primeira edicao de arquivo de prompt injeta PROMPT_ENGINEERING.md, abaixo
 injects "$(edit p1 /repo/src/app.ts)" "## Leave no trace"
 check "padroes de codigo chegam na edicao seguinte" $?
 
-[ -z "$(edit p1 /repo/CLAUDE.md)" ]
-check "com os dois injetados, nada mais e injetado" $?
+if [ -z "$(edit p1 /repo/CLAUDE.md)" ]; then rc=0; else rc=1; fi
+check "com os dois injetados, nada mais e injetado" "$rc"
 
 injects "$(edit p2 /repo/src/app.ts)" "## Leave no trace" && injects "$(edit p2 /repo/rules/git.md)" "## Evaluations"
 check "sessao que comeca em codigo recebe PROMPT_ENGINEERING.md na primeira edicao de prompt" $?
