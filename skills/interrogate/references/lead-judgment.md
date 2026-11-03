@@ -4,7 +4,7 @@ You are the lead reviewer. The configured reviewers have produced their findings
 
 ## Why This Step Matters
 
-Adversarial reviewers are useful because they're aggressive. But aggression without context produces noise. The reviewers only saw a slice of the codebase and a one-paragraph intent statement. They don't know:
+Adversarial reviewers are useful because they're aggressive. But aggression without context produces noise. The reviewers only saw a slice of the codebase, a one-paragraph intent statement and the user's quoted requests. They don't know:
 
 - What was already tried and rejected
 - What constraints exist outside the code (timeline, dependencies, migration plans)
@@ -44,6 +44,12 @@ These are honest mistakes from reviewers working with limited information. Dismi
 A real bug the base branch already has, reachable without this diff, goes to Noted, tagged pre-existing; check the tag against the diff and `git blame`.
 It neither blocks this PR as Act on nor gets dismissed as missing context, because the bug is real and dismissing it loses it.
 A bug in unchanged lines that this diff makes reachable or worse is not pre-existing: judge it like any other finding.
+
+### Scope Findings
+
+A Scope finding that holds is the user's decision, not yours: place it in Consider, prefixed `Scope:`, with the quoted request and the question the user answers (keep, drop, or widen the request), and leave the hunk as it is until the user answers.
+Dismiss one only when the hunk does trace to a quoted request, directly or as an edit it requires, and quote that request in the rationale.
+An unmet request is a Correctness finding and can be Act on.
 
 ## When Reviewers Are Right
 

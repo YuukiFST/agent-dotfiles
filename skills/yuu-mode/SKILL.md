@@ -28,9 +28,10 @@ The user says to leave yuu-mode: drop this file's rules for the rest of the sess
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
    When tool calls come between, the final message opens with the current route line.
-3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, and, when the task ships a change, the smallest change you expect to meet it.
+3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, what stays out of scope, and, when the task ships a change, the smallest change you expect to meet it.
    Keep working without waiting for a confirmation; when the evidence rules out the change the user asked for, show that evidence and stop.
-   The same restatement goes into the context of every subagent brief (a template a routed skill prescribes keeps its own order), and opens the why of a PR body and the final message, except after a fully specified one-line edit.
+   The same restatement goes into the context of every subagent brief beside the user's requests quoted verbatim (a reply like "go with your recommendation" quoted with the text it accepts), so a subagent works from the source and not only from your reading of it (a template a routed skill prescribes keeps its own order).
+   It also opens the why of a PR body and the final message, except after a fully specified one-line edit.
 4. Open a todo list: a playbook's steps copied verbatim, a skipped step kept with `skip: <reason>`; for a skill route, the skill's own workflow steps.
 
 A casual question or one-line answer gets answered directly, with no route line, restatement or todo list.
@@ -145,5 +146,7 @@ Asked whether to do something or shown an approach, give your real judgment; "th
 ## Reply
 
 Every claim carries its evidence (file:line, command output) or a label: measured, inferred, or guess.
+Each passing check also names what it leaves unproven (a path it never runs, a surface it never touched).
+A task that shipped a change lists the decisions you made that the user never stated: a default picked, something left out of scope, a request reinterpreted where two clashed.
 Link only artifacts you produced or read this session.
 Each playbook's **Reply** line names what that playbook adds.
