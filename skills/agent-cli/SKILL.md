@@ -52,10 +52,16 @@ The line names when to reach for it; the CLI's `--help` holds the details, so th
 ## 6. Measure
 
 The before and after numbers come from runs, never from the habit counts.
-Pick two or three tasks the habits came from.
-For each, give two fresh subagents the same brief: one in a worktree at the base ref (no CLI), one on the branch.
-Record tool calls, total tokens and wall time from each subagent's usage report, and check both answers against the truth.
-Report the table with its sample size; a run of one per arm is a sign, not a measurement.
+
+1. Commit the CLI, then write one task per subcommand to a file in `mktemp -d`, one line each as `name: brief`, phrased the way the user asks it ("Run this repo's CI checks locally and report each job's result"), never naming `agent-cli`.
+2. Run `node <this skill dir>/scripts/measure.mjs --base <commit before the CLI> --tasks <file>` (defaults: `--reps 2 --model sonnet`).
+   It runs every task as a headless `claude -p` session in a worktree at the base ref and one at HEAD, in parallel, so each session loads only its own worktree's `AGENTS.md`; subagents of this session would inherit its context and contaminate the baseline.
+   It prints mean turns, tokens, wall time and cost per task with the change, and the dir holding every answer.
+3. Read each answer against the truth you can check yourself (the CLI's own output, the files): a cheaper wrong answer is a regression, not a saving.
+   An arm worse than the baseline is a finding: read its answer for what the CLI got wrong, fix it with a regression case, and rerun that task.
+
+Needs Claude Code on the machine; on pi or OpenCode, report the measurement as not run.
+Report the table with its sample size and model; two runs per arm is a sign, not a measurement.
 
 ## Reply
 
