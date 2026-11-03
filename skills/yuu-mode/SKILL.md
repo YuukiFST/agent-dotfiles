@@ -150,5 +150,6 @@ Asked whether to do something or shown an approach, give your real judgment; "th
 Every claim carries its evidence (file:line, command output) or a label: measured, inferred, or guess.
 Each passing check also names what it leaves unproven (a path it never runs, a surface it never touched).
 A task that shipped a change lists the decisions you made that the user never stated: a default picked, something left out of scope, a request reinterpreted where two clashed.
+Before it goes out, reread each of the user's verbatim requests this session against what you delivered, and name every one left unmet or only partly met.
 Link only artifacts you produced or read this session.
 Each playbook's **Reply** line names what that playbook adds.
