@@ -36,7 +36,7 @@ grilling	mattpocock/skills	skills/productivity/grilling	bfdaef8
 handoff	mattpocock/skills	skills/productivity/handoff	0f5e033
 improve	shadcn/improve	skills/improve	bd0aff9
 improve-codebase-architecture	mattpocock/skills	skills/engineering/improve-codebase-architecture	697d4ce
-interrogate	cursor/plugins	pstack/skills/interrogate	99743e9
+interrogate	cursor/plugins	pstack/skills/interrogate	ab1f702
 interrogate	cursor/plugins	pstack/skills/blast-radius	df58112
 interrogate	openclaw/agent-skills	skills/autoreview	4f587b6
 maintain-verification-skill	cursor/plugins	pstack/skills/maintain-verification-skill	6714489

@@ -1,12 +1,13 @@
 ---
 name: interrogate
-description: "Adversarial code review of a diff, branch or PR: parallel read-only reviewers on the models in reviewers.md, a lead verdict (Act on / Consider / Noted / Dismissed), with reviewer count, lenses and a blast-radius proof scaled to the diff's risk. Use for a code review, 'review this PR', 'interrogate', 'what could this break', 'blast radius', or the review step before a merge."
+description: "Adversarial code review of a diff, branch or PR: parallel read-only reviewers on the models in reviewers.md, runtime findings rerun until proven or refuted, a lead verdict (Act on / Consider / Noted / Dismissed), with reviewer count, lenses and a blast-radius proof scaled to the diff's risk. Use for a code review, 'review this PR', 'interrogate', 'what could this break', 'blast radius', or the review step before a merge."
 ---
 
 # Interrogate
 
 Spawn read-only reviewers from the rows of `reviewers.md` for the harness you run in, as many as the diff's risk calls for (Step 3), then judge their findings as the lead.
 The adversarial signal comes from independent reviewers, and it is strongest when they run on different model families.
+A finding about runtime behavior blocks only once a run proves it; judgment findings (scope, structure, complexity) have no run and stay with the lead.
 The deliverable is a verdict: apply no fix until the user picks one.
 
 ## Step 1, Scope
@@ -72,21 +73,31 @@ A finding two or more reviewers raised independently is the highest signal; read
 When one reviewer flags something and another explicitly says the opposite, keep both as context for the verdict.
 A reviewer that failed, returned no parseable findings, or names changed files in its Coverage as skipped or partly read is **incomplete**: its silence on those files is no review, never agreement.
 
-A finding that shows a Step 3 trigger the diff alone hid (a public API, shared state, a caller three hops away) makes a non-risky diff risky: spawn the remaining rows with the code-quality lens, merge their findings in, and run Step 7.
+A finding that shows a Step 3 trigger the diff alone hid (a public API, shared state, a caller three hops away) makes a non-risky diff risky: spawn the remaining rows with the code-quality lens, merge their findings in, and run Step 8.
 
-## Step 6, Lead judgment
+## Step 6, Prove
+
+A runtime finding is one whose Proof is anything but `judgment`; a reviewer's pasted output is a self-report, so rerun each one yourself.
+
+- Run the command against the code under review: in place when it writes nothing outside OS temp, otherwise in a scratch worktree from `git worktree add "$(mktemp -d)" <ref>`, at the PR's head commit for a PR, or at `HEAD` followed by `git diff HEAD | git -C <worktree> apply` and a copy of the untracked files for local work; remove it with `git worktree remove` when done.
+- A runtime finding that arrived without a command gets the cheapest one you can write, at level 4 (Ran) of `references/blast-radius.md`.
+- Mark each runtime finding **proven** when the run shows the failure and the failure breaks the intent, **refuted** when the run shows the intended behavior, or **unproven** with the reason no run fits here (a race, a production-only service, a run the session cannot afford).
+
+Done when every runtime finding carries one mark, with the command and the output it printed.
+
+## Step 7, Lead judgment
 
 You are the lead reviewer, a pragmatic senior engineer, not a neutral aggregator.
 Read `references/lead-judgment.md`, then put every finding in one bucket, with the reviewers that raised it and a one-line rationale:
 
-- **Act on:** real issues affecting correctness, security or maintainability given the actual goals; they would block a real PR.
-- **Consider:** legitimate, but you are not sure they outweigh the cost of addressing them now.
+- **Act on:** real issues affecting correctness, security or maintainability given the actual goals; they would block a real PR. A runtime finding enters only when proven.
+- **Consider:** legitimate, but you are not sure they outweigh the cost of addressing them now; an unproven runtime finding goes no higher, with the run that would settle it.
 - **Noted:** technically valid but not actionable at this stage, and every real bug the base already has without this diff, tagged pre-existing.
-- **Dismissed:** wrong, nitpicky, or missing context, with a brief reason.
+- **Dismissed:** wrong, nitpicky, or missing context, with a brief reason; a refuted finding, with its output.
 
 Done when every finding from every reviewer sits in exactly one bucket.
 
-## Step 7, Blast radius
+## Step 8, Blast radius
 
 When Step 3 calls for it, read `references/blast-radius.md` and prove the one fact the change is safe because of.
 Otherwise write "not risky" with the reason and stop.
@@ -100,10 +111,10 @@ Otherwise write "not risky" with the reason and stop.
 Risky or not risky, with the trigger; sensitive or not, with the paths that made it so.
 
 ### Reviewers
-- Reviewer [label]: [model], [effort], [N findings], [complete, or incomplete with the files it missed], plus any fallback taken.
+- Reviewer [label]: [model], [effort], [N findings, P proven, R refuted], [complete, or incomplete with the files it missed], plus any fallback taken.
 
 ### Act On
-Each: description, bug class with every location it occurs, which reviewers raised it, why it matters.
+Each: description, bug class with every location it occurs, which reviewers raised it, why it matters, and the proving command with its output (or "judgment").
 
 ### Consider
 Each: description, which reviewers raised it, the tradeoff; a Scope finding also carries the quoted request and the question the user answers.
@@ -123,4 +134,5 @@ The safety fact, the proof level it reached, and the proof output; or "not risky
 ---
 
 Adapted from pstack's [`interrogate`](https://github.com/cursor/plugins/tree/main/pstack/skills/interrogate) and [`blast-radius`](https://github.com/cursor/plugins/tree/main/pstack/skills/blast-radius), MIT, see `LICENSE`.
+Step 6 takes pstack's rule that a finding survives only when a run proves it, applied to runtime findings alone, so the rubric, the lenses and the lead judgment stay for scope and complexity.
 The performance, API-contract and error-message checks in the rubric come from the former `thermo-nuclear-code-quality-review` skill.

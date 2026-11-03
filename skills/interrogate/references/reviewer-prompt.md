@@ -55,7 +55,10 @@ For each finding, provide:
 3. **Class**: the bug class in a few words ("unchecked exit code on a git call"), plus every other location in the code under review where the same class occurs, so the author fixes all of them at once.
 4. **Pre-existing**: `yes` when the bug is reachable on the base branch without this diff, else `no`; a bug in unchanged lines that this diff makes reachable or worse is `no`.
 5. **Evidence**: Why you believe this is a problem. Show your reasoning. Don't just assert.
-6. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
+6. **Proof**: for a runtime finding (a claim about what the code does when it runs: correctness, security, error handling, performance, an API contract, a doc that no longer matches the code), the exact command that shows the failure, such as a failing test, a repro script or a grep, plus the output the intent requires instead. Run it when it writes nothing outside OS temp and paste what it printed; otherwise write `not run` and why, and the lead runs it. For a judgment finding (scope, structure, complexity), write `judgment`.
+7. **Suggestion** (optional): What you'd do instead, only if you have a concrete alternative.
+
+A runtime finding shows the failure on the code as it stands, not after a change nobody has made yet; the lead reruns every Proof, and a finding whose run passes is dropped.
 
 A good finding references specific code, not vague concerns ("this could be better"). It distinguishes between "this is broken" and "I would have done this differently". It considers the user's requests. A finding that ignores the context of what's being built is a bad finding.
 Report no style-only finding (naming, formatting, a preferred idiom): it has no severity here.
@@ -75,6 +78,7 @@ Return your findings as a structured list:
 **Class**: Bug class, and its other locations
 **Pre-existing**: yes | no
 **Evidence**: Why this matters
+**Proof**: command, then its output or `not run: <reason>`, then the output the intent requires; or `judgment`
 **Suggestion**: (optional) What to do instead
 
 ### 2. [Severity] Short title
