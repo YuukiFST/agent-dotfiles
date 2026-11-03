@@ -128,6 +128,20 @@ jobs:
       - name: Run the ratchet, probe and count end-to-end tests
         run: node --test skills/perf-ratchet/scripts/ratchet.test.mjs
 
+  agent-cli:
+    name: agent-cli
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # agent-cli check reads its job list from this file, so a job shape the parser misses
+      # disappears from local runs without an error; the fixture ci.yml pins the shapes used here.
+      - name: Run agent-cli end-to-end tests
+        run: bash scripts/test-agent-cli.sh
+
   check-upstreams:
     name: check-upstreams
     runs-on: ubuntu-latest
