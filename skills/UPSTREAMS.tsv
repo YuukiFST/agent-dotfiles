@@ -72,6 +72,7 @@ writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054
 yuu-mode	cursor/plugins	pstack/skills/poteto-mode	c742dd6
 ./skills	cursor/plugins	pstack	c742dd6
 ./skills	morganlinton/BeautifulRust	skills	3385ca7
+./skills	benjitaylor/skills	.	8020574
 ./hooks	JuliusBrussee/caveman	src/hooks	d262ab3
 ./rtk	rtk-ai/rtk	CHANGELOG.md	91dd9ce	master
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
