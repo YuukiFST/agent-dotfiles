@@ -1,18 +1,18 @@
 ---
 name: git-workflow
-description: "Ship a change through GitHub end to end, only when the user invokes /git-workflow: open the issue, name the branch, sequence commits, open a PR that closes the issue, record a review, merge the PR, then delete the dead branches, worktrees and leftover files on the machine. Also covers reverting a merged mistake, forks vs standalone repos, and contributing to someone else's repo."
+description: "Ship a change through GitHub end to end, only when the user invokes /git-workflow: open the issue, name the branch, sequence commits, open a PR that closes the issue, record a review, quiz the user on the change, merge the PR, then delete the dead branches, worktrees and leftover files on the machine. Also covers reverting a merged mistake, forks vs standalone repos, and contributing to someone else's repo."
 disable-model-invocation: true
 metadata:
   opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
 
-# Git workflow — issue → branch → PR → review → merge → cleanup
+# Git workflow — issue → branch → PR → review → quiz → merge → cleanup
 
 The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit identity (§1), commit-message format (§2), push confirmation (§3), the AI-attribution ban (§4). **This skill does not restate them. Follow both.**
 
 **User-invoked only.** The flow runs when the user invokes `/git-workflow` or asks to ship the change with it; a message that only talks about this skill (editing it, quoting a step) does not start it.
-That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 and 6 pass; it covers no other PR, and a merge that triggers a release or deploy, or lands a PR the review marks sensitive, still needs its own yes.
+That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 to 7 pass; it covers no other PR, and a merge that triggers a release or deploy, or lands a PR the review marks sensitive, still needs its own yes.
 A skill that points here for one convention (branch name, PR body) applies that convention only, and the merge and cleanup do not run.
 
 **Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change shipped through this skill, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
@@ -27,16 +27,20 @@ A skill that points here for one convention (branch name, PR body) applies that 
    A PR touching five or more files adds a **Reading order**: the files in the order a reviewer should read them, one line each on what changed there and why it comes at that point.
    UI work adds a screenshot or recording with `gh pr create --attach '<file>#<alt>'` or `gh pr edit <n> --attach` (gh-axi has no attach flag; evidence paths stay git-ignored, never committed); a later push reruns the check and updates the body.
    No runnable check: write **Not verified** and why. Open it as a draft if the work spans sessions.
-   Then confirm GitHub linked it: `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){pullRequest(number:<pr>){closingIssuesReferences(first:5){nodes{number}}}}}'` lists the issue. Empty list: the merge will not close it, so step 8 closes it by hand. #105 and #107 in agent-dotfiles had `Closes #N` on line one and still never linked.
+   Then confirm GitHub linked it: `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){pullRequest(number:<pr>){closingIssuesReferences(first:5){nodes{number}}}}}'` lists the issue. Empty list: the merge will not close it, so step 9 closes it by hand. #105 and #107 in agent-dotfiles had `Closes #N` on line one and still never linked.
 5. **Review before merge — always.** Run the `interrogate` skill on the PR and post its verdict **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
    A verdict that marks the diff sensitive holds the merge: once the Act on fixes are pushed, show the user the verdict and the head SHA to merge, and wait for their go-ahead; a push after it needs a new one, since an agent's review is not a human approval.
 6. **CI green before merge.** A red or skipped check blocks the merge. Fix the failure, never merge past it (global CODING_STANDARDS.md, "Boy Scout rule": a lint/test failure found along the way gets fixed).
-7. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
-   Before merging, fix and push every review finding marked Act on, then wait for step 6 to pass again on the new head commit.
-   Then merge it yourself: `gh-axi pr merge <n> --rebase` or `--merge`, without `--delete-branch`, since step 9 deletes branches in the order a worktree needs.
+7. **Quiz before merge.** First fix and push every review finding marked Act on, then wait for step 6 to pass again on the new head commit, so the quiz covers the code that merges.
+   Post in chat a short report of the PR: what changed, the decisions the user never stated (a default picked, scope left out, a request reinterpreted where two clashed), and what the checks leave unproven.
+   End it with a quiz of 3 questions, 5 for a PR touching five or more files: one on a line picked at random from the diff, one on a decision from the report, each answerable in a sentence from the PR, with the answer key kept out of the message.
+   Wait for the user's answers and grade each against the diff. A wrong or missing answer gets the explanation with its file:line and a fresh question on the same point.
+   Done when every question has a correct answer; the merge waits until then, and a push after the quiz gets a new quiz on the new commits.
+8. **Merge with rebase or a merge commit — not squash by default.** Squash collapses the branch's atomic commits into one and destroys the history `git log`/`git blame` investigation depends on (global CLAUDE.md, "Git history is an investigation tool"). Squash only when the branch is genuinely WIP noise (`wip`, `fix typo`, `oops`).
+   Merge it yourself into the default branch once step 7 is done: `gh-axi pr merge <n> --rebase` or `--merge`, without `--delete-branch`, since step 10 deletes branches in the order a worktree needs.
    A merge that GitHub refuses (conflict, protection rule) stops the run: report the refusal and ask.
-8. **Confirm the issue is closed.** `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
-9. **Delete what the merge left dead, on every branch of the repo, not only this run's.** Work from the main checkout, never from inside a worktree you remove.
+9. **Confirm the issue is closed.** `gh-axi issue view <n>` still `open` → `gh-axi issue close <n>`.
+10. **Delete what the merge left dead, on every branch of the repo, not only this run's.** Work from the main checkout, never from inside a worktree you remove.
     1. `git status --porcelain` must print nothing; then `git switch <default-branch>`, `git pull --ff-only` and `git fetch --prune`. Any of these failing stops the cleanup: report it and ask.
     2. Only a local branch named `<type>/<issue-number>-<slug>` (step 2) can be dead; the default branch and long-lived branches (`develop`, `release/*`, `gh-pages`) never are.
        It is dead when `gh pr view <branch> --json number,state,headRefOid,isCrossRepository` shows `MERGED`, `isCrossRepository` false, and the branch tip holds no commit beyond the PR head: `git fetch origin pull/<number>/head`, then `git merge-base --is-ancestor <branch> <headRefOid>` exits 0.
