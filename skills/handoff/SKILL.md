@@ -49,7 +49,7 @@ Prose follows the conversation's language; template headings, the _unverified_ t
 # Handoff: <task in one line>
 
 ## Goal
-What done looks like for the whole task, and why it matters.
+The user's request verbatim, then what done looks like and why it matters.
 
 ## State
 Worktree path, branch, push status, uncommitted files, operation in progress, last commit, and what is mid-edit right now.
@@ -65,6 +65,7 @@ Approaches tried that failed, with the error or reason, so the next agent skips 
 
 ## Next steps
 Ordered; each ends on a completion criterion the next agent can check.
+Output you needed that was truncated gets the narrow command that retrieves it.
 
 ## Open questions
 What still needs the user, and assumptions nobody confirmed.
