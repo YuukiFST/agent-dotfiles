@@ -13,7 +13,7 @@ The safety rules live in `~/.claude/rules/git.md` and are always loaded: commit 
 
 **User-invoked only.** The flow runs when the user invokes `/git-workflow` or asks to ship the change with it; a message that only talks about this skill (editing it, quoting a step) does not start it.
 That invocation is the user's go-ahead to merge the PR this run opened, once steps 5 to 7 pass; it covers no other PR, and a merge that triggers a release or deploy, or lands a PR the review marks sensitive, still needs its own yes.
-A skill that points here for one convention (branch name, PR body) applies that convention only, and the merge and cleanup do not run.
+A skill that points here for one convention (branch name, issue link) applies that convention only, and the merge and cleanup do not run.
 
 **Never push straight to `main`/`master` on a repo you own.** Turn on branch protection requiring a PR. Every change shipped through this skill, including one-liners, follows the flow below. A repo may override it in its own `CLAUDE.md`.
 
@@ -22,11 +22,7 @@ A skill that points here for one convention (branch name, PR body) applies that 
 1. **Issue first.** Before writing code, open an issue stating the problem and the acceptance criteria — not the solution. `gh-axi issue create`. Label it with an existing label that fits the change type, read from `gh-axi label list`; with GitHub's defaults that is `bug` for a fix and `enhancement` for a feat or chore. A label the repo lacks fails the create, and adding one to someone else's repo is their call. Skip only for pure formatting runs.
 2. **Branch per issue.** `<type>/<issue-number>-<slug>` — `feat/42-dashboard-consumo`, `fix/57-token-expiry`. Types match Conventional Commits (`rules/git.md` §2).
 3. **Atomic commits.** One logical change per commit. Resist the end-of-day blob: a commit touching three unrelated things cannot be reverted or bisected. Read the diff before committing it, not after.
-4. **PR closes the issue.** Body contains `Closes #42`, plus what changed, why, and how it was verified: the output of the check that proves the issue's acceptance criteria, run on the PR's head commit and trimmed to the decisive lines, with secrets, tokens, personal data and home paths redacted, so the reviewer checks the outcome before reading the diff.
-   A PR adding tests lists each one with its source (global CODING_STANDARDS.md, "Human authority"), so the reviewer settles the expected behavior before reading the code.
-   A PR touching five or more files adds a **Reading order**: the files in the order a reviewer should read them, one line each on what changed there and why it comes at that point.
-   UI work adds a screenshot or recording with `gh pr create --attach '<file>#<alt>'` or `gh pr edit <n> --attach` (gh-axi has no attach flag; evidence paths stay git-ignored, never committed); a later push reruns the check and updates the body.
-   No runnable check: write **Not verified** and why. Open it as a draft if the work spans sessions.
+4. **PR closes the issue.** Write the body with the `pr-writing` skill, `Closes #42` included. Open it as a draft if the work spans sessions.
    Then confirm GitHub linked it: `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){pullRequest(number:<pr>){closingIssuesReferences(first:5){nodes{number}}}}}'` lists the issue. Empty list: the merge will not close it, so step 9 closes it by hand. #105 and #107 in agent-dotfiles had `Closes #N` on line one and still never linked.
 5. **Review before merge — always.** Run the `interrogate` skill on the PR and post its verdict **as a PR review on GitHub**, not as chat text. A PR merged with no recorded review is a broken flow, even solo.
    A verdict that marks the diff sensitive holds the merge: once the Act on fixes are pushed, show the user the verdict and the head SHA to merge, and wait for their go-ahead; a push after it needs a new one, since an agent's review is not a human approval.
