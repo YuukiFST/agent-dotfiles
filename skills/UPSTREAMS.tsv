@@ -40,6 +40,7 @@ interrogate	cursor/plugins	pstack/skills/interrogate	ab1f702
 interrogate	cursor/plugins	pstack/skills/blast-radius	df58112
 interrogate	openclaw/agent-skills	skills/autoreview	4f587b6
 maintain-verification-skill	cursor/plugins	pstack/skills/maintain-verification-skill	6714489
+pr-writing	HugoRCD/hr-folio	skills/pr-writing	e35d84f
 principle-attack-the-premise	cursor/plugins	pstack/skills/principle-attack-the-premise	e8d856f
 principle-boundary-discipline	cursor/plugins	pstack/skills/principle-boundary-discipline	d7cde2b
 principle-error-design	dmmulroy/cf-workflow-pool	docs/errors.md	e78cc4c
