@@ -20,7 +20,7 @@ Read the file at the referenced path. The user will normally pass the path or th
 
 ## Wayfinding operations
 
-Used by `/helmsman`. The **map** is a file with one **child** file per ticket.
+Used by `/helmsman`. The **map** is a file with one **child** file per ticket. Under firstmate, `<plan>/tracker/` replaces `.scratch/<effort>/`, because that worktree is discarded.
 
 - **Map**: `.scratch/<effort>/map.md` — the Destination / Notes / decision sections / fog body.
 - **Child ticket**: `.scratch/<effort>/issues/NN-<slug>.md`, numbered from `01`, with the question in the body. An `Audience:` line records `po`/`dev` and a `Type:` line the method (`decision`/`research`/`prototype`/`grilling`/`task`); a `Status:` line records `claimed`/`resolved`.
