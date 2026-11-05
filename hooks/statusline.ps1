@@ -27,6 +27,113 @@ function Format-K([double]$N) {
 
 try { $In = $Raw | ConvertFrom-Json } catch { exit 0 }
 
+# Uso por sessao para o painel do Herdr (mods/agents-edited): em state\ctx, <terminal>.json e
+# <terminal>.tally.json, a soma do transcript desde o offset lido. Transcript novo (/clear,
+# /resume) zera a soma. Conta mensagens do transcript principal; subagentes tem o proprio.
+$Utf8 = New-Object System.Text.UTF8Encoding($false)
+$CtxBase = if ($env:HC_TERMINAL_ID -and $In.transcript_path) { Join-Path $ClaudeDir "state\ctx\$($env:HC_TERMINAL_ID)" }
+
+function New-SessionTally([string]$Transcript) {
+    [pscustomobject][ordered]@{ transcript = $Transcript; offset = [long]0; last_id = ''; input = [long]0; cache_write = [long]0; cache_read = [long]0; output = [long]0; background = @() }
+}
+
+# Tarefas em background da sessao: a tool_result anuncia o id, <task-notification> ou TaskStop o encerra.
+# Texto comum pode citar essas frases, entao so vale o comeco do conteudo de um registro real.
+function Update-BackgroundTasks($Tally, $O) {
+    if ($O.isSidechain -eq $true) { return }
+    $Content = $O.message.content
+    $Notice = if ($O.attachment.prompt) { [string]$O.attachment.prompt } elseif ($Content -is [string]) { $Content }
+    if ($Notice -and $Notice -match '^<task-notification>\s*<task-id>(\w+)</task-id>') {
+        $Done = $Matches[1]
+        $Tally.background = @($Tally.background | Where-Object { $_ -ne $Done })
+        return
+    }
+    if ($O.type -ne 'user' -or $Content -is [string]) { return }
+    $BackgroundTaskId = [string]$O.toolUseResult.backgroundTaskId
+    if ($BackgroundTaskId -and @($Tally.background) -notcontains $BackgroundTaskId) { $Tally.background = @($Tally.background) + $BackgroundTaskId }
+    foreach ($Part in @($Content)) {
+        if ($Part.type -ne 'tool_result') { continue }
+        $Text = if ($Part.content -is [string]) { $Part.content } else { [string](@($Part.content)[0].text) }
+        $Started = $null
+        if ($Text -match '^Command running in background with ID: (\w+)') { $Started = $Matches[1] }
+        elseif ($Text -match '^Command did not complete within its \d+s timeout and was moved to the background \(ID: (\w+)\)') { $Started = $Matches[1] }
+        elseif ($Text -match '^Async agent launched successfully[\s\S]*?agentId: (\w+)') { $Started = $Matches[1] }
+        elseif ($Text -match '^\{"message":"Successfully stopped task: (\w+)') {
+            $Done = $Matches[1]
+            $Tally.background = @($Tally.background | Where-Object { $_ -ne $Done })
+        }
+        if ($Started -and @($Tally.background) -notcontains $Started) { $Tally.background = @($Tally.background) + $Started }
+    }
+}
+
+function Read-NewTranscriptBytes([string]$Transcript, $Tally) {
+    $Stream = [System.IO.File]::Open($Transcript, 'Open', 'Read', 'ReadWrite, Delete')
+    try {
+        $Stream.Position = $Tally.offset
+        $Bytes = New-Object byte[] ($Stream.Length - $Tally.offset)
+        $Read = 0
+        while ($Read -lt $Bytes.Length) {
+            $Got = $Stream.Read($Bytes, $Read, $Bytes.Length - $Read)
+            if ($Got -le 0) { break }
+            $Read += $Got
+        }
+        return ,$Bytes
+    } finally { $Stream.Dispose() }
+}
+
+function Update-SessionTally([string]$TallyPath, [string]$Transcript) {
+    $Tally = $null
+    if (Test-Path -LiteralPath $TallyPath) { try { $Tally = [System.IO.File]::ReadAllText($TallyPath) | ConvertFrom-Json } catch {} }
+    $Size = if (Test-Path -LiteralPath $Transcript) { (Get-Item -LiteralPath $Transcript).Length } else { 0 }
+    if ($Tally -and $null -eq $Tally.background) { $Tally | Add-Member -NotePropertyName background -NotePropertyValue @() }
+    if (-not $Tally -or $Tally.transcript -ne $Transcript -or $Tally.offset -gt $Size) {
+        $Tally = New-SessionTally $Transcript
+        [System.IO.File]::WriteAllText($TallyPath, ($Tally | ConvertTo-Json -Compress), $Utf8)
+    }
+    if ($Size -le $Tally.offset) { return $Tally }
+
+    $Bytes = Read-NewTranscriptBytes $Transcript $Tally
+    # Linha ainda sendo escrita fica para a proxima leitura.
+    $End = [array]::LastIndexOf($Bytes, [byte]10)
+    if ($End -lt 0) { return $Tally }
+    foreach ($Line in $Utf8.GetString($Bytes, 0, $End).Split("`n")) {
+        $IsBackground = $Line -match 'backgroundTaskId|in background with ID|moved to the background|Async agent launched|<task-notification>|Successfully stopped task'
+        $IsUsage = $Line -match '"usage"' -and $Line -match '"assistant"'
+        if (-not $IsBackground -and -not $IsUsage) { continue }
+        try { $O = $Line | ConvertFrom-Json } catch { continue }
+        if ($IsBackground) { Update-BackgroundTasks $Tally $O }
+        if (-not $IsUsage) { continue }
+        if (-not $O -or $O.isSidechain -eq $true) { continue }
+        $U = $O.message.usage
+        $Id = $O.message.id
+        # Uma mensagem ocupa varias linhas seguidas, todas com o mesmo usage.
+        if (-not $U -or -not $Id -or $Id -eq $Tally.last_id) { continue }
+        $Tally.last_id = $Id
+        $Tally.input += [long]$U.input_tokens
+        $Tally.cache_write += [long]$U.cache_creation_input_tokens
+        $Tally.cache_read += [long]$U.cache_read_input_tokens
+        $Tally.output += [long]$U.output_tokens
+    }
+    $Tally.offset += $End + 1
+    [System.IO.File]::WriteAllText($TallyPath, ($Tally | ConvertTo-Json -Compress), $Utf8)
+    return $Tally
+}
+
+function Write-ContextState([string]$Zone, [int]$SoftTokens, [int]$CapTokens, [double]$CapPct, [int]$TotalTokens, [int]$WindowTokens) {
+    if (-not $CtxBase) { return }
+    try {
+        [void](New-Item -ItemType Directory -Force -Path (Split-Path $CtxBase))
+        $Tally = Update-SessionTally "$CtxBase.tally.json" $In.transcript_path
+        $State = [ordered]@{
+            zone = $Zone; soft = $SoftTokens; cap = $CapTokens; pct_cap = $CapPct; total = $TotalTokens; window = $WindowTokens
+            background = @($Tally.background).Count
+            session = [ordered]@{ input = $Tally.input; cache_write = $Tally.cache_write; cache_read = $Tally.cache_read; output = $Tally.output; cost_usd = [double]$In.cost.total_cost_usd }
+            at = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        }
+        [System.IO.File]::WriteAllText("$CtxBase.json", ($State | ConvertTo-Json -Compress), $Utf8)
+    } catch {}
+}
+
 # Segmento modelo + effort. Campos do JSON da statusLine (claude 2.1.259):
 # model.display_name, effort.level (so aparece em modelo que suporta) e fast_mode.
 $ModelName = $In.model.display_name
@@ -64,7 +171,10 @@ if ($Used -le 0 -and $In.transcript_path -and (Test-Path -LiteralPath $In.transc
         break
     }
 }
-if ($Used -le 0) { exit 0 }
+if ($Used -le 0) {
+    Write-ContextState 'SMART' 0 0 0 0 0
+    exit 0
+}
 
 if ($Window -le 0) { $Window = 200000 }
 if ($env:CLAUDE_CONTEXT_WINDOW) { $Window = [int]$env:CLAUDE_CONTEXT_WINDOW }
@@ -96,6 +206,8 @@ if ($Total -ge $Cap) {
 } else {
     $Color = 41;  $Zone = 'SMART'
 }
+
+Write-ContextState $Zone $Soft $Cap $PctCap $Total $Window
 
 # Barra escalada no cap; o marcador mostra onde fica o alvo de 120k.
 $Slots = 12

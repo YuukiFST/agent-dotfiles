@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # List the vendored skills, hooks and plugins whose upstream changed past the
 # commit pinned in skills/UPSTREAMS.tsv (refresh procedure in that file's header).
-# Usage: check-upstreams.sh [--markdown] [target...]
+# Usage: check-upstreams.sh [--markdown|--tsv] [target...]
+# --tsv is for programs, tab-separated: "row target path" before each check, then
+# "changed target repo path pin latest count compare" with its "commit sha date subject"
+# lines, or "error target source reason".
 # Exit: 0 every checked row is current, 2 at least one row changed, 1 a row could
 # not be checked (local target gone, or repo or pin gone upstream).
 # Needs an authenticated gh; UPSTREAMS_FILE points it at another manifest.
@@ -11,14 +14,20 @@ manifest="${UPSTREAMS_FILE:-$(cd "$(dirname "$0")/.." && pwd)/skills/UPSTREAMS.t
 skills_dir="$(dirname "$manifest")"
 repo_root="$(dirname "$skills_dir")"
 format=text
-if [ "${1:-}" = --markdown ]; then format=markdown; shift; fi
+case "${1:-}" in
+  --markdown) format=markdown; shift ;;
+  --tsv) format=tsv; shift ;;
+esac
 max_listed=10
 
 checked=0 changed=0 failed=0
 
 report_error() { # $1 = skill, $2 = source, $3 = reason
   failed=$((failed + 1))
-  if [ "$format" = markdown ]; then
+  if [ "$format" = tsv ]; then
+    printf 'error	%s	%s	%s
+' "$1" "$2" "$3"
+  elif [ "$format" = markdown ]; then
     printf '## %s: error\n\n`%s`: %s\n\n' "$1" "$2" "$3"
   else
     printf 'ERROR    %s  %s: %s\n' "$1" "$2" "$3"
@@ -31,6 +40,16 @@ report_change() { # $1 = skill, $2 = repo, $3 = path, $4 = pin, $5 = newline-sep
   latest="${5%%$'\n'*}"; latest_date="${latest#* }"; latest_date="${latest_date%% *}"; latest="${latest%% *}"
   compare="https://github.com/$2/compare/$4...$latest"
   changed=$((changed + 1))
+  if [ "$format" = tsv ]; then
+    printf 'changed	%s	%s	%s	%s	%s	%s	%s
+' "$1" "$2" "$3" "$4" "$latest" "$count" "$compare"
+    printf '%s
+' "$5" | head -n "$max_listed" | while read -r sha date subject; do
+      printf 'commit	%s	%s	%s
+' "$sha" "$date" "$subject"
+    done
+    return
+  fi
   if [ "$format" = markdown ]; then
     printf '## %s: `%s` `%s`\n\n%s commits past `%s`, latest `%s` (%s). [Compare](%s)\n\n' \
       "$1" "$2" "$3" "$count" "$4" "$latest" "$latest_date" "$compare"
@@ -76,6 +95,8 @@ while IFS=$'\t' read -r target repo path pin branch _ || [ -n "$target" ]; do
   case "$target" in ''|'#'*) continue ;; esac
   if [ $# -gt 0 ] && [[ " $* " != *" $target "* ]]; then continue; fi
   checked=$((checked + 1))
+  [ "$format" != tsv ] || printf 'row	%s	%s
+' "$target" "$path"
   if [ -z "$pin" ]; then report_error "$target" "$repo:$path" "row needs 4 tab-separated columns"; continue; fi
   check_row "$target" "$repo" "$path" "$pin" "$branch"
 done < "$manifest"
