@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision packet</title>
+<style>:root{color-scheme:light dark}html,body{margin:0;background:Canvas;color:CanvasText}</style>
+</head>
+<body>
+<div id="helmsman-packet"></div>
+<script type="application/json" id="helmsman-packet-data">
+{
+  "round": "R1",
+  "title": "Your decisions for this round",
+  "intro": "Every recommendation is already selected. Change only what you disagree with, then send.",
+  "items": [
+    {
+      "id": "P-01",
+      "track": "product",
+      "question": "Can someone edit a submission after sending it?",
+      "context": "Changes what reviewers can trust.",
+      "options": [
+        { "value": "window", "label": "Yes, for 15 minutes", "detail": "Fixes typos without surprising reviewers" },
+        { "value": "never", "label": "No, sent is final" }
+      ],
+      "recommended": "window"
+    },
+    {
+      "id": "T-01",
+      "track": "technical",
+      "question": "Database",
+      "options": [
+        { "value": "sqlite", "label": "SQLite", "detail": "Free, one file, fits the expected volume" },
+        { "value": "postgres", "label": "Postgres" }
+      ],
+      "recommended": "sqlite"
+    },
+    {
+      "id": "A-01",
+      "track": "assumed",
+      "statement": "Deleting an account removes its submissions."
+    }
+  ]
+}
+</script>
+<script src="packet.js"></script>
+</body>
+</html>

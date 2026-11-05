@@ -49,7 +49,6 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Interactive isometric SVG figure that explains an idea as a physical object | `anatomy` |
 | Apple-style dimensional drawing, spec sheet or redline of a component | `dimensional-drawing` |
 | Animate a finished dimensional drawing sheet into a motion film | `dimensional-drawing-motion` |
-| Explain how `helmsman` works or whether to use it | `helmsman-explain` |
 | Teach the user a new skill or concept | `teach` |
 
 ### Build

@@ -70,3 +70,5 @@ specimen
 # Vendored from affaan-m/everything-claude-code, dropped; security-audit covers both.
 security-review
 security-bounty-hunter
+# The rewritten helmsman plans through decision packets; a page restating it would drift.
+helmsman-explain

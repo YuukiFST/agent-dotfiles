@@ -1,6 +1,6 @@
 # Spec and build tickets
 
-Reached from Advance step 0, when nothing is left to decide: the frontier is empty in both audiences and **Not yet specified** is clear.
+Reached from Advance step 0, when nothing is left to decide: the frontier is empty in both audiences, **Not yet specified** is clear, and **Design** is locked or Notes says `no interface`.
 This phase **synthesizes**; it asks the human nothing.
 Everything it needs is on the map, and the granularity of the build is a technical call, so it is yours.
 
@@ -14,6 +14,7 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 
 - **Givens**, **Product decisions** and **Assumed** become the problem, the solution and the user stories.
 - **Technical decisions** and their `locks:` become the implementation decisions.
+- **Design** becomes the interface section.
 - **Out of scope** carries over as it stands.
 
 ```markdown
@@ -28,6 +29,10 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 ## User stories
 
 1. As a <actor>, I want <feature>, so that <benefit>
+
+## Interface
+
+<`DESIGN.md` and each core screen's approved page, by plan-pack path; `FEEDBACK.md`, whose rows bind the build; "none" when the project has no interface>
 
 ## Implementation decisions
 
@@ -71,6 +76,7 @@ Each ticket's body:
 ## Acceptance criteria
 
 - [ ] <a behaviour an E2E run can check>
+- [ ] <for a screen: it matches its approved page, named by path>
 
 ## Context
 
@@ -86,7 +92,12 @@ Done when all of these hold, each failure with its fix:
 - no ticket contradicts a `locks:` clause or a given; a ticket that does is re-sliced to respect it;
 - no ticket depends on a service outside the budget; one that does gets a **Money** `po` ticket that blocks it.
 
-## 4. Hand over
+## 4. Open the plan PR
 
-Tell the human in their language what the spec says the product does, in three to five lines, and how many build tickets it became.
-Then [the next command](SKILL.md#the-next-command), which is `/helmsman <map> --build` unless a `po` ticket blocks every build ticket.
+Commit the plan pack and open the plan branch as a pull request to the default branch, per `git-workflow` and `pr-writing`, with the spec and the approved screens in its body.
+On the local tracker, with no remote, report the branch instead: the human's word replaces the merge, and Build branches from it.
+
+## 5. Hand over
+
+Tell the human in their language what the spec says the product does, in three to five lines, how many build tickets it became, and that merging the plan PR approves the plan.
+Then [the next command](SKILL.md#the-next-command), which is the plan PR link unless a `po` ticket blocks every build ticket.
