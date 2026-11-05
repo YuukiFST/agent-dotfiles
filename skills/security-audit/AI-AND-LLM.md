@@ -2,7 +2,7 @@
 
 #### When to use this file
 
-Reach for this file when a language model participates in a trust-sensitive decision: chatbots and assistants, RAG pipelines, persistent agent memory, agent/tool-calling loops, MCP servers and clients, code that builds prompts from untrusted input, or code that consumes model output and acts on it. The important data flow is *untrusted content → model or memory → capability, authority, or sink*.
+Reach for this file when a language model participates in a trust-sensitive decision: chatbots and assistants, RAG pipelines, persistent agent memory, agent/tool-calling loops, MCP servers and clients, skills, rule files, hooks, and harness settings installed into an agent, code that builds prompts from untrusted input, or code that consumes model output and acts on it. The important data flow is *untrusted content → model or memory → capability, authority, or sink*.
 
 Use this alongside `ATTACK-CLASSES.md`, not instead of it. Transport, access control, query construction, filesystem use, and output rendering remain ordinary trust boundaries. This file covers the model-specific delegation layer. Split large targets by retrieval, memory, tool dispatch, MCP, and output handling.
 
@@ -10,6 +10,7 @@ Use this alongside `ATTACK-CLASSES.md`, not instead of it. Transport, access con
 
 ```
 - Prompt injection alone is not a finding. Require a code-level boundary failure: content reaches another principal's context, invokes authority the requester lacks, discloses data they cannot read, or drives a sink they cannot reach directly.
+- An instruction file an agent loads with authority (`SKILL.md`, `AGENTS.md`, `CLAUDE.md`, a rule or command file) is code: its text is the grant, so no separate sink is needed once a lower-trust writer can reach it.
 - Model output, memory, tool descriptions, and MCP responses are untrusted inputs. Point to the code that grants authority, trusts output, writes durable state, or feeds a sink.
 - A guardrail prompt is not a security boundary. Count only deterministic checks bound to the final action and resource, resource-scoped authorization, isolation, binding, and constrained credentials. A denylist, pattern scanner, secret redaction, or model judge over attacker-influenced text is a heuristic: it refutes nothing, and bypassing one is not a finding by itself.
 - State the attacker, affected principal, effective execution identity, resource, exact action, authority used, and observable impact. An intentional direct request to use the requester's existing authority is not a delegation defect merely because a model executes it.
@@ -59,10 +60,29 @@ Calls or results are routed by attacker-influenceable server names, tool names, 
 **MCP metadata and schema as policy**
 Tool descriptions, resource metadata, prompts, completion hints, or schemas supplied by an MCP peer are trusted as policy or authorization. These fields can guide the model but cannot grant capability. Find the deterministic allowlist, server identity check, and handler authorization that remain authoritative when metadata conflicts.
 
+## Harness and installed-instruction attack classes (subagent_type: `general`)
+
+Every class here needs a writer of lower trust than the user who runs the agent: a contributor's pull request, a vendored skill, an unpinned plugin, or a repository opened for the first time. A user configuring their own agent crosses no boundary.
+
+**Harness settings that run commands**
+A settings file the harness loads from the repository runs a command or redirects the agent. Look for hooks, command-valued keys such as `apiKeyHelper`, `otelHeadersHelper`, `statusLine`, and `fileSuggestion`, and `env` entries that redirect traffic or load code, such as `ANTHROPIC_BASE_URL`, proxy variables, `NODE_OPTIONS`, `LD_PRELOAD`, and `GIT_SSH_COMMAND`. Check when each runs relative to the harness's trust prompt, for the pinned harness version.
+
+**Harness settings that widen authority**
+A repository-supplied setting removes a gate: `enableAllProjectMcpServers`, `defaultMode: bypassPermissions`, broad `permissions.allow` entries, or a project MCP server definition that starts a process. Trace who can write the file and whether the harness asks before honoring it.
+
+**Declared behavior differs from actual behavior**
+A skill, command, hook, or plugin does more than its name, description, and manifest say: it reads `.claude/`, MCP configuration, credentials, or other skills, sends data out, writes to the agent's own configuration or memory, or widens its scope on update. Compare the declared purpose with every file it bundles and every command it runs.
+
+**Trigger shadowing**
+A skill or tool description is written to fire on requests that belong to another skill, or to outrank a security or review step, so a lower-trust publisher captures that work. Compare trigger text against the installed set.
+
+**Unreviewable bundled content**
+An instruction or bundled file cannot be read as text by the reviewer: UTF-16 or another encoding the agent still decodes, compiled `.pyc`, an archive, or padding that pushes content past what a viewer shows. Record it as an uncovered unit, never as clean.
+
 ## Output and disclosure attack classes (subagent_type: `general`)
 
 **Insecure output rendering**
-Model output reaches an executing HTML, Markdown, template, URL, or command sink without the sink's required encoding and policy. For browser rendering, verify auto-loaded resources and CSP or sanitization in `CLIENT-SIDE.md`; renderer behavior outside the repository makes the candidate `needs_validation`.
+Model output reaches an executing HTML, Markdown, template, URL, or command sink, or a terminal or log viewer that honors ANSI, OSC 8, or OSC 52 escape sequences, without the sink's required encoding and policy. For browser rendering, verify auto-loaded resources and CSP or sanitization in `CLIENT-SIDE.md`; renderer behavior outside the repository makes the candidate `needs_validation`.
 
 **Sensitive context extraction**
 The assembled context contains credentials, another user's data, private source, or policy values that themselves grant access, and user-influenced output exposes them. Read prompt assembly and data-fetch code. Disclosure of generic instructions or behavior that does not cross a data boundary is not a finding.
@@ -80,4 +100,6 @@ The assembled context contains credentials, another user's data, private source,
 3. For memory or retrieval claims, cite both the attacker-controlled write and the later cross-principal read or privileged decision. A shared record without a reachable consumer is not enough.
 4. For action binding, establish the intentional request or normalized approved object, if any, and compare it with the object the handler uses. Confirm a locally observable unrequested action, mutation, duplicate, or authority change without extending the test into harmful execution. For schema disagreement, compare the normalized validated object with the handler's object.
 5. For MCP identity claims, verify the authenticated connection, request correlation, tool namespace, and effective credential. Mark `needs_validation` if external server identity or deployment routing is required.
-6. Return `confirmed` findings only with a complete source trace and meaningful result. Return `needs_validation` for a specific unresolved boundary fact and state the bounded local or owner-observed check needed to resolve it.
+6. Test the deterministic layer with a stub model: replace the provider with a function that returns the exact output or tool call the attacker needs, assert what the handler does with it, and run a benign stub output as the control. This spends no quota and proves the missing control, not the model's persuasion, so set `severity.model_dependent: true` unless the output needs no model cooperation.
+7. For a harness or installed-instruction claim, name the lower-trust writer, the file they can reach, and what the harness does with it at the pinned version. Read these files as text; the audit never loads them.
+8. Return `confirmed` findings only with a complete source trace and meaningful result. Return `needs_validation` for a specific unresolved boundary fact and state the bounded local or owner-observed check needed to resolve it.

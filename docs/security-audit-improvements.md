@@ -39,6 +39,17 @@ Este arquivo fica fora de `skills/` de propósito: o sync não o copia para os d
 | [vxcontrol/pentagi](https://github.com/vxcontrol/pentagi) | MIT + EULA | `843dfeb4bfc809c09d1bc5022e567c602d8fc9dd` | 2026-10-22 | Black-box autônomo; nada que o ledger e o vocabulário de capacidades já não cubram |
 | [GH05TCREW/pentestagent](https://github.com/GH05TCREW/pentestagent) | MIT | `87d763a9c830597e9b8c1d56293300f6961beec2` | 2026-10-22 | Black-box em estágio inicial; nada aproveitável |
 | [bugbasesecurity/pentest-copilot](https://github.com/bugbasesecurity/pentest-copilot) | MIT | `cd512edd037a32ddb1df3caf2672915bd555daec` | 2026-10-22 | Assistente interativo de operador; nada aproveitável |
+| [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | MIT | `c1c8a8c` | 2026-11-05 | Upstream da skill; idêntico ao pin de `skills/UPSTREAMS.tsv`, nada a portar |
+| [NVIDIA/SkillSpector](https://github.com/NVIDIA/SkillSpector) | Apache-2.0 (YARA com proveniência DRL-1.1) | `eee11ca5d2e6a8c1112ab6e8acd711d6b5539080` | 2026-11-05 | Catálogo de superfícies de skill e harness como alvo |
+| [anthropics/claude-code-security-review](https://github.com/anthropics/claude-code-security-review) | MIT | `0c6a49f1fa56a1d472575da86a94dbc1edb78eda` | 2026-11-05 | Fraco como método; útil como contraexemplo de gate de IA |
+| [semgrep/semgrep](https://github.com/semgrep/semgrep) | LGPL-2.1 | `692bfae4ca1bf070f7e8b603037a19886fa36b4f` | 2026-11-05 | Só com regras locais próprias; rende o modelo de taint |
+| [gitleaks/gitleaks](https://github.com/gitleaks/gitleaks) | MIT | `5f6ec56cfa6f8c67648d863582c7ae2f206d5c1c` | 2026-11-05 | Melhor semente de segredos, com config do alvo neutralizada |
+| [trufflesecurity/trufflehog](https://github.com/trufflesecurity/trufflehog) | AGPL-3.0 | `6ced18b79b371ef729559e1fedef88fe8f8f132b` | 2026-11-05 | Rejeitado como ferramenta padrão: verifica segredos no provedor por default; só ideias |
+| [google/osv-scanner](https://github.com/google/osv-scanner) | Apache-2.0 | `bfe247876f7c3f18cced77873ab784832f2ec39e` | 2026-11-05 | Melhor opção offline para npm, com banco baixado antes do run |
+| [zizmorcore/zizmor](https://github.com/zizmorcore/zizmor) | MIT | `a80b19c9a2a8df847e80c9681a1e43a9dde38deb` | 2026-11-05 | Maior ganho da rodada: catálogo de CI e regras de falso positivo |
+| [projectdiscovery/nuclei](https://github.com/projectdiscovery/nuclei) | MIT | `fb0eed51225985ab45c104e7314dbf77129f26f0` | 2026-11-05 | Scanner vivo, rejeitado para uso direto; uma classe de Next.js |
+| [NVIDIA/garak](https://github.com/NVIDIA/garak) | Apache-2.0 | `42badcdef40d569a7ce53db0286e3e6f177a0607` | 2026-11-05 | Mede o modelo, não a fronteira; rende o modelo-stub |
+| [usestrix/strix](https://github.com/usestrix/strix) (delta) | Apache-2.0 | `09536cf1481731c790995bd8060db19a3b75ff48` | 2026-11-05 | 27 commits desde a análise anterior, quase tudo ruído |
 
 ## Backlog consolidado
 
@@ -83,6 +94,22 @@ Status: `proposto`, `em andamento`, `feito`, `descartado`.
 | SA-34 | Classes que sozinhas não são finding | prompt | `HUNTING.md` (Candidate gate), `ATTACK-CLASSES.md` (Obvious things) | xalgorix, Dark-Moon | média | feito ([#224](https://github.com/YuukiFST/agent-dotfiles/pull/224)) |
 | SA-35 | Detector de registro fabricado ou de placeholder | script | `validate-findings.cjs` | xalgorix | baixa | proposto |
 | SA-36 | Prioridade SSVC para dependência vulnerável, com snapshot KEV/EPSS fixado | prompt | `SUPPLY-CHAIN-AND-RELEASE.md` | mukul975 | baixa | proposto |
+| SA-37 | Censo de supressões controladas pelo alvo; cada uma vira semente e a config do alvo é neutralizada | prompt | `RECONNAISSANCE.md:87` | semgrep, gitleaks, osv-scanner, zizmor, claude-code-security-review | alta | feito |
+| SA-38 | Detectores novos no gate: tokens, connection string ADO, `sbp_`, chave=valor com entropia | script | `validate-artifact-content.cjs:87-100` | gitleaks, trufflehog | alta | feito |
+| SA-39 | Projeção por allowlist da saída de scanner para semente | script | novo `scanner-seeds.cjs`, `RECONNAISSANCE.md:87` | gitleaks, trufflehog, osv-scanner, semgrep | alta | feito |
+| SA-40 | Clonar antes de rodar ferramenta git: `.git/config` executa código | prompt | `RECONNAISSANCE.md:79`, `SKILL.md:40` | trufflehog | alta | feito |
+| SA-41 | Classes de GitHub Actions: soundness de guard, capacidade do contexto, sinks entre steps, pin que mente, segredo em bloco | prompt | `SUPPLY-CHAIN-AND-RELEASE.md:28,39,42,45,48` | zizmor | alta | feito |
+| SA-42 | Superfície de execução do harness: hooks, chaves que rodam comando, `env` perigoso | prompt | `AI-AND-LLM.md:5`, `SUPPLY-CHAIN-AND-RELEASE.md:62` | SkillSpector | alta | feito |
+| SA-43 | Instrução instalada é código: comportamento declarado × real | prompt | `AI-AND-LLM.md:12` | SkillSpector | alta | feito |
+| SA-44 | Modelo-stub no pior caso para testar a camada determinística | prompt | `AI-AND-LLM.md`, `HUNTING.md:81,195` | garak | alta | feito |
+| SA-45 | Gate de IA em CI como alvo: caminhos fail-open | prompt | `SUPPLY-CHAIN-AND-RELEASE.md:48` | claude-code-security-review | média | feito |
+| SA-46 | Estado de taint no trace: label com `requires`, sanitizador por efeito colateral, taint de controle | prompt | `HUNTING.md:79`, `report-schema.json:54` | semgrep | média | proposto |
+| SA-47 | Conteúdo obrigatório opaco não fecha cobertura | schema + script | `RECONNAISSANCE.md`, `validate-coverage-ledger.cjs` | SkillSpector | média | parcial: só o texto em `AI-AND-LLM.md`, sem o script |
+| SA-48 | Saída de modelo em terminal ou log: ANSI, OSC 8, OSC 52 | prompt | `AI-AND-LLM.md:65` | garak | média | feito |
+| SA-49 | Cabeçalho interno de framework no cache key | prompt | `WEB-PROTOCOL-AND-AUTH.md:25` | nuclei-templates | baixa | proposto |
+| SA-50 | Nome de pacote vindo do modelo e artefato de modelo executável | prompt | `AI-AND-LLM.md:37` | garak | baixa | proposto |
+| SA-51 | Manifesto que amplia poder num diff | prompt | `RECONNAISSANCE.md:93-98` | SkillSpector | baixa | proposto |
+| SA-52 | Validar decisão de dedupe: booleano real e ID existente sem truncar | script | `HUNTING.md:251` | Strix | baixa | proposto |
 
 ### Detalhe das ideias
 
@@ -331,6 +358,104 @@ Fonte: `checkFabricatedFinding` e seus testes em `internal/tools/reporting/` (xa
 Para leads de dependência, os pontos de decisão do SSVC (exploração nenhuma, PoC ou KEV; impacto técnico; automatizável; prevalência na missão) ordenam o trabalho de Track a Act.
 O run não acessa a rede, então só vale com um snapshot KEV/EPSS já presente e datado.
 Fonte: `skills/triaging-vulnerabilities-with-ssvc-framework/SKILL.md` (mukul975).
+
+**SA-37, censo de supressões.**
+`RECONNAISSANCE.md:87` só diz que scanners leem config do alvo; nada trata o código auditado escondendo o próprio hit.
+Antes de varrer, listar `.gitleaks.toml`, `.gitleaksignore`, `gitleaks:allow`, `nosem`, `.semgrepignore`, `osv-scanner.toml`, `zizmor.yml`, `# zizmor: ignore` e `trufflehog:ignore`.
+Cada entrada vira semente de ledger, nunca descarte; depois cada ferramenta roda com config do auditor.
+Fontes: `cmd/root.go:178-187,317-320` e `detect/detect.go:510` (gitleaks); `src/targeting/Semgrepignore.ml:112-125` e `src/reporting/Nosemgrep.ml:58-61` (semgrep); `docs/configuration.md` e `internal/config/manager.go:37-39` (osv-scanner); `_filter_generated_files` em `claudecode/github_action_audit.py` (claude-code-security-review, em que `@generated` no diff exclui o arquivo).
+Contraste: SkillSpector declara escopo explícito "not an author-controlled ignore file" (README, § Explicit scan scope).
+
+**SA-38, detectores do gate.**
+`validate-artifact-content.cjs:89` só pega `AKIA`, e `:90` só `live`.
+Faltam `ASIA`/`ABIA`/`ACCA`/`A3T`, `sk-ant-api03-`, `sk-proj-`, `AIza`, `SG.`, `npm_`, `glpat-`, `sk_prod`/`rk_prod` (`config/gitleaks.toml`; adaptar pede linha em `UPSTREAMS.tsv`).
+Regra de chave=valor com entropia acima de 3.5, pulando `${VAR}`, `%VAR%` e `{{ }}` (`cmd/generate/config/rules/generic.go`).
+Connection string ADO (`Server=...;Password=...`) passa sem hit em `:94`, que exige `user:pass@`; é o formato do mssql nos três projetos (ideia de `pkg/detectors/sqlserver/sqlserver.go:56`, trufflehog, regex escrita do zero).
+`sbp_` do Supabase (ideia de `pkg/detectors/supabasetoken/supabasetoken.go:25`); o gitleaks não tem regra Supabase.
+
+**SA-39, sementes de scanner.**
+A saída bruta carrega o segredo: `Secret` no gitleaks, `Raw`, `RawV2` e `SecretParts` no trufflehog, e `--redact` do gitleaks deixa `Email`, `Author`, `Message` e `Link` (`report/finding.go:80-88`).
+Novo `scanner-seeds.cjs` projeta por allowlist só `tool`, `rule_id`, `path`, `line` e `commit`; o bruto fica em `scratch/`, e `validate-artifact-content.cjs` roda sobre as sementes.
+Chaves: `check_id+path+start.line` no semgrep, porque sem login o JSON zera `fingerprint`, `lines` e `metavars` (`src/osemgrep/reporting/Cli_json_output.ml:436-505,633`); `Fingerprint` no gitleaks; `groups[].ids` no osv-scanner, por advisory (`pkg/models/results.go`).
+
+**SA-40, clone antes de ferramenta git.**
+`RECONNAISSANCE.md:79` omite `.git/config`, que faz o git executar código do alvo.
+Rodar ferramenta git num clone, nunca no repositório original.
+Fonte: `README.md:280` (CVE-2025-41390) e `pkg/sources/git/git.go:1650-1665` (trufflehog, só ideia).
+Testado em 2026-11-05 com git 2.55 no Windows: num repositório com `core.fsmonitor` e `diff.*.textconv` hostis, `git status` e `git log -p` executaram os dois comandos no original e nada nos clones `--no-hardlinks` e `--mirror --no-hardlinks`.
+
+**SA-41, classes de GitHub Actions.**
+`SUPPLY-CHAIN-AND-RELEASE.md` tem as classes gerais, sem as regras que separam achado de ruído:
+- Soundness de guard: `:39` compara o gate, mas não testa se ele gateia (`github.actor`, bloco YAML sempre verdadeiro, `contains` em string). Fonte: `audit/bot_conditions.rs`, `docs/audits.md`.
+- Capacidade do contexto: em `:42`, `fixed` descarta, `structured` é média, `arbitrary` é alta; `secrets.*`, `needs.*.result` e `steps.*.outcome` saem; `matrix` e `env` só contam se dinâmicos. Fonte: `audit/template_injection.rs:385-535`, `data/context-capabilities.csv`.
+- Sinks entre steps: `GITHUB_ENV` e `GITHUB_PATH` em `:42`, `persist-credentials` em `:45`, com confiança alta só para checkout antes de upload. Fonte: `audit/artipacked.rs:160-197`.
+- Pin que mente: em `:28`, commit impostor e tag que diverge, sempre `needs_validation` offline. Fonte: `docs/audits.md`.
+- Segredo em bloco em `:48`: `toJson(secrets)`, `secrets: inherit`, `fromJSON(secrets.X).y`.
+
+**SA-42, superfície de execução do harness.**
+`RECONNAISSANCE.md:79` só proíbe a auditoria de carregar configs de harness, e `AI-AND-LLM.md:5` não cita hooks.
+Classes: hooks; chaves que rodam comando (`apiKeyHelper`, `otelHeadersHelper`, `statusLine`, `fileSuggestion`); `env` que redireciona tráfego ou executa código (`ANTHROPIC_BASE_URL`, `NODE_OPTIONS`, `LD_PRELOAD`, `GIT_SSH_COMMAND`); `enableAllProjectMcpServers`; `bypassPermissions`.
+Exige escritor de menor confiança, como `SUPPLY-CHAIN-AND-RELEASE.md:62`.
+Fonte: `src/skillspector/nodes/analyzers/bundled_execution_surface.py` (BH1-4); conferir as chaves na versão do harness antes de portar.
+
+**SA-43, instrução instalada é código.**
+`AI-AND-LLM.md:12` exige falha em código, mas num `SKILL.md` o texto é a própria autoridade.
+Comparar o que a skill declara com o que ela faz: ler `.claude/`, config MCP ou outras skills, e trigger que sombreia outra skill.
+Fontes: `nodes/analyzers/semantic_developer_intent.py` (SDI-1..4), `static_patterns_agent_snooping.py` (AS1-3), README § Trigger Abuse (TR1-3).
+
+**SA-44, modelo-stub.**
+Trocar o provider por uma função que devolve a saída ou tool call escolhida pelo atacante, e testar só a camada determinística, com saída benigna como controle.
+Custa zero e encaixa em `AI-AND-LLM.md:12`: prova o controle ausente, não a persuasão do modelo.
+`HUNTING.md:195` diz só "mocked", e `:81` não dá a técnica.
+Fonte: `garak/generators/test.py` (`Single`, `Repeat`), `generators/function.py`.
+
+**SA-45, gate de IA em CI.**
+Quando o alvo tem um revisor de IA obrigatório, conferir se ele falha aberto: marcador de cache que desliga execuções seguintes (`action.yml:104-106`), paginação sem próxima página (`per_page=100`), resultado vazio com `review_completed: false` e saída 0, prompt longo refeito sem diff.
+Fonte: claude-code-security-review.
+
+**SA-46, estado de taint.**
+`report-schema.json:54` só tem entrypoint, propagation e sink, e `HUNTING.md:79` só diz "sanitized value".
+Pedir label com `requires` booleano no sink, sanitizador por efeito colateral, taint de controle, sink `at_exit` e tipos que zeram taint.
+Fonte: `src/rule/Rule.ml:269-275,305,331,336`, `interfaces/Rule_options.atd:46-50` (semgrep).
+Reforça o SA-17: `requires` é a defesa exigida por slot.
+
+**SA-47, conteúdo opaco.**
+`SKILL.md` em UTF-16, grande demais ou `.pyc` vira unidade não coberta, em vez de passar calado.
+Fonte: `docs/scan-completeness.md`, `analyzers/artifact_integrity.py` (SkillSpector).
+
+**SA-48, saída de modelo em terminal.**
+`AI-AND-LLM.md:65` lista HTML, Markdown, template, URL e comando, mas não sequências de escape.
+Exige fronteira: chegar ao terminal de outro principal.
+Fonte: `garak/probes/ansiescape.py`.
+
+**SA-49, cabeçalho de framework no cache key.**
+`WEB-PROTOCOL-AND-AUTH.md:25` é genérica; exemplos do Next.js: `x-invoke-status`, `Rsc`, `X-Middleware-Prefetch`, com a versão vinda do lockfile.
+Fonte: `http/vulnerabilities/nextjs/` em `projectdiscovery/nuclei-templates` @ `21dedc3` (MIT).
+
+**SA-50, pacote e artefato de modelo.**
+Nome de pacote vindo do modelo e instalado sem allowlist (`garak/probes/packagehallucination.py`), só onde o código instala sozinho.
+Artefato pickle ou executável de caminho gravável por terceiro (`garak/detectors/fileformats.py:16-79`), só com modelo local.
+
+**SA-51, manifesto que amplia poder.**
+Num diff, permissão, trigger ou parâmetro ampliado em frontmatter ou `settings.json` vira candidato.
+Fonte: `analyzers/mcp_rug_pull.py` (SkillSpector).
+
+**SA-52, decisão de dedupe.**
+Validar booleano real e ID existente, sem truncar, porque truncar pode transformar um ID desconhecido em outro válido.
+Fonte: `strix/report/dedupe.py`.
+Não confirmado se `validate-coverage-ledger.cjs` já cobre isso.
+
+**Reforços da rodada de 2026-11-05.**
+- SA-06: `log -p --all --diff-filter=tuxdb` do gitleaks lê o conteúdo adicionado em toda ref, inclusive linha removida de arquivo vivo; `RECONNAISSANCE.md:32` só lista nomes apagados.
+- SA-09: `ATTACK-CLASSES.md:121` só busca bidi e invisíveis; faltam padding (`whitespace_padding.py`), confusáveis UTS #39 (`unicode_confusables.py`), texto espaçado (SkillSpector) e `obfuscation` (zizmor).
+- SA-10: `.git/config` entra na lista (SA-40).
+- SA-12: filtro regex do claude-code-security-review; `badchars.py` e `smuggling.HomoglyphObfuscation` (garak); matcher LLM que falha fechado em `pkg/operators/matchers/match_llm.go` (nuclei).
+- SA-13: veredito de modelo com modelo, hash do prompt e confiança (`matchers/llm_audit.go`, nuclei).
+- SA-20: Opengrep como alternativa offline, com `--taint-intrafile` (`strix/skills/tooling/opengrep.md`); `paths.scanned` do semgrep registra o que foi varrido; não passar `--allow-no-lockfiles`, para lockfile ausente não parecer limpo.
+- SA-21: `LedgerReason` (SkillSpector).
+- SA-24: RA1 e EA5 (SkillSpector); `web_injection.py` (garak).
+- SA-31: a análise de chamadas do osv-scanner só cobre Go e Rust (`flags.go:166`), então em npm a escada para em `vulnerable_symbol_used`.
+- SA-34: React sem sink inseguro e checagem ausente só no cliente (claude-code-security-review); SSRF só de path como teto, não exclusão.
 
 ## Fontes
 
@@ -588,6 +713,156 @@ Assistente interativo de operador no navegador, com shells Kali, Burp/Caido e My
 
 **Licença:** MIT.
 
+### Rodada de 2026-11-05
+
+Fontes lidas remotamente com `gh api`, sem clone e sem executar nada, no commit do índice.
+Os comandos de "Uso direto" vêm do código lido e não foram testados.
+
+### cloudflare/security-audit-skill
+
+Upstream da skill; `main` é idêntico ao pin `c1c8a8c`, então não há nada a portar.
+
+### NVIDIA/SkillSpector
+
+Scanner estático (regex, AST, YARA) com LLM opcional para skills de agente e MCP.
+
+**Não serve, e por quê:** o score aditivo contradiz o SA-02, e o meta-analyzer nunca suprime, enquanto na skill hit é lead.
+
+**Aproveitável:** SA-42, SA-43, SA-47, SA-51; reforços em SA-09, SA-21 e SA-24.
+
+**Uso direto:** triar skill de terceiro antes de vendorizar, com hit como lead e `--no-llm`, porque o LLM é padrão e envia arquivos ao provedor.
+Rodar sem rede, já que SC4 consulta o OSV.dev.
+No Windows, só stdout, porque `-o` exige POSIX.
+Os analisadores BH leem caminhos fixos, então `settings.json` da raiz e `hooks/*.js` deste repositório ficam fora.
+Instalar é dependência nova e depende de aprovação.
+
+**Licença:** Apache-2.0, mas `yara_rules/webshells.yar` declara base Neo23x0/signature-base (DRL-1.1), `cryptominers.yar`, `hacktools.yar` e `malware.yar.b64` citam a mesma base, e `THIRD_PARTY_NOTICES.md` não a lista: não copiar regras.
+
+### anthropics/claude-code-security-review
+
+Action que revisa o diff do PR com Claude e filtra em dois estágios (regex, depois LLM).
+
+**Não serve, e por quê:**
+
+- Descarta todo achado em `.md` e nega prompt com input do usuário (regra 14), o que cega skills e `CLAUDE.md`.
+- As exclusões de DoS, rate limit e dependência contradizem `RESOURCE-EXHAUSTION-AND-AVAILABILITY.md` e o SA-31.
+- O corte de confiança ≥ 8 elimina o estado `needs_validation`.
+
+**Aproveitável:** SA-37 (como contraexemplo), SA-45; reforços em SA-12 e SA-34.
+
+**Riscos:** `README.md:45` admite "not hardened"; `prompts.py` interpola título e diff crus, e `action.yml:181,184` põe `GITHUB_TOKEN` e `ANTHROPIC_API_KEY` no step, herdados pelo subprocess.
+Só usar em PR confiável, com pin por SHA.
+
+### semgrep/semgrep
+
+Motor útil só com regras locais próprias.
+
+**Não serve, e por quê:**
+
+- `--config auto` e `p/*` usam rede (`cli/src/semgrep/config_resolver.py:136-158`).
+- O LICENSE de `semgrep-rules` é só "Semgrep Rules License v1.0" e uma URL: termos não lidos, não vendorizar.
+- Taint entre arquivos exige `--pro` (`scan.py:410`).
+
+**Aproveitável:** SA-37, SA-39, SA-46; reforços em SA-17 e SA-20.
+
+**Uso direto:** numa cópia sem `.git`, depois de apagar todo `.semgrepignore` e criar um vazio na raiz, com HOME vazio e sem `SEMGREP_APP_TOKEN`:
+
+```
+semgrep scan --config <abs>/rules --metrics=off --disable-version-check --oss-only --exclude node_modules --exclude .next --sarif-output=scratch/sg.sarif --json-output=scratch/sg.json <cópia>
+```
+
+### gitleaks/gitleaks
+
+Melhor semente de segredos, mas a execução padrão confia no alvo.
+
+**Não serve, e por quê (execução padrão):**
+
+- Carrega `.gitleaks.toml` e `.gitleaksignore` do alvo e respeita `gitleaks:allow`.
+- Só mascara o segredo com `--redact`.
+- O allowlist global pula `package-lock.json`, `.xlsx`, `.docx` e `.pdf`, então planilha com CPF fica de fora.
+
+**Aproveitável:** SA-37, SA-38, SA-39; reforço em SA-06.
+
+**Uso direto:** com cwd em `scratch/` e `gitleaks.toml` do auditor com `[extend] useDefault = true`.
+Não há flag de "sem rede", quem garante é o sandbox; `gitleaks git` em repositório bare não foi confirmado:
+
+```
+git clone --mirror <alvo> scratch/repo.git
+gitleaks git scratch/repo.git -c <auditor>/gitleaks.toml -i <auditor>/vazio --ignore-gitleaks-allow --redact=100 --no-banner -f json -r scratch/gl.json --exit-code 0
+```
+
+### trufflesecurity/trufflehog
+
+Rejeitado como ferramenta padrão.
+
+**Não serve, e por quê:**
+
+- A verificação vem ligada (`Verify: !*noVerification`, `main.go:674`) e envia o segredo ao provedor; `--results=verified` não a desliga.
+- A verificação disca hosts escolhidos pelo alvo (`pkg/detectors/sqlserver/sqlserver.go:93`, `pkg/detectors/uri/uri.go:127`).
+- O JSON sempre traz o valor, sem flag de redação, e o fingerprint SARIF deriva de `sha256(raw)`, que `SKILL.md:46` proíbe para senha.
+
+**Aproveitável (só ideias):** SA-38, SA-40; reforços em SA-08 e SA-10.
+
+**Licença:** AGPL-3.0: regex escrita do zero.
+
+### google/osv-scanner
+
+Melhor opção offline para npm, com banco preparado pelo usuário antes do run.
+
+**Não serve, e por quê:** `fix` pode executar scripts, `--call-analysis=rust` roda `build.rs`, e `--offline-vulnerabilities` sozinho não basta: só `--offline` liga `PluginNetworkDisabled`.
+
+**Aproveitável:** SA-37, SA-39; reforços em SA-20 e SA-31.
+
+**Uso direto:** o arquivo vazio em `--config` não foi confirmado:
+
+```
+OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=$DB osv-scanner scan source --offline --no-call-analysis=all --config=<auditor>/vazio.toml -r --format=json --output-file=scratch/osv.json <cópia>
+```
+
+### zizmorcore/zizmor
+
+Analisador estático de GitHub Actions, com 41 auditorias em `docs/audits.md`.
+Não executa código do alvo: não há `Command::new` em `crates/zizmor/src`.
+
+**Não serve, e por quê:** `--fix` altera o alvo, e a persona `regular` deixa `self-hosted-runner` e `secrets-outside-env` de fora.
+
+**Aproveitável:** SA-37, SA-41; reforços em SA-09, SA-20 e SA-34.
+
+**Uso direto:** offline caem impostor-commit, known-vulnerable-actions, ref-confusion, stale-action-refs e ref-version-mismatch, e degradam typosquat-uses e artipacked:
+
+```
+zizmor --offline --no-config --no-ignores --persona=auditor --collect=all --format=json <alvo>
+```
+
+### projectdiscovery/nuclei
+
+Scanner vivo por templates YAML, rejeitado para uso direto.
+
+**Não serve, e por quê:** envia tráfego ao alvo (`HUNTING.md:196`), e em loopback um harness próprio com caso de controle prova mais, sem instalar binário nem templates (`HUNTING.md:98`).
+Templates `code` rodam na máquina; template do alvo nunca roda.
+
+**Aproveitável:** SA-49; reforços em SA-12, SA-13 e SA-26.
+
+### NVIDIA/garak
+
+Scanner de comportamento de modelo: mede o modelo, não a fronteira no código, então a maior parte colide com `AI-AND-LLM.md:12`.
+
+**Não serve, e por quê:** `dan`, `tap`, `grandma`, `lmrc`, `propile`, `leakreplay` e `divergence` medem persuasão ou memória do modelo; `latentinjection` e `sysprompt_extraction` já estão em `AI-AND-LLM.md:23,67`.
+
+**Aproveitável:** SA-44, SA-48, SA-50; reforços em SA-12 e SA-24.
+
+**Uso direto:** fora da auditoria, só pelo operador e contra modelo local; o resultado nunca vira finding:
+
+```
+garak --target_type ollama --target_name <modelo-local> --spec probes.ansiescape,probes.web_injection --generations 1
+```
+
+### usestrix/strix, delta até `09536cf`
+
+27 commits e 68 arquivos, quase tudo ruído: `counterevidence.md`, `diff.md` e `source_aware_discovery.md` só ganharam condicionais Jinja `coverage_tools`, sem mudança de método em SA-25, SA-28, SA-31, SA-32 ou SA-33.
+
+**Aproveitável:** SA-52; reforço em SA-20.
+
 ## Aplicabilidade nos projetos-alvo
 
 ### Perfil dos projetos
@@ -628,6 +903,12 @@ São só contagens: indicam onde vale olhar, não vulnerabilidades confirmadas.
 | openworker | não recomendado | não recomendado | não recomendado | Shell livre que pode ler `.env` e strings de conexão e mandar para o LLM; scanners em modo com rede. Melhor rodar semgrep/gitleaks direto. |
 | hexstrike-ai | não recomendado | não recomendado | não recomendado | Ferramentas atacam URL viva; o servidor é RCE sem autenticação em `0.0.0.0`. |
 | caldera | não recomendado | não recomendado | não recomendado | Emula adversário em hosts com agentes C2; não exercita a camada web nem o worker. |
+| gitleaks, osv-scanner, semgrep | válido com condições | válido com condições | válido com condições | Só offline e com a config do alvo neutralizada (SA-37); semgrep só com regras próprias. |
+| zizmor | válido com condições | válido com condições | válido com condições | Só onde houver `.github/workflows/`; presença não conferida nos três. |
+| trufflehog | não recomendado | não recomendado | não recomendado | Verifica segredos no provedor por default; contraria as restrições comuns acima. |
+| nuclei | não recomendado | não recomendado | não recomendado | Tráfego ao vivo; contra instância local, um harness próprio prova mais. |
+| garak | não recomendado | não recomendado | não recomendado | Só se algum projeto tiver feature de LLM, e fora da auditoria. |
+| SkillSpector, claude-code-security-review | não recomendado | não recomendado | não recomendado | Os projetos não são skills; a Action só cabe em PR confiável e manda o diff ao provedor. |
 
 ### Ideias do backlog
 
@@ -655,3 +936,9 @@ Ideias que não aparecem na tabela valem para os três projetos sem ressalva (in
 | SA-33 | Revisão de um PR dos três antes do merge, sem auditar o repositório inteiro. |
 | SA-34 | Chaves `NEXT_PUBLIC_*` do Supabase são públicas por design nos três; a chave `service_role` não é. |
 | SA-36 | Só com um snapshot KEV/EPSS baixado antes, fora do run. |
+| SA-38 | Decisivo: connection string mssql no formato ADO e chaves Supabase hoje passam pelo gate. |
+| SA-39, SA-40 | Só quando scanners forem usados no run; sem eles, o SA-40 ainda vale para qualquer ferramenta git. |
+| SA-41, SA-45 | Só onde houver workflows; valem direto para este `agent-dotfiles`. |
+| SA-42, SA-43, SA-47, SA-51 | Valem principalmente para este `agent-dotfiles`, que instala skills, hooks e mods em toda máquina. |
+| SA-44, SA-48, SA-50 | Só se algum projeto tiver feature de LLM. |
+| SA-49 | Os três usam Next.js; depende de cache compartilhado na frente, fato de implantação fora do repositório. |
