@@ -8,7 +8,7 @@ Take every tool flag below from the tool's own `--help` before the first run.
 
 | Project | Propose |
 |---------|---------|
-| Web app or site | LCP, CLS and TBT per key route (phone and desktop as separate ids), INP for the main interaction, JS and CSS bytes per route (`stable`) |
+| Web app or site | LCP, CLS and TBT per key route (phone and desktop as separate ids), INP for the main interaction, JS, CSS and font bytes per route (`stable`) |
 | Desktop app (Electron, Tauri, native) | Cold startup to settled, idle RAM and CPU after settle, peak RAM on the heaviest screen, FPS on animated or scrolling screens, latency of the main interaction, installer or binary size (`stable`) |
 | Game or canvas-heavy UI | Frame time p95 and FPS p5 per scene, load time per scene, peak RAM |
 | CLI | Wall time of the main commands on a fixed input, peak RAM, binary size (`stable`) |
@@ -89,5 +89,6 @@ The count takes no timing, so mark it `stable`, and CI catches a new N+1.
 ### Sizes (`stable`)
 
 Sum the built artifacts after a production build: JS and CSS per route from the bundler's stats file, the installer or binary from the filesystem.
+Font bytes per route count the files the loaded page requests (`chrome-devtools-axi network --type font`), since `unicode-range` decides which ones download.
 Same input gives the same bytes on every machine, so these gate in CI too.
 Check that first: a build that differs between Windows and Linux (line endings, path strings) makes the size machine-bound, so drop `stable` for it.

@@ -61,3 +61,4 @@ Check these before you ship each change:
 
 - Instruction count and heap counts (`count.mjs`) show a layout change cleanly, where wall time drowns it in noise; add them as metrics when the project runs on Linux or in CI.
 - A rewrite of a hot path keeps the old version as a differential oracle in the tests, so the speedup ships with the output proven unchanged.
+- A change to fonts, images or CSS proves the same thing with a before/after pixel diff built from the same content; classify each visible difference as a content change, a regression to fix, or sub-pixel rounding.

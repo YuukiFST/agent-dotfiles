@@ -74,10 +74,30 @@ For framework image components, retrieve the current priority or preload API fro
 
 ## Fonts
 
-- WOFF2, subset with `unicode-range`, one variable font instead of many weight files when several weights ship.
+- WOFF2, subset per [Subset fonts](#subset-fonts), one variable font instead of many weight files when several weights ship.
 - `font-display: swap` for text that must show immediately; `optional` for non-critical fonts (`FontDisplay`).
 - Preload only the font that renders the LCP text: `<link rel="preload" href="/f.woff2" as="font" type="font/woff2" crossorigin>`.
 - Font swaps that shift layout: see [cls.md](cls.md#stabilize-fonts).
+
+### Subset fonts
+
+Read when font files dominate a page's bytes.
+Rendering stays identical unless the user approves a change, so `font-display` and fallback fonts stay as they are.
+
+1. **Measure.** Record each file's size, glyph count, variable axes, OpenType features and hinting, plus font bytes and preloads per page.
+2. **Inventory what the site uses,** in inline component styles as well as stylesheets: characters in the content, axis values and weights (one-off overrides, bold inside italics), enabled OpenType features, and CSS side effects such as `hyphens: auto` drawing U+2010.
+3. **Cut.** Keep the used characters plus Latin-1 and Latin Extended-A, and leave CJK to system fonts when it renders that way today.
+   Limit each variable axis to the range in use, and fix it at one value only when nothing overrides it.
+   Drop unused OpenType features and hinting.
+4. **Split each font in two.** A core file with ASCII and common punctuation (curly quotes, dashes, ellipsis) gets the preload; an extended file behind `unicode-range` downloads only on pages that use it.
+   Each `unicode-range` lists only characters its file contains.
+5. **Prove it.** Pixel-diff before and after, per `perf-ratchet`'s [techniques.md](../../perf-ratchet/techniques.md#proving-it), on pages with code, italics, accented characters, components with their own font settings, and CJK.
+   Done when every visible difference is classified, bytes per font and page are re-measured, and extended files load only where needed.
+
+- Run the subset as a hand-run script, commit its output, and note when it needs rerunning (new characters in the content); the build stays free of font processing.
+- A generated fallback face placed between the core and extended files draws the extended characters before the real font does.
+- A font with a Reserved Font Name under the OFL gets renamed internally once subset.
+- Inspect the generated files: font tools have quirks.
 
 ## Render-blocking
 
