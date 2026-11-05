@@ -34,7 +34,31 @@ Each line names the metric that should move: if it doesn't, revert.
 
 In JavaScript, typed arrays (`Float64Array`, `Uint32Array`) give struct of arrays and index links without per-object overhead.
 
+## I/O and database
+
+Data layout moves CPU and memory; these changes move wait time.
+Find them in a trace of the real request, not a CPU profile.
+Each is a candidate until `check` confirms it: a scan for "hot paths" names where to look, and the trace names what is hot.
+
+| Signal in the trace | Change | Moves |
+|---------------------|--------|-------|
+| Independent awaits run one after another | Start them together, under a concurrency limit when the count is unbounded | latency |
+| One query per item in a list | One batched query | latency, queries per request |
+| Whole rows loaded to read a few fields | Select only those columns | latency, bytes read, RAM |
+| Hot reads of one key from a large `jsonb` column | Promote the key to a real column; reading one key pulls the whole TOASTed value | latency, buffers read |
+| A regex or URL parsed on every call of a hot function | Hoist the regex to module level, and replace the parse with a string check when one answers | instructions |
+
+Check these before you ship each change:
+
+- **Concurrent awaits:** keep the order where one call reads what another wrote, and inside a transaction, which holds one connection.
+  `Promise.all` rejects on the first failure while the rest keep running, so a write sequence that used to stop can now half-finish.
+  More calls at once also draw more from the connection pool and from rate limits.
+- **Promoted column:** a stored generated column keeps the JSON as the single source, but adding one rewrites the table and its indexes.
+  On a large table, add a plain column and backfill it in batches.
+- **Hoisted regex:** hoist only a regex with no `g` or `y` flag; those keep `lastIndex` between calls.
+
 ## Proving it
 
 - Instruction count and heap counts (`count.mjs`) show a layout change cleanly, where wall time drowns it in noise; add them as metrics when the project runs on Linux or in CI.
 - A rewrite of a hot path keeps the old version as a differential oracle in the tests, so the speedup ships with the output proven unchanged.
+- A change to fonts, images or CSS proves the same thing with a before/after pixel diff built from the same content; classify each visible difference as a content change, a regression to fix, or sub-pixel rounding.

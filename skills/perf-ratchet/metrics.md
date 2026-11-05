@@ -8,11 +8,11 @@ Take every tool flag below from the tool's own `--help` before the first run.
 
 | Project | Propose |
 |---------|---------|
-| Web app or site | LCP, CLS and TBT per key route (phone and desktop as separate ids), INP for the main interaction, JS and CSS bytes per route (`stable`) |
+| Web app or site | LCP, CLS and TBT per key route (phone and desktop as separate ids), INP for the main interaction, JS, CSS and font bytes per route (`stable`) |
 | Desktop app (Electron, Tauri, native) | Cold startup to settled, idle RAM and CPU after settle, peak RAM on the heaviest screen, FPS on animated or scrolling screens, latency of the main interaction, installer or binary size (`stable`) |
 | Game or canvas-heavy UI | Frame time p95 and FPS p5 per scene, load time per scene, peak RAM |
 | CLI | Wall time of the main commands on a fixed input, peak RAM, binary size (`stable`) |
-| Service or API | p50 and p95 latency per key endpoint under a fixed load, throughput, RAM at steady state |
+| Service or API | p50 and p95 latency per key endpoint under a fixed load, throughput, RAM at steady state; with a database, queries per request (`stable`) and the scale sweep below |
 | Any | Build time, when the user cares about it; test-suite time is a `minDelta` metric, never `stable` |
 
 Prefer a low percentile for FPS (`fps_p5`) and a high one for frame time and latency (`p95`): a mean hides the stutter users feel.
@@ -71,8 +71,24 @@ Field data (CrUX, RUM) is never a ratchet sample: it lags by weeks and mixes man
 Script the interaction (UI driver, `chrome-devtools-axi click`, an HTTP request) and time from input to the settled result, printed by the app or read from a trace.
 A timer around a function call measures the function, not what the user waits for.
 
+### Database at scale
+
+A scale sweep shows which queries break as data grows, which a fixed fixture cannot.
+
+1. Take the real queries from the code and the real relationships from the schema.
+2. Seed one database per scale (`x10`, `x100`, `x1000`, as far as the machine holds), multiplying every relationship from a fixed random seed.
+   Keep the production skew, such as a few huge tenants: uniform data hides the plan that fails.
+   Run `ANALYZE` after seeding, and reuse the database across runs.
+3. One script per scale prints each query's latency as JSON on its last line, read by one metric per query and scale: `{ "id": "sidebar.p95_ms.x100", "command": "node .perf/measure/db.mjs x100", "pick": "sidebar_p95_ms", "unit": "ms", "better": "lower", "warmup": 2 }`.
+4. Fix first the query whose time grows faster than its data between two scales: 10x the rows and 30x the time is superlinear.
+   `EXPLAIN (ANALYZE, BUFFERS)` on the largest scale shows why.
+
+For `db.queries_per_request`, count the queries one fixed request issues against one fixed seed.
+The count takes no timing, so mark it `stable`, and CI catches a new N+1.
+
 ### Sizes (`stable`)
 
 Sum the built artifacts after a production build: JS and CSS per route from the bundler's stats file, the installer or binary from the filesystem.
+Font bytes per route count the files the loaded page requests (`chrome-devtools-axi network --type font`), since `unicode-range` decides which ones download.
 Same input gives the same bytes on every machine, so these gate in CI too.
 Check that first: a build that differs between Windows and Linux (line endings, path strings) makes the size machine-bound, so drop `stable` for it.
