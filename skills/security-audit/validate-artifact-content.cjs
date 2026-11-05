@@ -84,14 +84,45 @@ function isValidCnpj(match) {
   return values[12] === first && values[13] === second;
 }
 
+function shannonEntropy(value) {
+  const counts = new Map();
+  for (const character of value) counts.set(character, (counts.get(character) || 0) + 1);
+  return [...counts.values()].reduce((sum, count) => sum - (count / value.length) * Math.log2(count / value.length), 0);
+}
+
+function isPlaceholder(value) {
+  const unquoted = value.replace(/^(["'])(.*)\1$/, "$2");
+  return unquoted === "" || /^(?:\$\{.*\}|\{\{.*\}\}?|%[^%]+%|\$[A-Za-z_]\w*|<.*>|\*+|x+|\[?redacted\]?)$/i.test(unquoted);
+}
+
+function isConnectionStringPassword(value, match) {
+  const isConnectionString = match.input.includes(";") && /\b(?:server|data source|host|addr(?:ess)?|uid|user id|username|initial catalog|database)\s*=|\bsqlserver:\/\//i.test(match.input);
+  return isConnectionString && !isPlaceholder(value);
+}
+
+// The digit requirement keeps identifiers and prose; 3.5 is gitleaks' generic-api-key threshold.
+function isAssignedSecretValue(value) {
+  const isDottedIdentifier = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+$/.test(value);
+  return /[A-Za-z]/.test(value) && /\d/.test(value) && !isDottedIdentifier && shannonEntropy(value) >= 3.5;
+}
+
 const BUILT_IN_DETECTORS = [
   { name: "private-key", pattern: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/g },
-  { name: "aws-access-key", pattern: new RegExp(`${ALNUM_BEFORE}AKIA[0-9A-Z]{16}${ALNUM_AFTER}`, "g") },
-  { name: "stripe-live-key", pattern: new RegExp(`${ALNUM_BEFORE}[rs]k_live_[0-9A-Za-z]{8,}`, "g") },
+  { name: "aws-access-key", pattern: new RegExp(`${ALNUM_BEFORE}(?:A3T[A-Z0-9]|AKIA|ASIA|ABIA|ACCA)[0-9A-Z]{16}${ALNUM_AFTER}`, "g") },
+  { name: "stripe-live-key", pattern: new RegExp(`${ALNUM_BEFORE}[rs]k_(?:live|prod)_[0-9A-Za-z]{8,}`, "g") },
   { name: "github-token", pattern: new RegExp(`${ALNUM_BEFORE}(?:gh[opsru]_[0-9A-Za-z]{36,}|github_pat_[0-9A-Za-z_]{22,})`, "g") },
   { name: "slack-token", pattern: new RegExp(`${ALNUM_BEFORE}xox[abposr]-[0-9A-Za-z-]{10,}`, "g") },
+  { name: "anthropic-api-key", pattern: new RegExp(`${ALNUM_BEFORE}sk-ant-(?:api03|admin01)-[0-9A-Za-z_-]{20,}`, "g") },
+  { name: "openai-api-key", pattern: new RegExp(`${ALNUM_BEFORE}sk-(?:(?:proj|svcacct|admin)-[0-9A-Za-z_-]{20,}|[0-9A-Za-z]{20}T3BlbkFJ[0-9A-Za-z]{20})`, "g") },
+  { name: "google-api-key", pattern: new RegExp(`${ALNUM_BEFORE}AIza[0-9A-Za-z_-]{35}`, "g") },
+  { name: "sendgrid-api-key", pattern: new RegExp(`${ALNUM_BEFORE}SG\\.[0-9A-Za-z=_.-]{66}`, "g") },
+  { name: "npm-token", pattern: new RegExp(`${ALNUM_BEFORE}npm_[0-9A-Za-z]{36}`, "g") },
+  { name: "gitlab-token", pattern: new RegExp(`${ALNUM_BEFORE}glpat-[0-9A-Za-z_-]{20,}`, "g") },
+  { name: "supabase-token", pattern: new RegExp(`${ALNUM_BEFORE}(?:sbp_[0-9a-z]{40}|sb_secret_[0-9A-Za-z_-]{16,})`, "g") },
   { name: "jwt", pattern: /(?<![0-9A-Za-z_-])eyJ[0-9A-Za-z_-]{4,}\.[0-9A-Za-z_-]{4,}\.[0-9A-Za-z_-]{4,}/g },
   { name: "url-credentials", pattern: /[A-Za-z][A-Za-z0-9+.-]*:\/\/([^\s/?#@:]+:[^\s/?#@]+)@/g, group: 1 },
+  { name: "connection-string", pattern: /(?<![0-9A-Za-z_])(?:password|pwd)\s*=\s*("[^"]*"|'[^']*'|\{[^}]*\}|[^\s;"']+)/gi, group: 1, keep: isConnectionStringPassword },
+  { name: "assigned-secret", pattern: new RegExp(`${ALNUM_BEFORE}(?:passw(?:or)?d|pwd|secret(?:[_-]?key)?|token|api[_-]?key|access[_-]?key|private[_-]?key|credential)["']?\\s*(?::=|=>|=|:)\\s*["'\`]?([\\w.+/=~-]{16,150})`, "gi"), group: 1, keep: isAssignedSecretValue },
   { name: "cpf", pattern: new RegExp(`${ALNUM_BEFORE}\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCpf },
   { name: "cnpj", pattern: new RegExp(`${ALNUM_BEFORE}[0-9A-Z]{2}\\.?[0-9A-Z]{3}\\.?[0-9A-Z]{3}/?[0-9A-Z]{4}-?\\d{2}${ALNUM_AFTER}`, "g"), keep: isValidCnpj },
   { name: "email", pattern: /[A-Za-z0-9._%+-]+@((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-]))/g, keep: (_, match) => !isReservedHost(match[1]) && !isUrlUserinfo(match) },

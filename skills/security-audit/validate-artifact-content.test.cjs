@@ -15,6 +15,15 @@ const SECRET_SAMPLES = {
   "stripe-live-key": ["sk_", "live_", "x".repeat(24)].join(""),
   "github-token": ["gh", "p_", "a".repeat(36)].join(""),
   "slack-token": ["xox", "b-", "1".repeat(12)].join(""),
+  "anthropic-api-key": ["sk-", "ant-api03-", "a".repeat(24)].join(""),
+  "openai-api-key": ["sk-", "proj-", "a".repeat(24)].join(""),
+  "google-api-key": ["AI", "za", "a".repeat(35)].join(""),
+  "sendgrid-api-key": ["SG", ".", "a".repeat(66)].join(""),
+  "npm-token": ["npm", "_", "a".repeat(36)].join(""),
+  "gitlab-token": ["gl", "pat-", "a".repeat(20)].join(""),
+  "supabase-token": ["sb", "p_", "a".repeat(40)].join(""),
+  "connection-string": ["Server=db.test;Database=iptu;User Id=app;", "Password=", "hunter2x"].join(""),
+  "assigned-secret": ["client_secret=", "aB3dE6fG9hJ2kL5m", "N8pQ1"].join(""),
   jwt: ["eyJ", "hbGciOi", ".eyJzdWIi", "OiIxIn0", ".c2lnbmF0dXJl"].join(""),
   "url-credentials": ["postgres://app", ":hunter2", "@db.internal.corp/app"].join(""),
   cpf: "529.982.247-25",
@@ -68,6 +77,65 @@ test("fails every built-in secret and personal-data type without echoing the val
     for (const value of [...Object.values(SECRET_SAMPLES), "12.ABC.345/01DE-35", "hunter2", "maria.silva"]) {
       assert.equal(result.output.includes(value), false, `output echoes ${value}`);
     }
+  });
+});
+
+test("fails each credential variant the built-in detectors name", () => {
+  const variants = {
+    "aws-access-key": ["AS" + "IA", "AB" + "IA", "AC" + "CA", "A3" + "TX"].map((prefix) => [prefix, "Z".repeat(16)].join("")),
+    "stripe-live-key": [["rk_", "prod_", "x".repeat(24)].join("")],
+    "anthropic-api-key": [["sk-", "ant-admin01-", "a".repeat(24)].join("")],
+    "openai-api-key": [["sk-", "svcacct-", "a".repeat(24)].join(""), ["sk-", "a".repeat(20), "T3Blbk", "FJ", "a".repeat(20)].join("")],
+    "supabase-token": [["sb_", "secret_", "a".repeat(32)].join("")],
+    "connection-string": [
+      ["sqlserver://db.test;database=iptu;", "password=", "hunter2x"].join(""),
+      ["Data Source=db.test;Initial Catalog=iptu;UID=app;", "PWD=", '"hunter2x"'].join(""),
+      ["Server=db.test;", "Password=", "{hunter;2x}"].join(""),
+    ],
+    "assigned-secret": [['"API_KEY": "', "aB3dE6fG9hJ2kL5mN8pQ1", '"'].join(""), ["db_password := ", "aB3dE6fG9hJ2kL5mN8pQ1"].join("")],
+  };
+  for (const [name, values] of Object.entries(variants)) {
+    withArtifacts({ "findings.json": [{ evidence: values }] }, (file) => {
+      const result = runCli([file("findings.json")]);
+      assert.equal(result.status, 1, `${name}: ${result.output}`);
+      values.forEach((value, index) => {
+        assert.ok(result.stderr.includes(`$[0].evidence[${index}]: ${name}\n`), result.stderr);
+        assert.equal(result.output.includes(value), false, `output echoes a ${name} value`);
+      });
+    });
+  }
+});
+
+test("passes placeholders, code references, and permitted hash prefixes", () => {
+  const evidence = [
+    "Server=db.test;Database=iptu;User Id=app;Password=${DB_PASSWORD};",
+    "Server=db.test;Password=%DB_PASSWORD%;",
+    "Server=db.test;Password=$DB_PASSWORD;",
+    "Server=db.test;Password={{ db_password }};",
+    "Server=db.test;Password=<password>;",
+    "Server=db.test;Password=***;",
+    'Server=db.test;Password="";',
+    "Set password=hunter2x on the dummy user; the form rejects it.",
+    "const token = process.env.API_TOKEN_2_VALUE;",
+    "password = correcthorsebatterystaple",
+    "secret_sha256: a1b2c3d4e5f6",
+    "token=aaaaaaaaaaaaaaaaaaaa1",
+    "The publishable key sb_publishable_abcdefghijklmnop ships to browsers.",
+    ["sk_", "test_", "a".repeat(24)].join(""),
+  ];
+  withArtifacts({ "findings.json": [{ evidence }] }, (file) => {
+    const result = runCli([file("findings.json")]);
+    assert.equal(result.status, 0, result.output);
+  });
+});
+
+test("an allow rule passes a dummy connection-string password by value", () => {
+  const rules = { allow: [{ detector: "connection-string", match: "dummy-pass" }] };
+  const findings = [{ evidence: ["Server=db.test;Password=dummy-pass;", "Server=db.test;Password=other-pass;"] }];
+  withArtifacts({ "findings.json": findings, "rules.json": rules }, (file) => {
+    const result = runCli(["--rules", file("rules.json"), file("findings.json")]);
+    assert.equal(result.status, 1, result.output);
+    assert.deepEqual(result.stderr.match(/^ERROR: .*$/gm), ['ERROR: "findings.json" $[0].evidence[1]: connection-string']);
   });
 });
 
