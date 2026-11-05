@@ -32,11 +32,13 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
    Done when you hold its harness list; a harness outside the row stays unsynced, since an extra one grows a config dir nobody keeps current.
 2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, gh-axi, chrome-devtools-axi, browser-harness, and in OpenCode the caveman-lean, ponytail-subagent and goal plugins), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
    `all` exists only in `sync-config.ps1`; `sync-config.sh` takes one harness per run.
+   The scripts copy the working tree of their own checkout, uncommitted files included, so a checkout on another branch installs that branch: run the sync from a tree at `origin/main`, or tell the user to.
    Done when every command exits 0 and ends with `Config synced (...)`.
 3. **Fetch the design references** when `~/.claude/ui-refs/` is missing (first sync) or a refresh is asked for: `bash skills/ui-polish/update-refs.sh`.
    Sync never runs it, and the clones sit outside every skills dir on purpose so none of their frontmatter reaches a session.
    Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/` (a route or a **Not routed** entry in `SKILL.md`, a repointed path or section citation, or a local term defined) and the script rerun.
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
+   Run checks 1 and 2 plus the checks for the row's harnesses and report each by number with its result; `drift` or a hand diff answers check 1 alone, and a check not run leaves the sync reported as unverified.
    1. `bin/agent-cli drift` prints `summary: 0 drift`: rules, payload files and every `skills/<name>/` match their live copies byte for byte, and no `REMOVED.txt` skill is still live.
    2. `browser-harness --version` prints a version, and `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       A snapshot failure means Chrome is missing, not that the repo drifted.
@@ -61,3 +63,5 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
   Strings use single quotes because PowerShell 5.1 drops double quotes inside native arguments; Herdr UI runs on Windows only here, so `sync-config.sh` has no herdr target.
 - **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.
 - **`CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md` sit outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md` in every session and subagent, and these files are disclosed, read only when a pointer fires (in `GLOBAL.md` and `rules/prompting.md`).
+- **Assume CRLF on a Windows checkout:** `.gitattributes` pins LF only for `*.sh` and `bin/*`, so make multi-line edits with Edit, never an LF-anchored script, and compare files by blob hash (`git hash-object`).
+- **Git Bash rewrites slash-leading arguments:** `/caveman off` reaches a native CLI as `C:/Program Files/Git/caveman off`, which can pass a test falsely, so send such arguments from PowerShell or with `MSYS_NO_PATHCONV=1`.
