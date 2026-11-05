@@ -70,6 +70,7 @@ web-perf	cloudflare/skills	skills/web-perf	41e0d19
 web-perf	addyosmani/web-quality-skills	skills/performance	afa8da9
 web-perf	addyosmani/web-quality-skills	skills/core-web-vitals	afa8da9
 writing-for-agents	mattpocock/skills	skills/productivity/writing-for-agents	f054def
+youtube-transcript	0xSero/youtube-translate-skill	.	51fa937
 yuu-mode	cursor/plugins	pstack/skills/poteto-mode	c742dd6
 ./skills	cursor/plugins	pstack	c742dd6
 ./skills	morganlinton/BeautifulRust	skills	3385ca7
