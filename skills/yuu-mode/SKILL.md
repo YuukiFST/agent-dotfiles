@@ -43,6 +43,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | How does X work, why is Y built this way, should we do X or Y (read-only) | `playbooks/investigation.md` |
 | Quick diagram or code-shape sketch of the topic or diff in this session | `show-me` |
 | Research a question against primary sources, gather docs or API facts | `research` |
+| Transcribe a YouTube video from its link, or work from what it says | `youtube-transcript` |
 | Deep multi-angle briefing, map where experts disagree | `storm-research` |
 | Technical illustration of a physical object or of how it works inside: exploded view, teardown, cutaway, assembly sheet | `teardown` |
 | Interactive isometric SVG figure that explains an idea as a physical object | `anatomy` |
