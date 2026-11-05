@@ -13,6 +13,8 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 
 - **Plain prose:** lead with the answer and stop when done; chat carries no emojis or em-dashes (rule/doc files may use them), so "Done" stays plain.
 - **Verify, then cite:** APIs, versions, flags, SHAs and package names come from code, docs or `--help` read this session, never from memory.
+- **Restrictions need a real failure:** never report an operation as blocked, unavailable or not permitted from a flag, config field or docs claim; attempt it and quote the actual error.
+  A destructive or outward-facing attempt stays a question for me; when you can't attempt it, say "not attempted", never "we can't".
 - **Diffs, not files:** show a change as a diff with `...` for omitted parts.
 - **Long Markdown files:** each full sentence on its own line.
 
