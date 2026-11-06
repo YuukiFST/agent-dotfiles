@@ -7,11 +7,12 @@ Emil's three-skill chain run as one procedure: `find-animation-opportunities` de
 The user describes an effect without its name ("the bouncy popover thing") → look it up in `animation-vocabulary` **Glossary** and confirm the term first. Then resolve the request shape:
 
 - **One named target** ("animate the dropdown", "add a press state to this button"): that target is the only candidate. Go to step 2.
+- **A speed pass** ("make it feel faster", "the UI feels slow"): read `review-animations/STANDARDS.md` **Easing** and **Duration**, then list every animation, transition and spinner in the scope that breaks them: `ease-in` on UI, a built-in curve where a strong custom one belongs, a duration past its table row or past 300ms, a spinner that turns slowly or runs on the main thread (rAF, a JS motion library), which moves to CSS. The references set no spinner speed, so shorten its period and report before and after. Each entry is a named target for step 2, where **The Gate** can delete it instead of retuning it. Slowness that remains with the motion fixed (load time, long tasks, input delay) goes to the `web-perf` skill.
 - **A scope with no named target** ("add motion to this page", "this feels static", "make it feel alive", "what could animate here?"): read `find-animation-opportunities/SKILL.md` and run its **Workflow** over the scope. The recon block stands in for its step 1, plus the frequency map that step asks for.
 
 The sweep is read-only and ends in `find-animation-opportunities` **Required Output Format**: the opportunities table with exact values in the project's tokens, the rejected candidates, the verdict. Its closing handoff to `improve-animations plan` is replaced by step 2 here.
 
-Done when: either one named target is the candidate, or every seam class in `find-animation-opportunities` **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
+Done when: either one named target is the candidate, or a speed pass covered the whole scope, or every seam class in `find-animation-opportunities` **Where to Hunt** yielded rows with `path:line` evidence or was cleared, and the three parts are written.
 
 Then, by request:
 
