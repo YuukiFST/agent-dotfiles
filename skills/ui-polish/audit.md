@@ -46,7 +46,7 @@ Done when: every applied row is checked off in the table with the file touched.
 ## 6. Review gate
 
 1. Run the project gates from recon step 6 (typecheck, lint, tests). Fix what your change broke.
-2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Reduced-motion emulated once if motion changed.
+2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Console read against step 2, with no new error, per `addyosmani-agent-skills/skills/frontend-ui-engineering/SKILL.md` **Verification**. Reduced-motion emulated once if motion changed.
 3. Motion changed → run [motion.md](motion.md) step 3 whole. Its **Evidence** reuses 1 and 2 above and adds what they lack: the reduced-motion confirmation and a keyboard walk of every element whose motion changed. Its three rounds count per pass through this step. A Block left after the third leads the step 7 report and keeps this step not done.
 
 Done when: gates pass, both after-screenshots exist, no HIGH finding remains open, and changed motion closed on Approve.

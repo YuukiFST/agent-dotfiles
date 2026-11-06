@@ -6,7 +6,7 @@
 # third column is cloned sparse, that subdirectory only. A clone left in REFS by a
 # repo dropped from the list is ignored, never read.
 # Ends with two drift checks: UNROUTED for an upstream skill, a file in its
-# references/ dir, or a concept draft under a repo's content/, that no file of
+# references/ or reference/ dir, or a concept draft under a repo's content/, that no file of
 # this skill routes or excludes, MISSING for a REFS/ path any file of this skill cites that
 # upstream no longer has, or a **bold** section name no upstream heading or label
 # still carries. All surface on the next pull instead of mid-task.
@@ -42,6 +42,8 @@ emilkowalski-skills https://github.com/emilkowalski/skills
 mengto-skills https://github.com/MengTo/Skills agent-skills/ui
 craft https://github.com/gustavo-fior/craft
 unslop https://github.com/heydamir/unslop skills
+impeccable https://github.com/pbakaus/impeccable skill
+addyosmani-agent-skills https://github.com/addyosmani/agent-skills skills/frontend-ui-engineering
 REPOS
 
 drift=0
@@ -57,7 +59,7 @@ for root in "${roots[@]}"; do
   done
 done
 for root in "${roots[@]}"; do
-  for ref in "$root"/*/references/*.md; do
+  for ref in "$root"/*/references/*.md "$root"/reference/*.md; do
     [ -e "$ref" ] || continue
     rel="${ref#"$REFS"/}"
     if ! grep -qF "$rel" "$(dirname "$ROUTER")"/*.md; then
