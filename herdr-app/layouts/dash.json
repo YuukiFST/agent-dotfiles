@@ -1,0 +1,17 @@
+{
+  "id": "root",
+  "type": "column",
+  "background": "canvas",
+  "children": [
+    {
+      "id": "usage-bar",
+      "type": "block",
+      "size": {
+        "px": 28
+      },
+      "content": {
+        "mod": "claude-usage"
+      }
+    }
+  ]
+}

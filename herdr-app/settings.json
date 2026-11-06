@@ -1,0 +1,12 @@
+{
+  "zoom": 1,
+  "sounds": {
+    "enabled": false
+  },
+  "minimum_contrast": 1,
+  "appearance": "dark",
+  "theme": "tokyo-night",
+  "font": "IoskeleyMonoTerm Nerd Font Mono",
+  "font_size": 14,
+  "telemetry": false
+}

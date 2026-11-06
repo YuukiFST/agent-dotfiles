@@ -1,0 +1,69 @@
+{
+  "id": "root",
+  "type": "column",
+  "children": [
+    {
+      "id": "panels",
+      "type": "row",
+      "children": [
+        {
+          "id": "board",
+          "type": "block",
+          "content": {
+            "mod": "agents-edited",
+            "props": {
+              "board": true,
+              "compact": true
+            }
+          },
+          "size": {
+            "weight": 1
+          }
+        }
+      ],
+      "background": "canvas"
+    },
+    {
+      "id": "footer",
+      "type": "row",
+      "children": [
+        {
+          "id": "usage-bar",
+          "type": "block",
+          "content": {
+            "mod": "claude-usage",
+            "props": {
+              "only": "network"
+            }
+          },
+          "size": {
+            "weight": 1
+          }
+        },
+        {
+          "id": "workspaces",
+          "type": "block",
+          "size": {
+            "px": 170
+          },
+          "content": {
+            "mod": "workspaces"
+          }
+        }
+      ],
+      "size": {
+        "px": 28
+      },
+      "resizable": false
+    }
+  ],
+  "background": "canvas",
+  "theme": {
+    "light": "vercel-dark",
+    "dark": "tokyo-night"
+  },
+  "divider": {
+    "width": 1,
+    "color": "border"
+  }
+}
