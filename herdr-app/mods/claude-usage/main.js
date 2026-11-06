@@ -1,7 +1,7 @@
 import { View, div } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { exec, readTextFile, home, appHome, theme, props } from "herdr";
-import { PlanUsage, resetsText } from "./plan-usage.js";
+import { PlanUsage, TokenUsage, resetsText, tokenBreakdown, tokenCount } from "./plan-usage.js";
 
 // Both windows show the same machine: a reading this recent came from the other one.
 const SAMPLE_FRESH_MS = 4000;
@@ -21,6 +21,7 @@ export default class ClaudeUsage extends View {
     cx.timer.every(5000, (cx) => this.loadSystem(cx));
     if (props()?.only === "system" || isNetworkOnly()) return;
     this.planUsage = new PlanUsage(cx);
+    this.tokenUsage = new TokenUsage(cx);
     // Countdowns move once a minute; 30 s keeps them within half a minute.
     cx.timer.every(30000, (cx) => cx.notify());
   }
@@ -81,6 +82,12 @@ export default class ClaudeUsage extends View {
       .child(div().text_color(t.dim).child(resetsText(win.resetsAt)));
   }
 
+  tokenPeriod(t, label, period) {
+    return h_flex().id(`tokens-${label}`).gap(6).items_center().tooltip(tokenBreakdown(period))
+      .child(div().text_color(t.dim).child(label))
+      .child(div().text_color(t.foreground).child(tokenCount(period.tokens)));
+  }
+
   cpuAndRam(t, s, sep) {
     return [
       this.meter(t, "CPU", s.cpu),
@@ -106,6 +113,7 @@ export default class ClaudeUsage extends View {
   render() {
     const t = theme();
     const hasReading = Boolean(this.planUsage?.reading?.windows);
+    const tokens = this.tokenUsage?.reading;
     const s = this.system;
     const sep = () => div().w(1).h(12).bg(t.border);
     if (props()?.only === "system") return this.systemOnly(t, s, sep);
@@ -115,6 +123,12 @@ export default class ClaudeUsage extends View {
       .child(div().text_color(t.accent).child("Claude"))
       .when(!hasReading, (el) => el.child(div().text_color(t.dim).child("no reading yet: sign in to Claude Code")))
       .when(hasReading, (el) => el.child(this.window(t, "week", this.planUsage.windowOf("week"))))
+      .when(Boolean(tokens), (el) => el
+        .child(sep())
+        .child(this.tokenPeriod(t, "today", tokens.today))
+        .child(this.tokenPeriod(t, "week", tokens.week))
+        .child(this.tokenPeriod(t, "month", tokens.month))
+        .child(this.tokenPeriod(t, "all", tokens.allTime)))
       .child(div().flex_1())
       .when(Boolean(s), (el) => el
         .children(this.cpuAndRam(t, s, sep))
