@@ -1,12 +1,15 @@
-// The Claude plan usage every view shows, from the file usage-sample.mjs leaves. Whichever view is
-// due runs the script, so several windows stay within the endpoint's rate limit.
+// The Claude plan usage and token spend every view shows, from the files usage-sample.mjs and
+// tokens-sample.mjs leave. Whichever view is due runs the script, so several windows share one
+// reading and stay within the endpoint's rate limit.
 // The same file lives in claude-usage and agents-edited: a mod cannot import outside its folder.
 
 import { exec, readTextFile, appHome, home } from "herdr";
 
 const CHECK_MS = 30000;
 const REFRESH_MS = 5 * 60000;
+const TOKENS_REFRESH_MS = 2 * 60000;
 const USAGE_FILE = () => `${home()}/.config/herdr-app/data/claude-usage/plan-usage.json`;
+const TOKENS_FILE = () => `${home()}/.config/herdr-app/data/claude-usage/tokens.json`;
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const pad2 = (n) => String(n).padStart(2, "0");
@@ -28,6 +31,25 @@ export function resetsText(resetsAt) {
   return `resets ${WEEKDAYS[d.getDay()]} ${pad2(d.getHours())}:${pad2(d.getMinutes())} · in ${remaining(resetsAt - Date.now() / 1000)}`;
 }
 
+export function tokenCount(n) {
+  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+  return n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${(n / 1e3).toFixed(1)}k`;
+}
+
+function dateTimeText(at) {
+  const d = new Date(at);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+// period: one of the tokens.json periods. Cache reads are most of the total, so it stays visible.
+export const tokenBreakdown = (period) => [
+  `since ${dateTimeText(period.since)}`,
+  `input ${tokenCount(period.input)}`,
+  `output ${tokenCount(period.output)}`,
+  `cache write ${tokenCount(period.cacheWrite)}`,
+  `cache read ${tokenCount(period.cacheRead)}`,
+].join(" · ");
+
 const parseReading = (text) => {
   try {
     return JSON.parse(text ?? "null");
@@ -36,8 +58,11 @@ const parseReading = (text) => {
   }
 };
 
-export class PlanUsage {
-  constructor(cx) {
+class SharedReading {
+  constructor(cx, file, script, refreshMs) {
+    this.file = file;
+    this.script = script;
+    this.refreshMs = refreshMs;
     this.reading = null;
     this.readingText = null;
     this.isFetching = false;
@@ -55,13 +80,25 @@ export class PlanUsage {
 
   check(cx) {
     cx.spawn(async (cx) => {
-      this.show(await readTextFile(USAGE_FILE()).catch(() => null), cx);
-      if (this.isFetching || Date.now() - (this.reading?.checkedAt ?? 0) < REFRESH_MS) return;
+      this.show(await readTextFile(this.file).catch(() => null), cx);
+      if (this.isFetching || Date.now() - (this.reading?.checkedAt ?? 0) < this.refreshMs) return;
       this.isFetching = true;
-      const r = await exec("node", [`${appHome()}/mods/claude-usage/usage-sample.mjs`, USAGE_FILE()]).catch(() => null);
+      const r = await exec("node", [`${appHome()}/mods/claude-usage/${this.script}`, this.file]).catch(() => null);
       this.isFetching = false;
       if (r?.code === 0) this.show(r.stdout, cx);
     });
+  }
+}
+
+export class TokenUsage extends SharedReading {
+  constructor(cx) {
+    super(cx, TOKENS_FILE(), "tokens-sample.mjs", TOKENS_REFRESH_MS);
+  }
+}
+
+export class PlanUsage extends SharedReading {
+  constructor(cx) {
+    super(cx, USAGE_FILE(), "usage-sample.mjs", REFRESH_MS);
   }
 
   windowOf(kind) {

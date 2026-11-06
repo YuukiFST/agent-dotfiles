@@ -2,12 +2,15 @@
 
 import { div, image } from "gpui-kit";
 import { v_flex, h_flex, Textarea, TextareaState } from "gpui-base";
-import { agents, hc, knownAgents, pickFolder, run, theme, watchFolder } from "herdr";
+import { agents, hc, pickFolder, run, theme, watchFolder } from "herdr";
+import { harnessSwitch, loadHarnesses } from "../harness-switch.js";
 import { SHARED_DIR, composeMessage, copyImage, folderName, imageAsset, isImagePath, isNotesFile, newId, openImage, pasteImage, readBook, removeImages, sessionsFor, updateBook } from "./store.js";
 
 const NEW_SESSION = "new";
 const PICKER_MAX_HEIGHT = 190;
 const PROJECT_KEY = "notes.project";
+const HARNESS_KEY = "notes.harness";
+const SWITCH_TILE_SIZE = 22;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const twoDigits = (value) => String(value).padStart(2, "0");
 const clock = (ms) => {
@@ -15,17 +18,12 @@ const clock = (ms) => {
   return `${MONTHS[date.getMonth()]} ${date.getDate()} ${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
 };
 
-// The agent last active here, so notes follow whichever one is in use; else the first installed.
-async function agentForNewSession() {
-  const installed = (await knownAgents()).filter((a) => a.installed);
-  const latest = agents().reduce((newest, a) => (a.seq > (newest?.seq ?? -1) ? a : newest), null);
-  return installed.find((a) => a.key === latest?.program.key) ?? installed[0];
-}
-
 export class NotesPanel {
   constructor(cx) {
     this.book = null;
     this.projectId = localStorage.getItem(PROJECT_KEY);
+    this.harnessKey = localStorage.getItem(HARNESS_KEY);
+    this.harnesses = [];
     this.targetByProject = {};
     this.editingId = null;
     this.armedDeleteId = null;
@@ -38,6 +36,8 @@ export class NotesPanel {
     this.draft.on("paste_other", (_e, cx) => this.attachPastedImage(cx));
     cx.spawn(async (cx) => {
       this.book = (await readBook()) ?? { projects: [] };
+      cx.notify();
+      this.harnesses = await loadHarnesses().catch(() => []);
       cx.notify();
       for (;;) {
         const changed = await watchFolder(SHARED_DIR());
@@ -198,21 +198,27 @@ export class NotesPanel {
     }, () => removeImages(images));
   }
 
-  // Picks on its own only a session in the project's folder: asking beats sending to the wrong one.
+  // The switch's pick; before the first click, the agent last active here, else the first installed.
+  harness() {
+    const installed = this.harnesses.filter((a) => a.installed);
+    const latest = agents().reduce((newest, a) => (a.seq > (newest?.seq ?? -1) ? a : newest), null);
+    return installed.find((a) => a.key === this.harnessKey) ?? installed.find((a) => a.key === latest?.program.key) ?? installed[0] ?? null;
+  }
+
+  // Using the switch means the next send opens a new session with that agent.
+  chooseHarness(project, key, cx) {
+    this.harnessKey = key;
+    localStorage.setItem(HARNESS_KEY, key);
+    this.chooseTarget(project, NEW_SESSION, cx);
+  }
+
+  // A new session, unless the person picked one that is still alive.
   target(project, sessions) {
-    const chosen = this.targetByProject[project.id];
-    if (chosen === NEW_SESSION) return NEW_SESSION;
-    return sessions.find((s) => s.address === chosen) ?? sessions.find((s) => s.inProject) ?? null;
+    return sessions.find((s) => s.address === this.targetByProject[project.id]) ?? NEW_SESSION;
   }
 
   send(project, notes, cx) {
-    const sessions = sessionsFor(project);
-    const target = this.target(project, sessions);
-    if (!target) {
-      this.openPicker(cx);
-      this.say("Choose the session that gets the note.", true);
-      return cx.notify();
-    }
+    const target = this.target(project, sessionsFor(project));
     if (this.isBusy || !notes.length) return;
     this.isBusy = true;
     this.say("Sending…");
@@ -245,8 +251,8 @@ export class NotesPanel {
   }
 
   async startSession(project, notes) {
-    const agent = await agentForNewSession();
-    if (!agent) throw new Error("no agent installed");
+    const agent = this.harness();
+    if (!agent) throw new Error("neither Claude Code nor OpenCode is installed");
     run("space.new", { name: project.name, folder: project.folder, argv: agent.run, task: composeMessage(project, notes, true) });
     return `new ${agent.name} session`;
   }
@@ -258,17 +264,8 @@ export class NotesPanel {
     cx.notify();
   }
 
-  openPicker(cx) {
-    this.isPickerOpen = true;
-    cx.spawn(async (cx) => {
-      this.newSessionAgent = (await agentForNewSession())?.name ?? null;
-      cx.notify();
-    });
-  }
-
   togglePicker(cx) {
-    if (this.isPickerOpen) this.isPickerOpen = false;
-    else this.openPicker(cx);
+    this.isPickerOpen = !this.isPickerOpen;
     cx.notify();
   }
 
@@ -353,25 +350,35 @@ export class NotesPanel {
     const rows = sessions.map((s) => this.sessionRow(`session-${s.address}`, s.address,
       `${s.space_name} · ${s.status}${s.inProject ? " · in this folder" : ""}`, target?.address === s.address,
       (_e, cx) => this.chooseTarget(project, s.address, cx)));
+    const harness = this.harness();
     return v_flex().id("session-list").flex_none().max_h(PICKER_MAX_HEIGHT).gap(2).overflow_y_scrollbar()
-      .children(rows)
-      .when(Boolean(this.newSessionAgent), (el) => el.child(this.sessionRow("session-new", "New session",
-        `${this.newSessionAgent} in ${folderName(project.folder)}`, target === NEW_SESSION,
+      .when(Boolean(harness), (el) => el.child(this.sessionRow("session-new", "New session",
+        `${harness.name} in ${folderName(project.folder)}`, target === NEW_SESSION,
         (_e, cx) => this.chooseTarget(project, NEW_SESSION, cx))))
-      .when(!rows.length && !this.newSessionAgent, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("No open sessions.")));
+      .children(rows)
+      .when(!rows.length && !harness, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("No open sessions.")));
+  }
+
+  // Lit only while a send would really start that agent.
+  harnessSwitch(project, target) {
+    const lit = target === NEW_SESSION ? this.harness()?.key : null;
+    return harnessSwitch(theme(), "harness-switch", this.harnesses, lit, SWITCH_TILE_SIZE, (key, cx) => this.chooseHarness(project, key, cx));
   }
 
   sendBar(project, pending) {
     const t = theme();
     const sessions = sessionsFor(project);
     const target = this.target(project, sessions);
-    const targetLabel = target === NEW_SESSION ? "New session" : target ? `${target.address} · ${target.space_name}` : "Choose session";
+    const harness = this.harness();
+    const newSessionLabel = harness ? `New ${harness.name} session` : "New session";
+    const targetLabel = target === NEW_SESSION ? newSessionLabel : `${target.address} · ${target.space_name}`;
     return v_flex().flex_none().p(10).gap(8).border_t(1).border_color(t.border)
       .when(Boolean(this.feedback), (el) => el.child(div().flex_none().text_size(11.5).whitespace_normal().text_color(this.feedback.isError ? t.blocked : t.muted).child(this.feedback.text)))
       .when(this.isPickerOpen, (el) => el.child(this.sessionPicker(project, sessions, target)))
       .child(h_flex().flex_none().gap(8).items_center()
+        .child(this.harnessSwitch(project, target))
         .child(h_flex().id("session-toggle").flex_1().min_w(0).h(26).px(8).gap(6).items_center().rounded(6).cursor_pointer()
-          .bg(t.raised).hover((s) => s.bg(t.hover)).text_size(12).text_color(target ? t.foreground : t.muted)
+          .bg(t.raised).hover((s) => s.bg(t.hover)).text_size(12).text_color(t.foreground)
           .on_click((_e, cx) => this.togglePicker(cx))
           .child(div().flex_1().min_w(0).truncate().child(targetLabel))
           .child(div().text_color(t.dim).child(this.isPickerOpen ? "▾" : "▴")))

@@ -330,14 +330,16 @@ export class TreemapTiles extends View {
   }
 }
 
-// view: { scope, onStep(by, cx), open, onToggle(key, cx) }: the sessions shown and the opened row.
+// view: { scope, onStep(by, cx), open, onToggle(key, cx), leading }: the sessions shown, the opened
+// row, and what opens the header (kept even with nothing to map, or the panel could not be left).
 // tiles: the retained TreemapTiles.
 export function contextTreemap(t, tree, view, tiles) {
   const panel = h_flex().items_stretch().flex_1().min_w(0).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden();
-  if (!tree) return panel;
+  if (!tree) return panel.child(div().p(10).child(view.leading));
   return panel
     .child(v_flex().flex_1().min_w(0).p(10).gap(8)
-      .child(h_flex().h(20).flex_none().min_w(0).overflow_hidden().px(2).gap(12).items_center()
+      .child(h_flex().h(22).flex_none().min_w(0).overflow_hidden().gap(12).items_center()
+        .child(view.leading)
         .child(scopeSwitch(t, view))
         .child(legend(t)))
       .child(tiles))
