@@ -24,6 +24,9 @@ if ($userPath -notlike "*$Bin*") {
 }
 
 $initArgs = @("init", "-g")
+# Without --agent, rtk also appends @RTK.md to ~/.claude/CLAUDE.md, which the sync owns as a copy of
+# GLOBAL.md. --hook-only keeps the hook and the OpenCode plugin and leaves that file alone.
+if (-not $Agent) { $initArgs += "--hook-only" }
 if ($Agent) { $initArgs += @("--agent", $Agent) }
 if ($AutoPatch) { $initArgs += "--auto-patch" }
 if ($OpenCode) { $initArgs += "--opencode" }
