@@ -3,6 +3,8 @@
 // plugins run in one background service with no terminal of their own, so the session is found
 // from the outside: the title the terminal shows, and its folder.
 //   node opencode-sample.mjs <terminal> <terminal title> <cwd>
+// With --usage alone it only refreshes the 7-day usage, which needs no session open:
+//   node opencode-sample.mjs --usage
 import { mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import { join } from "node:path";
@@ -12,6 +14,8 @@ const DATA_DIR = process.env.XDG_DATA_HOME ?? join(os.homedir(), ".local", "shar
 const DB_FILE = join(DATA_DIR, "opencode", "opencode.db");
 const MODELS_FILE = join(os.homedir(), ".cache", "opencode", "models.json");
 const STATE_DIR = join(os.homedir(), ".claude", "state", "ctx");
+const TRANSCRIPT_DIR = join(STATE_DIR, "opencode");
+const USAGE_ONLY = "--usage";
 const DEFAULT_WINDOW = 200000;
 // The same limits as statusline.ps1: a hard cap at 40% of the window, a softer session target.
 const CAP_SHARE = 0.4;
@@ -38,11 +42,20 @@ function findSession(db, title, cwd) {
 // Subagents' sessions count too: they spend tokens like any other.
 function recentUsage(db) {
   const since = Date.now() - USAGE_WINDOW_MS;
-  const { tokens, cost } = db.prepare(`SELECT
+  const byModel = db.prepare(`SELECT model, COUNT(*) AS sessions,
     SUM(tokens_input + tokens_output + tokens_reasoning + tokens_cache_read + tokens_cache_write) AS tokens,
     SUM(cost) AS cost
-    FROM session_v2 WHERE time_updated >= ?`).get(since);
-  return { tokens: tokens ?? 0, cost: cost ?? 0, at: Date.now() };
+    FROM session_v2 WHERE time_updated >= ? GROUP BY model ORDER BY tokens DESC`).all(since);
+  const sum = (field) => byModel.reduce((total, row) => total + (row[field] ?? 0), 0);
+  return { tokens: sum("tokens"), cost: sum("cost"), sessions: sum("sessions"), topModel: modelName(byModel[0]?.model), at: Date.now() };
+}
+
+function modelName(model) {
+  try {
+    return JSON.parse(model).id;
+  } catch {
+    return null;
+  }
 }
 
 function windowOf(model) {
@@ -101,6 +114,14 @@ function writeWhole(file, text) {
 }
 
 const [terminal, shownTitle, cwd] = process.argv.slice(2);
+if (terminal === USAGE_ONLY) {
+  const db = new DatabaseSync(DB_FILE, { readOnly: true });
+  const usage = recentUsage(db);
+  db.close();
+  mkdirSync(TRANSCRIPT_DIR, { recursive: true });
+  writeWhole(join(TRANSCRIPT_DIR, "usage.json"), JSON.stringify(usage));
+  process.exit(0);
+}
 if (!terminal || !shownTitle || !cwd) process.exit(0);
 
 const db = new DatabaseSync(DB_FILE, { readOnly: true });
@@ -117,11 +138,10 @@ const total = tokens.input + tokens.cache.read + tokens.cache.write;
 const window = windowOf(session.model);
 const cap = Math.round(CAP_SHARE * window);
 
-const transcriptDir = join(STATE_DIR, "opencode");
-mkdirSync(transcriptDir, { recursive: true });
-const transcript = join(transcriptDir, `${session.id}.jsonl`);
+mkdirSync(TRANSCRIPT_DIR, { recursive: true });
+const transcript = join(TRANSCRIPT_DIR, `${session.id}.jsonl`);
 writeWhole(transcript, `${transcriptEntries(rows).map((entry) => JSON.stringify(entry)).join("\n")}\n`);
-writeWhole(join(transcriptDir, "usage.json"), JSON.stringify(usage));
+writeWhole(join(TRANSCRIPT_DIR, "usage.json"), JSON.stringify(usage));
 writeWhole(join(STATE_DIR, `${terminal}.tally.json`), JSON.stringify({ transcript }));
 writeWhole(join(STATE_DIR, `${terminal}.json`), JSON.stringify({
   agent: "opencode",
