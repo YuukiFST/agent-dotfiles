@@ -80,6 +80,16 @@ jobs:
       - name: Run opencode-plugins cold-directory regression test
         run: bash scripts/test-regression-opencode-plugins-cold-directory.sh
 
+  browser-harness-install:
+    name: browser-harness install
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # uv tool install --force fails halfway on Windows while a daemon holds the tool's Scripts dir.
+      - name: Run browser-harness daemon regression test
+        run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
