@@ -15,7 +15,8 @@ bash "$(dirname "$0")/sync-config.sh" opencode
 
 echo "[3/7] rtk (+ OpenCode plugin)"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-rtk init -g --opencode
+# --hook-only: plain `rtk init -g` appends @RTK.md to ~/.claude/CLAUDE.md, a copy of GLOBAL.md the sync owns.
+rtk init -g --opencode --hook-only
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 bash "$(dirname "$0")/sync-config.sh" opencode >/dev/null
 
