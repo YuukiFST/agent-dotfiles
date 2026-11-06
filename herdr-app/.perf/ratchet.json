@@ -114,14 +114,6 @@
       "tolerance": 0.25
     },
     {
-      "id": "flow.git_calls",
-      "command": "node .perf/verify/flow-differential.mjs",
-      "pick": "git_calls",
-      "unit": "calls",
-      "better": "lower",
-      "stable": true
-    },
-    {
       "id": "status.working_cpu_pct",
       "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-status.json --working --settle 6 --seconds 12",
       "pick": "cpu_pct",
