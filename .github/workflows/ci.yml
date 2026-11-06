@@ -75,6 +75,11 @@ jobs:
       - name: Run add-opencode-tui-plugin test
         run: bash scripts/test-add-opencode-tui-plugin.sh
 
+      # A directory the OpenCode server has not loaded answers with the TUI half of the goal
+      # plugin only; the check and the setup must poll instead of trusting the first answer.
+      - name: Run opencode-plugins cold-directory regression test
+        run: bash scripts/test-regression-opencode-plugins-cold-directory.sh
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest

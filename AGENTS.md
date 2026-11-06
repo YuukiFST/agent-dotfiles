@@ -44,7 +44,8 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
       A snapshot failure means Chrome is missing, not that the repo drifted.
       browser-harness reaches the user's Chrome only after a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, which `browser-harness --doctor` reports as `daemon alive`.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
-   4. OpenCode only: `opencode plugin list` shows `caveman`, `ponytail-subagent` and `@prevalentware/opencode-goal-plugin`, and `~/.config/opencode/cli.json` lists the goal plugin.
+   4. OpenCode only: `node scripts/opencode-plugins.mjs wait` exits 0 and prints `caveman`, `ponytail-subagent` and `local.goal-mode.server`, and `~/.config/opencode/cli.json` lists the goal plugin.
+      One `opencode plugin list` proves nothing: a directory the server has not loaded yet answers with only the goal plugin, ID `-`, so that script polls, with a limit, until the answer settles.
 
 ## What the scripts won't tell you
 
