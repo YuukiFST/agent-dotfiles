@@ -2,7 +2,7 @@
 
 Reached from `/helmsman <map> --build`, in a fresh session.
 The goal is the whole spec working on one **integration branch**, every build ticket closed, and a reviewed pull request waiting for the human.
-The human answered the packets, approved the design and merged the plan, and the map holds every technical decision, so this phase runs alone: the commit identity is the one thing it asks.
+The human answered the packets, approved the design and approved the plan, and the map holds every technical decision, so this phase runs alone.
 A session with `FM_TASK_ID` set stops here and reads [FIRSTMATE.md](FIRSTMATE.md).
 
 The build tickets are a **task graph**, not a list: there is always a **frontier** of tickets whose blockers are all closed.
@@ -10,12 +10,12 @@ Talk to subagents through **context pointers** (the spec, the ticket, the map, a
 
 ## Steps
 
-1. **Load.** Read the map's **Notes** and **Technical decisions**, the spec, and the open build tickets (the spec's children labelled `helmsman:build`). Done when you can name the frontier.
-2. **Confirm the commit identity** per `~/.claude/rules/git.md`, the only question this phase asks up front. Ask it alone, then work without the human.
-3. **Prepare the workspace.** Create the integration branch off the default branch in a worktree of its own (`git worktree add -b <branch> <path> <default-branch>`, or off the plan branch on the local tracker with no remote), so uncommitted work in the human's checkout never enters a commit or a suite run; name it per `git-workflow`: `feat/<spec-number>-<slug>`, or `feat/<effort-slug>` on the local tracker, where the spec has no number. The tracker, `.scratch/` included, stays in the original checkout; every merge, suite run and fix on the integration branch runs in its worktree. A session resuming the build reuses the existing integration worktree, or adds one for the existing branch.
+1. **Load.** Read the map's **Notes** and **Technical decisions**, the spec, and the open build tickets (the spec's children labelled `helmsman:build`). **Spec** not marked `complete`, or a plan PR that is open or closed unmerged, ends the phase here, before any worktree, with [the next command](SKILL.md#the-next-command); on the local tracker, add `approved` beside `complete`. Done when you can name the frontier.
+2. **Read the commit identity** per `~/.claude/rules/git.md` §1. Ask only when it is unset, alone, then work without the human.
+3. **Prepare the workspace.** Create the integration branch off the default branch in a worktree of its own (`git worktree add -b <branch> <path> <default-branch>`, or off the plan branch on the local tracker), so uncommitted work in the human's checkout never enters a commit or a suite run; name it per `git-workflow`: `feat/<spec-number>-<slug>`, or `feat/<effort-slug>` on the local tracker, where the spec has no number. The tracker, `.scratch/` included, stays in the original checkout; every merge, suite run and fix on the integration branch runs in its worktree. A session resuming the build reuses the existing integration worktree, or adds one for the existing branch.
 4. **Build the walking skeleton** (the first build ticket) alone, before anything else: every other ticket builds on it.
 5. **Work the frontier.** Claim each frontier ticket and hand it to an **implementer subagent** in its own worktree, on its own branch off the integration branch; independent tickets run in parallel in the background. A harness without subagents works the frontier one ticket at a time, inline. Each implementer:
-   - builds the ticket to its acceptance criteria, a screen per [Interface tickets](#interface-tickets), with E2E tests at the interface the spec's testing decisions name, per `~/.claude/CODING_STANDARDS.md`;
+   - builds the ticket to its acceptance criteria, a screen per [Interface tickets](#interface-tickets), with E2E tests at the interface the spec's testing decisions name, per `~/.claude/CODING_STANDARDS.md`, and applies the [SKILLS.md](SKILLS.md) rows its brief names, each with the skill's absolute path, and the skills **Notes** names. The approved plan is the human's approval of the acceptance criteria, so each test quotes the criterion it traces to, and a test with no criterion stays out of the commit ("Human authority");
    - gets the project's tests, lint and typecheck green;
    - commits per `~/.claude/rules/git.md`, merges the integration branch tip into its own branch, and reports what it verified and any interface it fixed that the spec left open.
 6. **Land each ticket.** Merge the finished branch into the integration branch, rerun the suite, and close the ticket with a comment saying what now works and how it was verified; an interface the implementer reported is settled as a technical gap (step 7) before the tickets it unblocks are dispatched. Then remove its worktree and delete its branch, in the removal order of "Leave no trace" in `~/.claude/CODING_STANDARDS.md`; a worktree that refuses stays and goes in the report. Recompute the frontier and dispatch the newly unblocked tickets.
@@ -24,25 +24,27 @@ Talk to subagents through **context pointers** (the spec, the ticket, the map, a
    - A technical gap is a decision: settle it under the rules for resolving a `dev` ticket and append it to **Technical decisions**.
    - A dependency or service that costs money is a **Money** escalation, never a quiet purchase.
    - A ticket that stays red after two attempts on the same error, or a merge conflict you can't resolve without guessing at intent, is **stuck**: release its claim, file a `po` `task` ticket that shows the error and asks the human one question, block the stuck ticket on it, and keep building the tickets that don't depend on it. A suite that goes red after landing is fixed before the next ticket lands.
-8. **Review and open the PR.** When no build ticket is left, push the integration branch and open a pull request (a merge request on GitLab) to the default branch that closes the spec and its build tickets, per `git-workflow`. Run `/interrogate` on it with the spec as the statement of intent, fix what it says to act on, rerun the suite, and record the verdict on the PR. On the local tracker, with no remote, skip the PR and report the branch.
-9. **Leave no trace.** Every worktree, dev server and scratch directory this session created is removed or stopped, or named in the report with the reason it stays.
+8. **Prove the whole.** When no build ticket is left, run every goal and user story on the real surface: the project's `.claude/skills/verify-*` skill first, otherwise `browser-harness`, a real CLI run or `curl`. Record each result in `<plan>/proof.md`, so a resumed session reruns only what failed. A failure becomes a new `helmsman:build` ticket, worked through steps 5 to 7, and this step reruns. Done when every goal and story holds its evidence; no pull request opens while one fails.
+9. **Review and open the PR.** With a `po` ticket open, stop here: the PR goes out only with nothing left to decide. Push the integration branch and open a pull request (a merge request on GitLab) to the default branch that closes the map, the spec and its build tickets, per `git-workflow`. Run `/interrogate` on it with the spec as the statement of intent, fix what it says to act on, rerun the suite, and record the verdict on the PR. On the local tracker, skip the PR and report the branch. Add `built` to **Spec**, beside `complete`.
+10. **Leave no trace.** Every worktree, dev server and scratch directory this session created is removed or stopped, or named in the report with the reason it stays.
 
 Merging into the default branch and going live are the human's calls; the phase ends at a reviewed PR, with the deploy command, the command that undoes it, and the smoke check to run right after it (a health URL, the critical flow) ready in the report.
+A project with no `verify-*` skill gets one more line there: `/create-verification-skill` gives later changes this same proof.
 
 ## Interface tickets
 
 A ticket that touches a screen is built with `ui-polish` on its **Design** route: the approved page decides, and every value maps to a token in `DESIGN.md`.
 Read `FEEDBACK.md` first; each `Liked` and `Disliked` row is a constraint on the build.
 The screen ends on `ui-polish`'s review gate, then on a screenshot beside its approved page.
-A deviation the build cannot avoid is a product gap (step 7) and is reported with both screenshots.
+Its **Report and stop** goes to the lead instead of the human, and a deviation the build cannot avoid is a product gap (step 7) reported with both screenshots.
 
 ## Stopping
 
 Stop when one of these is true, and only then:
 
-- **Every build ticket is closed** and the PR is open.
+- **Every build ticket is closed** and **Spec** is marked `built`.
 - **Context is running out.** Stop between tickets, with every finished branch landed and every unfinished claim released.
-- **Every remaining build ticket is blocked** by a `po` ticket.
+- **Every remaining build ticket is blocked** by a `po` ticket, or none remains and a `po` ticket is open.
 
 Report in the human's language: what works now, the one command that runs it, and what is waiting on them, stuck tickets included.
 Then [the next command](SKILL.md#the-next-command).

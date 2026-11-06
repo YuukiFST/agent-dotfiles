@@ -36,4 +36,5 @@ One packet is one decision key, however many questions it holds, so the captain 
 ## The next command
 
 [The next command](SKILL.md#the-next-command) goes to the first mate, not the human: end with the status line, and the phase that command names in `done`.
-When the plan is complete, list the unblocked build tickets by title and URL in the report, in dependency order, so the first mate can file them as tasks.
+When the plan is complete, list every build ticket by title and URL in the report, in dependency order, with the [SKILLS.md](SKILLS.md) rows each one applies, so the first mate can file them as tasks.
+End the list with one task, blocked by all of them, that runs [Prove the whole](BUILD.md#steps) over the landed work, files each failure as a new build ticket, and adds `built` to **Spec** once every goal and story holds.
