@@ -1,6 +1,5 @@
 // The board as a status dashboard (props { compact: true }): a summary strip, the sessions grouped
-// by state in a list that scrolls on its own, and beside it the context map, or the pull request
-// cards while a session is shipping one.
+// by state in a list that scrolls on its own, and beside it the context map.
 
 import { chosenSessionName } from "./session-name.js";
 import { div } from "gpui-kit";
@@ -8,7 +7,6 @@ import { h_flex, v_flex } from "gpui-base";
 import { home } from "herdr";
 import { icon } from "./insight.js";
 import { averageContextTree, contextTreemap } from "./ctxmap/treemap.js";
-import { phaseOf } from "./flow/model.js";
 import { usagePanel } from "./usage-panel.js";
 import { alertLight, alertOf, alertOrb } from "./attention.js";
 
@@ -120,30 +118,6 @@ function sessionsPanel(t, list, ctx, board) {
       .children(groups.map(([id, members]) => stateGroup(t, id, members, ctx, board))));
 }
 
-// One agent per checkout with a pull request moving, or a merge in the way.
-function shippingAgents(list, ctx, board) {
-  const byCheckout = new Map();
-  for (const a of list) {
-    const flow = board.flows.of(ctx.cwdOf(a));
-    if (!flow || byCheckout.has(flow.top)) continue;
-    const phase = phaseOf(flow);
-    const ships = phase !== "gone" && (Boolean(flow.pr) || phase === "conflicts" || phase === "resolving");
-    if (ships) byCheckout.set(flow.top, { agent: a, flow });
-  }
-  return [...byCheckout.values()];
-}
-
-function pullRequestsPanel(t, shipping, board, cx) {
-  return v_flex().flex_1().min_w(0).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden()
-    .child(h_flex().h(34).flex_none().px(14).gap(8).items_center().border_b(1).border_color(t.border).text_size(12).text_color(t.dim)
-      .child("Pull requests")
-      .child(div().font_family(NUMBER_FONT).child(String(shipping.length))))
-    .child(v_flex().id("status-pull-requests").flex_1().min_h(0).p(12).gap(14).overflow_y_scrollbar().text_size(13)
-      .children(shipping.map(({ agent, flow }) => v_flex().flex_none().gap(4)
-        .child(div().px(2).truncate().text_size(12).text_color(t.muted).child(lastPart(flow.top)))
-        .children([board.flowCards.render(t, agent.address, flow, board.flows.stepOf(agent.address), cx)].filter(Boolean)))));
-}
-
 // The context map's sessions: all of them averaged, or the one stepped to.
 function contextScope(list, ctx, board) {
   const measured = list.filter((a) => board.maps.of(a.address));
@@ -169,7 +143,6 @@ function contextScope(list, ctx, board) {
 const sameMaps = (a, b) => a.length === b?.length && a.every((map, i) => map === b[i]);
 
 export function statusBoard(t, list, ctx, board, cx) {
-  const shipping = shippingAgents(list, ctx, board);
   const { maps, view } = contextScope(list, ctx, board);
   if (maps.length && !sameMaps(maps, board.shownContextMaps)) {
     board.shownContextMaps = maps;
@@ -177,7 +150,6 @@ export function statusBoard(t, list, ctx, board, cx) {
     const tree = board.shownContextTree;
     cx.timer.after(0, () => board.treemapTiles.set_props({ tree }));
   }
-  const beside = shipping.length ? pullRequestsPanel(t, shipping, board, cx) : contextTreemap(t, board.shownContextTree, view, board.treemapTiles);
   return h_flex().size_full().min_h(0).p(10).gap(GAP).items_stretch().bg(t.canvas)
     .child(v_flex().w(SESSIONS_WIDTH).flex_none().min_h(0).gap(GAP)
       .child(v_flex().flex_1().min_h(0).gap(GAP)
@@ -185,5 +157,5 @@ export function statusBoard(t, list, ctx, board, cx) {
         .child(sessionsPanel(t, list, ctx, board)))
       .child(v_flex().h(USAGE_HEIGHT).flex_none().child(usagePanel(t, board.usagePanel))))
     .child(board.notesPanel.render(t))
-    .child(h_flex().w(CONTEXT_WIDTH).flex_none().min_h(0).items_stretch().child(beside));
+    .child(h_flex().w(CONTEXT_WIDTH).flex_none().min_h(0).items_stretch().child(contextTreemap(t, board.shownContextTree, view, board.treemapTiles)));
 }

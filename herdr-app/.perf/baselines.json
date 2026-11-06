@@ -246,22 +246,6 @@
           "unit": "ms"
         }
       }
-    },
-    "stable": {
-      "env": "machine-independent",
-      "metrics": {
-        "flow.git_calls": {
-          "better": "lower",
-          "date": "2026-11-04T13:55:19.335Z",
-          "median": 89,
-          "noise": 0,
-          "ref": "00803e7-dirty",
-          "samples": [
-            89
-          ],
-          "unit": "calls"
-        }
-      }
     }
   },
   "version": 1
