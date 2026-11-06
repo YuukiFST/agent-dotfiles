@@ -36,7 +36,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
    Done when every command exits 0 and ends with `Config synced (...)`.
 3. **Fetch the design references** when `~/.claude/ui-refs/` is missing (first sync) or a refresh is asked for: `bash skills/ui-polish/update-refs.sh`.
    Sync never runs it, and the clones sit outside every skills dir on purpose so none of their frontmatter reaches a session.
-   Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/` (a route or a **Not routed** entry in `SKILL.md`, a repointed path or section citation, or a local term defined) and the script rerun.
+   Done when `~/.claude/ui-refs/` lists the cloned repos and the script printed no `UNROUTED` or `MISSING` line; each such line is fixed here in `skills/ui-polish/` (a route in `SKILL.md`, a **Not routed** entry in `not-routed.md`, a repointed path or section citation, or a local term defined) and the script rerun.
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
    Run checks 1 and 2 plus the checks for the row's harnesses and report each by number with its result; `drift` or a hand diff answers check 1 alone, and a check not run leaves the sync reported as unverified.
    1. `bin/agent-cli drift` prints `summary: 0 drift`: rules, payload files and every `skills/<name>/` match their live copies byte for byte, and no `REMOVED.txt` skill is still live.
@@ -44,7 +44,8 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
       A snapshot failure means Chrome is missing, not that the repo drifted.
       browser-harness reaches the user's Chrome only after a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, which `browser-harness --doctor` reports as `daemon alive`.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
-   4. OpenCode only: `opencode plugin list` shows `caveman`, `ponytail-subagent` and `@prevalentware/opencode-goal-plugin`, and `~/.config/opencode/cli.json` lists the goal plugin.
+   4. OpenCode only: `node scripts/opencode-plugins.mjs wait` exits 0 and prints `caveman`, `ponytail-subagent` and `local.goal-mode.server`, and `~/.config/opencode/cli.json` lists the goal plugin.
+      One `opencode plugin list` proves nothing: a directory the server has not loaded yet answers with only the goal plugin, ID `-`, so that script polls, with a limit, until the answer settles.
 
 ## What the scripts won't tell you
 

@@ -11,7 +11,8 @@ echo "[1/6] Config files"
 
 echo "[2/6] rtk"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-rtk init -g
+# --hook-only: plain `rtk init -g` appends @RTK.md to ~/.claude/CLAUDE.md, a copy of GLOBAL.md the sync owns.
+rtk init -g --hook-only
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 "$(dirname "$0")/sync-config.sh" claude >/dev/null
 

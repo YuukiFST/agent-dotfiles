@@ -15,16 +15,13 @@ bash "$(dirname "$0")/sync-config.sh" opencode
 
 echo "[3/7] rtk (+ OpenCode plugin)"
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-rtk init -g --opencode
+# --hook-only: plain `rtk init -g` appends @RTK.md to ~/.claude/CLAUDE.md, a copy of GLOBAL.md the sync owns.
+rtk init -g --opencode --hook-only
 # Again, now that rtk is on PATH: the sync writes rtk/config.toml where `rtk config` points.
 bash "$(dirname "$0")/sync-config.sh" opencode >/dev/null
 
 echo "[4/7] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
-# `plugin add` skips a plugin already in opencode.jsonc without updating it, so `update` follows.
-for p in github:YuukiFST/caveman-lean github:YuukiFST/ponytail-subagent @prevalentware/opencode-goal-plugin; do
-  opencode plugin add "$p"
-  opencode plugin update "$p"
-done
+node "$(dirname "$0")/opencode-plugins.mjs" install
 # OpenCode 2 loads a plugin's TUI half (sidebar, palette) only from cli.json, which `plugin add`
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 node "$(dirname "$0")/add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"

@@ -41,12 +41,14 @@ Present the table. A review-only request ends here with the step 7 report. If th
 
 Fix in the project's idiom, reusing recon's shared components and tokens. Motion fixes, a polish finding on motion included, take their exact values from `review-animations/STANDARDS.md`, except an icon swap, whose values only `better-ui` `icon-transitions.md` **Motion** gives; gesture fixes take the spring from `review-animations/STANDARDS.md` **Springs** and the behaviour from `apple-design` **Quick Reference**; translucent surfaces from `apple-design` **Materials & depth**; overflow fixes from `break-ui` **Failure signatures**; polish values from `better-ui` siblings; a craft-only concept (scroll fade, grain, root canvas, squircle, sound) from the craft part its finding cites. A slop finding is fixed by removal, or by the smallest correction in the project's system when removal loses a job, per `audit-ai-design-slop` **Use the Removal Test**. Keep each fix minimal and local; a systemic finding is fixed at its source (token, shared primitive), not per leaf.
 
+A fix that deletes motion runs `remove-animations/SKILL.md` **Removal Hazards** first and **Cleanup** after.
+
 Done when: every applied row is checked off in the table with the file touched.
 
 ## 6. Review gate
 
 1. Run the project gates from recon step 6 (typecheck, lint, tests). Fix what your change broke.
-2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Reduced-motion emulated once if motion changed.
+2. Reopen the route. After-screenshots at both widths, next to the before ones. Keyboard walk of the primary flow. Console read against step 2, with no new error, per `addyosmani-agent-skills/skills/frontend-ui-engineering/SKILL.md` **Verification**. Reduced-motion emulated once if motion changed.
 3. Motion changed → run [motion.md](motion.md) step 3 whole. Its **Evidence** reuses 1 and 2 above and adds what they lack: the reduced-motion confirmation and a keyboard walk of every element whose motion changed. Its three rounds count per pass through this step. A Block left after the third leads the step 7 report and keeps this step not done.
 
 Done when: gates pass, both after-screenshots exist, no HIGH finding remains open, and changed motion closed on Approve.

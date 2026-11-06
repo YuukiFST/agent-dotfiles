@@ -19,11 +19,8 @@ Write-Host "[3/7] rtk (+ OpenCode plugin)"
 & "$PSScriptRoot\sync-config.ps1" opencode | Out-Null
 
 Write-Host "[4/7] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
-# `plugin add` skips a plugin already in opencode.jsonc without updating it, so `update` follows.
-foreach ($p in "github:YuukiFST/caveman-lean", "github:YuukiFST/ponytail-subagent", "@prevalentware/opencode-goal-plugin") {
-  opencode plugin add $p
-  opencode plugin update $p
-}
+node "$PSScriptRoot\opencode-plugins.mjs" install
+if ($LASTEXITCODE -ne 0) { throw "OpenCode plugin step failed, see the error above" }
 # OpenCode 2 loads a plugin's TUI half (sidebar, palette) only from cli.json, which `plugin add`
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
