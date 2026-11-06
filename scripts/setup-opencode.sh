@@ -7,7 +7,7 @@ set -euo pipefail
 echo "[1/7] opencode (npm, latest)"
 # Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
 # script is documented as the updater. Skipping it when opencode is on PATH would never update.
-npm install -g opencode-ai@latest
+npm install -g --allow-scripts=@opencode/cli @opencode/cli@latest
 opencode --version
 
 echo "[2/7] Config (AGENTS.md + skills + rules)"
