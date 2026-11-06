@@ -4,35 +4,6 @@
   "background": "canvas",
   "children": [
     {
-      "id": "panels",
-      "type": "row",
-      "background": "canvas",
-      "padding": 6,
-      "gap": 6,
-      "children": [
-        {
-          "id": "memory",
-          "type": "block",
-          "size": {
-            "weight": 2
-          },
-          "min": 320,
-          "content": {
-            "mod": "ai-memory",
-            "props": {
-              "block": "memory"
-            }
-          },
-          "radius": 10,
-          "border": {
-            "width": 1,
-            "color": "border"
-          },
-          "hidden": true
-        }
-      ]
-    },
-    {
       "id": "usage-bar",
       "type": "block",
       "size": {

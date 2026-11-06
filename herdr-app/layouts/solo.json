@@ -69,27 +69,6 @@
           "resizable": false
         },
         {
-          "id": "memory",
-          "type": "block",
-          "size": {
-            "px": 340
-          },
-          "min": 260,
-          "content": {
-            "mod": "ai-memory",
-            "props": {
-              "block": "memory"
-            }
-          },
-          "radius": 10,
-          "border": {
-            "width": 1,
-            "color": "border"
-          },
-          "hidden": true,
-          "max": 700
-        },
-        {
           "id": "work",
           "type": "column",
           "children": [
@@ -195,16 +174,6 @@
           },
           "size": {
             "weight": 1
-          }
-        },
-        {
-          "id": "agent-watch",
-          "type": "block",
-          "content": {
-            "mod": "agent-watch"
-          },
-          "size": {
-            "px": 110
           }
         },
         {

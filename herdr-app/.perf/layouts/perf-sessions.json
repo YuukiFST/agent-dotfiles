@@ -109,13 +109,6 @@
                   "lone": true
                 }
               }
-            },
-            {
-              "id": "side",
-              "type": "row",
-              "children": [],
-              "padding": 8,
-              "gap": 8
             }
           ],
           "active": "main",
@@ -151,19 +144,6 @@
               }
             },
             {
-              "id": "skills-toggle",
-              "type": "block",
-              "content": {
-                "mod": "skills",
-                "props": {
-                  "role": "toggle"
-                }
-              },
-              "size": {
-                "px": 96
-              }
-            },
-            {
               "id": "workspaces",
               "type": "block",
               "size": {
@@ -178,19 +158,6 @@
             "px": 28
           },
           "resizable": false
-        },
-        {
-          "id": "timeline-recorder",
-          "type": "block",
-          "size": {
-            "px": 0
-          },
-          "content": {
-            "mod": "timeline",
-            "props": {
-              "record": true
-            }
-          }
         }
       ],
       "resizable": false

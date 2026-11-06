@@ -106,13 +106,6 @@
                   "lone": true
                 }
               }
-            },
-            {
-              "id": "side",
-              "type": "row",
-              "children": [],
-              "padding": 8,
-              "gap": 8
             }
           ],
           "active": "main",
@@ -135,26 +128,6 @@
               }
             },
             {
-              "id": "agent-watch",
-              "type": "block",
-              "content": {
-                "mod": "agent-watch"
-              },
-              "size": {
-                "px": 110
-              }
-            },
-            {
-              "id": "companion",
-              "type": "block",
-              "content": {
-                "mod": "companion"
-              },
-              "size": {
-                "px": 110
-              }
-            },
-            {
               "id": "system",
               "type": "block",
               "content": {
@@ -165,35 +138,6 @@
               },
               "size": {
                 "px": 420
-              }
-            },
-            {
-              "id": "skills-toggle",
-              "type": "block",
-              "content": {
-                "mod": "skills",
-                "props": {
-                  "role": "toggle"
-                }
-              },
-              "size": {
-                "px": 96
-              }
-            },
-            {
-              "id": "layout-flip",
-              "type": "block",
-              "size": {
-                "px": 112
-              },
-              "content": {
-                "mod": "layout-flip",
-                "props": {
-                  "to": "status",
-                  "label": "Status",
-                  "icon": "mods/workspace-chrome/layers.svg",
-                  "tooltip": "Show agent status"
-                }
               }
             }
           ],

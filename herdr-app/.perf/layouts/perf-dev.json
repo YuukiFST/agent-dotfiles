@@ -109,13 +109,6 @@
                   "lone": true
                 }
               }
-            },
-            {
-              "id": "side",
-              "type": "row",
-              "children": [],
-              "padding": 8,
-              "gap": 8
             }
           ],
           "active": "main",
@@ -152,19 +145,6 @@
             "px": 28
           },
           "resizable": false
-        },
-        {
-          "id": "timeline-recorder",
-          "type": "block",
-          "size": {
-            "px": 0
-          },
-          "content": {
-            "mod": "timeline",
-            "props": {
-              "record": true
-            }
-          }
         }
       ],
       "resizable": false

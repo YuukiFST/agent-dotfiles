@@ -38,29 +38,6 @@
           }
         },
         {
-          "id": "agent-watch",
-          "type": "block",
-          "content": {
-            "mod": "agent-watch"
-          },
-          "size": {
-            "px": 110
-          }
-        },
-        {
-          "id": "skills-toggle",
-          "type": "block",
-          "content": {
-            "mod": "skills",
-            "props": {
-              "role": "toggle"
-            }
-          },
-          "size": {
-            "px": 96
-          }
-        },
-        {
           "id": "workspaces",
           "type": "block",
           "size": {
