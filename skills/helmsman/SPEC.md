@@ -6,13 +6,15 @@ Everything it needs is on the map, and the granularity of the build is a technic
 
 **Resume, don't duplicate.** Before publishing anything, query the tracker for a `helmsman:spec` issue (or `spec.md`) belonging to this map and for its build tickets.
 What exists is reused and completed; only what is missing gets published.
-Link the spec from the map's **Spec** section the moment it is published, before slicing the tickets.
+A decision newer than the spec updates it, the build tickets it touches and an open plan PR; a plan PR closed unmerged gets a new one.
+Link the spec from the map's **Spec** section the moment it is published, before slicing the tickets, and mark it `complete` only at the end of step 5, so a run that died here is re-entered.
 
 ## 1. Write the spec
 
 Build it from the map, in the vocabulary of `CONTEXT.md`:
 
-- **Givens**, **Product decisions** and **Assumed** become the problem, the solution and the user stories.
+- **Problem and goals** become the problem and the goals.
+- **Givens**, **Product decisions** and **Assumed** become the solution and the user stories.
 - **Technical decisions** and their `locks:` become the implementation decisions.
 - **Design** becomes the interface section.
 - **Out of scope** carries over as it stands.
@@ -21,6 +23,10 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 ## Problem
 
 <the problem the people using it face, from their perspective>
+
+## Goals
+
+<the checks that show it is solved, each one runnable on the surface people use>
 
 ## Solution
 
@@ -36,7 +42,7 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 
 ## Implementation decisions
 
-<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape and how a deploy is undone, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
+<modules, their interfaces, schema, API contracts, auth, hosting and deploy shape and how a deploy is undone, backups and what shows a failure, each traced to its ticket on the map; no file paths or code, except a prototype snippet that pins a decision more precisely than prose>
 
 ## Testing decisions
 
@@ -53,16 +59,16 @@ Build it from the map, in the vocabulary of `CONTEXT.md`:
 
 The user stories are a **long** list: every flow and rule on the map appears in at least one.
 Publish the spec with the tracker's spec operation.
-Done when every product decision and assumption on the map is reflected in a user story.
+Done when every product decision and assumption on the map is reflected in a user story, and every goal has its check.
 
 ## 2. Slice the build tickets
 
 Break the spec into **tracer bullets**: each ticket cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window.
 
-- **The first ticket is the walking skeleton**: the project scaffold, the test harness running one E2E test, lint and typecheck, and, when the spec has hosting, the deploy configuration with the production build verified locally. Every other ticket is blocked by it.
+- **The first ticket is the walking skeleton**: the project scaffold, a README that leads with the problem, the test harness running one E2E test, lint and typecheck, the CI job that runs them on every PR when the project has a remote, and, when the spec has hosting, the deploy configuration with the production build verified locally. Every other ticket is blocked by it.
   The deploy itself is never a build ticket: going live is the human's go, so BUILD.md hands it over in its final report.
   In an existing repo, the first ticket is instead the thinnest end-to-end slice through the harness it already has, adding only the skeleton pieces it lacks, and every other ticket is blocked by it the same way.
-- Then one ticket per user-facing flow, smallest useful flow first, each blocked only by the tickets that genuinely gate it, so independent flows can be built in parallel.
+- Then one ticket per user-facing flow, the flow resting on the least proven integration first and otherwise the smallest useful one, each blocked only by the tickets that genuinely gate it, so independent flows can be built in parallel.
   Two flows that meet at an interface (an API shape, a schema, an event) that **Implementation decisions** leaves open are not built in parallel: the one sliced earlier blocks the later one, which keeps the edges free of cycles, and settles the interface as a technical gap (BUILD.md step 7), so two implementers never each invent it.
 - A wide mechanical change across an existing codebase runs as expand, migrate in batches, contract, each its own ticket.
 
@@ -92,12 +98,23 @@ Done when all of these hold, each failure with its fix:
 - no ticket contradicts a `locks:` clause or a given; a ticket that does is re-sliced to respect it;
 - no ticket depends on a service outside the budget; one that does gets a **Money** `po` ticket that blocks it.
 
-## 4. Open the plan PR
+## 4. Attack the plan
+
+Give one read-only subagent, on another model family when `../interrogate/reviewers.md` lists one, the spec and the map's goals, givens, decisions and `locks:`, never your own conclusion.
+Ask how the plan breaks them, which sweep concern it misses, and which ticket no run can verify.
+A valid finding revises the plan; a product one goes through the ask test.
+Rerun three times at most; findings still open go in the plan PR body.
+Done when a run returns nothing valid, or the third has run.
+
+## 5. Open the plan PR
+
+With a `po` ticket open, stop here and hand over `--review`: the plan goes out only with nothing left to decide, and Advance step 0 brings you back.
 
 Commit the plan pack and open the plan branch as a pull request to the default branch, per `git-workflow` and `pr-writing`, with the spec and the approved screens in its body.
-On the local tracker, with no remote, report the branch instead: the human's word replaces the merge, and Build branches from it.
+On the local tracker, report the branch instead: running `--build` replaces the merge, and Build branches from it.
+Done when the PR is open or the branch is reported; mark **Spec** `complete`.
 
-## 5. Hand over
+## 6. Hand over
 
 Tell the human in their language what the spec says the product does, in three to five lines, how many build tickets it became, and that merging the plan PR approves the plan.
-Then [the next command](SKILL.md#the-next-command), which is the plan PR link unless a `po` ticket blocks every build ticket.
+Then [the next command](SKILL.md#the-next-command), which is the plan PR link, or `--build` on the local tracker.

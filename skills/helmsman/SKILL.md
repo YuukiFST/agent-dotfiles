@@ -26,19 +26,19 @@ Two defaults hold for every effort until the human's own words override them: th
 | [Review](#3-review-helmsman-map---review) | `/helmsman <map> --review` | one packet per batch |
 | [Design](#4-design-helmsman-map---design) | `/helmsman <map> --design` | a blueprint, then a prototype, each until approved |
 | Spec | runs inside Advance once nothing is left to decide | reviewing the plan PR |
-| [Build](#5-build-helmsman-map---build) | `/helmsman <map> --build` | confirming the commit identity once |
+| [Build](#5-build-helmsman-map---build) | `/helmsman <map> --build` | none, unless the commit identity is unset |
 
 Chart, Advance, Review and Design are **planning**: they produce decisions and throwaway artifacts, not product code.
 The pull to just write the code is the signal you've reached the edge of the map: write the spec and build tickets, then hand over `--build`.
 Build is the only phase that writes product code, and it runs in a fresh session.
 A session with `FM_TASK_ID` set runs under firstmate: read [FIRSTMATE.md](FIRSTMATE.md) first, since it changes how every phase reaches the human.
 Every phase follows "Leave no trace" in `~/.claude/CODING_STANDARDS.md`: a throwaway spike runs in a fresh `mktemp -d` directory and is deleted after, and the session's footprint is cleared before its report.
+Every session reads [SKILLS.md](SKILLS.md) when it loads the map and applies each row whose condition holds.
 
 ## Refer by name
 
 Every map and ticket has a **name**: its title.
 In everything the human reads (narration, packets, the map's decision sections) refer to it by that name, never by a bare id, number, or slug.
-A wall of `#42, #43, #44` is illegible; names read at a glance.
 The id and URL ride _inside_ the name as its link, never stand in for it.
 
 ## The four tracks
@@ -171,64 +171,11 @@ When the directory is not a repo yet, `git init` and make an initial commit firs
 
 ### The map body
 
-The whole map at low resolution, loaded once per session.
+The whole map at low resolution, loaded once per session, in the shape of [MAP.md](MAP.md).
 Open tickets are **not** listed: they are open child issues, found by query.
-
-```markdown
-## Destination
-
-<what reaching the end of this map looks like, in one or two lines; every session orients to it before choosing a ticket>
-
-## Notes
-
-- Givens: <each given from the brief or added later, or "none">
-- Budget: <zero | the stated budget>
-- Skills: <skills every session should consult>
-- Plan: <the plan branch and `docs/plan/<effort>/`>
-- Design: <core screens | no interface>
-
-## Product decisions
-
-<!-- what the human decided, in their language: one line per closed `po` ticket, or per answer from a charting packet, which has no ticket -->
-
-- [<closed ticket title>](link) - <one-line gist of the answer>
-- <charting answer in one line>
-
-## Assumed
-
-<!-- product defaults taken without asking, in their language; the human vetoes any line by saying so -->
-
-- <the assumption>
-
-## Technical decisions
-
-<!-- what you decided: one line per closed `dev` ticket, gist plus the constraint it imposes -->
-
-- [<closed ticket title>](link) - <the choice> - locks: <what later tickets must now assume>
-
-## Design
-
-<!-- the approved look: a link to DESIGN.md once the design is locked; empty until then -->
-
-## Waiting on you
-
-<!-- every open `po` ticket, refreshed from the frontier query at the start and end of every session -->
-
-- [<ticket title>](link) - <the question in one line>
-
-## Not yet specified
-
-<!-- see "Fog of war": in-scope fog you can't ticket yet -->
-
-## Out of scope
-
-<!-- see "Out of scope": work ruled beyond the destination -->
-
-## Spec
-
-<!-- a link to the spec once SPEC.md has written it; empty until then -->
-```
-
+**Spec** holds the plan's state, and its marks accumulate: empty, then the spec's link, then `complete` when SPEC.md has finished; `approved` (local tracker, once `--build` runs) and `built` (BUILD.md has finished) sit beside `complete`, never in its place.
+Until the plan is approved (its PR merged, or `approved`), a decision recorded on the map removes `complete` in the same write, so SPEC.md reconciles it.
+After approval, a decision that changes behavior updates the spec and files a new `helmsman:build` ticket; that ticket, or any `po` ticket filed, removes `built` in the same write, so no decision stays pending behind it.
 The `locks:` clause on a technical decision is how a cascade of decisions made across sessions stays consistent with itself: the next ticket reads it instead of re-deciding.
 
 ### Tickets
@@ -249,6 +196,7 @@ Every ticket carries **two** labels:
 
 A session **claims** a ticket by assigning it to the dev driving the map, **first**, before any work, so concurrent sessions skip it.
 An open, unassigned ticket is unclaimed.
+A claim is a lease, because a session that dies cannot release it: it carries a comment with its UTC time and lapses six hours later, and a session opens by unclaiming every lapsed claim, build tickets included.
 
 Blocking uses the tracker's **native** dependency relationship, because it renders the frontier visually in the tracker's own UI; only a tracker without native blocking falls back to a body convention.
 A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children.
@@ -341,17 +289,20 @@ Name the map in the sentence above the block instead.
 One line above it says what that session will do; one line below says how much of _their_ time it costs.
 One command, never a menu.
 
-Pick it from the tracker **as it stands after this session's writes**, taking the first row that matches:
+While **Spec** is `complete` and the latest plan PR is closed unmerged, the human has rejected the plan: file a `po` ticket asking what should change, unless that PR already has one, then remove `complete`.
+Then pick it from the tracker **as it stands after this session's writes**, taking the first row that matches:
 
 | State | Next command | Their time |
 |---|---|---|
 | an unclaimed frontier `dev` ticket exists | `/helmsman <map>` | none: start it and walk away |
-| an unblocked, unclaimed build ticket exists and the plan PR is merged | `/helmsman <map> --build` | ~1 min to confirm the commit identity, then none |
+| an unblocked, unclaimed build ticket exists, **Spec** is marked `complete`, and the plan PR is merged or the tracker is local | `/helmsman <map> --build` | none; on the local tracker, running it is the human's approval of the plan |
 | an open `po` ticket exists | `/helmsman <map> --review` | ~<n> min, one packet per twelve open questions |
 | no open decision ticket, an interface exists, and **Design** is empty | `/helmsman <map> --design` | a blueprint, then a prototype, each until approved |
-| no open decision ticket, and fog left or no spec yet | `/helmsman <map>` | none: it graduates the fog, or writes the spec and build tickets |
-| the plan PR is open | no command: the plan PR link, to review and merge | the review |
-| every build ticket closed | no command: the pull request link, to review and merge | the review |
+| no open decision ticket, and fog left or **Spec** not marked `complete` | `/helmsman <map>` | none: it graduates the fog, or writes or finishes the spec and build tickets |
+| only claimed tickets are open or ready | `/helmsman <map>`, or `--build` when they are build tickets | none: it retakes them once their claims lapse |
+| the plan PR is open | no command: the plan PR link, to review and merge, and `/helmsman <map> --build` to run after the merge | the review |
+| every build ticket closed, and **Spec** not marked `built` | `/helmsman <map> --build` | none: it proves the whole and opens the pull request |
+| **Spec** marked `built` | no command: the pull request link, or on the local tracker the branch, to review and merge | the review |
 
 Work the human doesn't attend goes first whenever any exists: it costs them nothing, and it often shrinks the review that follows.
 If you stopped on context, the next command resumes the same phase; name the ticket it will pick up.
@@ -361,27 +312,27 @@ A session that stopped because a resolution **contradicts a product decision** h
 
 The one session that starts from nothing, and the only open questions are ones that passed the ask test.
 
-1. **Read the brief.** Pull out the problem it solves, the people it serves, the destination, and every given. Done when each given is written down for **Notes**.
-2. **Create the plan pack** per [The plan pack](#the-plan-pack). Done when the plan branch exists.
-3. **Draft the product yourself.** Write the destination, the users, the core flows and their rules as you would build them. Answer every gap yourself, then run the ask test on each answer; most become assumptions. Done when every gap is either an assumption or a question that passed the ask test.
+1. **Read the brief.** Pull out the problem it solves, the people it serves, the destination, and every given. In an existing repo, read the subsystem the brief touches, per step 1 of `../yuu-mode/playbooks/investigation.md`. Done when each given is written down for **Notes**.
+2. **Create the plan pack** per [The plan pack](#the-plan-pack). A plan branch or map already holding this effort means an earlier Chart died: resume from its banked answers and duplicate nothing. Done when the plan branch exists.
+3. **Draft the product yourself.** Write the destination, the users, the core flows and their rules as you would build them. Sweep for the gaps a first draft forgets: who can do what, the data's life (creation, export, deletion), failure and empty paths, abuse, notifications, payments, languages and accessibility, expected scale, existing data to migrate, backups, and what shows the operator it broke. Answer every gap yourself, then run the ask test on each answer; most become assumptions. Done when every gap is an assumption, a question that passed the ask test, a `dev` ticket to file, or a **Coverage** line saying why it does not apply.
 4. **Send the first packet** per [PACKET.md](PACKET.md). Its `intro` is your restatement, in two to four lines of their language: the problem and who has it, the goals that will show it is solved, and the destination you would build, so the human can correct the whole picture at once, the why as well as the what.
 5. **Send further packets** only for questions the last answers unlocked that pass the ask test, within the cap. Done when no open question passes the ask test, or the cap is hit.
-6. **Create the map** (label `helmsman:map`) with Destination, Notes, Product decisions, and Assumed filled in, and the fog sketched into **Not yet specified**. Record the vocabulary in `CONTEXT.md` through `/domain-modeling`.
+6. **Create the map** (label `helmsman:map`) per [MAP.md](MAP.md) with Problem and goals, Destination, Notes, Product decisions, and Assumed filled in, and the fog sketched into **Not yet specified**. Record the vocabulary in `CONTEXT.md` on the plan branch through `/domain-modeling`, and again whenever a later resolution adds a term.
 7. **Create the tickets you can specify now** as child issues, sorted by the experience test, including every technical question you already know you owe yourself. Wire blocking edges in a **second pass**, once every issue has an id.
 8. **Fire the research subagents**: one `/research` subagent per `research` ticket, in parallel (see [Ticket methods](#ticket-methods) for where findings go).
-9. **Tell the human** in their language what the map says, opening with the problem and goals as the answers left them, and that the rest is yours until the look needs their eye, so they can step away; a correction to that restatement is handled like a veto, as a `po` ticket that routes to a review (see [The ask test](#the-ask-test)). Then **continue straight into [Advance](#2-advance-helmsman-map)** in this same session.
+9. **Tell the human** in their language what the map says, opening with the problem and goals as the answers left them, and that the rest is yours until the look needs their eye, so they can step away; a correction to that restatement rewrites **Problem and goals** and is handled like a veto, as a `po` ticket that routes to a review (see [The ask test](#the-ask-test)). Then **continue straight into [Advance](#2-advance-helmsman-map)** in this same session.
 
-If drafting shows the whole project fits one session with nothing left to decide, skip the cascade: go to Design when it has an interface, then write the spec.
+If drafting shows the whole project fits one session with nothing left to decide, skip the cascade after step 6: go to Design when it has an interface, then write the spec.
 
 ### 2. Advance: `/helmsman <map>`
 
 The default mode, and the one that runs without the human.
 **Cascade** until you can't:
 
-0. **Spec check.** When no decision ticket is open in either audience, claimed or not, graduate whatever is left in **Not yet specified** (into tickets, assumptions, or **Out of scope**). If that leaves no open decision ticket and **Spec** is empty: with an interface and an empty **Design**, stop and hand over `--design`; otherwise read [SPEC.md](SPEC.md) and follow it, then stop. Otherwise go on.
+0. **Spec check.** When no decision ticket is open in either audience, claimed or not, graduate whatever is left in **Not yet specified** (into tickets, assumptions, or **Out of scope**). If that leaves no open decision ticket and **Spec** is not marked `complete`: with an interface and an empty **Design**, stop and hand over `--design`; otherwise read [SPEC.md](SPEC.md) and follow it, then stop. Otherwise go on.
 1. Load the **map**, the low-res view, not every ticket body. Read **Notes** and **Technical decisions** in full: the givens and `locks:` clauses are the constraints this session respects.
 2. Take the first frontier `dev` ticket in map order. **Claim it** before any work.
-3. Resolve it under [Resolving a `dev` ticket](#resolving-a-dev-ticket); a `research` ticket goes to a `/research` subagent, and you take the next ticket while it runs. Fetch the full body of any related or closed ticket on demand; invoke the skills **Notes** names.
+3. Resolve it under [Resolving a `dev` ticket](#resolving-a-dev-ticket); a `research` ticket goes to a `/research` subagent, and you take the next ticket while it runs. Fetch the full body of any related or closed ticket on demand; apply the matching [SKILLS.md](SKILLS.md) rows and the skills **Notes** names.
 4. Record it, close it, append to **Technical decisions**.
 5. Graduate whatever fog the answer made specifiable into fresh tickets, clearing each graduated patch from **Not yet specified**. A product question it raises goes through the ask test first: assume it, or ticket it. Rule out of scope any ticket the answer shows to sit past the destination; update or delete tickets it invalidates.
 6. **Loop back to step 0.**

@@ -22,7 +22,7 @@
   var COLLAPSED_TRACKS = { technical: true, assumed: true };
 
   var STYLE = [
-    ".hp{--hp-ink:#1c1c1e;--hp-soft:#5f5f66;--hp-line:#d9d9de;--hp-bg:Canvas;--hp-tint:#f1f1f4;--hp-mark:#0b5fff;",
+    ".hp{color-scheme:light dark;--hp-ink:#1c1c1e;--hp-soft:#5f5f66;--hp-line:#d9d9de;--hp-bg:Canvas;--hp-tint:#f1f1f4;--hp-mark:#0b5fff;",
     "color:var(--hp-ink);background:var(--hp-bg);font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;",
     "max-width:760px;margin:0 auto;padding:24px 16px 96px}",
     "@media (prefers-color-scheme:dark){.hp{--hp-ink:#f2f2f4;--hp-soft:#a8a8b0;--hp-line:#3a3a40;--hp-tint:#26262b;--hp-mark:#7aa7ff}}",
@@ -225,6 +225,9 @@
       var changed = collectAnswers(form, packet).filter(function (entry) { return !entry.recommended; }).length;
       status.textContent = changed + " " + labels.changed;
     }
+    form.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && event.target !== submit) event.preventDefault();
+    });
     form.addEventListener("change", refreshChangedCount);
     form.addEventListener("input", refreshChangedCount);
     form.addEventListener("submit", function (event) {

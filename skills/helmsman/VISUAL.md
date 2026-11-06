@@ -4,6 +4,8 @@ Reached from `/helmsman <map> --design`.
 The human sees the drawing first and the model second: **blueprint, then prototype, then evaluation**.
 Structure is settled on the blueprint, look and feel on the prototype, and each stage is approved before the next one starts, because a screen rebuilt after its structure moved costs more than a redrawn line.
 
+**Resume, don't redraw.** A rerun reads `FEEDBACK.md`, the newest page and its banked answers; `blueprint approved` in **Notes** means it continues from step 3.
+
 A project with no interface skips this phase: write `Design: no interface` in the map's **Notes** and stop.
 
 ## 1. Ground
@@ -24,7 +26,7 @@ Draw the structure as one HTML page at `<plan>/design/blueprint-<n>.html`, readi
 
 Embed a [packet](PACKET.md) under the drawing and send it.
 Revise until a round returns no change and no open ledger row on structure.
-Done when the human has approved the blueprint: record it on the map and move to step 3 only then.
+Done when the human has approved the blueprint: write `blueprint approved` on the **Design** line of **Notes** and move to step 3 only then.
 
 ## 3. Prototype
 
@@ -55,6 +57,7 @@ Move the approved pages to `<plan>/design/approved/` and delete the losing revis
 A component whose proportions matter gets a sheet from `dimensional-drawing`.
 Link `DESIGN.md` from the map's **Design** section.
 Done when every core screen has an approved page and every `Liked` row is reflected in `DESIGN.md`.
+Then [the next command](SKILL.md#the-next-command).
 
 On request only: `stageshow` for an animated walkthrough, `anatomy` for a figure of how the system works.
 
