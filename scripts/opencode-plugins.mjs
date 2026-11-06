@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// Verify the OpenCode plugins this repo tracks.
+// Install, update and verify the OpenCode plugins this repo tracks.
 //
-// Usage: node scripts/opencode-plugins.mjs wait
+// Usage: node scripts/opencode-plugins.mjs wait | install
 //
-// `opencode plugin list` asks the server for the plugins of the current directory, and a directory
-// the server has not loaded yet answers with no server plugin at all. The CLI still prints what
-// cli.json holds, so a cold answer shows only the TUI half of the goal plugin, with ID `-`.
+// `opencode plugin list` and `update` ask the server for the plugins of the current directory, and
+// a directory the server has not loaded yet answers with no server plugin at all. The CLI still
+// reads cli.json, so a cold answer shows only the TUI half of the goal plugin, with ID `-`, and
+// `update` of a plugin outside cli.json fails with "Plugin is not configured".
 // --standalone starts cold on every run, so polling the same directory is the reliable path.
 import { spawnSync } from "node:child_process";
 
@@ -47,9 +48,27 @@ function waitForPlugins() {
   process.exit(1);
 }
 
+function runOrExit(...args) {
+  const { status, stdout, stderr } = opencode(...args);
+  process.stdout.write(stdout);
+  process.stderr.write(stderr);
+  if (status !== 0) {
+    console.error(`opencode ${args.join(" ")} exited ${status}`);
+    process.exit(1);
+  }
+}
+
+// `plugin add` skips a plugin already configured without updating it, so `update` follows.
+function installPlugins() {
+  for (const plugin of PLUGINS) runOrExit("plugin", "add", plugin);
+  waitForPlugins();
+  for (const plugin of PLUGINS) runOrExit("plugin", "update", plugin);
+}
+
 const [mode, ...extra] = process.argv.slice(2);
-if (mode !== "wait" || extra.length > 0) {
-  console.error("usage: opencode-plugins.mjs wait");
+if (!["wait", "install"].includes(mode) || extra.length > 0) {
+  console.error("usage: opencode-plugins.mjs wait | install");
   process.exit(2);
 }
-process.stdout.write(waitForPlugins());
+if (mode === "wait") process.stdout.write(waitForPlugins());
+else installPlugins();

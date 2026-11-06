@@ -20,11 +20,7 @@ rtk init -g --opencode
 bash "$(dirname "$0")/sync-config.sh" opencode >/dev/null
 
 echo "[4/7] OpenCode plugins (caveman-lean, ponytail-subagent, goal mode)"
-# `plugin add` skips a plugin already in opencode.jsonc without updating it, so `update` follows.
-for p in github:YuukiFST/caveman-lean github:YuukiFST/ponytail-subagent @prevalentware/opencode-goal-plugin; do
-  opencode plugin add "$p"
-  opencode plugin update "$p"
-done
+node "$(dirname "$0")/opencode-plugins.mjs" install
 # OpenCode 2 loads a plugin's TUI half (sidebar, palette) only from cli.json, which `plugin add`
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 node "$(dirname "$0")/add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
