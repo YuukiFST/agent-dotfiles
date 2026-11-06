@@ -1,6 +1,6 @@
 // The agents list as a board for a workspace of its own (props { board: true }):
 // a card per agent, most urgent first, with what it says it is doing, its checkout,
-// the tokens its session spent and the task it is shipping. A click asks the sessions
+// and the tokens its session spent. A click asks the sessions
 // window to show that agent (it reads ~/.config/herdr-app-shared/focus-request.json).
 // props { compact: true } draws status-board.js instead.
 
@@ -10,8 +10,6 @@ import { h_flex, v_flex } from "gpui-base";
 import { agents, terminals, panes, spaces, home, appHome, props, readTextFile, writeTextFile } from "herdr";
 import { BlockedMenus } from "./answers.js";
 import { CheckoutsByFolder, ContextByTerminal, agentDetails, reportOf, sharedCheckouts, spaceColor, StateClock, duration, icon, withBackground } from "./insight.js";
-import { FlowByFolder } from "./flow/watch.js";
-import { FlowCards } from "./flow/card.js";
 import { ContextMaps, contextMap, contextSummary } from "./ctxmap/view.js";
 import { SilentAgents } from "./silent.js";
 import { kilo, statusBoard, tilde } from "./status-board.js";
@@ -60,8 +58,6 @@ export class AgentBoard {
     this.contexts = new ContextByTerminal(cx);
     this.clock = new StateClock();
     this.menus = new BlockedMenus(cx);
-    this.flows = new FlowByFolder();
-    this.flowCards = new FlowCards();
     this.maps = new ContextMaps();
     this.maps.restore(cx);
     this.silent = new SilentAgents(cx);
@@ -85,7 +81,6 @@ export class AgentBoard {
     cx.timer.every(COLORS_MS, (cx) => this.readColors(cx));
     if (props()?.compact) cx.timer.every(CLOCK_MS, (cx) => cx.notify());
     cx.timer.every(1000, (cx) => this.checkouts.tick(panes(), cx));
-    cx.timer.every(1000, (cx) => this.flows.tick(this.flowEntries(), cx));
     cx.timer.every(5000, (cx) => this.maps.tick(this.localAddresses(), this.contexts, cx));
   }
 
@@ -105,13 +100,6 @@ export class AgentBoard {
 
   localAddresses() {
     return this.silent.with(agents()).map((a) => a.address).filter((a) => !a.includes("/"));
-  }
-
-  // Local agents and the folders they work in, for the task cards.
-  flowEntries() {
-    const paneOf = new Map(panes().map((p) => [p.pane, p]));
-    return this.silent.with(agents()).filter((a) => !a.address.includes("/"))
-      .map((a) => ({ address: a.address, cwd: paneOf.get(a.pane)?.cwd, busy: a.status === "working" }));
   }
 
   requestFocus(terminal, cx) {
@@ -157,8 +145,7 @@ export class AgentBoard {
       .when(Boolean(details), (el) => el.child(details))
       .when(started && Boolean(session?.session), (el) => el.child(tokenLine(t, session)))
       .children([contextMap(t, a.address, this.maps.of(a.address), this.hover)].filter(Boolean))
-      .when(a.status === "blocked", (el) => el.children([this.menus.buttons(t, a.address, 0)].filter(Boolean)))
-      .children([this.flowCards.render(t, a.address, this.flows.of(ctx.cwdOf(a)), this.flows.stepOf(a.address), cx)].filter(Boolean));
+      .when(a.status === "blocked", (el) => el.children([this.menus.buttons(t, a.address, 0)].filter(Boolean)));
   }
 
   render(t, cx) {
