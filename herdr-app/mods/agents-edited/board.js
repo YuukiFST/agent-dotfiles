@@ -12,7 +12,7 @@ import { BlockedMenus } from "./answers.js";
 import { CheckoutsByFolder, ContextByTerminal, agentDetails, reportOf, sharedCheckouts, spaceColor, StateClock, duration, icon, withBackground } from "./insight.js";
 import { ContextMaps, contextMap, contextSummary } from "./ctxmap/view.js";
 import { SilentAgents } from "./silent.js";
-import { kilo, statusBoard, tilde } from "./status-board.js";
+import { kilo, savedRightPanel, statusBoard, tilde } from "./status-board.js";
 import { UsagePanel } from "./usage-panel.js";
 import { NotesPanel } from "./notes/panel.js";
 import { FinishGlow } from "./finish-glow.js";
@@ -66,6 +66,7 @@ export class AgentBoard {
     this.finishGlow = new FinishGlow();
     this.hovered = null;
     this.treemapTiles = props()?.compact ? cx.new(TreemapTiles, { tree: null }) : null;
+    this.rightPanel = savedRightPanel();
     this.hover = {
       is: (id) => this.hovered === id,
       set: (id, on, cx) => {
@@ -152,10 +153,12 @@ export class AgentBoard {
     const list = withBackground(this.silent.with(agents()), this.contexts).sort((x, y) => (URGENCY[y.status] ?? 0) - (URGENCY[x.status] ?? 0) || y.seq - x.seq);
     const paneOf = new Map(panes().map((p) => [p.pane, p]));
     const cwdOf = (a) => paneOf.get(a.pane)?.cwd;
+    const terminalPanesOf = Map.groupBy(panes().filter((p) => p.terminal), (p) => p.tab);
     const ctx = {
       tabs: new Map(spaces().flatMap((s) => s.tabs).map((x) => [x.id, x])),
       terminalOf: new Map(terminals().map((k) => [k.address, k])),
       cwdOf,
+      sharesTab: (a) => (terminalPanesOf.get(a.tab)?.length ?? 0) > 1,
       clash: sharedCheckouts(list, this.checkouts, cwdOf, (a) => a.space_name),
     };
     this.contexts.watch(list.map((a) => a.address), cx);

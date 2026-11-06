@@ -1,10 +1,12 @@
 // The board as a status dashboard (props { compact: true }): a summary strip, the sessions grouped
-// by state in a list that scrolls on its own, and beside it the context map.
+// by state in a list that scrolls on its own, and beside it the context map or the Hardware Monitor.
 
-import { chosenSessionName } from "./session-name.js";
-import { div } from "gpui-kit";
+import { spaceListName } from "./session-name.js";
+import { div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { home } from "herdr";
+import { iconSwitch } from "./harness-switch.js";
+import { hardwareMonitor } from "./hardware-panel.js";
 import { icon } from "./insight.js";
 import { averageContextTree, contextTreemap } from "./ctxmap/treemap.js";
 import { usagePanel } from "./usage-panel.js";
@@ -13,7 +15,11 @@ import { alertLight, alertOf, alertOrb } from "./attention.js";
 const NUMBER_FONT = "Geist Mono";
 const SESSIONS_WIDTH = 470;
 const CONTEXT_WIDTH = 660;
-const USAGE_HEIGHT = 300;
+const USAGE_HEIGHT = 170;
+const RIGHT_PANEL_KEY = "status.rightPanel";
+const CONTEXT_PANEL = "context";
+const HARDWARE_PANEL = "hardware";
+const RIGHT_SWITCH_TILE_SIZE = 18;
 const NUMBER_WIDTH = 54;
 const GAP = 8;
 
@@ -76,7 +82,7 @@ function sessionRow(t, a, ctx, board) {
   const since = started ? board.clock.ageFrom(a, tab) : null;
   const cwd = ctx.cwdOf(a);
   const session = started ? board.contexts.of(a.address)?.session : null;
-  const name = chosenSessionName(a.address) || ((tab?.named ? tab.name : a.title) ?? "");
+  const name = spaceListName(a, ctx.sharesTab(a), cwd && lastPart(cwd));
   const alert = alertOf(t, a.status);
   const isWorking = a.status === "working";
   return v_flex().id(`status-${a.address}`).relative().flex_none().cursor_pointer().border_t(1).border_color(t.border).hover((s) => s.bg(t.raised))
@@ -86,9 +92,7 @@ function sessionRow(t, a, ctx, board) {
       .child(alert ? alertOrb(alert) : div().w(14).flex_none())
       .children([icon(a.program, 14, t.foreground)].filter(Boolean))
       .child(v_flex().flex_1().min_w(0)
-        .child(h_flex().gap(8).items_center().min_w(0)
-          .child(div().flex_none().max_w(220).truncate().text_size(13).font_medium().text_color(isWorking ? t.muted : t.foreground).child(cwd ? lastPart(cwd) : a.space_name))
-          .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.dim).child(name)))
+        .child(div().truncate().text_size(13).font_medium().text_color(isWorking ? t.muted : t.foreground).child(name))
         .when(Boolean(cwd), (el) => el.child(div().id(`status-path-${a.address}`).truncate().text_ellipsis_start().text_size(11).text_color(t.dim).tooltip(cwd).child(tilde(cwd)))))
       .child(number(since ? elapsed(Date.now() - since) : "—", t.muted))
       .child(number(session ? kilo(tokensOf(session)) : "—", isWorking ? t.muted : t.foreground)))
@@ -123,7 +127,7 @@ function contextScope(list, ctx, board) {
   const measured = list.filter((a) => board.maps.of(a.address));
   const index = measured.findIndex((a) => a.address === board.treemapSession);
   const shown = measured[index] ?? null;
-  const nameOf = (a) => lastPart(ctx.cwdOf(a) ?? a.space_name);
+  const nameOf = (a) => spaceListName(a, ctx.sharesTab(a), lastPart(ctx.cwdOf(a) ?? ""));
   return {
     maps: (shown ? [shown] : measured).map((a) => board.maps.of(a.address)),
     view: {
@@ -142,8 +146,24 @@ function contextScope(list, ctx, board) {
 
 const sameMaps = (a, b) => a.length === b?.length && a.every((map, i) => map === b[i]);
 
+function rightPanelSwitch(t, board, hardware) {
+  const option = (key, tooltip, file, hasAlert) => ({ key, tooltip, isEnabled: true, hasAlert, icon: (size, color) => svg(`mods/agents-edited/icons/${file}.svg`).size(size).flex_none().text_color(color) });
+  const isHardwareBad = board.rightPanel !== HARDWARE_PANEL && Boolean(hardware?.headline.isBad);
+  const options = [option(CONTEXT_PANEL, "Context Window Map", "context", false), option(HARDWARE_PANEL, hardware?.headline.text ?? "Hardware Monitor", "hardware", isHardwareBad)];
+  return iconSwitch(t, "right-panel", options, board.rightPanel, RIGHT_SWITCH_TILE_SIZE, (key, cx) => {
+    board.rightPanel = key;
+    localStorage.setItem(RIGHT_PANEL_KEY, key);
+    cx.notify();
+  });
+}
+
+export const savedRightPanel = () => (localStorage.getItem(RIGHT_PANEL_KEY) === HARDWARE_PANEL ? HARDWARE_PANEL : CONTEXT_PANEL);
+
 export function statusBoard(t, list, ctx, board, cx) {
   const { maps, view } = contextScope(list, ctx, board);
+  const hardware = board.usagePanel.hardware.analysis(board.usagePanel.sample);
+  const panelSwitch = rightPanelSwitch(t, board, hardware);
+  const rightPanel = board.rightPanel === HARDWARE_PANEL ? hardwareMonitor(t, hardware, panelSwitch) : contextTreemap(t, board.shownContextTree, { ...view, leading: panelSwitch }, board.treemapTiles);
   if (maps.length && !sameMaps(maps, board.shownContextMaps)) {
     board.shownContextMaps = maps;
     board.shownContextTree = averageContextTree(maps);
@@ -157,5 +177,5 @@ export function statusBoard(t, list, ctx, board, cx) {
         .child(sessionsPanel(t, list, ctx, board)))
       .child(v_flex().h(USAGE_HEIGHT).flex_none().child(usagePanel(t, board.usagePanel))))
     .child(board.notesPanel.render(t))
-    .child(h_flex().w(CONTEXT_WIDTH).flex_none().min_h(0).items_stretch().child(contextTreemap(t, board.shownContextTree, view, board.treemapTiles)));
+    .child(h_flex().w(CONTEXT_WIDTH).flex_none().min_h(0).items_stretch().child(rightPanel));
 }
