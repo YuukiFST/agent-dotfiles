@@ -17,6 +17,7 @@ const DEFAULT_WINDOW = 200000;
 const CAP_SHARE = 0.4;
 const SOFT_TOKENS = 120000;
 const EDGE_PCT = 85;
+const USAGE_WINDOW_MS = 7 * 24 * 3600000;
 
 function sameFolder(a, b) {
   const real = (p) => {
@@ -32,6 +33,16 @@ function sameFolder(a, b) {
 function findSession(db, title, cwd) {
   const named = db.prepare("SELECT * FROM session_v2 WHERE parent_id IS NULL AND title = ? ORDER BY time_updated DESC").all(title);
   return named.find((s) => sameFolder(s.directory, cwd)) ?? null;
+}
+
+// Subagents' sessions count too: they spend tokens like any other.
+function recentUsage(db) {
+  const since = Date.now() - USAGE_WINDOW_MS;
+  const { tokens, cost } = db.prepare(`SELECT
+    SUM(tokens_input + tokens_output + tokens_reasoning + tokens_cache_read + tokens_cache_write) AS tokens,
+    SUM(cost) AS cost
+    FROM session_v2 WHERE time_updated >= ?`).get(since);
+  return { tokens: tokens ?? 0, cost: cost ?? 0, at: Date.now() };
 }
 
 function windowOf(model) {
@@ -96,6 +107,7 @@ const db = new DatabaseSync(DB_FILE, { readOnly: true });
 const session = findSession(db, shownTitle.replace(/^OC \| /, ""), cwd);
 if (!session) process.exit(0);
 const rows = db.prepare("SELECT id, type, data FROM session_message WHERE session_id = ? ORDER BY seq").all(session.id);
+const usage = recentUsage(db);
 db.close();
 
 const last = rows.findLast((row) => row.type === "assistant" && JSON.parse(row.data).tokens);
@@ -109,6 +121,7 @@ const transcriptDir = join(STATE_DIR, "opencode");
 mkdirSync(transcriptDir, { recursive: true });
 const transcript = join(transcriptDir, `${session.id}.jsonl`);
 writeWhole(transcript, `${transcriptEntries(rows).map((entry) => JSON.stringify(entry)).join("\n")}\n`);
+writeWhole(join(transcriptDir, "usage.json"), JSON.stringify(usage));
 writeWhole(join(STATE_DIR, `${terminal}.tally.json`), JSON.stringify({ transcript }));
 writeWhole(join(STATE_DIR, `${terminal}.json`), JSON.stringify({
   agent: "opencode",

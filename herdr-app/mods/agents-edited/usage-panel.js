@@ -17,6 +17,12 @@ const LABEL_WIDTH = 42;
 const PERCENT_WIDTH = 34;
 const DETAIL_WIDTH = 78;
 
+// Written by ./opencode-sample.mjs while an OpenCode session runs. OpenCode has no plan limit to
+// measure against, so its section shows what was spent, not a percentage.
+const OPENCODE_USAGE_FILE = () => `${home()}/.claude/state/ctx/opencode/usage.json`;
+const OPENCODE_USAGE_STALE_MS = 7 * 24 * 3600000;
+const tokenCount = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${(n / 1e3).toFixed(1)}k`);
+
 const parseSample = (text) => {
   try {
     return JSON.parse(text ?? "null");
@@ -30,8 +36,23 @@ export class UsagePanel {
     this.plan = new PlanUsage(cx);
     this.sample = null;
     this.shownSample = null;
+    this.opencode = null;
     this.readSample(cx);
-    cx.timer.every(SAMPLE_MS, (cx) => this.readSample(cx));
+    this.readOpenCode(cx);
+    cx.timer.every(SAMPLE_MS, (cx) => {
+      this.readSample(cx);
+      this.readOpenCode(cx);
+    });
+  }
+
+  readOpenCode(cx) {
+    cx.spawn(async (cx) => {
+      const usage = parseSample(await readTextFile(OPENCODE_USAGE_FILE()).catch(() => null));
+      const fresh = usage && Date.now() - usage.at < OPENCODE_USAGE_STALE_MS ? usage : null;
+      if (fresh?.at === this.opencode?.at) return;
+      this.opencode = fresh;
+      cx.notify();
+    });
   }
 
   readSample(cx) {
@@ -88,6 +109,14 @@ function machineGauges(t, sample) {
   ];
 }
 
+function openCodeSection(t, usage) {
+  return v_flex().flex_grow_1().pb(4)
+    .child(sectionTitle(t, "OpenCode", "last 7 days"))
+    .child(h_flex().flex_1().min_h(24).px(12).gap(8).items_center().text_size(12)
+      .child(div().flex_1().text_color(t.muted).child(`${tokenCount(usage.tokens)} tokens`))
+      .child(div().flex_none().font_family(NUMBER_FONT).text_color(t.foreground).child(`$${usage.cost.toFixed(2)}`)));
+}
+
 export function usagePanel(t, panel) {
   const reading = panel.plan.reading;
   const windows = reading?.windows ?? [];
@@ -97,6 +126,7 @@ export function usagePanel(t, panel) {
     .child(section()
       .child(sectionTitle(t, "Claude", reading ? planNote(reading) : ""))
       .children(windows.length ? windows.map((w) => planGauge(t, w)) : [waiting(reading?.error ?? "Reading the plan…")]))
+    .when(Boolean(panel.opencode), (el) => el.child(div().h(1).flex_none().bg(t.border)).child(openCodeSection(t, panel.opencode)))
     .child(div().h(1).flex_none().bg(t.border))
     .child(section()
       .child(sectionTitle(t, "Machine", ""))
