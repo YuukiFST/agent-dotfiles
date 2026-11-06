@@ -5,6 +5,7 @@
 import { div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { exec, hc, home, readTextFile, watchFolder, setShared, shared, window } from "herdr";
+import { OpenCodeContext } from "./opencode.js";
 
 // Every local pane's git, by folder, for the pane headers too.
 export const GIT_KEY = "git.cwd";
@@ -176,6 +177,7 @@ export class ContextByTerminal {
     this.byTerminal = {};
     this.textOf = {};
     this.addresses = [];
+    this.opencode = new OpenCodeContext(cx);
     cx.timer.every(CTX_RELOAD_MS, (cx) => this.reload(cx));
     cx.spawn(async (cx) => {
       for (;;) {

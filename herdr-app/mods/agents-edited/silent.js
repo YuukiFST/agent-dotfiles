@@ -29,7 +29,8 @@ export class SilentAgents {
           const text = await fs.readFile(`${this.dir}/${name}`, "utf8").catch(() => null);
           let at = 0;
           try {
-            at = JSON.parse(text?.replace(/^﻿/, "") ?? "{}").at ?? 0;
+            const reading = JSON.parse(text?.replace(/^﻿/, "") ?? "{}");
+            at = reading.agent ? 0 : reading.at ?? 0; // Another agent's reading says nothing of Claude Code.
           } catch {
             // Mid-write: the next scan reads it.
           }

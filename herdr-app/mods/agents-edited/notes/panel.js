@@ -2,7 +2,7 @@
 
 import { div, image } from "gpui-kit";
 import { v_flex, h_flex, Textarea, TextareaState } from "gpui-base";
-import { hc, knownAgents, pickFolder, run, theme, watchFolder } from "herdr";
+import { agents, hc, knownAgents, pickFolder, run, theme, watchFolder } from "herdr";
 import { SHARED_DIR, composeMessage, copyImage, folderName, imageAsset, isImagePath, isNotesFile, newId, openImage, pasteImage, readBook, removeImages, sessionsFor, updateBook } from "./store.js";
 
 const NEW_SESSION = "new";
@@ -14,6 +14,13 @@ const clock = (ms) => {
   const date = new Date(ms);
   return `${MONTHS[date.getMonth()]} ${date.getDate()} ${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
 };
+
+// The agent last active here, so notes follow whichever one is in use; else the first installed.
+async function agentForNewSession() {
+  const installed = (await knownAgents()).filter((a) => a.installed);
+  const latest = agents().reduce((newest, a) => (a.seq > (newest?.seq ?? -1) ? a : newest), null);
+  return installed.find((a) => a.key === latest?.program.key) ?? installed[0];
+}
 
 export class NotesPanel {
   constructor(cx) {
@@ -238,7 +245,7 @@ export class NotesPanel {
   }
 
   async startSession(project, notes) {
-    const agent = (await knownAgents()).find((a) => a.installed);
+    const agent = await agentForNewSession();
     if (!agent) throw new Error("no agent installed");
     run("space.new", { name: project.name, folder: project.folder, argv: agent.run, task: composeMessage(project, notes, true) });
     return `new ${agent.name} session`;
@@ -254,7 +261,7 @@ export class NotesPanel {
   openPicker(cx) {
     this.isPickerOpen = true;
     cx.spawn(async (cx) => {
-      this.newSessionAgent = (await knownAgents()).find((a) => a.installed)?.name ?? null;
+      this.newSessionAgent = (await agentForNewSession())?.name ?? null;
       cx.notify();
     });
   }
