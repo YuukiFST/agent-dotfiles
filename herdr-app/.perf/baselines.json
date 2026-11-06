@@ -1,0 +1,268 @@
+{
+  "buckets": {
+    "e307f522ef48": {
+      "env": {
+        "arch": "x64",
+        "cores": 4,
+        "cpu": "Intel(R) Core(TM) i3-9100F CPU @ 3.60GHz",
+        "memGB": 16,
+        "platform": "win32",
+        "profile": "release"
+      },
+      "metrics": {
+        "board.cpu_pct": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 14.11,
+          "noise": 5.767314000000001,
+          "ref": "00803e7-dirty",
+          "samples": [
+            14.11,
+            18,
+            6.28
+          ],
+          "unit": "%"
+        },
+        "board.private_mb": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 192.7,
+          "noise": 0.29651999999998313,
+          "ref": "00803e7-dirty",
+          "samples": [
+            192.7,
+            192.5,
+            194
+          ],
+          "unit": "MB"
+        },
+        "dev.cpu_pct": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 1.55,
+          "noise": 0.2668679999999999,
+          "ref": "00803e7-dirty",
+          "samples": [
+            0.95,
+            1.73,
+            1.55
+          ],
+          "unit": "%"
+        },
+        "dev.private_mb": {
+          "better": "lower",
+          "date": "2026-11-05T10:50:41.846Z",
+          "median": 194.1,
+          "noise": 0,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            193.9,
+            194.1,
+            194.1
+          ],
+          "unit": "MB"
+        },
+        "empty.cpu_pct": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 0.86,
+          "noise": 0.014826000000000013,
+          "ref": "00803e7-dirty",
+          "samples": [
+            1.3,
+            0.86,
+            0.85
+          ],
+          "unit": "%"
+        },
+        "empty.private_mb": {
+          "better": "lower",
+          "date": "2026-11-05T10:50:41.846Z",
+          "median": 166.4,
+          "noise": 0.44478000000001683,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            166.8,
+            166.4,
+            166.1
+          ],
+          "unit": "MB"
+        },
+        "sample.wall_ms": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 633,
+          "noise": 23.7216,
+          "ref": "00803e7-dirty",
+          "samples": [
+            604,
+            641,
+            633,
+            613,
+            677,
+            639,
+            617
+          ],
+          "unit": "ms"
+        },
+        "treemap.glide_cpu_ms_per_frame": {
+          "better": "lower",
+          "date": "2026-11-05T14:00:49.100Z",
+          "median": 17.05,
+          "noise": 1.260210000000002,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            16.03,
+            16.2,
+            19.3,
+            17.13,
+            17.05
+          ],
+          "unit": "ms"
+        },
+        "treemap.glide_fps_median": {
+          "better": "higher",
+          "date": "2026-11-05T14:00:49.100Z",
+          "median": 60.24,
+          "noise": 0,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            60.24,
+            60.61,
+            60.24,
+            59.88,
+            60.24
+          ],
+          "unit": "fps"
+        },
+        "treemap.glide_fps_p5": {
+          "better": "higher",
+          "date": "2026-11-05T14:00:49.100Z",
+          "median": 37.45,
+          "noise": 9.192120000000005,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            58.48,
+            50.25,
+            37.45,
+            37.04,
+            31.25
+          ],
+          "unit": "fps"
+        },
+        "treemap.glide_frame_ms_p95": {
+          "better": "lower",
+          "date": "2026-11-05T14:00:49.100Z",
+          "median": 26.7,
+          "noise": 7.857780000000001,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            17.1,
+            19.9,
+            26.7,
+            27,
+            32
+          ],
+          "unit": "ms"
+        },
+        "treemap.glide_private_mb": {
+          "better": "lower",
+          "date": "2026-11-05T14:00:49.100Z",
+          "median": 87.8,
+          "noise": 0.14826000000001263,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            87.3,
+            87.9,
+            87.9,
+            87.8,
+            87.4
+          ],
+          "unit": "MB"
+        },
+        "windows.cpu_pct": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 28.85,
+          "noise": 0.8302560000000033,
+          "ref": "00803e7-dirty",
+          "samples": [
+            29.83,
+            28.85,
+            28.29
+          ],
+          "unit": "%"
+        },
+        "windows.private_mb": {
+          "better": "lower",
+          "date": "2026-11-05T10:50:41.846Z",
+          "median": 438,
+          "noise": 0,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            438.1,
+            438,
+            438
+          ],
+          "unit": "MB"
+        },
+        "windows.spawns_per_min": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 34.6,
+          "noise": 5.9304,
+          "ref": "00803e7-dirty",
+          "samples": [
+            38.6,
+            34.6,
+            30.6
+          ],
+          "unit": "/min"
+        },
+        "workspace.switch_first_change_ms": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 234,
+          "noise": 17.7912,
+          "ref": "00803e7-dirty",
+          "samples": [
+            250,
+            234,
+            222
+          ],
+          "unit": "ms"
+        },
+        "workspace.switch_settled_ms": {
+          "better": "lower",
+          "date": "2026-11-04T19:14:01.344Z",
+          "median": 246,
+          "noise": 59.303999999999995,
+          "ref": "b17b92f-dirty",
+          "samples": [
+            246,
+            204,
+            286
+          ],
+          "unit": "ms"
+        }
+      }
+    },
+    "stable": {
+      "env": "machine-independent",
+      "metrics": {
+        "flow.git_calls": {
+          "better": "lower",
+          "date": "2026-11-04T13:55:19.335Z",
+          "median": 89,
+          "noise": 0,
+          "ref": "00803e7-dirty",
+          "samples": [
+            89
+          ],
+          "unit": "calls"
+        }
+      }
+    }
+  },
+  "version": 1
+}

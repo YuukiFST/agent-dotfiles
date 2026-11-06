@@ -1,0 +1,7 @@
+unrelated neighbor closed, closed one: state=finished pane=none
+unrelated neighbor closed, other one: state=live pane=shown
+child closed, child: state=finished pane=none
+child closed, parent: state=live pane=shown
+parent closed, parent: pane=none still working=false
+parent closed, child beside it: state=live pane=shown
+last shown child closed, parent: state=finished

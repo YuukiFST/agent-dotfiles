@@ -1,0 +1,17 @@
+{
+  "id": "root",
+  "type": "column",
+  "background": "canvas",
+  "children": [
+    {
+      "id": "a",
+      "type": "block",
+      "size": {
+        "weight": 1
+      },
+      "content": {
+        "mod": "claude-usage"
+      }
+    }
+  ]
+}

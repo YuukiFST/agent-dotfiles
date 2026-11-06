@@ -1,0 +1,21 @@
+{
+  "id": "root",
+  "type": "column",
+  "background": "canvas",
+  "children": [
+    {
+      "id": "a",
+      "type": "block",
+      "size": {
+        "weight": 1
+      },
+      "content": {
+        "mod": "agents-edited",
+        "props": {
+          "board": true,
+          "compact": true
+        }
+      }
+    }
+  ]
+}

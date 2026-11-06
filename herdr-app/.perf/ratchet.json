@@ -1,0 +1,230 @@
+{
+  "profile": "release",
+  "metrics": [
+    {
+      "id": "workspace.switch_settled_ms",
+      "command": "node .perf/measure/workspace-switch.mjs --switches 8",
+      "pick": "settled_ms",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.15,
+      "minDelta": 40
+    },
+    {
+      "id": "workspace.switch_first_change_ms",
+      "command": "node .perf/measure/workspace-switch.mjs --switches 8",
+      "pick": "first_change_ms",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.15,
+      "minDelta": 40
+    },
+    {
+      "id": "windows.spawns_per_min",
+      "command": "node .perf/measure/live.mjs 45",
+      "pick": "spawns_per_min",
+      "unit": "/min",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25
+    },
+    {
+      "id": "windows.cpu_pct",
+      "command": "node .perf/measure/live.mjs 45",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25,
+      "minDelta": 2
+    },
+    {
+      "id": "windows.private_mb",
+      "command": "node .perf/measure/live.mjs 45",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 20
+    },
+    {
+      "id": "empty.cpu_pct",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-empty.json --seconds 18",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 1
+    },
+    {
+      "id": "empty.private_mb",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-empty.json --seconds 18",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 10
+    },
+    {
+      "id": "board.cpu_pct",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-board.json --seconds 18",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25,
+      "minDelta": 2
+    },
+    {
+      "id": "board.private_mb",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-board.json --seconds 18",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 10
+    },
+    {
+      "id": "dev.cpu_pct",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-dev.json --seconds 18",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25,
+      "minDelta": 2
+    },
+    {
+      "id": "dev.private_mb",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-dev.json --seconds 18",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 10
+    },
+    {
+      "id": "sample.wall_ms",
+      "command": "node .perf/measure/sample-time.mjs",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 7,
+      "tolerance": 0.25
+    },
+    {
+      "id": "flow.git_calls",
+      "command": "node .perf/verify/flow-differential.mjs",
+      "pick": "git_calls",
+      "unit": "calls",
+      "better": "lower",
+      "stable": true
+    },
+    {
+      "id": "status.working_cpu_pct",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-status.json --working --settle 6 --seconds 12",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25,
+      "minDelta": 1
+    },
+    {
+      "id": "status.working_private_mb",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-status.json --working --settle 6 --seconds 12",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 10
+    },
+    {
+      "id": "startup.status_window_ms",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-status.json --working --settle 6 --seconds 12",
+      "pick": "window_ms",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.15,
+      "minDelta": 60
+    },
+    {
+      "id": "sessions.working_cpu_pct",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-sessions.json --working --settle 6 --seconds 12",
+      "pick": "cpu_pct",
+      "unit": "%",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.25,
+      "minDelta": 1
+    },
+    {
+      "id": "sessions.working_private_mb",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-sessions.json --working --settle 6 --seconds 12",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 3,
+      "minDelta": 10
+    },
+    {
+      "id": "startup.sessions_window_ms",
+      "command": "node .perf/measure/isolated.mjs --layout .perf/layouts/perf-sessions.json --working --settle 6 --seconds 12",
+      "pick": "window_ms",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 3,
+      "tolerance": 0.15,
+      "minDelta": 60
+    },
+    {
+      "id": "treemap.glide_fps_median",
+      "command": "node .perf/measure/treemap-glide.mjs --seconds 10",
+      "pick": "fps_median",
+      "unit": "fps",
+      "better": "higher",
+      "runs": 5,
+      "tolerance": 0.1
+    },
+    {
+      "id": "treemap.glide_fps_p5",
+      "command": "node .perf/measure/treemap-glide.mjs --seconds 10",
+      "pick": "fps_p5",
+      "unit": "fps",
+      "better": "higher",
+      "runs": 5,
+      "tolerance": 0.25
+    },
+    {
+      "id": "treemap.glide_frame_ms_p95",
+      "command": "node .perf/measure/treemap-glide.mjs --seconds 10",
+      "pick": "frame_ms_p95",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 5,
+      "tolerance": 0.25,
+      "minDelta": 8
+    },
+    {
+      "id": "treemap.glide_cpu_ms_per_frame",
+      "command": "node .perf/measure/treemap-glide.mjs --seconds 10",
+      "pick": "cpu_ms_per_frame",
+      "unit": "ms",
+      "better": "lower",
+      "runs": 5,
+      "tolerance": 0.25,
+      "minDelta": 2
+    },
+    {
+      "id": "treemap.glide_private_mb",
+      "command": "node .perf/measure/treemap-glide.mjs --seconds 10",
+      "pick": "private_mb",
+      "unit": "MB",
+      "better": "lower",
+      "runs": 5,
+      "minDelta": 10
+    }
+  ]
+}

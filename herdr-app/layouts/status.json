@@ -1,0 +1,102 @@
+{
+  "id": "root",
+  "type": "column",
+  "children": [
+    {
+      "id": "panels",
+      "type": "row",
+      "children": [
+        {
+          "id": "board",
+          "type": "block",
+          "content": {
+            "mod": "agents-edited",
+            "props": {
+              "board": true,
+              "compact": true
+            }
+          },
+          "size": {
+            "weight": 1
+          }
+        }
+      ],
+      "background": "canvas"
+    },
+    {
+      "id": "footer",
+      "type": "row",
+      "children": [
+        {
+          "id": "usage-bar",
+          "type": "block",
+          "content": {
+            "mod": "claude-usage",
+            "props": {
+              "only": "network"
+            }
+          },
+          "size": {
+            "weight": 1
+          }
+        },
+        {
+          "id": "agent-watch",
+          "type": "block",
+          "content": {
+            "mod": "agent-watch"
+          },
+          "size": {
+            "px": 110
+          }
+        },
+        {
+          "id": "companion",
+          "type": "block",
+          "content": {
+            "mod": "companion"
+          },
+          "size": {
+            "px": 110
+          }
+        },
+        {
+          "id": "skills-toggle",
+          "type": "block",
+          "content": {
+            "mod": "skills",
+            "props": {
+              "role": "toggle"
+            }
+          },
+          "size": {
+            "px": 96
+          }
+        },
+        {
+          "id": "workspaces",
+          "type": "block",
+          "size": {
+            "px": 170
+          },
+          "content": {
+            "mod": "workspaces"
+          }
+        }
+      ],
+      "size": {
+        "px": 28
+      },
+      "resizable": false
+    }
+  ],
+  "background": "canvas",
+  "theme": {
+    "light": "vercel-dark",
+    "dark": "tokyo-night"
+  },
+  "divider": {
+    "width": 1,
+    "color": "border"
+  }
+}

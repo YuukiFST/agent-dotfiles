@@ -14,13 +14,13 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 - **Seeds are machine-owned:** `settings.json` (Claude Code, `sync-config.ps1` only) is written only when absent, and in `pi/settings.json` the `defaultProvider`, `defaultModel` and `defaultThinkingLevel` keys apply on first install only.
   Once written, the live value belongs to the machine and a sync leaves it alone; the rest of pi's `settings.json` is a merge in which `enabledModels`, `theme` and `packages` converge from the repo and pi-owned keys like `lastChangelogVersion` survive.
 - **Commits and pushes follow `rules/git.md`** (hooks in `git-hooks/`).
-- **Sensitive paths** for `interrogate` in this repo: `AGENTS.md`, `CLAUDE.md`, `GLOBAL.md` and `rules/` (instructions every session loads), `skills/interrogate/` and `skills/git-workflow/` (the review and merge gate), `hooks/`, `mods/`, `git-hooks/`, `scripts/` and `.github/workflows/` (code run on every machine or in CI), `settings.json` (Claude Code permissions and hooks), `pi/cloak.json` (secret masking), `pi/extensions/`, `rtk/config.toml` and `herdr/` (live harness config).
+- **Sensitive paths** for `interrogate` in this repo: `AGENTS.md`, `CLAUDE.md`, `GLOBAL.md` and `rules/` (instructions every session loads), `skills/interrogate/` and `skills/git-workflow/` (the review and merge gate), `hooks/`, `mods/`, `git-hooks/`, `scripts/` and `.github/workflows/` (code run on every machine or in CI), `settings.json` (Claude Code permissions and hooks), `pi/cloak.json` (secret masking), `pi/extensions/`, `rtk/config.toml` and `herdr-app/` (live harness config).
 
 ## Machines
 
 | Machine | Harnesses in use | Sync command |
 |---------|------------------|--------------|
-| Windows, work PC | Claude Code, pi, OpenCode, Herdr UI | `pwsh -File scripts/sync-config.ps1 all` |
+| Windows, work PC | Claude Code, pi, OpenCode, herdr-app | `pwsh -File scripts/sync-config.ps1 all`, then `herdr-app` by name |
 | Windows, home PC | pi, OpenCode | `pwsh -File scripts/sync-config.ps1 all` |
 | NixOS, home PC | pi, OpenCode | `bash scripts/sync-config.sh pi` **and** `bash scripts/sync-config.sh opencode` |
 
@@ -59,8 +59,8 @@ Destinations are in `scripts/sync-config.{sh,ps1}`; these are the semantics an e
 - **`mods/` is copied over, never mirrored:** Claude Code writes each mod's `.claude-plugin/types/` itself, so the repo leaves it out and a file deleted from a repo mod stays on synced machines until removed by hand.
 - **`rules/` is a full mirror** at `~/.claude/rules` on every harness, because GLOBAL.md's pointers hardcode that path; a file written there by hand is gone on the next sync.
 - **OpenCode reviewer agents are generated, not copied:** OpenCode's `task` tool takes no model, so the sync writes one `~/.config/opencode/agents/interrogate-reviewer-<n>.md` per `opencode` row of `skills/interrogate/reviewers.md` and deletes the rest of that prefix; edit the table, never the generated files.
-- **`herdr/config-gpui.toml` is set key by key, never copied:** `Sync-Herdr` passes each key to `herdr-gpui config set`, which validates it and rewrites `config-gpui.local.toml` without its comments, so keys the app writes there survive.
-  Strings use single quotes because PowerShell 5.1 drops double quotes inside native arguments; Herdr UI runs on Windows only here, so `sync-config.sh` has no herdr target.
+- **`herdr-app/` is copied over `~/.config/herdr-app`, never mirrored:** the app keeps its own state beside those files, and `sync-config.ps1 all` skips the target because live mods change on the machine first; run `sync-config.ps1 herdr-app` by name.
+  It holds only the Windows work PC setup, so `sync-config.sh` has no herdr-app target, and employer-specific mods stay out because this repo is public.
 - **`rtk/config.toml` replaces the live rtk config whole,** at the path `rtk config` prints; an rtk setting changed by hand on a machine is gone on the next sync, so it belongs in the repo file.
 - **`CODING_STANDARDS.md` and `PROMPT_ENGINEERING.md` sit outside `rules/` on purpose:** Claude Code auto-loads every `rules/*.md` in every session and subagent, and these files are disclosed, read only when a pointer fires (in `GLOBAL.md` and `rules/prompting.md`).
 - **Assume CRLF on a Windows checkout:** `.gitattributes` pins LF only for `*.sh` and `bin/*`, so make multi-line edits with Edit, never an LF-anchored script, and compare files by blob hash (`git hash-object`).
