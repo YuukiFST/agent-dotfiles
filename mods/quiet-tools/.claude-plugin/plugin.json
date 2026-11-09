@@ -1,6 +1,5 @@
 {
   "name": "quiet-tools",
-  "version": "0.1.0",
-  "description": "Collapse tool rows to a count; keep errors visible",
-  "types": "./types/index.d.ts"
+  "version": "0.2.0",
+  "description": "Calm for Claude Code: conversation-only transcript and the working sailboat, toggled by /calm"
 }

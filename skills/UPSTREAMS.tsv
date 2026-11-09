@@ -78,6 +78,8 @@ yuu-mode	cursor/plugins	pstack/skills/poteto-mode	c742dd6
 ./skills	benjitaylor/skills	.	8020574
 ./hooks	JuliusBrussee/caveman	src/hooks	d262ab3
 ./rtk	rtk-ai/rtk	CHANGELOG.md	91dd9ce	master
+./mods/quiet-tools	kunchenguid/firstmate	.claude/mods/firstmate-calm	c6b6232
+./mods/quiet-tools	0xSero/ascii-art	scripts/photo_dots.py	0968699
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/hooks	e649529
 YuukiFST/caveman-lean	JuliusBrussee/caveman	skills/caveman	d262ab3
 YuukiFST/caveman-lean	JuliusBrussee/caveman	src/plugins/opencode	9b68f7e
