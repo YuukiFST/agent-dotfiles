@@ -83,6 +83,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Review a diff, branch or PR; "what could this break" | `interrogate` |
 | Review Rust code for idiom, API design, error handling or safety | `rust-review` |
 | Write, change or audit tests | `test-audit` |
+| Audit existing stateful code: map its state machines, find invalid states or transitions it reaches under retries or concurrency | `playbooks/state-machine-audit.md` |
 | Agents keep repeating the same mistakes in a repo; make each class impossible | `correct` |
 | Agents keep repeating the same lookups and commands in a repo; give them one CLI | `agent-cli` |
 | Security review or audit of existing code | `security-audit` |
