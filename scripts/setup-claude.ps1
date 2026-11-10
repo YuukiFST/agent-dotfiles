@@ -1,6 +1,7 @@
 #!/usr/bin/env pwsh
 # Claude Code harness setup (Windows). Run from a clone of this repo.
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\invoke-native.ps1"
 
 $Repo   = Split-Path $PSScriptRoot -Parent
 $Claude = Join-Path $env:USERPROFILE ".claude"
@@ -19,16 +20,16 @@ Write-Host "[3/6] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host "[4/6] gh-axi + chrome-devtools-axi"
-npm install -g gh-axi chrome-devtools-axi
+Invoke-Native npm install -g gh-axi chrome-devtools-axi
 
 Write-Host "[5/6] browser-harness"
 & "$PSScriptRoot\install-browser-harness.ps1"
 
 Write-Host "[6/6] Plugins"
 foreach ($m in "YuukiFST/caveman-lean", "anthropics/claude-plugins-official", "YuukiFST/ponytail-subagent") {
-  claude plugin marketplace add $m
+  Invoke-Native claude plugin marketplace add $m
 }
-claude plugin install caveman-lean@caveman-lean
-claude plugin install ponytail-subagent@ponytail-subagent
+Invoke-Native claude plugin install caveman-lean@caveman-lean
+Invoke-Native claude plugin install ponytail-subagent@ponytail-subagent
 
 Write-Host "Done. Restart Claude Code."
