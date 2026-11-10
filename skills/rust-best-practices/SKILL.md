@@ -10,7 +10,7 @@ description: >-
   Effective Rust, Rust Design Patterns, and Microsoft's Pragmatic Rust Guidelines.
 paths: ["**/*.rs"]
 ---
-<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line -->
+<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line; Tests follows the E2E-only rule of CODING_STANDARDS.md -->
 
 # Rust best practices
 
@@ -456,13 +456,14 @@ panic, `# Safety` for every `unsafe fn`.
 
 ## 11. Tests
 
-- Unit tests in `#[cfg(test)] mod tests { use super::*; .. }` for private internals.
-  Integration tests in `tests/` for anything reachable through the public API, and prefer
-  that location when either would do. Doc examples are tests too.
+- Tests are end-to-end, per the "Tests" section of `CODING_STANDARDS.md`: a library's go
+  in `tests/` and call only the public API, a binary's run the built CLI. Write a
+  `#[cfg(test)] mod tests` unit test only when the user asks for one. Doc examples are
+  tests too.
 - Test observable behavior and properties (monotonic, round-trips, idempotent), not
   restated constants or mirrored branches.
-- Write a failing test before fixing a bug. Cover each feature combination and each
-  platform-specific path.
+- A bug fix ships one regression test in `tests/` that fails before the fix. Cover each
+  feature combination and each platform-specific path.
 - Anything doing I/O, time, randomness, or network must be mockable:
   `new_mocked() -> (Self, MockCtrl)` behind `test-util`, not a `Default` that performs I/O.
 - Fuzz parsers of untrusted input with `cargo fuzz`. Benchmark with `criterion` or `divan`

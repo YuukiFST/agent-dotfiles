@@ -9,7 +9,7 @@ description: >-
   they don't say "review". Pairs with the rust-best-practices skill, which covers writing
   new code.
 ---
-<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-review (MIT, notice in LICENSE) -->
+<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-review (MIT, notice in LICENSE); test findings follow the E2E-only rule of CODING_STANDARDS.md -->
 
 # Rust review
 
@@ -100,7 +100,8 @@ Work through these in order. The first two categories are where real bugs live.
 - Public items without docs, and docs that restate the name.
 - Missing `# Errors`, `# Panics`, or `# Safety` sections where they apply.
 - Doc examples that use `unwrap()` instead of `?`.
-- Logic with no tests, or tests that only restate constants.
+- Public behavior no test reaches through the public API or the CLI, or tests that only
+  restate constants. Missing unit tests are not a finding (`CODING_STANDARDS.md` "Tests").
 
 The `rust-best-practices` skill and its `references/` folder hold the full rules and their
 reasoning. If it is installed, read the relevant reference when a finding needs a rule
