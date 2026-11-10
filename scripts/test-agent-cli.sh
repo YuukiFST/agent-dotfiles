@@ -213,6 +213,21 @@ echo "new" > "$REPO/new.txt"
 expect state-dirty 0 '^changed: 1 \(\?\? new.txt\)$' -- state
 git -C "$REPO" config --unset user.email
 GIT_CONFIG_GLOBAL="$WORK/empty-gitconfig" expect state-unset 0 '<UNSET>$' -- state
+rm "$REPO/new.txt"
+
+# --- behind origin/main: drift measured from a stale tree misleads ---
+expect state-no-origin-main 0 '^behind origin/main: unknown \(no origin/main ref\)$' -- state
+git -C "$REPO" update-ref refs/remotes/origin/main HEAD
+expect state-even 0 '^behind origin/main: 0$' -- state
+sync_home
+expect drift-even-no-warning 0 '^summary: 0 drift' -- drift
+if node "$REPO/bin/agent-cli" drift | grep -q WARNING; then fail=$((fail + 1)); echo "FAILED: drift-even-no-warning printed a WARNING" >&2; else pass=$((pass + 1)); fi
+for n in 1 2; do
+  git -C "$REPO" update-ref refs/remotes/origin/main "$(git -C "$REPO" -c user.email=test@example.invalid commit-tree "HEAD^{tree}" -p origin/main -m "upstream $n")"
+done
+expect state-behind 0 '^behind origin/main: 2$' -- state
+expect drift-behind-warns 0 '^WARNING: this checkout is 2 commits behind origin/main' -- drift
+expect state-behind-json 0 '"behindMain": 2' -- state --json
 
 echo "agent-cli: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]

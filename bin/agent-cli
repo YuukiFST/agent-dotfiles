@@ -44,7 +44,9 @@ that exists on this machine:
   skills/<name>/ vs ~/.claude/skills, ~/.agents/skills; names in REMOVED.txt still live
 Text files compare with CRLF folded to LF; files .gitignore drops (__pycache__) are skipped.
 Not covered: settings.json (seeded once, machine-owned) and the rtk config.
-Prints only drift, then one summary line. Fix drift with the sync command in AGENTS.md.
+Prints only drift, then one summary line, after a WARNING when this checkout is behind
+origin/main as of the last fetch (drift from an old tree misleads).
+Fix drift with the sync command in AGENTS.md.
 Exit: 0 no drift, 1 drift.`,
   skill: `agent-cli skill <name> [--json]
 
@@ -55,7 +57,7 @@ Exit: 0 found, 1 unknown name (close matches listed), 2 usage error.`,
   state: `agent-cli state [--json]
 
 The git orientation rules/git.md needs before a commit, in one call: current branch and
-its upstream with ahead/behind counts, changed files, the commit identity read inside the
+its upstream with ahead/behind counts, commits behind origin/main as of the last fetch, changed files, the commit identity read inside the
 repo (user.name, user.email; "UNSET" means ask the user), worktrees, and the last commit.
 Exit: 0, or 1 outside a git repo.`,
 };
@@ -254,6 +256,7 @@ async function cmdCheck(args, json) {
 // ---------- drift ----------
 
 function cmdDrift(json) {
+  const behindMain = commitsBehindMain();
   const issues = [];
   const claude = path.join(HOME, '.claude');
   let checked = 0;
@@ -318,8 +321,10 @@ function cmdDrift(json) {
     for (const name of removed)
       if (fs.existsSync(path.join(dir, name))) issues.push({ what: `skills/${name}`, live: tilde(dir), detail: 'in REMOVED.txt but still live' });
   }
-  if (json) print(true, { drift: issues, checked, liveSkillDirs: LIVE_SKILL_DIRS.map(tilde) });
+  if (json) print(true, { drift: issues, checked, liveSkillDirs: LIVE_SKILL_DIRS.map(tilde), behindMain });
   else {
+    if (behindMain > 0)
+      console.log(`WARNING: this checkout is ${behindMain} commit${behindMain === 1 ? '' : 's'} behind origin/main (as of the last fetch), so drift compares the live dirs with an old tree`);
     for (const i of issues) console.log(`DRIFT ${i.what} -> ${i.live}: ${i.detail}`);
     console.log(`summary: ${issues.length} drift in ${checked} targets (skill dirs: ${LIVE_SKILL_DIRS.map(tilde).join(', ') || 'none'})`);
   }
@@ -428,6 +433,13 @@ function git(args) {
   }
 }
 
+// Commits on origin/main that HEAD lacks, as of the last fetch; null without that ref or a commit.
+function commitsBehindMain() {
+  if (git(['rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main']) === null) return null;
+  const count = git(['rev-list', '--count', 'HEAD..refs/remotes/origin/main']);
+  return count === null ? null : Number(count);
+}
+
 function cmdState(json) {
   const branch = git(['branch', '--show-current']);
   if (branch === null) { console.error(`not a git repo: ${REPO}`); return 1; }
@@ -447,6 +459,7 @@ function cmdState(json) {
     upstream,
     ahead,
     behind,
+    behindMain: commitsBehindMain(),
     changed,
     identity: { name: git(['config', 'user.name']) || 'UNSET', email: git(['config', 'user.email']) || 'UNSET' },
     worktrees,
@@ -454,6 +467,7 @@ function cmdState(json) {
   };
   if (json) return print(true, info);
   console.log(`branch: ${info.branch}${upstream ? ` -> ${upstream} (ahead ${ahead}, behind ${behind})` : ' (no upstream)'}`);
+  console.log(`behind origin/main: ${info.behindMain === null ? 'unknown (no origin/main ref)' : info.behindMain}`);
   console.log(`changed: ${changed.length ? `${changed.length} (${changed.slice(0, 5).map((l) => l.trim()).join(', ')}${changed.length > 5 ? ', ...' : ''})` : 'clean'}`);
   console.log(`identity: ${info.identity.name} <${info.identity.email}>`);
   console.log(`worktrees: ${worktrees.map((w) => `${w.branch} ${w.path}`).join(' ; ')}`);

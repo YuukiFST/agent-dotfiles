@@ -2,6 +2,7 @@
 # Update every external tool/hook the harness depends on (Windows).
 # Companion to setup-claude.ps1: setup installs, this refreshes to latest.
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\invoke-native.ps1"
 
 $Bin = Join-Path $env:USERPROFILE ".local\bin"
 
@@ -16,13 +17,13 @@ Invoke-WebRequest $rtkUrl -OutFile "$tmp\rtk.zip"
 Expand-Archive "$tmp\rtk.zip" -DestinationPath $tmp -Force
 Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.exe" -Force
 Remove-Item -Recurse -Force $tmp
-& "$Bin\rtk.exe" --version
+Invoke-Native "$Bin\rtk.exe" --version
 
 Write-Host "[2/5] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"
 
 Write-Host "[3/5] npm globals (chrome-devtools-axi, gh-axi)"
-npm install -g chrome-devtools-axi@latest gh-axi@latest
+Invoke-Native npm install -g chrome-devtools-axi@latest gh-axi@latest
 # Windows runs Claude Code only — pi/Cursor live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 
@@ -31,7 +32,7 @@ Write-Host "[4/5] browser-harness"
 
 Write-Host "[5/5] Claude Code plugins"
 foreach ($p in "caveman-lean@caveman-lean", "ponytail-subagent@ponytail-subagent") {
-  claude plugin update $p
+  Invoke-Native claude plugin update $p
 }
 
 Write-Host "Done. Restart Claude Code to load updated plugins."

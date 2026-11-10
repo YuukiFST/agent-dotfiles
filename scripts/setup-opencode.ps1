@@ -3,12 +3,13 @@
 # Idempotent, and doubles as the updater.
 # Unix equivalent: scripts/setup-opencode.sh
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\invoke-native.ps1"
 
 Write-Host "[1/7] opencode (npm, latest)"
 # Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
 # script is documented as the updater. Skipping it when opencode is on PATH would never update.
-npm install -g --allow-scripts=@opencode/cli @opencode/cli@latest
-opencode --version
+Invoke-Native npm install -g --allow-scripts=@opencode/cli @opencode/cli@latest
+Invoke-Native opencode --version
 
 Write-Host "[2/7] Config (AGENTS.md + skills + rules)"
 & "$PSScriptRoot\sync-config.ps1" opencode
@@ -23,10 +24,10 @@ node "$PSScriptRoot\opencode-plugins.mjs" install
 if ($LASTEXITCODE -ne 0) { throw "OpenCode plugin step failed, see the error above" }
 # OpenCode 2 loads a plugin's TUI half (sidebar, palette) only from cli.json, which `plugin add`
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
-node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
+Invoke-Native node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
 
 Write-Host "[5/7] gh-axi + chrome-devtools-axi"
-npm install -g gh-axi chrome-devtools-axi
+Invoke-Native npm install -g gh-axi chrome-devtools-axi
 
 Write-Host "[6/7] browser-harness"
 & "$PSScriptRoot\install-browser-harness.ps1"

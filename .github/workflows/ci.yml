@@ -51,7 +51,7 @@ jobs:
       # Skill scripts sit one or two levels deep (skills/<name>/, skills/<name>/scripts/),
       # so find them instead of globbing; a glob that matches nothing is passed literally.
       - name: Shellcheck hooks and scripts
-        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
+        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh hooks/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
 
   sync-git-hooks-windows:
     name: sync-config.ps1 git hooks
@@ -85,6 +85,10 @@ jobs:
       - name: Run sync-config opencode test
         run: bash scripts/test-sync-opencode.sh
 
+      # Each skill and rules/ is swapped in by rename, so a copy that fails leaves the live dir intact.
+      - name: Run sync-config replace-on-failure test
+        run: bash scripts/test-sync-replace-on-failure.sh
+
       # OpenCode 2 loads the TUI half of a plugin only from cli.json; adding one must keep the
       # machine's other keys and stay a no-op on a rerun.
       - name: Run add-opencode-tui-plugin test
@@ -104,6 +108,77 @@ jobs:
       # uv tool install --force fails halfway on Windows while a daemon holds the tool's Scripts dir.
       - name: Run browser-harness daemon regression test
         run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
+
+  sync-config-windows:
+    name: sync-config.ps1 (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The claude, pi and opencode targets, run twice each against a temporary home.
+      - name: Run sync-config.ps1 end-to-end test
+        run: pwsh -NoProfile -File scripts/test-sync-config-windows.ps1
+
+      # A locked file must fail the sync without deleting the live skill or rules/ it was replacing.
+      - name: Run sync-config.ps1 replace-on-failure test
+        run: pwsh -NoProfile -File scripts/test-sync-replace-on-failure.ps1
+
+      # A failed npm, claude, pi, opencode or node call must stop a setup script before "Done".
+      - name: Run setup native-failure test
+        run: pwsh -NoProfile -File scripts/test-setup-native-failure.ps1
+
+  statusline:
+    name: statusline (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # statusline.ps1 once ran the caveman segment in a child powershell with empty stdin,
+      # so every window showed the machine-wide mode instead of its own session's.
+      - name: Run caveman session-mode regression test
+        run: node scripts/test-statusline-regression-caveman-session-mode.cjs
+
+      # Herdr showed a session as Done while its background shell or agent still ran.
+      - name: Run background-tasks regression test
+        run: node scripts/test-statusline-regression-background-tasks.cjs
+
+  mods:
+    name: Claude Code mods
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # `claude plugin test` needs no login. Pinned to the version the suites were last run on,
+      # and run through npx, never npm -g, so agent-cli check leaves the machine's claude alone.
+      - name: Run every mod's tests
+        run: |
+          status=0
+          for mod in mods/*/; do
+            npx --yes @anthropic-ai/claude-code@2.1.317 plugin test "$mod" || status=1
+          done
+          exit "$status"
+
+  file-length:
+    name: File length ratchet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # CODING_STANDARDS.md caps a file at 500 lines; files already past it may only shrink.
+      - name: Run check-file-length end-to-end tests
+        run: bash scripts/test-check-file-length.sh
+
+      - name: Check every tracked file against the 500-line ratchet
+        run: node scripts/check-file-length.mjs
 
   ai-tells-lint:
     name: ai-tells lint
