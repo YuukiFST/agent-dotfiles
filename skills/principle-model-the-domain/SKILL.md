@@ -25,5 +25,6 @@ Do not force an abstraction. Prefer boring code if the current shape is already 
 The sign that you skipped this is a new feature that grows an existing if/else chain by one more branch, or a second boolean that must stay in sync with the first. Temporal decomposition is another sign. Phase-named modules repeat the same domain rules across steps.
 
 For the type-level side of this, see [Type System Discipline](../principle-type-system-discipline/SKILL.md).
+For code that already exists, map its state machines and the invalid states it reaches with the [state machine audit playbook](../yuu-mode/playbooks/state-machine-audit.md).
 
 Source: [pstack](https://github.com/cursor/plugins/tree/main/pstack/skills/principle-model-the-domain), MIT, see `LICENSE`.

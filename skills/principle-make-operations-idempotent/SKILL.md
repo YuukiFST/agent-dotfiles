@@ -19,8 +19,9 @@ Design operations so they converge to the correct state regardless of how many t
 **The test:**
 1. What happens if this runs twice in a row?
 2. What happens if the previous run crashed at every possible point?
-3. Does re-execution converge to the same end state?
+3. What happens if two runs overlap on the same state?
+4. Does re-execution converge to the same end state?
 
-If any answer is "it depends on what state was left behind," the operation needs a reconciliation step.
+If any answer is "it depends on what state was left behind," the operation needs a reconciliation step; if it depends on which run wins, it needs a lock, lease or compare-and-set.
 
 Source: [pstack](https://github.com/cursor/plugins/tree/main/pstack/skills/principle-make-operations-idempotent), MIT, see `LICENSE`.
