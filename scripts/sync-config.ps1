@@ -70,22 +70,36 @@ function Remove-StaleSkills($Dest) {
   # would delete skills it never installed.
 }
 
+# Replaces dir $Dest with a copy of dir $Src: the copy lands in staging dir $Stage on the same
+# volume, then two renames swap it in, so a copy that fails or is interrupted leaves $Dest intact.
+# $Stage sits outside every dir a harness scans. Mirrors replace_dir() in sync-config.sh.
+function Copy-DirectoryByRename($Src, $Dest, $Stage) {
+  $name = Split-Path $Dest -Leaf
+  $new = Join-Path $Stage "$name.new"
+  $old = Join-Path $Stage "$name.old"
+  foreach ($leftover in $new, $old) { if (Test-Path $leftover) { Remove-Item $leftover -Recurse -Force } }
+  New-Item -ItemType Directory -Force -Path $Stage | Out-Null
+  Copy-Item $Src $new -Recurse
+  if (Test-Path $Dest) { Move-Item $Dest $old }
+  try { Move-Item $new $Dest } catch { Move-Item $old $Dest; throw }
+  if (Test-Path $old) { Remove-Item $old -Recurse -Force }
+  if (-not (Get-ChildItem $Stage -Force)) { Remove-Item $Stage }
+}
+
 # Per-skill replace: prunes files removed/renamed inside a repo skill, keeps local-only skills.
 # Mirrors sync_skills() in sync-config.sh.
 function Sync-Skills($Dest) {
   New-Item -ItemType Directory -Force -Path $Dest | Out-Null
+  $stage = Join-Path (Split-Path $Dest -Parent) ".sync-staging"
   Get-ChildItem "$Repo\skills" -Directory | ForEach-Object {
-    $d = Join-Path $Dest $_.Name
-    if (Test-Path $d) { Remove-Item $d -Recurse -Force }
-    Copy-Item $_.FullName $d -Recurse
+    Copy-DirectoryByRename $_.FullName (Join-Path $Dest $_.Name) $stage
   }
   Remove-StaleSkills $Dest
 }
 
 # rules/ is entirely repo-owned — full mirror so deleted rules don't linger.
 function Sync-Rules($Dest) {
-  if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
-  Copy-Item "$Repo\rules" $Dest -Recurse
+  Copy-DirectoryByRename "$Repo\rules" $Dest (Join-Path (Split-Path $Dest -Parent) ".sync-staging")
 }
 
 # Every harness on this machine shares these.
