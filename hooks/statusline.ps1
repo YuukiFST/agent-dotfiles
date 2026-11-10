@@ -12,9 +12,13 @@ $Raw = [Console]::In.ReadToEnd()
 
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME ".claude" }
 
-# segmento caveman (reusa o script existente)
+$In = $null
+try { $In = $Raw | ConvertFrom-Json } catch {}
+
+# segmento caveman (reusa o script existente). Roda neste processo com o session_id ja lido:
+# um powershell filho teria stdin vazio e cairia no flag global .caveman-active.
 $Caveman = Join-Path $ClaudeDir "hooks\caveman-statusline.ps1"
-if (Test-Path $Caveman) { & powershell -NoProfile -ExecutionPolicy Bypass -File $Caveman }
+if (Test-Path $Caveman) { & $Caveman -SessionId ([string]$In.session_id) }
 
 function Write-Seg([string]$Text, [int]$Color) {
     [Console]::Write(" ${Esc}[38;5;${Color}m${Text}${Esc}[0m")
@@ -25,7 +29,7 @@ function Format-K([double]$N) {
     return [string][int]$N
 }
 
-try { $In = $Raw | ConvertFrom-Json } catch { exit 0 }
+if (-not $In) { exit 0 }
 
 # Uso por sessao para o painel do Herdr (mods/agents-edited): em state\ctx, <terminal>.json e
 # <terminal>.tally.json, a soma do transcript desde o offset lido. Transcript novo (/clear,

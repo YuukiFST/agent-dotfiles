@@ -1,3 +1,4 @@
 *.sh text eol=lf
 bin/* text eol=lf
 scripts/show-shot text eol=lf
+git-hooks/* text eol=lf
