@@ -11,6 +11,8 @@ REPO="$WORK/repo"
 FAKE_HOME="$WORK/home"
 # os.homedir() reads USERPROFILE on Windows and HOME elsewhere.
 export HOME="$FAKE_HOME" USERPROFILE="$FAKE_HOME"
+# drift reads the global core.hooksPath; keep every global read and write in the fixture.
+export GIT_CONFIG_GLOBAL="$WORK/gitconfig"
 
 pass=0
 fail=0
@@ -31,11 +33,13 @@ expect() {
 }
 
 # --- Fixture repo: the files agent-cli reads ---
-mkdir -p "$REPO/bin" "$REPO/.github/workflows" "$REPO/rules" "$REPO/skills/alpha" "$REPO/skills/yuu-mode" "$REPO/hooks" "$REPO/mods/beta"
+mkdir -p "$REPO/bin" "$REPO/.github/workflows" "$REPO/rules" "$REPO/skills/alpha" "$REPO/skills/yuu-mode" "$REPO/hooks" "$REPO/mods/beta" "$REPO/git-hooks"
 cp "$CLI" "$REPO/bin/agent-cli"
 echo "rule" > "$REPO/rules/git.md"
 echo "hook" > "$REPO/hooks/gate.js"
 echo "mod" > "$REPO/mods/beta/index.js"
+echo "gate" > "$REPO/git-hooks/commit-msg"
+echo "hook test" > "$REPO/git-hooks/test-commit-msg.sh"
 printf '__pycache__/\n' > "$REPO/.gitignore"
 for f in CODING_STANDARDS.md PROMPT_ENGINEERING.md GLOBAL.md; do echo "$f" > "$REPO/$f"; done
 cat > "$REPO/skills/alpha/SKILL.md" <<'EOF'
@@ -104,6 +108,9 @@ sync_home() {
   cp -r "$REPO/rules" "$FAKE_HOME/.claude/rules"
   cp -r "$REPO/hooks" "$FAKE_HOME/.claude/hooks"
   cp -r "$REPO/mods/beta" "$FAKE_HOME/.claude/mods/beta"
+  mkdir -p "$FAKE_HOME/.claude/git-hooks"
+  cp "$REPO/git-hooks/commit-msg" "$FAKE_HOME/.claude/git-hooks/"
+  git config --global core.hooksPath "$FAKE_HOME/.claude/git-hooks"
   cp "$REPO/CODING_STANDARDS.md" "$REPO/PROMPT_ENGINEERING.md" "$FAKE_HOME/.claude/"
   cp "$REPO/GLOBAL.md" "$FAKE_HOME/.claude/CLAUDE.md"
   for d in "$FAKE_HOME/.claude/skills" "$FAKE_HOME/.agents/skills"; do
@@ -135,9 +142,9 @@ expect state-not-repo 1 'not a git repo' -- state
 git -C "$REPO" init -q -b work
 git -C "$REPO" config core.autocrlf false
 sync_home
-# rules/ + 1 mod + 3 files whose live dir exists (no ~/.pi, no ~/.config/opencode) + 1 hook
-# + 2 skills x 2 dirs
-expect drift-clean 0 '^summary: 0 drift in 10 targets' -- drift
+# rules/ + 1 mod + core.hooksPath + 1 git hook (its test-*.sh is not live) + 3 files whose live
+# dir exists (no ~/.pi, no ~/.config/opencode) + 1 hook + 2 skills x 2 dirs
+expect drift-clean 0 '^summary: 0 drift in 12 targets' -- drift
 # Regression (A/B run on a fresh worktree): a checkout with core.autocrlf=true differs from
 # the live copy only in CR bytes, and byte compare reported ~100 false drifts.
 sed -i 's/$/\r/' "$FAKE_HOME/.claude/skills/alpha/SKILL.md" "$FAKE_HOME/.claude/CLAUDE.md"
@@ -151,6 +158,17 @@ expect drift-skill-extra 1 '^DRIFT skills/alpha -> ~/.claude/skills: extra: note
 sync_home
 echo "old hook" > "$FAKE_HOME/.claude/hooks/gate.js"
 expect drift-hook 1 '^DRIFT hooks/gate.js -> ~/.claude/hooks/gate.js: differs$' -- drift
+sync_home
+# Regression: core.hooksPath on a checkout's git-hooks/ follows that checkout's branch and
+# goes silent when the worktree is removed; the gate must run from ~/.claude/git-hooks.
+git config --global core.hooksPath "$REPO/git-hooks"
+expect drift-git-hooks-path 1 '^DRIFT git-hooks/ -> core.hooksPath: points at .*/git-hooks, not ~/.claude/git-hooks$' -- drift
+sync_home
+rm -rf "$FAKE_HOME/.claude/git-hooks"
+expect drift-git-hook-missing 1 '^DRIFT git-hooks/commit-msg -> ~/.claude/git-hooks/commit-msg: not installed$' -- drift
+sync_home
+echo "old gate" > "$FAKE_HOME/.claude/git-hooks/commit-msg"
+expect drift-git-hook-differs 1 '^DRIFT git-hooks/commit-msg -> ~/.claude/git-hooks/commit-msg: differs$' -- drift
 sync_home
 mkdir -p "$FAKE_HOME/.claude/mods/beta/.claude-plugin/types"
 echo "generated" > "$FAKE_HOME/.claude/mods/beta/.claude-plugin/types/x.d.ts"

@@ -23,6 +23,11 @@ jobs:
       - name: Run pre-push end-to-end tests
         run: bash git-hooks/test-pre-push.sh
 
+      # A core.hooksPath into a checkout followed its branch and went silent with a removed
+      # worktree; the sync must leave a gate that outlives the checkout it ran from.
+      - name: Run global git hooks sync end-to-end test
+        run: bash scripts/test-sync-git-hooks.sh
+
   coding-standards-gate:
     name: coding-standards-gate hook
     runs-on: ubuntu-latest
@@ -47,6 +52,16 @@ jobs:
       # so find them instead of globbing; a glob that matches nothing is passed literally.
       - name: Shellcheck hooks and scripts
         run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
+
+  sync-git-hooks-windows:
+    name: sync-config.ps1 git hooks
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # sync-config.ps1 never installed the commit gate, so a Windows-only machine had none.
+      - name: Run global git hooks sync end-to-end test
+        run: pwsh -NoProfile -File scripts/test-sync-git-hooks.ps1
 
   sync-pi:
     name: sync-config pi
