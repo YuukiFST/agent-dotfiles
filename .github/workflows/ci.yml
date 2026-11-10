@@ -104,6 +104,10 @@ jobs:
       - name: Run sync-config.ps1 replace-on-failure test
         run: pwsh -NoProfile -File scripts/test-sync-replace-on-failure.ps1
 
+      # A failed npm, claude, pi, opencode or node call must stop a setup script before "Done".
+      - name: Run setup native-failure test
+        run: pwsh -NoProfile -File scripts/test-setup-native-failure.ps1
+
   statusline:
     name: statusline (windows)
     runs-on: windows-latest
