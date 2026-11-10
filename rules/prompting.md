@@ -1,7 +1,7 @@
 # Prompting — Writing Instructions
 
 Apply when writing a prompt for a sub-agent, tool or LLM call.
-Changing an existing prompt (the change ships with eval cases), designing an agentic task, debugging a prompt, or maintaining a prompt file or CLAUDE.md → also read `~/.claude/PROMPT_ENGINEERING.md`.
+Changing an existing prompt (the change ships with the eval its kind owes), designing an agentic task, debugging a prompt, or maintaining a prompt file or CLAUDE.md → also read `~/.claude/PROMPT_ENGINEERING.md`.
 
 ## Structure
 
