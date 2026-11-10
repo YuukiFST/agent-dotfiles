@@ -31,9 +31,25 @@ expect() { # expect <description> <command...>
   if "$@"; then echo "ok: $what"; else echo "FAILED: $what" >&2; fail=1; fi
 }
 
+sync() { env HOME="$home" PATH="$stub_bin:$PATH" bash "$checkout/scripts/sync-config.sh" cursor; }
 for run in 1 2; do
-  expect "sync run $run exits 0" env HOME="$home" PATH="$stub_bin:$PATH" bash "$checkout/scripts/sync-config.sh" cursor
+  expect "sync run $run exits 0" sync
 done
+
+# Leftovers of an interrupted sync go on the next run.
+live="$home/.claude/git-hooks"
+mkdir -p "$live.new.orphan" "$live.old"
+# On Windows a process whose cwd is the live dir blocks renaming it; the sync has to update
+# the files in place instead of aborting. Linux renames a busy dir, so only Git Bash runs this.
+locker=""
+if command -v pwsh >/dev/null 2>&1 && command -v cygpath >/dev/null 2>&1; then
+  locker="$(pwsh -NoProfile -Command "(Start-Process pwsh -ArgumentList '-NoProfile','-Command','Start-Sleep 120' -WorkingDirectory '$(cygpath -w "$live")' -PassThru -WindowStyle Hidden).Id" | tr -d '\r')"
+  sleep 2
+fi
+expect "sync exits 0 with leftovers and a busy live dir" sync
+[ -z "$locker" ] || { pwsh -NoProfile -Command "Stop-Process -Id $locker -Force"; sleep 1; }
+expect "no git-hooks.new.* or .old left behind" \
+  bash -c '[ -z "$(ls -d "$1".new.* "$1".old 2>/dev/null)" ]' _ "$live"
 rm -rf "$checkout"
 
 hooks_path="$(git config --global --get core.hooksPath || true)"

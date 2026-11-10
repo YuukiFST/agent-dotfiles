@@ -39,9 +39,23 @@ try {
     Expect "sync run $run exits 0" ($LASTEXITCODE -eq 0 -and $out -match "Config synced")
     if ($LASTEXITCODE -ne 0) { Write-Host $out }
   }
+
+  # Leftovers of an interrupted sync go on the next run, and a process whose cwd is the live
+  # dir (it blocks renaming it on Windows) makes the sync update the files in place, not abort.
+  $live = Join-Path $home_ ".claude\git-hooks"
+  New-Item -ItemType Directory -Force -Path "$live.new.orphan", "$live.old" | Out-Null
+  $locker = Start-Process pwsh -ArgumentList "-NoProfile", "-Command", "Start-Sleep 120" -WorkingDirectory $live -PassThru -WindowStyle Hidden
+  Start-Sleep 2
+  $out = & pwsh -NoProfile -File "$checkout\scripts\sync-config.ps1" claude 2>&1 | Out-String
+  Expect "sync exits 0 with leftovers and a busy live dir" ($LASTEXITCODE -eq 0 -and $out -match "Config synced")
+  if ($LASTEXITCODE -ne 0) { Write-Host $out }
+  Stop-Process -Id $locker.Id -Force -ErrorAction SilentlyContinue
+  $locker.WaitForExit()
+  $leftovers = @(Get-ChildItem (Split-Path $live -Parent) -Directory | Where-Object { $_.Name -like "git-hooks.new.*" -or $_.Name -eq "git-hooks.old" })
+  Expect "no git-hooks.new.* or .old left behind" ($leftovers.Count -eq 0)
+  if ($leftovers) { Write-Host "  left: $($leftovers.Name -join ', ')" }
   Remove-Item $checkout -Recurse -Force
 
-  $live = Join-Path $home_ ".claude\git-hooks"
   $hooksPath = git config --global --get core.hooksPath
   Expect "core.hooksPath points at ~/.claude/git-hooks" ($hooksPath -and (Test-Path $hooksPath) -and
     (Resolve-Path $hooksPath).Path -eq (Resolve-Path $live).Path)
@@ -69,6 +83,7 @@ try {
   git -C $repo commit -q -m "feat: add x"
   Expect "a clean commit still goes through" ($LASTEXITCODE -eq 0)
 } finally {
+  if ($locker) { Stop-Process -Id $locker.Id -Force -ErrorAction SilentlyContinue }
   foreach ($k in $saved.Keys) { Set-Item "Env:$k" $saved[$k] -ErrorAction SilentlyContinue }
   if (-not $saved.HOME) { Remove-Item Env:HOME -ErrorAction SilentlyContinue }
   if (-not $saved.GIT_CONFIG_GLOBAL) { Remove-Item Env:GIT_CONFIG_GLOBAL -ErrorAction SilentlyContinue }

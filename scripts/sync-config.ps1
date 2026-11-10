@@ -99,14 +99,27 @@ function Install-GitHooks {
   }
   # Build the new set beside the live one and swap it in, so a commit running mid-sync never
   # finds the dir empty. test-*.sh are the hooks' own tests, not hooks.
+  $parent = Split-Path $dest -Parent
   $tmp = "$dest.new.$PID"
   $old = "$dest.old"
-  foreach ($d in $tmp, $old) { if (Test-Path $d) { Remove-Item $d -Recurse -Force } }
+  New-Item -ItemType Directory -Force -Path $parent | Out-Null
+  # Leftovers of an interrupted run; best-effort, a busy one waits for the next run.
+  Get-ChildItem $parent -Directory -Filter "git-hooks.new.*" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+  if (Test-Path $old) { Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue }
   New-Item -ItemType Directory -Force -Path $tmp | Out-Null
   Get-ChildItem $src -File | Where-Object { $_.Name -notlike "test-*" } | Copy-Item -Destination $tmp
-  if (Test-Path $dest) { Move-Item $dest $old }
-  Move-Item $tmp $dest
-  if (Test-Path $old) { Remove-Item $old -Recurse -Force }
+  try {
+    if (Test-Path $dest) { Move-Item $dest $old }
+    Move-Item $tmp $dest
+    if (Test-Path $old) { Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue }
+  } catch {
+    # Windows refuses to rename a dir that is some process's cwd; its files still take a write.
+    Write-Warning "could not swap $dest in ($($_.Exception.Message)); updating its files in place"
+    New-Item -ItemType Directory -Force -Path $dest | Out-Null
+    Get-ChildItem $tmp -File | Copy-Item -Destination $dest -Force
+    Get-ChildItem $dest -File | Where-Object { -not (Test-Path (Join-Path $tmp $_.Name)) } | Remove-Item -Force
+    Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
+  }
 
   git config --global core.hooksPath ($dest -replace '\\', '/')
   if ($LASTEXITCODE -ne 0) { throw "git config --global core.hooksPath failed (exit $LASTEXITCODE)" }
