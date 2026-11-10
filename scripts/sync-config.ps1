@@ -102,6 +102,48 @@ function Sync-Rules($Dest) {
   Copy-DirectoryByRename "$Repo\rules" $Dest (Join-Path (Split-Path $Dest -Parent) ".sync-staging")
 }
 
+# Global git hooks (pre-push blocks AI attribution trailers; commit-msg is early feedback).
+# A live copy, never the checkout: a hooksPath into git-hooks/ follows that checkout's branch and
+# dies with a removed worktree. Mirrors scripts/install-global-git-hooks.sh.
+function Install-GitHooks {
+  $src = Join-Path $Repo "git-hooks"
+  $dest = Join-Path $UserHome ".claude\git-hooks"
+  foreach ($hook in "commit-msg", "pre-push", "validate-commit-message.sh") {
+    if (-not (Test-Path (Join-Path $src $hook))) { throw "hook missing: $src\$hook" }
+  }
+  # Build the new set beside the live one and swap it in, so a commit running mid-sync never
+  # finds the dir empty. test-*.sh are the hooks' own tests, not hooks.
+  $parent = Split-Path $dest -Parent
+  $tmp = "$dest.new.$PID"
+  $old = "$dest.old"
+  New-Item -ItemType Directory -Force -Path $parent | Out-Null
+  # Leftovers of an interrupted run; best-effort, a busy one waits for the next run.
+  Get-ChildItem $parent -Directory -Filter "git-hooks.new.*" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+  if (Test-Path $old) { Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue }
+  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+  Get-ChildItem $src -File | Where-Object { $_.Name -notlike "test-*" } | Copy-Item -Destination $tmp
+  try {
+    if (Test-Path $dest) { Move-Item $dest $old }
+    Move-Item $tmp $dest
+    if (Test-Path $old) { Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue }
+  } catch {
+    # Windows refuses to rename a dir that is some process's cwd; its files still take a write.
+    Write-Warning "could not swap $dest in ($($_.Exception.Message)); updating its files in place"
+    New-Item -ItemType Directory -Force -Path $dest | Out-Null
+    Get-ChildItem $tmp -File | Copy-Item -Destination $dest -Force
+    Get-ChildItem $dest -File | Where-Object { -not (Test-Path (Join-Path $tmp $_.Name)) } | Remove-Item -Force
+    Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
+  }
+
+  git config --global core.hooksPath ($dest -replace '\\', '/')
+  if ($LASTEXITCODE -ne 0) { throw "git config --global core.hooksPath failed (exit $LASTEXITCODE)" }
+
+  # Agents in Cursor commit through it instead of `git commit`; Git Bash runs it by its shebang.
+  $bin = Join-Path $UserHome ".local\bin"
+  New-Item -ItemType Directory -Force -Path $bin | Out-Null
+  Copy-Item "$Repo\scripts\git-safe-commit.sh" (Join-Path $bin "git-safe-commit") -Force
+}
+
 # Every harness on this machine shares these.
 function Sync-Shared {
   # rules/ live at ~/.claude/rules on EVERY harness — GLOBAL.md's conditional pointers
@@ -134,6 +176,8 @@ function Sync-Shared {
   if (Test-Path "$UserHome\.claude\skills") {
     Remove-StaleSkills "$UserHome\.claude\skills"
   }
+
+  Install-GitHooks
 }
 
 function Sync-Claude {
