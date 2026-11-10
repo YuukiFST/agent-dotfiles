@@ -5,6 +5,7 @@ metadata:
   version: 0.2.0
   creator: Nico Bailon
 ---
+<!-- Source: https://github.com/nicobailon/skill-diet/tree/main/skills/skill-diet; the eval.mjs path is spelled relative to this skill's folder -->
 
 # Skill Diet
 
@@ -32,7 +33,7 @@ Stop at the first step that handles the change.
 
 **When code changes** a name or behavior the skill relies on, update the skill in the same change. Index new public operations by name only, unless agents will call them often. Run the skill's coverage check, or add one if drift could recur.
 
-**Budget:** put `SKILL.md`'s size before and after in the commit message, and offset growth with a cut. When it is over 10% larger than at its last diet commit, or one idea appears in two places, do a full diet. `node scripts/eval.mjs check <skill-dir>` prints the size and checks links.
+**Budget:** put `SKILL.md`'s size before and after in the commit message, and offset growth with a cut. When it is over 10% larger than at its last diet commit, or one idea appears in two places, do a full diet. [`scripts/eval.mjs`](scripts/eval.mjs) sits in this skill's folder: `node <this skill's dir>/scripts/eval.mjs check <skill-dir>` prints the size and checks links.
 
 **Verify:** rerun the case that prompted the change in a fresh session, and any tests that assert the skill's text.
 
