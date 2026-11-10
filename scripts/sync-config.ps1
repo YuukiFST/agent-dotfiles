@@ -88,6 +88,35 @@ function Sync-Rules($Dest) {
   Copy-Item "$Repo\rules" $Dest -Recurse
 }
 
+# Global git hooks (pre-push blocks AI attribution trailers; commit-msg is early feedback).
+# A live copy, never the checkout: a hooksPath into git-hooks/ follows that checkout's branch and
+# dies with a removed worktree. Mirrors scripts/install-global-git-hooks.sh.
+function Install-GitHooks {
+  $src = Join-Path $Repo "git-hooks"
+  $dest = Join-Path $UserHome ".claude\git-hooks"
+  foreach ($hook in "commit-msg", "pre-push", "validate-commit-message.sh") {
+    if (-not (Test-Path (Join-Path $src $hook))) { throw "hook missing: $src\$hook" }
+  }
+  # Build the new set beside the live one and swap it in, so a commit running mid-sync never
+  # finds the dir empty. test-*.sh are the hooks' own tests, not hooks.
+  $tmp = "$dest.new.$PID"
+  $old = "$dest.old"
+  foreach ($d in $tmp, $old) { if (Test-Path $d) { Remove-Item $d -Recurse -Force } }
+  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+  Get-ChildItem $src -File | Where-Object { $_.Name -notlike "test-*" } | Copy-Item -Destination $tmp
+  if (Test-Path $dest) { Move-Item $dest $old }
+  Move-Item $tmp $dest
+  if (Test-Path $old) { Remove-Item $old -Recurse -Force }
+
+  git config --global core.hooksPath ($dest -replace '\\', '/')
+  if ($LASTEXITCODE -ne 0) { throw "git config --global core.hooksPath failed (exit $LASTEXITCODE)" }
+
+  # Agents in Cursor commit through it instead of `git commit`; Git Bash runs it by its shebang.
+  $bin = Join-Path $UserHome ".local\bin"
+  New-Item -ItemType Directory -Force -Path $bin | Out-Null
+  Copy-Item "$Repo\scripts\git-safe-commit.sh" (Join-Path $bin "git-safe-commit") -Force
+}
+
 # Every harness on this machine shares these.
 function Sync-Shared {
   # rules/ live at ~/.claude/rules on EVERY harness — GLOBAL.md's conditional pointers
@@ -120,6 +149,8 @@ function Sync-Shared {
   if (Test-Path "$UserHome\.claude\skills") {
     Remove-StaleSkills "$UserHome\.claude\skills"
   }
+
+  Install-GitHooks
 }
 
 function Sync-Claude {
