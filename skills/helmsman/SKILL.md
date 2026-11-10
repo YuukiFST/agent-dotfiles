@@ -310,56 +310,15 @@ A session that stopped because a resolution **contradicts a product decision** h
 
 ### 1. Chart: `/helmsman <idea>`
 
-The one session that starts from nothing, and the only open questions are ones that passed the ask test.
-
-1. **Read the brief.** Pull out the problem it solves, the people it serves, the destination, and every given. In an existing repo, read the subsystem the brief touches, per step 1 of `../yuu-mode/playbooks/investigation.md`. Done when each given is written down for **Notes**.
-2. **Create the plan pack** per [The plan pack](#the-plan-pack). A plan branch or map already holding this effort means an earlier Chart died: resume from its banked answers and duplicate nothing. Done when the plan branch exists.
-3. **Draft the product yourself.** Write the destination, the users, the core flows and their rules as you would build them. Sweep for the gaps a first draft forgets: who can do what, the data's life (creation, export, deletion), failure and empty paths, abuse, notifications, payments, languages and accessibility, expected scale, existing data to migrate, backups, and what shows the operator it broke. Answer every gap yourself, then run the ask test on each answer; most become assumptions. Done when every gap is an assumption, a question that passed the ask test, a `dev` ticket to file, or a **Coverage** line saying why it does not apply.
-4. **Send the first packet** per [PACKET.md](PACKET.md). Its `intro` is your restatement, in two to four lines of their language: the problem and who has it, the goals that will show it is solved, and the destination you would build, so the human can correct the whole picture at once, the why as well as the what.
-5. **Send further packets** only for questions the last answers unlocked that pass the ask test, within the cap. Done when no open question passes the ask test, or the cap is hit.
-6. **Create the map** (label `helmsman:map`) per [MAP.md](MAP.md) with Problem and goals, Destination, Notes, Product decisions, and Assumed filled in, and the fog sketched into **Not yet specified**. Record the vocabulary in `CONTEXT.md` on the plan branch through `/domain-modeling`, and again whenever a later resolution adds a term.
-7. **Create the tickets you can specify now** as child issues, sorted by the experience test, including every technical question you already know you owe yourself. Wire blocking edges in a **second pass**, once every issue has an id.
-8. **Fire the research subagents**: one `/research` subagent per `research` ticket, in parallel (see [Ticket methods](#ticket-methods) for where findings go).
-9. **Tell the human** in their language what the map says, opening with the problem and goals as the answers left them, and that the rest is yours until the look needs their eye, so they can step away; a correction to that restatement rewrites **Problem and goals** and is handled like a veto, as a `po` ticket that routes to a review (see [The ask test](#the-ask-test)). Then **continue straight into [Advance](#2-advance-helmsman-map)** in this same session.
-
-If drafting shows the whole project fits one session with nothing left to decide, skip the cascade after step 6: go to Design when it has an interface, then write the spec.
+Read [CHART.md](CHART.md) and follow it.
 
 ### 2. Advance: `/helmsman <map>`
 
-The default mode, and the one that runs without the human.
-**Cascade** until you can't:
-
-0. **Spec check.** When no decision ticket is open in either audience, claimed or not, graduate whatever is left in **Not yet specified** (into tickets, assumptions, or **Out of scope**). If that leaves no open decision ticket and **Spec** is not marked `complete`: with an interface and an empty **Design**, stop and hand over `--design`; otherwise read [SPEC.md](SPEC.md) and follow it, then stop. Otherwise go on.
-1. Load the **map**, the low-res view, not every ticket body. Read **Notes** and **Technical decisions** in full: the givens and `locks:` clauses are the constraints this session respects.
-2. Take the first frontier `dev` ticket in map order. **Claim it** before any work.
-3. Resolve it under [Resolving a `dev` ticket](#resolving-a-dev-ticket); a `research` ticket goes to a `/research` subagent, and you take the next ticket while it runs. Fetch the full body of any related or closed ticket on demand; apply the matching [SKILLS.md](SKILLS.md) rows and the skills **Notes** names.
-4. Record it, close it, append to **Technical decisions**.
-5. Graduate whatever fog the answer made specifiable into fresh tickets, clearing each graduated patch from **Not yet specified**. A product question it raises goes through the ask test first: assume it, or ticket it. Rule out of scope any ticket the answer shows to sit past the destination; update or delete tickets it invalidates.
-6. **Loop back to step 0.**
-
-An escalation does **not** stop the cascade: file the `po` ticket, block whatever depends on it, and take the next `dev` ticket.
-
-Stop when one of these is true, and only then:
-
-- **The frontier has no unclaimed `dev` ticket left**, and step 0 doesn't apply (another session may still hold a claimed one).
-- **Context is running out.** Stop at a clean ticket boundary, never mid-resolution.
-- **A resolution contradicts a product decision.** File a `po` ticket that names the contradiction and stop.
-
-Then refresh **Waiting on you** and report in the human's language:
-
-> Decided <n> things this session: <one line each, plain>. <n> questions are waiting on you: <names>. I also assumed: <new Assumed lines, if any>.
-
-Then [the next command](#the-next-command).
+Read [ADVANCE.md](ADVANCE.md) and follow it.
 
 ### 3. Review: `/helmsman <map> --review`
 
-Drains **every** open `po` ticket through [packets](PACKET.md).
-The three-packet cap is charting's; a review sends as many as its queue needs, because every ticket in it already passed the ask test.
-
-1. Load the map and query all open `po` tickets. Order them: blockers first, then whatever unblocks the most `dev` tickets.
-2. Send them as packets, with each escalation's recommendation selected, plus the **Assumed** lines and technical decisions added since the last packet.
-3. Apply each packet per [PACKET.md](PACKET.md) as it lands, so an interrupted session still banks it.
-4. When the queue is empty, refresh **Waiting on you** to empty, tell them what just unblocked ("that unblocks <n> technical questions, and I'll work through them alone"), and hand over [the next command](#the-next-command).
+Read [REVIEW.md](REVIEW.md) and follow it.
 
 ### 4. Design: `/helmsman <map> --design`
 

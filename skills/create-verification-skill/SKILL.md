@@ -76,6 +76,6 @@ Done when all of these hold, and you report the evidence path, the feature drive
 - The run went green once.
 - After cleanup, the processes, ports and browser session the run recorded are gone, and its scaffolding is removed.
 - The evidence is still at its named path, and `git check-ignore <evidence path>` prints that path.
-- `opencode debug skill` lists `verify-<app>` with its description.
+- `grep -cE '^(name: verify-<app>|description: ".+")$' .claude/skills/verify-<app>/SKILL.md` prints `2`: the skill registers, with a quoted description.
 
 Adapted from pstack's [`create-verification-skill`](https://github.com/cursor/plugins/tree/main/pstack/skills/create-verification-skill), MIT, see `LICENSE`.

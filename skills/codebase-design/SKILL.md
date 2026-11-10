@@ -2,6 +2,7 @@
 name: codebase-design
 description: Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary.
 ---
+<!-- Source: https://github.com/mattpocock/skills/tree/main/skills/engineering/codebase-design; E2E rule is a pointer to CODING_STANDARDS.md -->
 
 # Codebase Design
 
@@ -61,7 +62,7 @@ When designing an interface, ask:
 
 - **Depth is a property of the interface, not the implementation.** A deep module can be internally composed of small, mockable, swappable parts — they just aren't part of the interface. A module can have **internal seams** (private to its implementation) as well as the **external seam** at its interface.
 - **The deletion test.** Imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
-- **The interface is the test surface.** Callers and tests cross the same seam; for the tests an agent writes, that seam is the outermost one (E2E). If you want to test *past* the interface, the module is probably the wrong shape.
+- **The interface is the test surface.** Callers and tests cross the same seam; which seam an agent's own tests use is "E2E only" in `CODING_STANDARDS.md`. If you want to test *past* the interface, the module is probably the wrong shape.
 - **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it.
 
 ## Designing for testability

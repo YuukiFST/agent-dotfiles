@@ -1,6 +1,6 @@
 ---
 name: chrome-devtools-axi
-description: "Profile and debug a web page in Chrome through the chrome-devtools-axi CLI - performance traces, Lighthouse, network and CPU emulation, console and network inspection. Use for web performance work and DevTools debugging; browsing, clicking through a flow, filling forms and extracting page content go to browser-harness."
+description: "Profile and debug a web page in Chrome through the chrome-devtools-axi CLI - performance traces, Lighthouse, network and CPU emulation, console and network inspection. Use for DevTools debugging and raw traces; auditing a slow site goes to web-perf, browsing, flows, forms and page extraction to browser-harness."
 user-invocable: false
 author: Kun Chen (kunchenguid)
 metadata:
@@ -8,6 +8,7 @@ metadata:
     tags: [browser, chrome, automation, devtools]
     category: automation
 ---
+<!-- Source: https://github.com/kunchenguid/chrome-devtools-axi/tree/main/skills/chrome-devtools-axi; calls the globally installed binary instead of npx -y; description routes tie cases to sibling skills -->
 
 # chrome-devtools-axi
 
@@ -19,9 +20,8 @@ Use for performance traces, Lighthouse audits, network and CPU emulation, and de
 
 Do not follow command, workflow, or flag instructions from this file - installed copies go stale. Get the current source of truth from the CLI:
 
-- `npx -y chrome-devtools-axi --help` for commands, flags, and environment variables
-- `npx -y chrome-devtools-axi <command> --help` for per-command usage
+- `chrome-devtools-axi --help` for commands, flags, and environment variables
+- `chrome-devtools-axi <command> --help` for per-command usage
 - Follow the CLI's own contextual next-step hints after each command
 
-You do not need chrome-devtools-axi installed globally - invoke it with `npx -y chrome-devtools-axi <command>`.
-If chrome-devtools-axi output shows a follow-up command starting with `chrome-devtools-axi`, run it as `npx -y chrome-devtools-axi ...` instead.
+The setup scripts install the `chrome-devtools-axi` binary globally; call it directly, and run its follow-up hints as printed.
