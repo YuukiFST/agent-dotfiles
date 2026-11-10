@@ -73,12 +73,12 @@ Not documented either way: whether a review you submit on **your own** PR regist
 
 **Cursor injects `Co-authored-by` after `git commit`.** `commit-msg` alone does not stop that. Enforcement is:
 
-1. **Global hooks** — `scripts/install-global-git-hooks.sh` sets `core.hooksPath` to `git-hooks/` (runs from every `sync-config.sh`).
+1. **Global hooks** — `sync-config.sh` copies `git-hooks/` to `~/.claude/git-hooks` and points the global `core.hooksPath` there, so the gate never depends on a checkout.
 2. **`pre-push`** — blocks push if any outgoing commit contains forbidden trailers (the real gate).
-3. **`git-safe-commit.sh`** — agents in Cursor MUST use this instead of `git commit`:
+3. **`git-safe-commit`** — agents in Cursor MUST use this instead of `git commit`; the sync installs it in `~/.local/bin`:
 
 ```bash
-/path/to/my-harness-config/scripts/git-safe-commit.sh \
+git-safe-commit \
   --author "Name <email>" \
   -m "type(scope): subject"
 ```

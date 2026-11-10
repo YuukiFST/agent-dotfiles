@@ -36,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/YuukiFST/agent-dotfiles/main/script
 ```
 
 The install overwrites the global `CLAUDE.md`, mirrors `rules/` to `~/.claude/rules` (hand edits there are lost), writes `settings.json` only when it is absent, and in `opencode.json` removes only the retired `mcp.fff` key.
-On Linux and macOS it also points `core.hooksPath` at `git-hooks/` for every repo.
+On Linux and macOS it also copies `git-hooks/` to `~/.claude/git-hooks` and points the global `core.hooksPath` there for every repo.
 Restart the agent after install.
 
 ## Already cloned

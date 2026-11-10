@@ -23,6 +23,11 @@ jobs:
       - name: Run pre-push end-to-end tests
         run: bash git-hooks/test-pre-push.sh
 
+      # A core.hooksPath into a checkout followed its branch and went silent with a removed
+      # worktree; the sync must leave a gate that outlives the checkout it ran from.
+      - name: Run global git hooks sync end-to-end test
+        run: bash scripts/test-sync-git-hooks.sh
+
   coding-standards-gate:
     name: coding-standards-gate hook
     runs-on: ubuntu-latest
