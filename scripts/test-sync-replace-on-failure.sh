@@ -38,7 +38,7 @@ sync() { # sync [VAR=value...] - runs sync-config.sh opencode inside the tempora
     bash "$SYNC" opencode >/dev/null 2>&1
 }
 fails() { ! "$@"; }
-no_staging_in() { ! ls -A "$1" | grep -q sync; }
+no_staging_in() { [ -z "$(find "$1" -mindepth 1 -maxdepth 1 -name '*sync*')" ]; }
 
 fail=0
 expect() { # expect <description> <command...>
