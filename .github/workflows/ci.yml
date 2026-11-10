@@ -46,7 +46,7 @@ jobs:
       # Skill scripts sit one or two levels deep (skills/<name>/, skills/<name>/scripts/),
       # so find them instead of globbing; a glob that matches nothing is passed literally.
       - name: Shellcheck hooks and scripts
-        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
+        run: shellcheck -x --severity=warning git-hooks/*.sh scripts/*.sh hooks/*.sh git-hooks/commit-msg git-hooks/pre-push scripts/show-shot $(find skills -name '*.sh')
 
   sync-pi:
     name: sync-config pi
@@ -121,6 +121,29 @@ jobs:
       # so every window showed the machine-wide mode instead of its own session's.
       - name: Run caveman session-mode regression test
         run: node scripts/test-statusline-regression-caveman-session-mode.cjs
+
+      # Herdr showed a session as Done while its background shell or agent still ran.
+      - name: Run background-tasks regression test
+        run: node scripts/test-statusline-regression-background-tasks.cjs
+
+  mods:
+    name: Claude Code mods
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # `claude plugin test` needs no login. Pinned to the version the suites were last run on,
+      # and run through npx, never npm -g, so agent-cli check leaves the machine's claude alone.
+      - name: Run every mod's tests
+        run: |
+          status=0
+          for mod in mods/*/; do
+            npx --yes @anthropic-ai/claude-code@2.1.317 plugin test "$mod" || status=1
+          done
+          exit "$status"
 
   ai-tells-lint:
     name: ai-tells lint
