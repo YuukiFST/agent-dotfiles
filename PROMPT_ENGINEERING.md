@@ -16,12 +16,16 @@ Reached from the pointer in `~/.claude/rules/prompting.md`; in Claude Code, `hoo
 
 ## Evaluations
 
-Every prompt change needs test cases:
-1. Control case (happy path — must always pass)
-2. Edge cases (previously seen failures)
-3. Refusal case (model should say no)
-4. Escalation case (model should defer to human/tool)
-5. Calculation case (numeric precision)
+The eval a prompt change owes depends on what the prompt is:
+
+- **User-invoked skill or playbook:** the variant-against-baseline runs in `yuu-mode`'s `playbooks/eval.md`.
+- **Model-invoked skill's content:** the before/after eval in `skill-diet`'s `references/eval.md`.
+- **Product prompt** (an LLM call inside an app): test cases that ship with the change:
+  1. Control case (happy path — must always pass)
+  2. Edge cases (previously seen failures)
+  3. Refusal case (model should say no)
+  4. Escalation case (model should defer to human/tool)
+  5. Calculation case (numeric precision)
 
 ## Maintenance (CLAUDE.md and long-lived prompts)
 
