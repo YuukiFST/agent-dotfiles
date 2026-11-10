@@ -15,7 +15,7 @@ Adapted from pstack's poteto-mode (MIT, see `LICENSE`).
 ## Loading a route
 
 Every routed skill sits beside this one: read `../<name>/SKILL.md` relative to this file, then follow it, resolving its own relative paths against its own directory.
-Read it by path even when the skill is user-invoked (`disable-model-invocation`); that is how this mode reaches skills the model cannot fire on its own.
+Read it by path even when the skill is user-invoked (`disable-model-invocation`).
 A playbook lives at `playbooks/<name>.md` next to this file.
 A routed skill missing on disk: name it in the reply and take the next-best route.
 
@@ -26,6 +26,7 @@ A follow-up on the same task ("continue", "do it", "keep going") keeps the curre
 The user says to leave yuu-mode: drop this file's rules for the rest of the session.
 
 1. Pick the most specific row below as the primary route; a row can pull secondary skills during its steps (a bug whose fix crosses a module boundary runs the bug-fix playbook and designs the fix with `codebase-design`).
+   A row whose task starts with "Secondary:" rides along with the bug-fix or feature playbook when one of them fits, and is primary only when neither does.
 2. Put one line at the top of the reply: `route: <playbook or skill> (+ <secondary>)`, or `route: none` when no row fits and you work under Principles alone.
    When tool calls come between, the final message opens with the current route line.
 3. Under the route line, restate the task in your own words: the user's goal, the problem behind it, what stays out of scope, and, when the task ships a change, the smallest change you expect to meet it.
@@ -61,9 +62,9 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Faux product UI for a marketing page: a mocked app screen, feature card, bento grid or animated cursor demo | `stageshow` |
 | Behavior-preserving restructure: rename, extract, inline, dedupe, move | `playbooks/refactoring.md` |
 | Port or rewrite code from another language in Rust | `rust-port` |
-| Write or change Rust code | `rust-best-practices` |
-| Write or change TypeScript code | `typescript-best-practices` |
-| Add auth, user input handling, secrets, API endpoints or payment code | `security-audit` |
+| Secondary: write or change Rust code | `rust-best-practices` |
+| Secondary: write or change TypeScript code | `typescript-best-practices` |
+| Secondary: add auth, user input handling, secrets, API endpoints or payment code | `security-audit` |
 | Simplify code just written | `code-simplifier` |
 | Design a module interface, a seam, a deep module | `codebase-design` |
 | Scan a codebase for deepening opportunities | `improve-codebase-architecture` |
