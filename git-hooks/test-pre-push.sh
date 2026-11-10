@@ -6,6 +6,8 @@ set -uo pipefail
 HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+# A machine's global core.hooksPath would gate the seed pushes too; only the clones get the hook.
+export GIT_CONFIG_GLOBAL="$WORK/gitconfig" GIT_CONFIG_NOSYSTEM=1
 
 pass=0
 fail=0
@@ -60,6 +62,24 @@ git reset -q --hard HEAD~1
   commit "feat: remote only" && git push -q origin feat/1-new-branch)
 commit "Add w"
 expect block "force-push sobre remote_sha desconhecido" git push --force gh feat/1-new-branch
+
+# A shallow clone still lists the pushed commits, so the trailer is caught.
+git clone -q --depth 1 "file://$WORK/remote.git" "$WORK/shallow"
+cd "$WORK/shallow" || exit 1
+git config core.hooksPath "$HOOK_DIR"
+git switch -q -c feat/2-shallow
+commit "$(printf 'feat: add s\n\nCo-authored-by: Bot <bot@example.com>')"
+expect block "clone raso com trailer de atribuicao" git push origin feat/2-shallow
+
+# A remote-tracking ref to a missing object makes rev-list fail: the hook must fail closed.
+printf '%s\n' deadbeefdeadbeefdeadbeefdeadbeefdeadbeef >.git/refs/remotes/origin/broken
+expect block "rev-list falha com ref remota quebrada" git push origin feat/2-shallow
+grep -q "git rev-list falhou" "$WORK/push.log" ||
+  { fail=$((fail + 1)); echo "FALHOU: mensagem de rev-list ausente" >&2; }
+git update-ref -d refs/remotes/origin/broken
+git reset -q --hard HEAD~1
+commit "feat: add t"
+expect allow "push limpo depois de remover a ref quebrada" git push origin feat/2-shallow
 
 echo "ok: $pass | falhas: $fail"
 [ "$fail" -eq 0 ]

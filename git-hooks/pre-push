@@ -30,12 +30,19 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     range+=("$remote_sha")
   fi
 
+  # Sem a lista de commits nada seria checado, então uma falha aqui bloqueia o push.
+  if ! commits="$(git rev-list "${range[@]}")"; then
+    echo "ERRO: pre-push não checou $local_ref: git rev-list falhou (erro acima), em geral por uma ref ou objeto quebrado." >&2
+    echo "Rode 'git fsck' para achar a ref quebrada, apague-a com 'git update-ref -d <ref>' e repita o push." >&2
+    exit 1
+  fi
+
   while read -r commit; do
     [ -n "$commit" ] || continue
     if ! validate_commit_object "$commit"; then
       failed=1
     fi
-  done < <(git rev-list "${range[@]}" 2>/dev/null || true)
+  done <<<"$commits"
 done
 
 if [ "$failed" -ne 0 ]; then
