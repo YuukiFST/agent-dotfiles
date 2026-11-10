@@ -5,6 +5,7 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 ## Task routing
 
 - **Editing or running a project** (code, tests, CI, docs, builds, worktrees, dev servers) → read `~/.claude/CODING_STANDARDS.md` before the first change.
+- **Working in an SB360 project** (git remote under `SB360WorkStation`) → read `~/.sb360/AGENTS.md` before the first change, if it exists; it stays on the machine, outside this public repo.
 - **Committing or pushing** → `~/.claude/rules/git.md` before the first commit (machine git identity, Conventional Commits, no AI attribution).
 - **Opening a pull request or editing its description** → the `pr-writing` skill before the first word of the body.
 - **Reviewing or simplifying code** → the `interrogate` skill for a review and `code-simplifier` for a simplification, not the built-in `/code-review` or `/simplify`.
