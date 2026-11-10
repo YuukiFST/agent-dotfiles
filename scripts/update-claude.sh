@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Update every external tool the Claude Code harness depends on (Linux/macOS).
-# Companion to setup-claude.sh: setup installs, this refreshes to latest.
+# Companion to setup-claude.sh: setup installs, this refreshes the npm globals and plugins to
+# latest and reinstalls rtk at the build pinned in rtk-pin.txt.
 set -euo pipefail
 
 echo "[0/5] Config files (skills, rules, CLAUDE.md)"
 "$(dirname "$0")/sync-config.sh" claude
 
 echo "[1/5] rtk"
-curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+bash "$(dirname "$0")/install-rtk.sh"
 rtk --version
 
 echo "[2/5] fff MCP (retired, unregister)"

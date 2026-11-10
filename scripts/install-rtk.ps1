@@ -1,21 +1,34 @@
 #!/usr/bin/env pwsh
-# Download rtk into ~/.local/bin, put that dir on the user PATH, and run `rtk init -g`.
-# Shared by setup-claude.ps1, setup-pi.ps1 and setup-opencode.ps1. Idempotent: re-running just refreshes the exe.
+# Download the rtk release pinned in rtk-pin.txt into ~/.local/bin, refusing a zip whose SHA256
+# differs from the pin, put that dir on the user PATH, and run `rtk init -g`.
+# Shared by setup-claude.ps1, setup-pi.ps1, setup-opencode.ps1 and update-claude.ps1.
+# Idempotent: re-running reinstalls the same pinned build.
 #
 # Usage: install-rtk.ps1 [-Agent claude|pi] [-AutoPatch] [-OpenCode]
 param([string]$Agent = "", [switch]$AutoPatch, [switch]$OpenCode)
 $ErrorActionPreference = "Stop"
 
-$Bin = Join-Path $env:USERPROFILE ".local\bin"
-New-Item -ItemType Directory -Force -Path $Bin | Out-Null
+$pin = Get-Content (Join-Path $PSScriptRoot "rtk-pin.txt")
+$tag = (($pin | Where-Object { $_ -like "tag *" }) -split '\s+')[1]
+$asset = "rtk-x86_64-pc-windows-msvc.zip"
+$pinLine = $pin | Where-Object { ($_ -split '\s+')[1] -eq $asset } | Select-Object -First 1
+if (-not $pinLine) { throw "install-rtk: rtk-pin.txt has no SHA256 for $asset; copy its line from the $tag checksums.txt." }
+$expected = ($pinLine -split '\s+')[0]
 
-$rtkUrl = (Invoke-RestMethod "https://api.github.com/repos/rtk-ai/rtk/releases/latest").assets |
-  Where-Object name -EQ "rtk-x86_64-pc-windows-msvc.zip" | ForEach-Object browser_download_url
-$tmp = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "rtk-dl")
-Invoke-WebRequest $rtkUrl -OutFile "$tmp\rtk.zip"
-Expand-Archive "$tmp\rtk.zip" -DestinationPath $tmp -Force
-Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.exe" -Force
-Remove-Item -Recurse -Force $tmp
+$tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "rtk-dl-$([guid]::NewGuid())")
+try {
+  Invoke-WebRequest "https://github.com/rtk-ai/rtk/releases/download/$tag/$asset" -OutFile "$tmp\$asset"
+  $actual = (Get-FileHash "$tmp\$asset" -Algorithm SHA256).Hash.ToLowerInvariant()
+  if ($actual -ne $expected) {
+    throw "install-rtk: SHA256 of $asset ($tag) is $actual, rtk-pin.txt expects $expected; nothing was installed. Compare both with the release page before changing rtk-pin.txt."
+  }
+  Expand-Archive "$tmp\$asset" -DestinationPath $tmp -Force
+  $Bin = Join-Path $env:USERPROFILE ".local\bin"
+  New-Item -ItemType Directory -Force -Path $Bin | Out-Null
+  Copy-Item (Get-ChildItem $tmp -Recurse -Filter rtk.exe)[0].FullName "$Bin\rtk.exe" -Force
+} finally {
+  Remove-Item -Recurse -Force $tmp
+}
 
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -notlike "*$Bin*") {
