@@ -1,6 +1,6 @@
 ---
 name: perf-ratchet
-description: Performance ratchet for any app (web, desktop, CLI, game, service). Committed per-machine baselines for startup time, RAM, CPU, FPS, instruction count, bundle size or Web Vitals that a change may never regress, with improvements promoted to the new baseline. Use to set up performance baselines or a regression gate, when a project has .perf/ratchet.json and a change touches performance, to prove a performance change made nothing slower, or to choose a data-layout change or remove a cache in a hot path.
+description: "Performance ratchet for any app (web, desktop, CLI, game, service): committed per-machine baselines for startup time, RAM, CPU, FPS, instruction count, bundle size or Web Vitals that no change may regress, and improvements become the new baseline. Use to set up baselines or a gate, when a project has .perf/ratchet.json and a change touches performance, to prove a change made nothing slower, or to choose a data-layout change or remove a cache in a hot path. Slow-page diagnosis goes to web-perf."
 ---
 
 # Performance ratchet

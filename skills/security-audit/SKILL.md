@@ -1,7 +1,8 @@
 ---
 name: security-audit
-description: Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pen tests. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.
+description: Security guidance and vulnerability review for codebases, APIs, services, CLIs, libraries and daemons. Use for security questions, focused reviews, vulnerability research, audits or pen tests. Run the full workflow only for explicit audits, pen tests, full/comprehensive/end-to-end reviews or report artifacts. Improvement surveys go to improve.
 ---
+<!-- Source: https://github.com/cloudflare/security-audit-skill/tree/main/skills/security-audit (MIT, notice in LICENSE); description routes tie cases to sibling skills -->
 
 # Security Audit
 

@@ -1,16 +1,15 @@
 ---
 name: rust-best-practices
 description: >-
-  Write idiomatic, robust, maintainable Rust. Use this skill whenever you write, review,
-  refactor, debug, or explain Rust code: new crates, modules, functions, structs, traits,
-  error types, async code, unsafe or FFI code, Cargo.toml, tests, or rustdoc. Trigger on
-  any mention of Rust, cargo, crates, .rs files, the borrow checker, lifetimes, traits,
+  Write idiomatic, robust, maintainable Rust. Use this skill whenever you write, refactor,
+  debug, or explain Rust code: new crates, modules, functions, structs, traits, error
+  types, async code, unsafe or FFI code, Cargo.toml, tests, or rustdoc. Trigger on any
+  mention of Rust, cargo, crates, .rs files, the borrow checker, lifetimes, traits,
   clippy, or rustfmt, even when the user does not ask for "best practices" or "idiomatic"
-  code. Synthesized from the Google Rust Style Guide, the Rust API Guidelines,
-  Effective Rust, Rust Design Patterns, and Microsoft's Pragmatic Rust Guidelines.
+  code. Reviewing Rust goes to rust-review, porting code into Rust to rust-port.
 paths: ["**/*.rs"]
 ---
-<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line; Tests follows the E2E-only rule of CODING_STANDARDS.md -->
+<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line; Tests follows the E2E-only rule of CODING_STANDARDS.md; description routes tie cases to sibling skills -->
 
 # Rust best practices
 

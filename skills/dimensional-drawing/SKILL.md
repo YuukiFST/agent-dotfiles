@@ -1,7 +1,8 @@
 ---
 name: dimensional-drawing
-description: Make an Apple-style monochrome dimensional drawing of a UI component or physical product — title-block summary plus one dense drawing sheet with variable-based dimensions. Use when asked for an anatomy, spec sheet, redline or dimensional drawing of a component.
+description: Make an Apple-style monochrome dimensional drawing of a UI component or physical product — title block plus one dense sheet with variable-based dimensions. Use when asked for a spec sheet, redline or dimensional drawing. Isometric explainers go to anatomy.
 ---
+<!-- Source: https://github.com/enesozturk/dimensional-drawing/tree/main/skills/dimensional-drawing (MIT, notice in LICENSE); description routes tie cases to sibling skills -->
 
 # Dimensional drawing
 

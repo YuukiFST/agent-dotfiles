@@ -1,8 +1,9 @@
 ---
 name: web-perf
-description: Measure and fix website performance - slow page loads, Core Web Vitals (LCP, INP, CLS), Lighthouse or PageSpeed scores, sluggish interactions, layout shifts, heavy bundles. Use for a performance audit of a URL or a web codebase, or to verify a performance fix before and after. Desktop app launch time belongs to optimizing-startup.
+description: Measure and fix website performance - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse scores, sluggish interactions, layout shifts, heavy bundles. Use for a performance audit of a URL or web codebase, or to verify a fix before and after. App launch time belongs to optimizing-startup, a standing regression gate to perf-ratchet.
 license: Apache-2.0 AND MIT (see LICENSE)
 ---
+<!-- Source: https://github.com/cloudflare/skills/tree/main/skills/web-perf and addyosmani/web-quality-skills (notices in LICENSE); description routes tie cases to sibling skills -->
 
 # Web performance
 

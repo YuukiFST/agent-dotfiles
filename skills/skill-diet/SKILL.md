@@ -1,11 +1,11 @@
 ---
 name: skill-diet
-description: Keep agent skills lean and correct. Use before editing an existing skill, such as adding a lesson; when a code change touches names or behavior a skill describes; and to put a skill on a full diet when it is large, loads detail most tasks never use, or has drifted from the tool it teaches.
+description: Keep agent skills lean and correct. Use before editing an existing skill, such as adding a lesson; when a code change touches names or behavior a skill describes; and for a full diet when a skill is large, loads detail most tasks never use, or has drifted from its tool. New skills go to writing-for-agents.
 metadata:
   version: 0.2.0
   creator: Nico Bailon
 ---
-<!-- Source: https://github.com/nicobailon/skill-diet/tree/main/skills/skill-diet; the eval.mjs path is spelled relative to this skill's folder -->
+<!-- Source: https://github.com/nicobailon/skill-diet/tree/main/skills/skill-diet; the eval.mjs path is spelled relative to this skill's folder; description routes tie cases to sibling skills -->
 
 # Skill Diet
 

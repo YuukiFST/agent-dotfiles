@@ -1,8 +1,8 @@
 ---
 name: test-audit
-description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate for new tests plus audit workflow for low-value, implementation-coupled, or duplicative tests and the test-only production seams they demand."
+description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate plus audit of low-value, implementation-coupled or duplicative tests and their test-only seams. A whole-codebase survey goes to improve."
 ---
-<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added) -->
+<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills -->
 
 # Test Audit
 

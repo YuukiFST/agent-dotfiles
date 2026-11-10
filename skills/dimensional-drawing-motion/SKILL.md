@@ -1,8 +1,8 @@
 ---
 name: dimensional-drawing-motion
-description: Turn a finished dimensional drawing sheet into a ~10 s Apple-style motion film — lines draw themselves in, the camera pulls back, layers lift into an exploded view, the full sheet resolves. Use after the dimensional-drawing skill, or when asked to animate a spec sheet or anatomy drawing.
+description: Turn a finished dimensional drawing sheet into a ~10 s Apple-style motion film — lines draw themselves in, the camera pulls back, layers lift into an exploded view, the full sheet resolves. Use after the dimensional-drawing skill, or when asked to animate a spec sheet or dimensional drawing.
 ---
-<!-- Source: https://github.com/enesozturk/dimensional-drawing/tree/main/skills/dimensional-drawing-motion (MIT, notice in LICENSE); the headless adapter runs from a mktemp -d copy and asks before installing Playwright or ffmpeg -->
+<!-- Source: https://github.com/enesozturk/dimensional-drawing/tree/main/skills/dimensional-drawing-motion (MIT, notice in LICENSE); the headless adapter runs from a mktemp -d copy and asks before installing Playwright or ffmpeg; description routes tie cases to sibling skills -->
 
 # Dimensional drawing → motion
 

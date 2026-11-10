@@ -1,8 +1,8 @@
 ---
 name: stageshow
-description: Build faux product UI that looks like a real product, as a still illustration or an animated demo with a cursor. Browser and app windows, dashboards, phones, notifications, terminals, bento grids and cursor walkthroughs, framed, masked and cropped the way a marketing page, feature card or docs hero needs them. Use whenever someone wants a fake or mocked UI, a product demo or walkthrough animation, a hero or feature-card illustration of an app, a product shot in the style of a polished marketing site, or an animated cursor doing things in an interface, even if they never say "faux UI". React and plain CSS.
+description: Build faux product UI that looks like a real product, as a still illustration or an animated demo with a cursor. Browser and app windows, dashboards, phones, notifications, terminals, bento grids and cursor walkthroughs, framed, masked and cropped the way a marketing page, feature card or docs hero needs them. Use whenever someone wants a fake or mocked UI, a product demo or walkthrough animation, a hero or feature-card illustration of an app, a polished marketing-site product shot, or an animated cursor doing things in an interface, even if they never say "faux UI". A real app's own screens go to ui-polish.
 ---
-<!-- Source: https://github.com/benjitaylor/skills/tree/main/stageshow (MIT, notice in NOTICE.md); runs the playground from a mktemp -d copy and asks before npm install -->
+<!-- Source: https://github.com/benjitaylor/skills/tree/main/stageshow (MIT, notice in NOTICE.md); runs the playground from a mktemp -d copy and asks before npm install; description routes tie cases to sibling skills -->
 
 # Stageshow
 

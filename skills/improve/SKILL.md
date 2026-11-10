@@ -1,11 +1,12 @@
 ---
 name: improve
-description: Survey any codebase as a senior advisor and produce prioritized, self-contained implementation plans for OTHER models/agents to execute. Strictly read-only on source code — never implements, fixes, or refactors anything itself. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent to implement.
+description: "Survey any codebase as a senior advisor and produce prioritized, self-contained plans for OTHER models/agents to execute. Read-only: it never implements. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent. A security-only review goes to security-audit, a test-suite sweep to test-audit."
 license: MIT
 metadata:
   author: shadcn
   version: "1.0.0"
 ---
+<!-- Source: https://github.com/shadcn/improve/tree/main/skills/improve (MIT); description routes tie cases to sibling skills -->
 
 # Improve
 
