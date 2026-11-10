@@ -149,6 +149,22 @@ jobs:
           done
           exit "$status"
 
+  file-length:
+    name: File length ratchet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # CODING_STANDARDS.md caps a file at 500 lines; files already past it may only shrink.
+      - name: Run check-file-length end-to-end tests
+        run: bash scripts/test-check-file-length.sh
+
+      - name: Check every tracked file against the 500-line ratchet
+        run: node scripts/check-file-length.mjs
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
