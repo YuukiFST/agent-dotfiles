@@ -10,6 +10,8 @@ Two choices, trading the two loads:
 - A **user-invoked** skill strips the description from the agent's reach: only the human typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load — you are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing — a one-line summary, trigger lists stripped.
 
 Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+A language best-practices skill earns model-invocation only with what the `principle-*` skills and `CODING_STANDARDS.md` leave out: `rust-best-practices` carries ownership, lifetimes and unsafe, so it stays model-invoked, while `typescript-best-practices` restates `principle-type-system-discipline` and stays user-invoked, reached through `yuu-mode`.
+Its description then summarizes it for the human, and `paths` goes with the trigger, since `disable-model-invocation: true` keeps a path match from loading it.
 
 Shared reference that two user-invoked skills both need can live in neither — with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
 
