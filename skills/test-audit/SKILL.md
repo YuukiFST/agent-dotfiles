@@ -1,8 +1,8 @@
 ---
 name: test-audit
-description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate for new tests plus audit workflow for low-value, implementation-coupled, or duplicative tests and the test-only production seams they demand."
+description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate plus audit of low-value, implementation-coupled or duplicative tests and their test-only seams. A whole-codebase survey goes to improve."
 ---
-<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added) -->
+<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md -->
 
 # Test Audit
 
@@ -16,11 +16,8 @@ before starting one, read [CAMPAIGN.md](CAMPAIGN.md).
 
 ## Authoring gate
 
-New tests are E2E: they drive the outermost interface the caller touches
-(browser flow, HTTP request, CLI run, a library's public API). A unit or
-integration test lands only when the user asks for one; this skill's audit
-mode still applies to the ones that already exist. For a test you write, the
-"owner boundary" and "strongest boundary" below mean that outermost interface.
+New tests follow "E2E only" in `CODING_STANDARDS.md` "Tests"; for one you write,
+the "owner boundary" and "strongest boundary" below mean that outermost interface.
 
 Before adding any test, answer five questions; a missing answer means do not
 add it yet:

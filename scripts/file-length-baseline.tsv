@@ -1,0 +1,7 @@
+# Files over the 500-line limit when scripts/check-file-length.mjs landed, with their line count.
+# Each may not grow past its count; lower a count as the file shrinks, and drop the line at 500 or under.
+# Never add a line: a new file over 500 lines gets split instead.
+docs/security-audit-improvements.md	944
+herdr-app/mods/agents-edited/main.js	596
+herdr-app/mods/spaces-edited/main.js	541
+pi/extensions/opencode/index.ts	508

@@ -12,7 +12,10 @@ trap 'rm -rf "$WORK"' EXIT
 home="$WORK/home"
 export XDG_CONFIG_HOME="$home/.config"
 oc="$XDG_CONFIG_HOME/opencode"
-mkdir -p "$oc/commands"
+mkdir -p "$oc/commands" "$WORK/bin"
+# rtk config would name a path outside this HOME (%APPDATA% on Windows).
+printf '#!/bin/sh\necho "Config: %s/rtk/config.toml"\n' "$home" > "$WORK/bin/rtk"
+chmod +x "$WORK/bin/rtk"
 
 # A wrapper the old generator wrote, one for a skill deleted since, and a hand-written command.
 for skill in ui-polish brainstorming; do
@@ -44,7 +47,7 @@ config_has() { # config_has <file> <js expression over c>
   node -e 'const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); process.exit(eval(process.argv[2]) ? 0 : 1)' "$1" "$2"
 }
 
-expect "sync exits 0" env HOME="$home" bash "$SCRIPTS/sync-config.sh" opencode
+expect "sync exits 0" env HOME="$home" PATH="$WORK/bin:$PATH" bash "$SCRIPTS/sync-config.sh" opencode
 expect "generated wrapper for a live skill removed" test ! -e "$oc/commands/ui-polish.md"
 expect "generated wrapper for a deleted skill removed" test ! -e "$oc/commands/brainstorming.md"
 expect "hand-written command kept" test -e "$oc/commands/deploy.md"

@@ -28,7 +28,7 @@ Stanford STORM (Synthesis of Topic Outlines through Retrieval and Multi-perspect
 
 ## Workflow — run all 4 phases, in order, in one response
 
-Produce four clearly-headed sections. Do not stop after one. Do not ask permission between phases. If web search is available, use it to ground claims; otherwise reason from knowledge and flag in Phase 4 what would need verification.
+Produce four clearly-headed sections. Do not stop after one. Do not ask permission between phases. Every finding and evidence claim cites the source you read for it (URL, paper, doc). With no search or fetch tool, say so at the top of the reply and mark every claim `[unverified]`.
 
 ### Phase 1 — Multi-Perspective Scan
 

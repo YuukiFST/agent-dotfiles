@@ -6,6 +6,7 @@ metadata:
   opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
+<!-- Source: https://github.com/humanlayer/skills/tree/main/plugins/show-me (MIT, notice in LICENSE); HTML goes to mktemp -d and opens in Herdr, start or xdg-open instead of macOS open -->
 
 Help the user understand the current topic of conversation visually. Skip the preamble and keep prose brief. Pick the smallest view that makes the key point clear.
 
@@ -118,11 +119,7 @@ function expandSkill(command: string): string {
 }
 ```
 
-- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then open it for the user:
-
-```
-Bash(open path/to/show-me-{description}.html)
-```
+- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Write it to a fresh `mktemp -d` dir as `show-me-{description}.html`, never into the repo. Then open it for the user: inside Herdr (`HERDR_ENV=1`) with the `herdr-gpui-browser` skill; otherwise with `start "" <file>` on Windows or `xdg-open <file>` on Linux.
 
 ### guidance
 

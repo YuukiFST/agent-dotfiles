@@ -5,7 +5,7 @@ license: MIT
 metadata:
   version: "2.0.0"
 ---
-<!-- Source: https://github.com/mikiarlo3/ai-copywriter (MIT) -->
+<!-- Source: https://github.com/mikiarlo3/ai-copywriter (MIT); embedded mode dropped: ai-tells owns it -->
 
 # AI Copywriter: Write Copy That Converts, Humanize Everything
 
@@ -66,8 +66,6 @@ Complete answers are not the bar; interesting ones are. After the intake, test y
 - Can you write the reader's 11pm search query word for word? If not, you don't know the reader yet; keep asking.
 
 Ask the moment your material stops being interesting, not only when a field is empty. Never write around a gap you noticed: generic input produces generic copy, and no downstream craft can fix it.
-
-In embedded mode, where there is no user to ask, write from what exists and name what was missing next to the output.
 
 ### Making the story worth telling
 
@@ -174,8 +172,6 @@ The audit is the `ai-tells` skill: load it and run its audit mode (the lint scri
 ## Invocation Modes
 
 **Copy request (default).** The user asks you to write or punch up copy: titles, descriptions, microcopy, subject lines, posts. Work in COPYWRITING MODE, run the audit loop internally, and deliver the variants and your pick. No draft or audit bullets; the options are the deliverable.
-
-**Embedded mode.** Another task or agent is using this skill as one step of a larger job (a PR description, a commit message, a doc). Run the loop internally and output only the final text. No draft, no audit bullets, no summary. The caller wants prose, not ceremony.
 
 ## Process and Output
 

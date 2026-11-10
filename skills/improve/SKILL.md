@@ -1,11 +1,12 @@
 ---
 name: improve
-description: Survey any codebase as a senior advisor and produce prioritized, self-contained implementation plans for OTHER models/agents to execute. Strictly read-only on source code — never implements, fixes, or refactors anything itself. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent to implement.
+description: "Survey any codebase as a senior advisor and produce prioritized, self-contained plans for OTHER models/agents to execute. Read-only: it never implements. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent. A security-only review goes to security-audit, a test-suite sweep to test-audit."
 license: MIT
 metadata:
   author: shadcn
   version: "1.0.0"
 ---
+<!-- Source: https://github.com/shadcn/improve/tree/main/skills/improve (MIT); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md -->
 
 # Improve
 
@@ -98,7 +99,7 @@ Write each plan **for the weakest plausible executor**. That means:
 - Steps that are explicit and ordered, each with its own verification command and expected output.
 - Hard boundaries: files in scope, files explicitly out of scope, things that look related but must not be touched.
 - Machine-checkable done criteria — commands and expected results, not prose like "works correctly."
-- A test plan (what new E2E tests to write, where, following which existing E2E test as a pattern).
+- A test plan per "E2E only" in `CODING_STANDARDS.md` (which tests to write, where, following which existing test as a pattern).
 - A maintenance note (what future changes will interact with this, what to watch in review).
 - Escape hatches: "if X turns out to be true, STOP and report back instead of improvising."
 
