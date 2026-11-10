@@ -100,6 +100,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The claude, pi and opencode targets, run twice each against a temporary home.
+      - name: Run sync-config.ps1 end-to-end test
+        run: pwsh -NoProfile -File scripts/test-sync-config-windows.ps1
+
       # A locked file must fail the sync without deleting the live skill or rules/ it was replacing.
       - name: Run sync-config.ps1 replace-on-failure test
         run: pwsh -NoProfile -File scripts/test-sync-replace-on-failure.ps1

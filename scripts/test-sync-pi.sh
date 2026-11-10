@@ -26,7 +26,9 @@ cat > "$stub_bin/pi" <<'EOF'
 #!/bin/sh
 exec node "$HOME/.pi/agent/bin/pi-launcher.js" "$@"
 EOF
-chmod +x "$stub_bin/pi"
+# rtk config would name a path outside this HOME (%APPDATA% on Windows).
+printf '#!/bin/sh\necho "Config: %s/rtk/config.toml"\n' "$home" > "$stub_bin/rtk"
+chmod +x "$stub_bin/pi" "$stub_bin/rtk"
 export PI_STUB_LOG="$WORK/installs.log"
 : > "$PI_STUB_LOG"
 
