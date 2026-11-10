@@ -6,6 +6,7 @@ metadata:
   opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
+<!-- Source: https://github.com/mattpocock/skills/tree/main/skills/engineering/setup-matt-pocock-skills; AGENTS.md is edited before CLAUDE.md, and helmsman replaces the upstream to-tickets, triage and to-spec skills -->
 
 # Setup Matt Pocock's Skills
 
@@ -29,7 +30,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
-- Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
+- Is the `helmsman` skill installed (a `helmsman` folder alongside this one, or `helmsman` in your available skills)? It is the skill that reads the tracker doc. Is a `triage` skill installed? This set ships none, so Section B runs only when the user has their own.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
@@ -40,7 +41,7 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 **Section A — Issue tracker.**
 
-> Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, and `to-spec` read from and write to it — they need to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
+> Explainer: The "issue tracker" is where issues live for this repo. The `helmsman` skill reads from and writes to it when it files build tickets — it needs to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
 Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
 
@@ -76,8 +77,8 @@ Let them edit before writing.
 
 **Pick the file to edit:**
 
-- If `CLAUDE.md` exists, edit it.
-- Else if `AGENTS.md` exists, edit it.
+- If `AGENTS.md` exists, edit it.
+- Else if `CLAUDE.md` exists, edit it. A `CLAUDE.md` whose only content is an `@AGENTS.md` import counts as absent: edit `AGENTS.md`.
 - If neither exists, ask the user which one to create — don't pick for them.
 
 Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa) — always edit the one that's already there.
