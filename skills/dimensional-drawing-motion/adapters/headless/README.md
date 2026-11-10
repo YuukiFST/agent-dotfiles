@@ -9,8 +9,12 @@ Playwright opens `player.html`, calls the scene's `render(t)` for every frame, s
 
 ## Run
 
+Ask the user before installing Playwright (its `postinstall` downloads Chromium) or ffmpeg. Run from a scratch copy so the installed skill stays untouched:
+
 ```bash
-cd skills/dimensional-drawing-motion/adapters/headless
+tmp=$(mktemp -d)
+cp -r <path-to>/dimensional-drawing-motion/. "$tmp"
+cd "$tmp/adapters/headless"
 npm install            # installs playwright + its chromium
 
 # the reference dialog film

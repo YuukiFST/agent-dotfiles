@@ -24,7 +24,7 @@ Run it on the viewer page, the direct scene route and the real destination page 
 
 `scripts/film.mjs` opens a page in headless Chrome and shoots the stage at a fixed interval into one contact sheet at true size. It prints console and `[stageshow]` warnings (loop seams, missing targets); `--help` lists every flag.
 
-First time: copy `scripts/` beside `kit/`, `npm i -D playwright-core` (and `postcss` for the CSS check); `CHROME_PATH` picks another Chrome. The kit itself needs neither.
+First time: copy `scripts/` beside `kit/`, then, once the user agrees, `npm i -D playwright-core` (and `postcss` for the CSS check); `CHROME_PATH` picks another Chrome. The kit itself needs neither.
 
 In the playground, film the direct `?capture=<name>` route (the ordinary viewer wraps the scene in an iframe); on a site, the real page URL (open an embedded frame's URL directly when needed). Still watch playback, pause, resume and Replay in the viewer yourself.
 
