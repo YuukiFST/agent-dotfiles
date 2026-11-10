@@ -90,6 +90,20 @@ jobs:
       - name: Run browser-harness daemon regression test
         run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
 
+  statusline:
+    name: statusline (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # statusline.ps1 once ran the caveman segment in a child powershell with empty stdin,
+      # so every window showed the machine-wide mode instead of its own session's.
+      - name: Run caveman session-mode regression test
+        run: node scripts/test-statusline-regression-caveman-session-mode.cjs
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
