@@ -9,7 +9,7 @@ description: >-
   code. Reviewing Rust goes to rust-review, porting code into Rust to rust-port.
 paths: ["**/*.rs"]
 ---
-<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line; Tests follows the E2E-only rule of CODING_STANDARDS.md; description routes tie cases to sibling skills -->
+<!-- Source: https://github.com/morganlinton/BeautifulRust/tree/main/skills/rust-best-practices (MIT, notice in LICENSE); adds the paths trigger, the principle-skill pointer and the repo-config precedence line; Tests follows the E2E-only rule of CODING_STANDARDS.md; description routes tie cases to sibling skills; Concurrency, Unsafe/FFI, Crates and Performance moved to references/ and the final checklist dropped -->
 
 # Rust best practices
 
@@ -364,79 +364,14 @@ panic, `# Safety` for every `unsafe fn`.
 - **Logging:** structured events through `tracing` or `log`, not `println!` / `dbg!`,
   except for a CLI's own stdout output.
 
-## 7. Concurrency and async
+## 7. Read when the task needs it
 
-- Public types, and the futures they return, should be `Send` (and usually `Sync`). Pin
-  it with a compile-time check so a refactor can't silently regress it:
+- Async code, threads, locks, or `Send` / `Sync` bounds: [references/concurrency.md](references/concurrency.md).
+- Any `unsafe` block, `unsafe fn` or FFI boundary: [references/unsafe-ffi.md](references/unsafe-ffi.md).
+- Crate or module layout, a new dependency or feature flag, or a change that may break semver: [references/crates.md](references/crates.md).
+- Optimizing code after a measurement: [references/performance.md](references/performance.md).
 
-  ```rust
-  const _: () = {
-      const fn assert_send<T: Send>() {}
-      assert_send::<MyClient>();
-  };
-  ```
-
-  Holding an `Rc` or a `RefCell` borrow across an `.await` makes a future `!Send`.
-- Prefer message passing (channels) to shared state. When sharing is necessary: keep data
-  with linked invariants under one lock, keep lock scopes to a few lines, never call user
-  closures while holding a lock, and never return a `MutexGuard` from a public method.
-- Write `async fn` rather than `fn -> impl Future`, except in traits or when setup must
-  run outside the async block for a hot path.
-- Long CPU-bound work inside async must yield (`tokio::task::yield_now().await` every
-  tens of microseconds) or move to `spawn_blocking`.
-- Library code doesn't spawn raw threads or assume a runtime; take an executor, a spawn
-  function, or `impl AsyncRead` / `impl Read` from the caller.
-
-## 8. Unsafe and FFI
-
-- Write `unsafe` only for one of three reasons: a novel abstraction safe code can't
-  express, a benchmarked performance need, or FFI and platform calls. Reach for std and
-  well-reviewed crates first; they already contain the audited `unsafe`.
-- Every `unsafe` block or impl gets a `// SAFETY:` comment stating why the invariants
-  hold. Every `unsafe fn` gets a `# Safety` doc section listing what the caller must
-  uphold. Enable `unsafe_op_in_unsafe_fn`.
-- Keep `unsafe` in the smallest module that can uphold its invariant and wrap it in a
-  safe API; the module boundary is the soundness boundary. A safe function that can cause
-  undefined behavior through any sequence of safe calls is unsound, and unsound code is
-  never acceptable.
-- Mark a function `unsafe` only when misuse can cause undefined behavior, not because it
-  is dangerous (`delete_database()` is a safe function).
-- No `transmute` to cast enums or dodge lifetimes, and no `unsafe impl Send` to silence
-  the compiler.
-- Test unsafe code under Miri and with adversarial inputs.
-- FFI: `#[repr(C)]` on shared structs, sized integer types, `CString` / `CStr` for
-  strings, allocate and free on the same side, wrap C-owned pointers in an RAII type whose
-  `Drop` frees them, check for null and return `Result`, and stop panics at the boundary
-  with `catch_unwind`. Generate bindings with `bindgen` in a `foo-sys` crate and keep
-  business logic in a safe core crate.
-
-## 9. Crates, modules, dependencies
-
-- **Prefer small, single-purpose crates** in a flat `crates/` workspace; never nest a
-  crate inside another crate's `src/`. Split when a crate grows a second purpose or a
-  subdirectory. Share versions and lints through `[workspace.dependencies]` and
-  `[workspace.lints]`.
-- **Modules:** name a leaf module after its primary item (`Foo` lives in `foo.rs`).
-  Non-leaf modules contain only `mod` declarations and re-exports. Put the essential items
-  at the crate root and group the rest by use case (`account`, `network`), not by kind
-  (`traits`, `errors`). Don't define a prelude.
-- **Re-export individually** (`pub use foo::{A, B};`), never with a glob.
-- **Dependencies:** every one costs compile time, binary size, and supply-chain exposure,
-  including `build.rs` and proc macros. Use ranges (`"1"`, `"1.4"`), never `"*"` or a
-  needless `"="`. Commit `Cargo.lock` for binaries. Audit with `cargo tree --duplicates`,
-  `cargo deny`, `cargo udeps`, and `cargo audit`.
-- **Features are additive and bare-named:** `std`, `serde`, `alloc`, `test-util`. Never
-  `no-std`, `use-serde`, or a feature that removes or changes a public item. Don't
-  feature-gate struct fields or trait methods. Put mocks and fakes behind `test-util`.
-- **Semver:** breaking changes include removing or renaming public items, adding a
-  variant to an enum that isn't `#[non_exhaustive]`, adding a field to a publicly
-  constructible struct, adding a trait bound, or making a trait non-object-safe.
-  Deprecate in a minor release before removing in a major one. Use the latest stable
-  edition for new crates and set an MSRV deliberately.
-- Don't run code before `main()` (no `ctor`-style crates). Don't use unstable features
-  on a stable toolchain.
-
-## 10. Documentation and comments
+## 8. Documentation and comments
 
 - `///` on every public item; `//!` at the top of every public module and the crate root.
   The first sentence is a single line of about fifteen words, because it becomes the
@@ -453,7 +388,7 @@ panic, `# Safety` for every `unsafe fn`.
   magic values, workarounds with a link. No design journals, "why we chose X" essays, or
   rule-compliance tables in code docs. Document the end state.
 
-## 11. Tests
+## 9. Tests
 
 - Tests are end-to-end, per the "Tests" section of `CODING_STANDARDS.md`: a library's go
   in `tests/` and call only the public API, a binary's run the built CLI. Write a
@@ -468,35 +403,6 @@ panic, `# Safety` for every `unsafe fn`.
 - Fuzz parsers of untrusted input with `cargo fuzz`. Benchmark with `criterion` or `divan`
   and `std::hint::black_box`. Run Miri over `unsafe`.
 - Assertions get context so failures read well: `assert_eq!(got, want, "input {input:?}")`.
-
-## 12. Performance, in order
-
-Design for usability first and optimize after measuring. When you do: `Vec::with_capacity`
-or `collect()` over push loops; reuse caller-owned buffers in hot APIs
-(`fn read_into(&mut self, buf: &mut Vec<u8>)`); `Box<[T]>`, `Box<str>`, `Arc<str>` for
-long-lived immutable sequences; `shrink_to_fit` on long-lived collections built without a
-reservation; a faster hasher (`foldhash`, `FxHash`) only for trusted keys; batch work
-instead of per-item locking; applications may set a `#[global_allocator]` such as
-`mimalloc`. Derive `Copy` for small plain types and never for large ones.
-
-## 13. Final checklist
-
-Before returning Rust code, confirm:
-
-- `cargo fmt`, `cargo clippy -- -D warnings`, and `cargo test` are clean.
-- No `unwrap()` outside tests and `main`; every `expect`, `assert`, and `panic` has a
-  message with the relevant values.
-- Public functions take `&str`, `&[T]`, `impl AsRef<_>`, or `impl IntoIterator`, not
-  `&String` or `&Vec<T>`.
-- Every public type derives `Debug` and the applicable common traits; error types
-  implement `Error + Display + Send + Sync + 'static`.
-- No `bool` parameters in public signatures; no hand-written `Ord` without matching
-  `PartialEq` and `Hash`.
-- No `.clone()` whose only job is to satisfy the borrow checker.
-- No glob imports, no preludes, no glob re-exports, no leaked third-party types.
-- Every `unsafe` block has a `// SAFETY:` comment; every `unsafe fn` has `# Safety` docs.
-- Public items have docs with a one-line summary and `# Errors` / `# Panics` where relevant.
-- Application code stayed simple; library code followed the API rules.
 
 ## References
 
