@@ -1,8 +1,8 @@
 ---
 name: code-simplifier
-description: Simplify and refine recently modified code for clarity, consistency and maintainability while preserving all functionality. Use when asked to simplify, clean up or refine code just written, or after finishing a change.
+description: Simplify and refine recently modified code for clarity, consistency and maintainability while preserving all functionality. Use when asked to simplify, clean up or refine code just written.
 ---
-<!-- Source: https://github.com/anthropics/claude-plugins-official/blob/main/plugins/code-simplifier/agents/code-simplifier.md (converted from a subagent to a skill) -->
+<!-- Source: https://github.com/anthropics/claude-plugins-official/blob/main/plugins/code-simplifier/agents/code-simplifier.md (converted from a subagent to a skill; triggers only on request, not after every change) -->
 
 Simplify recently modified code for clarity, consistency and maintainability without changing what it does. Readable, explicit code wins over compact code.
 

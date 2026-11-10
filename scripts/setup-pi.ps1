@@ -3,6 +3,7 @@
 # Idempotent, and doubles as the updater: re-run it to pull the latest pi.
 # Unix equivalent: scripts/setup-pi.sh
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\invoke-native.ps1"
 
 Write-Host "[1/3] pi (npm, latest)"
 # Unconditional: `npm install -g @latest` is both the install and the upgrade path, and this
@@ -23,8 +24,8 @@ if ($piCmd) {
     Write-Host "  pi is bundled-runtime managed - updating through $npm"
   }
 }
-& $npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
-pi --version
+Invoke-Native $npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@latest"
+Invoke-Native pi --version
 
 Write-Host "[2/3] rtk"
 & "$PSScriptRoot\install-rtk.ps1" -Agent pi -AutoPatch

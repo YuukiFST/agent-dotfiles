@@ -2,6 +2,7 @@
 name: prototype
 description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.
 ---
+<!-- Source: https://github.com/mattpocock/skills/tree/main/skills/engineering/prototype; rule 1 moves prototypes out of the working tree (mktemp -d, throwaway worktree) -->
 
 # Prototype
 
@@ -18,7 +19,7 @@ The two branches produce very different artifacts — getting this wrong wastes 
 
 ## Rules that apply to both
 
-1. **Throwaway from day one, and clearly marked as such.** Locate the prototype code close to where it will actually be used (next to the module or page it's prototyping for) so context is obvious — but name it so a casual reader can see it's a prototype, not production. For throwaway UI routes, obey whatever routing convention the project already uses; don't invent a new top-level structure.
+1. **Throwaway from day one, and outside the working tree.** A logic prototype lives in a fresh `mktemp -d` dir, importing the real module by path when it needs one. A UI prototype that must run inside the app lives on a throwaway branch in its own `git worktree`, so the user's checkout never holds it. Name it so a casual reader can see it's a prototype, not production. For throwaway UI routes, obey whatever routing convention the project already uses; don't invent a new top-level structure.
 2. **Trivial to run.** A UI prototype starts from one command in the project's task runner — `pnpm <name>`, `python <path>`, `bun <path>`, etc. A logic demo is a single HTML file the user double-clicks. Either way, no thinking required to start it.
 3. **No persistence by default.** State lives in memory. Persistence is the thing the prototype is _checking_, not something it should depend on. If the question explicitly involves a database, hit a scratch DB or a local file with a clear "PROTOTYPE — wipe me" name.
 4. **Skip the polish.** No tests, no error handling beyond what makes the prototype _runnable_, no abstractions. The point is to learn something fast.

@@ -1,3 +1,7 @@
+# -SessionId: statusline.ps1 calls this script in its own process after reading stdin,
+# so it passes the id it already parsed; stdin is read only when the id is absent.
+param([string]$SessionId = "")
+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME ".claude" }
 
@@ -9,8 +13,7 @@ $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-
 #   1. IsInputRedirected — an interactive console is never read from.
 #   2. ReadToEndAsync + Wait(1000) — a hard 1s ceiling if stdin is an open
 #      pipe that never closes. Normally EOF arrives immediately.
-$SessionId = ""
-if ([Console]::IsInputRedirected) {
+if (-not $SessionId -and [Console]::IsInputRedirected) {
     try {
         $task = [Console]::In.ReadToEndAsync()
         if ($task.Wait(1000)) {

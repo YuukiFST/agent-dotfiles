@@ -34,12 +34,25 @@ prune_stale_skills() { # $1 = dest skills dir — archived stacks + REMOVED.txt,
   fi
 }
 
+# Replaces dir $2 with a copy of dir $1: the copy lands in staging dir $3 on the same volume,
+# then two renames swap it in, so a copy that fails or is interrupted leaves $2 intact.
+# $3 sits outside every dir a harness scans, so a leftover never loads as a skill or rule.
+replace_dir() { # $1 = source dir, $2 = dest dir, $3 = staging dir
+  local stage="$3" name
+  name="$(basename "$2")"
+  rm -rf "${stage:?}/$name.new" "${stage:?}/$name.old"
+  mkdir -p "$stage"
+  cp -r "$1" "$stage/$name.new"
+  if [ -e "$2" ]; then mv "$2" "$stage/$name.old"; fi
+  mv "$stage/$name.new" "$2" || { mv "$stage/$name.old" "$2"; return 1; }
+  rm -rf "${stage:?}/$name.old"
+  rmdir "$stage" 2>/dev/null || true
+}
+
 sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files removed/renamed
   mkdir -p "$1"  # inside a repo skill, but keeps skills that exist only locally
   for s in "$repo"/skills/*/; do
-    name="$(basename "$s")"
-    rm -rf "${1:?}/$name"
-    cp -r "$s" "$1/$name"
+    replace_dir "${s%/}" "$1/$(basename "$s")" "$(dirname "$1")/.sync-staging"
   done
   prune_stale_skills "$1"
   # Plugin/extension-only skills — not vendored in skills/
@@ -47,9 +60,7 @@ sync_skills() { # $1 = dest skills dir — per-skill replace: prunes files remov
 }
 
 sync_rules() { # $1 = dest rules dir — full mirror: rules/ is entirely repo-owned
-  rm -rf "${1:?}"
-  mkdir -p "$1"
-  cp -r "$repo/rules/." "$1/"
+  replace_dir "$repo/rules" "$1" "$(dirname "$1")/.sync-staging"
 }
 
 sync_pi_agent() {

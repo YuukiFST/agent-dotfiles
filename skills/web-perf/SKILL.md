@@ -1,8 +1,9 @@
 ---
 name: web-perf
-description: Measure and fix website performance - slow page loads, Core Web Vitals (LCP, INP, CLS), Lighthouse or PageSpeed scores, sluggish interactions, layout shifts, heavy bundles. Use for a performance audit of a URL or a web codebase, or to verify a performance fix before and after. Desktop app launch time belongs to optimizing-startup.
+description: Measure and fix website performance - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse, sluggish interactions, layout shifts, heavy bundles and web fonts. Use for an audit of a URL or web codebase, or to verify a fix before and after. App launch time goes to optimizing-startup, a regression gate to perf-ratchet.
 license: Apache-2.0 AND MIT (see LICENSE)
 ---
+<!-- Source: https://github.com/cloudflare/skills/tree/main/skills/web-perf and addyosmani/web-quality-skills (notices in LICENSE); description routes tie cases to sibling skills -->
 
 # Web performance
 
@@ -166,7 +167,7 @@ Fetch `network-get <id>` only for a request that backs a finding.
 2. **Chains**: resources discovered late behind other resources (CSS `@import`, JS-injected fonts or images).
 3. **Missing priority**: the LCP image, critical fonts, or key scripts discovered late with no preload or `fetchpriority`.
 4. **Caching**: missing or weak `Cache-Control`, `ETag`, `Last-Modified`.
-5. **Payloads**: uncompressed or oversized JS, CSS, images.
+5. **Payloads**: uncompressed or oversized JS, CSS, images, fonts. When font bytes dominate a page, subset them per [lcp.md](references/lcp.md#subset-fonts), even with a good LCP.
 6. **Preconnects**: per the Judgment rule, zero requests to the origin means remove it.
 
 ### 6 Codebase

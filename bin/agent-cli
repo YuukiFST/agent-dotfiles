@@ -38,12 +38,15 @@ Compares, byte for byte, what the sync scripts copy with what is live, for every
 that exists on this machine:
   rules/ vs ~/.claude/rules (full mirror: extra live files count)
   hooks/*, mods/<name>/ vs ~/.claude/hooks, ~/.claude/mods (copied over: extras ignored)
+  git-hooks/* (minus test-*) vs ~/.claude/git-hooks, and the global core.hooksPath pointing there
   CODING_STANDARDS.md, PROMPT_ENGINEERING.md vs ~/.claude/
   GLOBAL.md vs ~/.claude/CLAUDE.md, ~/.pi/agent/AGENTS.md, ~/.config/opencode/AGENTS.md
   skills/<name>/ vs ~/.claude/skills, ~/.agents/skills; names in REMOVED.txt still live
 Text files compare with CRLF folded to LF; files .gitignore drops (__pycache__) are skipped.
 Not covered: settings.json (seeded once, machine-owned) and the rtk config.
-Prints only drift, then one summary line. Fix drift with the sync command in AGENTS.md.
+Prints only drift, then one summary line, after a WARNING when this checkout is behind
+origin/main as of the last fetch (drift from an old tree misleads).
+Fix drift with the sync command in AGENTS.md.
 Exit: 0 no drift, 1 drift.`,
   skill: `agent-cli skill <name> [--json]
 
@@ -54,7 +57,7 @@ Exit: 0 found, 1 unknown name (close matches listed), 2 usage error.`,
   state: `agent-cli state [--json]
 
 The git orientation rules/git.md needs before a commit, in one call: current branch and
-its upstream with ahead/behind counts, changed files, the commit identity read inside the
+its upstream with ahead/behind counts, commits behind origin/main as of the last fetch, changed files, the commit identity read inside the
 repo (user.name, user.email; "UNSET" means ask the user), worktrees, and the last commit.
 Exit: 0, or 1 outside a git repo.`,
 };
@@ -122,6 +125,21 @@ function describeTreeDrift(d) {
   if (d.missing.length) parts.push(`missing: ${d.missing.slice(0, 3).join(', ')}${d.missing.length > 3 ? ` +${d.missing.length - 3}` : ''}`);
   if (d.extra.length) parts.push(`extra: ${d.extra.slice(0, 3).join(', ')}${d.extra.length > 3 ? ` +${d.extra.length - 3}` : ''}`);
   return parts.join('; ');
+}
+
+function globalGitConfig(key) {
+  try {
+    return execFileSync('git', ['config', '--global', '--get', key], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return '';
+  }
+}
+
+// realpath folds Windows 8.3 short names and either slash, so two spellings of one dir match.
+function samePath(a, b) {
+  if (!a || !fs.existsSync(a) || !fs.existsSync(b)) return false;
+  const norm = (p) => fs.realpathSync.native(p);
+  return process.platform === 'win32' ? norm(a).toLowerCase() === norm(b).toLowerCase() : norm(a) === norm(b);
 }
 
 function repoSkills() {
@@ -238,6 +256,7 @@ async function cmdCheck(args, json) {
 // ---------- drift ----------
 
 function cmdDrift(json) {
+  const behindMain = commitsBehindMain();
   const issues = [];
   const claude = path.join(HOME, '.claude');
   let checked = 0;
@@ -266,6 +285,25 @@ function cmdDrift(json) {
     ['GLOBAL.md', path.join(HOME, '.config', 'opencode', 'AGENTS.md')],
     ...hooks.map((f) => [`hooks/${f}`, path.join(claude, 'hooks', f)]),
   ];
+  // The commit gate runs from ~/.claude/git-hooks, never from a checkout, so a missing live
+  // dir is drift even when its parent was never created.
+  const liveGitHooks = path.join(claude, 'git-hooks');
+  const gitHooks =
+    fs.existsSync(path.join(REPO, 'git-hooks')) && fs.existsSync(claude)
+      ? repoFiles('git-hooks').filter((f) => !f.includes('/') && !f.startsWith('test-'))
+      : [];
+  if (gitHooks.length) {
+    checked++;
+    const hooksPath = globalGitConfig('core.hooksPath');
+    if (!samePath(hooksPath, liveGitHooks))
+      issues.push({ what: 'git-hooks/', live: 'core.hooksPath', detail: `points at ${hooksPath ? tilde(hooksPath) : 'nothing'}, not ${tilde(liveGitHooks)}` });
+  }
+  for (const f of gitHooks) {
+    checked++;
+    const dest = path.join(liveGitHooks, f);
+    if (!fs.existsSync(dest)) issues.push({ what: `git-hooks/${f}`, live: tilde(dest), detail: 'not installed' });
+    else if (!sameContent(path.join(REPO, 'git-hooks', f), dest)) issues.push({ what: `git-hooks/${f}`, live: tilde(dest), detail: 'differs' });
+  }
   for (const [src, dest] of files) {
     if (!fs.existsSync(path.dirname(dest))) continue;
     checked++;
@@ -283,8 +321,10 @@ function cmdDrift(json) {
     for (const name of removed)
       if (fs.existsSync(path.join(dir, name))) issues.push({ what: `skills/${name}`, live: tilde(dir), detail: 'in REMOVED.txt but still live' });
   }
-  if (json) print(true, { drift: issues, checked, liveSkillDirs: LIVE_SKILL_DIRS.map(tilde) });
+  if (json) print(true, { drift: issues, checked, liveSkillDirs: LIVE_SKILL_DIRS.map(tilde), behindMain });
   else {
+    if (behindMain > 0)
+      console.log(`WARNING: this checkout is ${behindMain} commit${behindMain === 1 ? '' : 's'} behind origin/main (as of the last fetch), so drift compares the live dirs with an old tree`);
     for (const i of issues) console.log(`DRIFT ${i.what} -> ${i.live}: ${i.detail}`);
     console.log(`summary: ${issues.length} drift in ${checked} targets (skill dirs: ${LIVE_SKILL_DIRS.map(tilde).join(', ') || 'none'})`);
   }
@@ -393,6 +433,13 @@ function git(args) {
   }
 }
 
+// Commits on origin/main that HEAD lacks, as of the last fetch; null without that ref or a commit.
+function commitsBehindMain() {
+  if (git(['rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main']) === null) return null;
+  const count = git(['rev-list', '--count', 'HEAD..refs/remotes/origin/main']);
+  return count === null ? null : Number(count);
+}
+
 function cmdState(json) {
   const branch = git(['branch', '--show-current']);
   if (branch === null) { console.error(`not a git repo: ${REPO}`); return 1; }
@@ -412,6 +459,7 @@ function cmdState(json) {
     upstream,
     ahead,
     behind,
+    behindMain: commitsBehindMain(),
     changed,
     identity: { name: git(['config', 'user.name']) || 'UNSET', email: git(['config', 'user.email']) || 'UNSET' },
     worktrees,
@@ -419,6 +467,7 @@ function cmdState(json) {
   };
   if (json) return print(true, info);
   console.log(`branch: ${info.branch}${upstream ? ` -> ${upstream} (ahead ${ahead}, behind ${behind})` : ' (no upstream)'}`);
+  console.log(`behind origin/main: ${info.behindMain === null ? 'unknown (no origin/main ref)' : info.behindMain}`);
   console.log(`changed: ${changed.length ? `${changed.length} (${changed.slice(0, 5).map((l) => l.trim()).join(', ')}${changed.length > 5 ? ', ...' : ''})` : 'clean'}`);
   console.log(`identity: ${info.identity.name} <${info.identity.email}>`);
   console.log(`worktrees: ${worktrees.map((w) => `${w.branch} ${w.path}`).join(' ; ')}`);

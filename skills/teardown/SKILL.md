@@ -1,8 +1,8 @@
 ---
 name: teardown
-description: Creates technical illustrations of physical objects and of how things work, such as display pixels or interface layers, with coherent views, fine linework and part fills.
+description: Technical illustrations of physical objects and how they work, with coherent views, fine linework and part fills. Use for exploded views, teardowns, cutaways or assembly sheets.
 ---
-<!-- Source: https://github.com/jakubkrehel/skills/tree/main/skills/teardown (MIT, notice in LICENSE); the better-* skills it defers to are read from ~/.claude/ui-refs/jakubkrehel-skills/skills/<name>/SKILL.md, cloned by ui-polish's update-refs.sh -->
+<!-- Source: https://github.com/jakubkrehel/skills/tree/main/skills/teardown (MIT, notice in LICENSE); the better-* skills it defers to are read from ~/.claude/ui-refs/jakubkrehel-skills/skills/<name>/SKILL.md, cloned by ui-polish's update-refs.sh; description routes tie cases to sibling skills -->
 
 # Teardown
 
