@@ -14,7 +14,7 @@ jobs:
     name: Commit message regression tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # This job is what runs these tests; no rule asks agents to run them by hand.
       - name: Run validate-commit-message regression tests
@@ -27,7 +27,7 @@ jobs:
     name: coding-standards-gate hook
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # Also fails when CODING_STANDARDS.md outgrows the 10,000-character additionalContext cap.
       - name: Run coding-standards-gate end-to-end test
@@ -37,7 +37,7 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # commit-msg and pre-push have no .sh extension, so a *.sh glob misses
       # exactly the two files that gate every commit and push.
@@ -52,7 +52,7 @@ jobs:
     name: sync-config pi
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # A package.json synced into ~/.pi/agent reaches pi's CommonJS launcher in bin/
       # and breaks every pi command on Windows (#148, #150).
@@ -63,7 +63,7 @@ jobs:
     name: sync-config opencode
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # Skill /name commands must not be shadowed by generated wrappers, and removing the retired
       # fff MCP server must keep every other key of a commented opencode.jsonc.
@@ -84,17 +84,37 @@ jobs:
     name: browser-harness install
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # uv tool install --force fails halfway on Windows while a daemon holds the tool's Scripts dir.
       - name: Run browser-harness daemon regression test
         run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
 
+  rtk-install-linux:
+    name: rtk install (linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      # Every setup script installs the rtk build pinned in scripts/rtk-pin.txt; a pin whose
+      # hash does not match the release must install nothing.
+      - name: Run install-rtk.sh end-to-end test
+        run: bash scripts/test-install-rtk.sh
+
+  rtk-install-windows:
+    name: rtk install (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Run install-rtk.ps1 end-to-end test
+        run: pwsh -NoProfile -File scripts/test-install-rtk.ps1
+
   ai-tells-lint:
     name: ai-tells lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # Golden files pin every lint finding, and the id check fails when a lint rule or an
       # ai-tells#<id> citation in another skill points at a pattern patterns.md no longer has.
@@ -108,8 +128,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
@@ -128,8 +148,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
@@ -147,8 +167,8 @@ jobs:
     name: agent-cli
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
@@ -161,7 +181,7 @@ jobs:
     name: check-upstreams
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # A stub gh serves canned API output; the weekly upstreams.yml run is the live check.
       - name: Run check-upstreams end-to-end tests
@@ -171,7 +191,7 @@ jobs:
     name: Skill frontmatter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # A SKILL.md whose frontmatter does not parse loads with no description and
       # silently loses its triggers (PR #97). yq comes preinstalled on the runner.
@@ -185,8 +205,8 @@ jobs:
     name: Skill routes and links
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 

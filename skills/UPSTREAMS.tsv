@@ -6,7 +6,8 @@
 # or a downstream GitHub repo written owner/name. A watch row targets ./skills and
 # tracks a whole upstream collection, so a skill not vendored yet shows up too;
 # its refresh is deciding whether to vendor what changed.
-# This file is the only place a pin lives; Source comments and SOURCES.md only credit.
+# This file is the only place a pin lives, except the rtk binary's in scripts/rtk-pin.txt;
+# Source comments and SOURCES.md only credit.
 #
 # scripts/check-upstreams.sh lists every row with commits on its path past the pin,
 # and .github/workflows/upstreams.yml runs it weekly into one upstream-drift issue.

@@ -1,0 +1,8 @@
+# The rtk release every setup and update script installs, read by install-rtk.sh and install-rtk.ps1.
+# Hash lines are copied verbatim from that release's checksums.txt; AGENTS.md says how to move the pin.
+tag v1.2.0
+b291b4e53d37f84b7f1696bc20559207396fb0190f20ed3c949db1b7e1c0c378  rtk-x86_64-pc-windows-msvc.zip
+70fee7b4a548c43dde94c77e2335550981b0bc2fb013691d8c8109b5bd0eda37  rtk-x86_64-unknown-linux-musl.tar.gz
+f91a06e94e5fad7dfa87946c811a4bcbc500e6da119fd47033f2a8940bf64f93  rtk-aarch64-unknown-linux-musl.tar.gz
+1484ae6fffd0da180d65434eeca32e014a86a6e21dcfc7a0004fe82b7bb0a9b9  rtk-x86_64-apple-darwin.tar.gz
+a2c411ffa49a8595b408c151ea47c9a812268924a76eaeecbc3a5065b02207ff  rtk-aarch64-apple-darwin.tar.gz

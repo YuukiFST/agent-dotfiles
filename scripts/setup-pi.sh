@@ -28,7 +28,7 @@ fi
 pi --version
 
 echo "[2/4] rtk"
-curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+bash "$(dirname "$0")/install-rtk.sh"
 export PATH="$bin:$PATH"
 rtk init -g --agent pi --auto-patch
 
