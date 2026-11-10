@@ -1,7 +1,6 @@
 ---
 name: typescript-best-practices
-description: TypeScript best practices. Use when reading or editing any .ts or .tsx file.
-paths: ["**/*.ts", "**/*.tsx"]
+description: TypeScript best practices for types, boundaries, narrowing and tests.
 disable-model-invocation: true
 metadata:
   opencode/slash: "true"
@@ -30,6 +29,6 @@ Apply the **principle-type-system-discipline** skill first.
 | Schema-derived types | Reach for `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` before declaring a new interface. |
 | Object args | Pass objects, not positional, so argument order is self-documenting. Skip on hot paths (per-frame render, tokenizers, parsers). |
 | Real tests | Don't mock what you can run. Prefer the framework's real test primitives with leak/disposable checks, and verify UI in a running build. Mock only what you can't run locally. |
-| Structured telemetry | Prefer structured logger diagnostics with enough context to debug from an id. No `console.log` in shipped code. |
+| Structured telemetry | Prefer structured logger diagnostics with enough context to debug from an id. Plain `console.log` is for a CLI's user-facing output only. |
 
 Examples: `references/patterns.md`.
