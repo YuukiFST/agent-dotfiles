@@ -61,29 +61,118 @@ function sessionFinder(byId, sessionOfPid, known) {
   return find;
 }
 
+// node.exe says nothing about what it runs: the tool is in its command line.
+const INTERPRETERS = new Set(["node", "bun", "deno", "python", "pythonw"]);
+const PACKAGE_IN_PROJECT = /([^\\/]+)[\\/]+node_modules[\\/]+(?:\.bin[\\/]+\.\.[\\/]+)?((?:@[\w.-]+[\\/]+)?[\w.-]+)/i;
+const GLOBAL_INSTALL_FOLDERS = new Set(["nodejs", "npm"]);
+const SCRIPT_FILE = /([\w.-]+)\.(?:mjs|cjs|js|ts|py)\b/i;
+const SHORT_LIVED = "Short-lived processes";
+
+// "vitest (integracao)" for a package run from a project's node_modules, else the script's name.
+// A helper whose command line names neither (a worker, a transform pool) does its parent's work.
+function toolNamer(processOf) {
+  const named = new Map();
+  const toolOf = (id, seen = new Set()) => {
+    const p = processOf(id);
+    if (!p || !INTERPRETERS.has(p.name) || seen.has(id)) return null;
+    if (named.has(id)) return named.get(id);
+    seen.add(id);
+    const pkg = PACKAGE_IN_PROJECT.exec(p.cmd ?? "");
+    const fromPackage = pkg && (GLOBAL_INSTALL_FOLDERS.has(pkg[1]) ? pkg[2] : `${pkg[2]} (${pkg[1]})`);
+    const tool = fromPackage || toolOf(p.parent, seen) || (SCRIPT_FILE.exec(p.cmd ?? "")?.[1] ?? null);
+    named.set(id, tool);
+    return tool;
+  };
+  return toolOf;
+}
+
 // What weighs on the machine, biggest first. sessionOfPid: terminal pid to session name. CPU is
 // the share of the whole machine since the previous reading. A process with no previous reading
 // started since, so all its time counts. known: process id to session, carried between calls.
+// mostly: the tool behind most of a row's CPU, when the row's name does not already say it.
 export function consumers(reading, previous, sessionOfPid, known) {
-  const gapMs = reading.at - previous.at;
+  const hasCounterClock = reading.cpuAt != null && previous.cpuAt != null;
+  const gapMs = hasCounterClock ? reading.cpuAt - previous.cpuAt : reading.at - previous.at;
   if (gapMs <= 0) return [];
-  const cpuMsBefore = new Map(previous.processes.map((p) => [p.id, p.cpuMs]));
+  const before = new Map(previous.processes.map((p) => [p.id, p]));
   const byId = new Map(reading.processes.map((p) => [p.id, p]));
   for (const id of known.keys()) if (!byId.has(id)) known.delete(id);
   const sessionOf = sessionFinder(byId, sessionOfPid, known);
+  const toolOf = toolNamer((id) => byId.get(id) ?? before.get(id));
+  const share = (ms) => (100 * ms) / (gapMs * reading.cores);
   const totals = new Map();
+  const rowOf = (p) => {
+    const session = sessionOf(byId.has(p.id) ? p.id : liveAncestor(p.parent, byId, before));
+    if (!session && isWindowsOwn(p)) return null;
+    const tool = toolOf(p.id);
+    const name = session ?? tool ?? APP_NAMES[p.name] ?? p.name;
+    if (!totals.has(name)) totals.set(name, newConsumer(name, Boolean(session), session != null || !THE_APP_ITSELF.has(p.name)));
+    return { row: totals.get(name), tool };
+  };
+  let liveMs = 0;
   for (const p of reading.processes) {
-    const session = sessionOf(p.id);
-    if (!session && isWindowsOwn(p)) continue;
-    const name = session ?? APP_NAMES[p.name] ?? p.name;
-    const row = totals.get(name) ?? { name, isSession: Boolean(session), isClosable: session != null || !THE_APP_ITSELF.has(p.name), cpu: 0, ramGb: 0, count: 0 };
-    row.cpu += (100 * Math.max(0, p.cpuMs - (cpuMsBefore.get(p.id) ?? 0))) / (gapMs * reading.cores);
-    row.ramGb += p.ws / GIB;
-    row.count += 1;
-    totals.set(name, row);
+    const ms = Math.max(0, p.cpuMs - (before.get(p.id)?.cpuMs ?? 0));
+    liveMs += ms;
+    const found = rowOf(p);
+    if (!found) continue;
+    addCpu(found.row, found.tool, share(ms));
+    found.row.ramGb += p.ws / GIB;
+    found.row.count += 1;
   }
+  // Idle's time is in liveMs, so what the cores spent beyond it went to processes gone by now.
+  if (hasCounterClock) shareShortLivedCpu(share(gapMs * reading.cores - liveMs), reading, previous, byId, rowOf, totals);
+  for (const row of totals.values()) row.mostly = heaviestTool(row);
   const pressure = (row) => row.cpu + (100 * row.ramGb) / reading.totalRamGb;
   return [...totals.values()].sort((a, b) => pressure(b) - pressure(a));
+}
+
+const newConsumer = (name, isSession, isClosable) => ({ name, isSession, isClosable, cpu: 0, ramGb: 0, count: 0, shortLivedCpu: 0, cpuByTool: new Map(), mostly: null });
+
+function addCpu(row, tool, cpu) {
+  row.cpu += cpu;
+  if (tool && tool !== row.name) row.cpuByTool.set(tool, (row.cpuByTool.get(tool) ?? 0) + cpu);
+}
+
+function heaviestTool(row) {
+  const [tool, cpu] = [...row.cpuByTool].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+  return cpu >= WORTH_SHOWING_CPU ? tool : null;
+}
+
+function liveAncestor(id, byId, before) {
+  const seen = new Set();
+  while (id && !byId.has(id) && !seen.has(id)) {
+    seen.add(id);
+    id = before.get(id)?.parent;
+  }
+  return byId.has(id) ? id : null;
+}
+
+// A test runner's workers live for seconds: most start and end between two readings, and their
+// CPU shows in no process. It goes to the processes seen starting or ending over the gap, in
+// proportion to how hard each worked while seen: a busy worker, not the shells that came and went.
+// Windows's own share of that churn is left out, as everywhere here.
+function shareShortLivedCpu(cpu, reading, previous, byId, rowOf, totals) {
+  if (cpu < WORTH_SHOWING_CPU) return;
+  const earlier = new Set(previous.processes.map((p) => p.id));
+  const coresWhileSeen = (p, seenAt) => (p.started && seenAt > p.started ? p.cpuMs / (seenAt - p.started) : 0);
+  const churn = [
+    ...reading.processes.filter((p) => !earlier.has(p.id)).map((p) => ({ p, weight: coresWhileSeen(p, reading.at) })),
+    ...previous.processes.filter((p) => !byId.has(p.id)).map((p) => ({ p, weight: coresWhileSeen(p, previous.at) })),
+  ];
+  const totalWeight = churn.reduce((sum, c) => sum + c.weight, 0);
+  if (totalWeight <= 0) {
+    const row = totals.get(SHORT_LIVED) ?? newConsumer(SHORT_LIVED, false, false);
+    row.cpu += cpu;
+    row.shortLivedCpu += cpu;
+    totals.set(SHORT_LIVED, row);
+    return;
+  }
+  for (const { p, weight } of churn) {
+    const found = weight > 0 ? rowOf(p) : null;
+    if (!found) continue;
+    addCpu(found.row, found.tool, (cpu * weight) / totalWeight);
+    found.row.shortLivedCpu += (cpu * weight) / totalWeight;
+  }
 }
 
 // Anything smaller would change no answer on the panel.
