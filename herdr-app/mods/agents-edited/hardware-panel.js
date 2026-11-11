@@ -171,11 +171,19 @@ function usageCell(t, width, share, text) {
     .child(div().w(NUMBER_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_size(11.5).text_color(t.muted).child(text));
 }
 
+function consumerTooltip(c) {
+  const running = `${c.count} ${c.count === 1 ? "process" : "processes"} running${c.isSession ? " in this session" : ""}`;
+  const shortLived = c.shortLivedCpu >= 1 ? `. ${Math.round(c.shortLivedCpu)}% CPU from processes that started and ended since the last reading` : "";
+  return `${running}${shortLived}`;
+}
+
 function consumerRow(t, c, totalGb, isFirst) {
   return h_flex().id(`consumer-${c.name}`).flex_none().h(CONSUMER_ROW_HEIGHT).px(12).gap(14).items_center().hover((s) => s.bg(t.raised))
     .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
-    .tooltip(`${c.count} ${c.count === 1 ? "process" : "processes"}${c.isSession ? " in this session" : ""}`)
-    .child(div().flex_1().min_w(0).truncate().text_size(12.5).text_color(c.isSession ? t.foreground : t.muted).child(c.name))
+    .tooltip(consumerTooltip(c))
+    .child(h_flex().flex_1().min_w(0).gap(6).items_center()
+      .child(div().min_w(0).truncate().text_size(12.5).text_color(c.isSession ? t.foreground : t.muted).child(c.name))
+      .when(Boolean(c.mostly), (el) => el.child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(c.mostly))))
     .child(usageCell(t, CPU_COLUMN, c.cpu, `${Math.round(c.cpu)}%`))
     .child(usageCell(t, RAM_COLUMN, (100 * c.ramGb) / totalGb, `${c.ramGb.toFixed(1)} GB`));
 }

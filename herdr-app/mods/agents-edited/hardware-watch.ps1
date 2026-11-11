@@ -7,6 +7,7 @@
 param([Parameter(Mandatory)][string]$Folder)
 
 $CycleSeconds = 15
+$MaxCommandChars = 400
 $WantedTimeoutSeconds = 120
 $SignalCooldownSeconds = 60
 $SignalKeepHours = 24
@@ -44,28 +45,35 @@ function WriteWhole([string]$File, [string]$Text) {
 }
 
 $signals = @()
-if (Test-Path -LiteralPath $signalsFile) { $signals = @(Get-Content -LiteralPath $signalsFile -Raw | ConvertFrom-Json) }
+# ForEach-Object unrolls it: Windows PowerShell's ConvertFrom-Json hands a JSON array over as one
+# object, which @() would wrap again and ConvertTo-Json write as {"value":[...],"Count":n}.
+if (Test-Path -LiteralPath $signalsFile) { $signals = @((Get-Content -LiteralPath $signalsFile -Raw | ConvertFrom-Json) | ForEach-Object { $_ }) }
 
 while (((Get-Date) - (Get-Item -LiteralPath $wantedFile).LastWriteTime).TotalSeconds -lt $WantedTimeoutSeconds) {
   $parents = @{}
   $starts = @{}
   $system = @{}
-  foreach ($p in Get-CimInstance Win32_Process -Property ProcessId, ParentProcessId, CreationDate, ExecutablePath) {
+  $commands = @{}
+  foreach ($p in Get-CimInstance Win32_Process -Property ProcessId, ParentProcessId, CreationDate, ExecutablePath, CommandLine) {
     $id = [int]$p.ProcessId
     $parents[$id] = [int]$p.ParentProcessId
     if ($p.CreationDate) { $starts[$id] = ([DateTimeOffset]$p.CreationDate).ToUnixTimeMilliseconds() }
     # No path means Windows would not say: a protected process, not one this user can close.
     $system[$id] = (-not $p.ExecutablePath) -or ($p.ExecutablePath -match '^[A-Za-z]:\\Windows\\|\\Windows Defender\\')
+    # Names the tool behind an interpreter: node.exe alone does not say vitest or next.
+    if (-not $system[$id] -and $p.CommandLine) { $commands[$id] = $p.CommandLine.Substring(0, [math]::Min($MaxCommandChars, $p.CommandLine.Length)) }
   }
   $queue = (Get-CimInstance Win32_PerfFormattedData_PerfOS_System -Property ProcessorQueueLength).ProcessorQueueLength
   $diskIdle = (Get-CimInstance Win32_PerfFormattedData_PerfDisk_PhysicalDisk -Filter "Name='_Total'" -Property PercentIdleTime).PercentIdleTime
   # The perf counters, not System.Diagnostics.Process: that one reads 0 for protected processes.
-  $processes = foreach ($p in Get-CimInstance Win32_PerfRawData_PerfProc_Process -Property Name, IDProcess, PercentProcessorTime, WorkingSet) {
-    if ($p.Name -eq '_Total') { continue }
+  # cpuAt: the counters' own clock, so CPU over a gap does not drift with how long a cycle took.
+  $cpuAt = $null
+  $processes = foreach ($p in Get-CimInstance Win32_PerfRawData_PerfProc_Process -Property Name, IDProcess, PercentProcessorTime, WorkingSet, Timestamp_Sys100NS) {
+    if ($p.Name -eq '_Total') { $cpuAt = [int64]($p.Timestamp_Sys100NS / 10000); continue }
     $id = [int]$p.IDProcess
-    @{ id = $id; parent = $parents[$id]; started = $starts[$id]; system = ($system[$id] -ne $false); name = ($p.Name -replace '#\d+$', ''); ws = [int64]$p.WorkingSet; cpuMs = [int64]($p.PercentProcessorTime / 10000) }
+    @{ id = $id; parent = $parents[$id]; started = $starts[$id]; system = ($system[$id] -ne $false); name = ($p.Name -replace '#\d+$', ''); ws = [int64]$p.WorkingSet; cpuMs = [int64]($p.PercentProcessorTime / 10000); cmd = $commands[$id] }
   }
-  $reading = @{ at = (Now); cores = [Environment]::ProcessorCount; queue = $queue; diskIdle = $diskIdle; lowMemory = @($signals); processes = $processes }
+  $reading = @{ at = (Now); cpuAt = $cpuAt; cores = [Environment]::ProcessorCount; queue = $queue; diskIdle = $diskIdle; lowMemory = @($signals); processes = $processes }
   WriteWhole $rawFile ($reading | ConvertTo-Json -Compress -Depth 3)
 
   # Waiting on the signal itself: a dip between two readings would otherwise go unseen.
