@@ -45,7 +45,9 @@ function WriteWhole([string]$File, [string]$Text) {
 }
 
 $signals = @()
-if (Test-Path -LiteralPath $signalsFile) { $signals = @(Get-Content -LiteralPath $signalsFile -Raw | ConvertFrom-Json) }
+# ForEach-Object unrolls it: Windows PowerShell's ConvertFrom-Json hands a JSON array over as one
+# object, which @() would wrap again and ConvertTo-Json write as {"value":[...],"Count":n}.
+if (Test-Path -LiteralPath $signalsFile) { $signals = @((Get-Content -LiteralPath $signalsFile -Raw | ConvertFrom-Json) | ForEach-Object { $_ }) }
 
 while (((Get-Date) - (Get-Item -LiteralPath $wantedFile).LastWriteTime).TotalSeconds -lt $WantedTimeoutSeconds) {
   $parents = @{}
