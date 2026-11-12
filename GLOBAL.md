@@ -8,7 +8,7 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 - **Committing or pushing** → `~/.claude/rules/git.md` before the first commit (machine git identity, Conventional Commits, no AI attribution).
 - **Opening a pull request or editing its description** → the `pr-writing` skill before the first word of the body.
 - **Reviewing or simplifying code** → the `interrogate` skill for a review and `code-simplifier` for a simplification, not the built-in `/code-review` or `/simplify`.
-- **Performance work** (anything slow, laggy, janky or heavy, or "make it faster", on web, desktop, mobile, CLI or service) → the `perf-ratchet` skill before the first change: measure, record the baseline, fix, gate.
+- **Performance work** (anything slow, laggy, janky or heavy, or "make it faster", on web, desktop, CLI or service) → the `perf-ratchet` skill before the first change: measure, record the baseline, fix, gate.
 - **Writing a prompt** for a sub-agent, tool or LLM call → `~/.claude/rules/prompting.md`; maintaining a prompt file or CLAUDE.md → also `~/.claude/PROMPT_ENGINEERING.md`.
 
 ## Output
