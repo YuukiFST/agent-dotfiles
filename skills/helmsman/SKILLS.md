@@ -9,6 +9,7 @@ A user-invoked skill below is read by path, as `../<name>/SKILL.md` from this fi
 |---|---|---|
 | A `dev` ticket decides modules, a seam or a public interface | `codebase-design`; its `DESIGN-IT-TWICE.md` when the choice is hard to undo | the resolution, and the spec's Implementation decisions |
 | A `dev` ticket decides a schema, a state model or a lifecycle | `principle-model-the-domain`; `principle-type-system-discipline` in a typed language | the resolution |
+| A `dev` ticket decides how a web frontend renders, holds state, talks to the network or fails | [FRONTEND.md](FRONTEND.md), a checklist in this folder | the resolution, and the spec's Implementation decisions |
 | A decision is hard to reverse, surprising without context, and a real trade-off | `domain-modeling`'s ADR, on the plan branch | the resolution |
 | The product touches auth, user input, secrets, payments or personal data | `security-audit`, guidance mode | the ticket deciding it, each build ticket touching it, and the integration branch before `/interrogate` |
 | A product decision sets a speed or resource target | `perf-ratchet`; `web-perf` for a website, `optimizing-startup` for desktop launch | the walking skeleton sets the baseline; each later ticket keeps it |
