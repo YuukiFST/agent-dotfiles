@@ -1,6 +1,6 @@
 ---
 name: perf-ratchet
-description: "The one entry for performance work on any app (web, desktop, Android, CLI, game, service), measured in microseconds: page load and Web Vitals, launch, quit, typing, scrolling, idle RAM and CPU, FPS, instruction count, bundle size, with committed per-machine baselines that no change may regress and improvements become the new baseline. Use for anything slow, laggy, janky or heavy, even when the app cannot run on this machine (no device, no toolchain), to make an app or site faster, to set up baselines or a gate, when a project has .perf/ratchet.json and a change touches performance, to prove a change made nothing slower, or to choose a data-layout change or remove a cache in a hot path."
+description: "The one entry for performance work on any app (web, desktop, CLI, game, service), measured in microseconds: page load and Web Vitals, launch, quit, typing, scrolling, idle RAM and CPU, FPS, instruction count, bundle size, with committed per-machine baselines that no change may regress and improvements become the new baseline. Use for anything slow, laggy, janky or heavy, to make an app or site faster, to set up baselines or a gate, when a project has .perf/ratchet.json and a change touches performance, to prove a change made nothing slower, or to choose a data-layout change or remove a cache in a hot path."
 ---
 
 # Performance ratchet
@@ -34,10 +34,10 @@ Run it from the project; it finds `.perf/` in the working directory or a parent.
 
 ## Setup
 
-Done when `.perf/ratchet.json` covers every metric the user agreed to and the first `check` wrote `.perf/baselines.json`, or step 5's `blocked` wrote the report.
+Done when `.perf/ratchet.json` covers every metric the user agreed to and the first `check` wrote `.perf/baselines.json`.
 
 1. Detect the project type and propose metrics from [metrics.md](metrics.md), adding every area the user named ("FPS on tab X").
-   For a desktop, web or Android app, answer every row of its checklist: proposed, or not applicable with the reason.
+   For a desktop or web app, answer every row of its checklist: proposed, or not applicable with the reason.
    The user confirms the list before you write anything; in a run with nobody to answer, go on with the whole checklist and list the metrics in the report.
 2. Copy the scripts into `.perf/bin/`.
 3. Write one measurement command per metric, or one per run that yields several values (`pick`), under `.perf/measure/`.
@@ -64,10 +64,7 @@ Done when `.perf/ratchet.json` covers every metric the user agreed to and the fi
    `stable: true` marks a deterministic, machine-independent value (a count of work, bundle or binary size, Valgrind instruction or heap count); it shares one baseline across machines and is the only kind CI gates.
    `platforms` limits a metric to the OSes its tool runs on (`count.mjs` needs Linux); other machines skip it and say so, and CI or a Linux machine gates it.
    A metric with no `command` is fed by hand with `record`.
-5. A target that cannot run on this machine (an Android app with no device attached, a missing toolchain) still gets steps 1 to 4, then `node .perf/bin/ratchet.mjs blocked "no Android device attached"` in place of step 6.
-   It refuses until `.perf/measure/` holds the scripts, records no baseline and writes the report: paste it in the answer and list the fixes the code suggests as unmeasured.
-   A number from another host or an emulator is never a sample.
-6. Run `node .perf/bin/ratchet.mjs measure`, then `check`. With no baseline yet, every metric is `new` and becomes the baseline. Commit `.perf/`.
+5. Run `node .perf/bin/ratchet.mjs measure`, then `check`. With no baseline yet, every metric is `new` and becomes the baseline. Commit `.perf/`.
 
 ## Make it faster
 

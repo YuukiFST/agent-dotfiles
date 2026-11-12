@@ -109,25 +109,6 @@ test("check refuses a run that skipped a configured metric", () => {
   assert.equal(baselineMedian(root, "lcp"), 1200);
 });
 
-// Source: the user's decision for a target with no device, "passa com ratchet.json com
-// métricas em us + scripts de medição + relatório dizendo que a baseline não foi gravada".
-test("blocked reports that no baseline was recorded and asks for the measurement scripts first", () => {
-  const root = scratchProject([{ id: "scroll.frame_overrun_us_p95", command: undefined, pick: undefined }]);
-  const run = () => spawnSync(process.execPath, [RATCHET, "blocked", "no Android device attached"], { cwd: root, encoding: "utf8" });
-  const early = run();
-  assert.equal(early.status, 2);
-  assert.match(early.stderr, /\.perf\/measure\/ holds no measurement script/);
-
-  fs.mkdirSync(path.join(root, ".perf", "measure"));
-  fs.writeFileSync(path.join(root, ".perf", "measure", "macrobenchmark.mjs"), "");
-  const res = run();
-  assert.equal(res.status, 0, res.stderr);
-  const report = fs.readFileSync(path.join(root, ".perf", "runs", "report.md"), "utf8");
-  assert.match(report, /^No baseline recorded: no Android device attached\./);
-  assert.match(report, /\| scroll\.frame_overrun_us_p95 \(lower is better\) \| us \|/);
-  assert.equal(fs.existsSync(path.join(root, ".perf", "baselines.json")), false);
-});
-
 test("probe reads the memory of a launched app and stops it afterwards", () => {
   const scratch = fs.mkdtempSync(path.join(scratchRoot, "probe-"));
   const app = path.join(scratch, "app.js");
