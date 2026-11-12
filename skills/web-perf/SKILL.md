@@ -86,7 +86,7 @@ Copy this checklist and tick it as you go:
 - [ ] 5 Network
 - [ ] 6 Codebase (skip without source access)
 - [ ] 7 Coverage
-- [ ] 8 Fix and verify
+- [ ] 8 Fix, verify and ratchet (`perf-ratchet`)
 ```
 
 ### 1 Scope
@@ -185,6 +185,8 @@ Skip it only when the user asked about one metric.
 ### 8 Fix and verify
 
 Apply fixes only to measured bottlenecks, then re-run phase 3 under identical conditions and report before and after.
+With source access, the before and after go through `perf-ratchet`, which owns baselines and the no-regression gate: run its gate when the project has `.perf/ratchet.json`, and its Setup with the web checklist when it has none, so every fix becomes a baseline no later change may undo.
+An audit of a URL alone has nowhere to commit a baseline: say so in the report.
 Field improvement stays **pending**: CrUX is a rolling 28-day window and RUM needs new visits, so never claim a field gain right after a deploy.
 
 ## Output
