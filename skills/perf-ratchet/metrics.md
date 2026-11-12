@@ -10,6 +10,7 @@ Take every tool flag below from the tool's own `--help` before the first run.
 |---------|---------|
 | Web app or site | Every row of the web checklist below |
 | Desktop app (Electron, Tauri, native) | Every row of the desktop checklist below |
+| Android app | Every row of the Android checklist below |
 | Game or canvas-heavy UI | Frame time p95 and FPS p5 per scene, load time per scene, peak RAM |
 | CLI | Wall time of the main commands on a fixed input, peak RAM, binary size (`stable`) |
 | Service or API | p50 and p95 latency per key endpoint under a fixed load, throughput, RAM at steady state; with a database, queries per request (`stable`) and the scale sweep below |
@@ -49,6 +50,32 @@ These are the numbers the gate holds; finding why one is bad is `web-perf`'s aud
 | Memory | `<flow>.heap_mb`, `<flow>.heap_growth_mb`, `<route>.dom_nodes` | JS heap after the flow; heap kept after repeating it 20 times; DOM size | Heap snapshot, `eval` |
 | API | `<endpoint>.latency_us_p50`, `<endpoint>.latency_us_p95`, `<flow>.api_requests` (`stable`) | Latency of each endpoint the flow waits on, under a fixed load; requests the flow issues | Load script, network log |
 | Errors (`stable`) | `<flow>.console_errors`, `<flow>.failed_requests` | Console errors and failed requests during the flow; the baseline is 0, so a speedup that breaks a chunk load or an endpoint fails the gate | `console --type error`, network log |
+
+## Android checklist
+
+Answer every row the same way.
+Each time below is read from a trace or tool that prints nanoseconds or milliseconds: convert to integer microseconds and give the metric the resolution its row states.
+iOS has no checklist here.
+
+| Area | Metrics | From, to | Source, resolution |
+|------|---------|----------|--------------------|
+| Launch, per start kind | `launch.cold_ttid_us`, `launch.cold_ttfd_us`, `launch.warm_ttid_us`, `launch.hot_ttid_us` | The system receiving the launch intent to: the first frame of the destination Activity rendered (TTID), the first frame rendered after or containing the `reportFullyDrawn()` call (TTFD; an app that never calls it has no TTFD) | Macrobenchmark `StartupTimingMetric` (`timeToInitialDisplayMs`, `timeToFullDisplayMs`) under `StartupMode.COLD`, `WARM`, `HOT`; trace-derived, below 1 us |
+| Launch, where it goes | `launch.<section>_us`, `launch.<reason>_us` | `Trace.beginSection(name)` to its `endSection()` on the same thread; each exclusive interval of the startup grouped by its `reason` | `dur` of the `slice` table and of `android_startup_opinionated_breakdown`, in ns, queried with `trace_processor` from the iteration's `.perfetto-trace`; `resolution: 10` for a section, the cost of one marker pair |
+| Quit | Not applicable | Android documents no quit or background latency | |
+| Typing or tapping, 100 scripted events | `typing.input_to_frame_us_p50`, `typing.input_to_frame_us_p95`, `typing.handling_us_p95` | The input event read by InputReader to the present time of the frame it caused; the event received by the app to its ACK sent | `end_to_end_latency_dur` and `handling_latency_dur` of `android_input_events`, in ns; the first lands on a refresh, so `resolution` is the refresh interval (16,667 at 60 Hz, 8,333 at 120 Hz) |
+| Scrolling a fixed list | `scroll.frame_overrun_us_p95`, `scroll.frame_cpu_us_p95`, `scroll.frames_janky`, `scroll.frames` | The frame's deadline to its completion (positive is a missed deadline); the time producing the frame on the UI thread and RenderThread; frames with a positive overrun; frames produced | `overrun` and `cpu_time` of `android_frame_stats`, in ns, from the trace Macrobenchmark's `FrameTimingMetric` run leaves; needs Android 12; below 1 us |
+| Idle, 30 s after settle | `idle.pss_kb`, `idle.private_dirty_kb`, `idle.cpu_us` | Snapshot of the `TOTAL` row; `utime` plus `stime` burned over the 30 s | `adb shell dumpsys meminfo <package>` (`Pss Total`, `Private Dirty`, in KB); fields 14 and 15 of `/proc/<pid>/stat`, in clock ticks, so `resolution` is one tick in us |
+| Heaviest content | `open_large.rss_anon_kb_peak`, `reopen.activities` | Largest sample while the largest fixture opens; `Activities` count after opening and closing it 20 times, where growth is a leaked Activity | `MemoryUsageMetric(mode = Max)` (`memoryRssAnonKb`); `dumpsys meminfo` object counts |
+| Size (`stable`) | `apk.bytes`, `apk.download_bytes`, `apk.method_refs` | Built release APK | `apkanalyzer apk file-size`, `apk download-size` (an estimate), `dex references` |
+| Energy, Pixel 6 or newer only | `scroll.energy_total_uws` | System-wide energy over the measured block, not the app's share | Macrobenchmark `PowerMetric` (`energyTotalUws`) |
+
+- **A physical device, or no baseline:** Macrobenchmark refuses an emulator and a low battery, and the app under test is `profileable` and not debuggable.
+  With no device attached, write `.perf/ratchet.json`, the measurement scripts and the benchmark module, run nothing, and report that no baseline was recorded; a number from the host or an emulator is never a sample.
+- **The device is part of the id:** `ratchet.mjs` buckets by the host machine, so prefix each device-bound id with the device model (`pixel8.launch.cold_ttid_us`).
+- **Pin the compilation mode:** pass `CompilationMode` explicitly (`Partial(baselineProfileMode = BaselineProfileMode.Require)` for what users get), since it moves every time metric.
+- **Feed the gate by hand:** one `./gradlew :macrobenchmark:connectedCheck` yields every iteration of every metric in the `benchmarkData.json` under `build/outputs/connected_android_test_additional_output/`; a script under `.perf/measure/` reads `benchmarks[].metrics.<name>.runs[]`, multiplies milliseconds by 1,000 and calls `ratchet.mjs record <id> <values>`.
+- **Keep `dumpsys meminfo` out of a frame measurement:** it forces a garbage collection in the app.
+- **A table with no rows fails the script:** `android_input_events` and `android_frame_stats` are empty when the trace lacked their data source, and a missing value must not read as zero.
 
 ## Recipes
 

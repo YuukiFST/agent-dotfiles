@@ -1,6 +1,6 @@
 ---
 name: web-perf
-description: Measure and fix website performance - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse, sluggish interactions, layout shifts, heavy bundles, web fonts, memory, dropped frames and slow API calls. Use for an audit of a URL or web codebase, or to verify a fix before and after. App launch time and a regression gate go to perf-ratchet.
+description: Diagnose why a website is slow - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse, sluggish interactions, layout shifts, heavy bundles, web fonts, memory, dropped frames and slow API calls. perf-ratchet calls it for the web diagnosis inside its cycle; use it directly only to audit a URL whose code you cannot change. Making a site faster starts at perf-ratchet.
 license: Apache-2.0 AND MIT (see LICENSE)
 ---
 <!-- Source: https://github.com/cloudflare/skills/tree/main/skills/web-perf and addyosmani/web-quality-skills (notices in LICENSE); description routes tie cases to sibling skills -->

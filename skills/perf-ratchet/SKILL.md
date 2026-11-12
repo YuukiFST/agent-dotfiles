@@ -1,12 +1,15 @@
 ---
 name: perf-ratchet
-description: "Measure and improve the performance of any app (web, desktop, CLI, game, service) in microseconds: launch, quit, typing, scrolling, idle RAM and CPU, FPS, instruction count, bundle size, with committed per-machine baselines that no change may regress and improvements become the new baseline. Use to make an app faster, when launch or startup feels slow, to set up baselines or a gate, when a project has .perf/ratchet.json and a change touches performance, to prove a change made nothing slower, or to choose a data-layout change or remove a cache in a hot path. Slow-page diagnosis goes to web-perf."
+description: "The one entry for performance work on any app (web, desktop, Android, CLI, game, service), measured in microseconds: page load and Web Vitals, launch, quit, typing, scrolling, idle RAM and CPU, FPS, instruction count, bundle size, with committed per-machine baselines that no change may regress and improvements become the new baseline. Use for anything slow, laggy, janky or heavy, to make an app or site faster, to set up baselines or a gate, when a project has .perf/ratchet.json and a change touches performance, to prove a change made nothing slower, or to choose a data-layout change or remove a cache in a hot path."
 ---
 
 # Performance ratchet
 
 A **ratchet** turns one way: every metric keeps its best proven value as the baseline, a change that makes any metric worse past its noise threshold is rejected, and a change that makes one better moves the baseline there.
 Each release is then at least as fast as the one before it.
+
+Every performance request runs the same cycle, on a project of any size, in this order: Setup when the project has no `.perf/ratchet.json`, Make it faster, Gate a change.
+The baseline is recorded before the first change to the code; a speedup measured by a throwaway script is lost with the script.
 
 `ratchet.mjs` (Node 18+, no dependencies) holds the verdict and the speedup, so neither rests on arithmetic done in your head.
 Setup copies every `.mjs` in this skill's `scripts/` except the test into the project's `.perf/bin/`, so CI and every machine run the same gate without the skill installed; recopy them when this skill's copies change.
@@ -34,8 +37,8 @@ Run it from the project; it finds `.perf/` in the working directory or a parent.
 Done when `.perf/ratchet.json` covers every metric the user agreed to and the first `check` wrote `.perf/baselines.json`.
 
 1. Detect the project type and propose metrics from [metrics.md](metrics.md), adding every area the user named ("FPS on tab X").
-   For a desktop or web app, answer every row of its checklist: proposed, or not applicable with the reason.
-   The user confirms the list before you write anything.
+   For a desktop, web or Android app, answer every row of its checklist: proposed, or not applicable with the reason.
+   The user confirms the list before you write anything; in a run with nobody to answer, go on with the whole checklist and list the metrics in the report.
 2. Copy the scripts into `.perf/bin/`.
 3. Write one measurement command per metric, or one per run that yields several values (`pick`), under `.perf/measure/`.
    Each command must exit 0 and print the value on its last stdout line.
