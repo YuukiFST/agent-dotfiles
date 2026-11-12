@@ -11,7 +11,7 @@ A user-invoked skill below is read by path, as `../<name>/SKILL.md` from this fi
 | A `dev` ticket decides a schema, a state model or a lifecycle | `principle-model-the-domain`; `principle-type-system-discipline` in a typed language | the resolution |
 | A decision is hard to reverse, surprising without context, and a real trade-off | `domain-modeling`'s ADR, on the plan branch | the resolution |
 | The product touches auth, user input, secrets, payments or personal data | `security-audit`, guidance mode | the ticket deciding it, each build ticket touching it, and the integration branch before `/interrogate` |
-| A product decision sets a speed or resource target | `perf-ratchet`; `web-perf` for a website, `optimizing-startup` for desktop launch | the walking skeleton sets the baseline; each later ticket keeps it |
+| A product decision sets a speed or resource target | `perf-ratchet`; `web-perf` for a website | the walking skeleton sets the baseline; each later ticket keeps it |
 | Tests are written or changed | `test-audit` | every build ticket |
 | The interface carries words: labels, empty states, errors, CTAs | `ai-copywriter` | the prototype, and each screen's build ticket |
 | TypeScript or Rust is in the stack | `typescript-best-practices` or `rust-best-practices`; `rust-port` when porting | every build ticket |

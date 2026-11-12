@@ -24,6 +24,10 @@ const NOISE_SIGMAS = 2;
 // Deterministic metrics (bundle size, binary size) are machine-independent, so
 // they share one baseline bucket and CI can gate them on any runner.
 const STABLE_BUCKET = "stable";
+// Time is recorded in integer microseconds, so a sub-millisecond phase keeps its
+// digits and every report reads in one unit.
+const COARSE_TIME_UNITS = new Set(["ms", "msec", "millis", "milliseconds", "s", "sec", "secs", "seconds"]);
+const TIME_UNITS = new Set(["us", "ns"]);
 
 class RatchetError extends Error {}
 const fail = (message) => {
@@ -72,6 +76,9 @@ function loadConfig(root) {
     seen.add(m.id);
     if (m.better !== "lower" && m.better !== "higher") fail(`${where}.better must be "lower" or "higher"`);
     if (typeof m.unit !== "string" || m.unit === "") fail(`${where}.unit must be a non-empty string`);
+    if (COARSE_TIME_UNITS.has(m.unit.toLowerCase())) {
+      fail(`${where}.unit "${m.unit}": time is recorded in microseconds; set unit "us" and have the command print integer microseconds`);
+    }
     for (const key of ["command", "pick", "description"]) {
       if (m[key] !== undefined && typeof m[key] !== "string") fail(`${where}.${key} must be a string`);
     }
@@ -91,6 +98,7 @@ function loadConfig(root) {
       warmup: numberField(m.warmup, 0, `${where}.warmup`, { integer: true }),
       tolerance: numberField(m.tolerance, stable ? 0 : 0.05, `${where}.tolerance`),
       minDelta: numberField(m.minDelta, 0, `${where}.minDelta`),
+      resolution: numberField(m.resolution, 0, `${where}.resolution`),
     };
   });
   return { metrics, profile: raw.profile ?? "" };
@@ -247,31 +255,53 @@ function noise(xs) {
   return MAD_TO_SIGMA * median(xs.map((x) => Math.abs(x - m)));
 }
 
+// A difference smaller than the threshold is noise or below what the measurement
+// can resolve, so it is neither a verdict nor a speedup worth printing.
+function compare(metric, older, current) {
+  const threshold = Math.max(
+    metric.tolerance * Math.abs(older.median),
+    NOISE_SIGMAS * Math.max(older.noise ?? 0, current.noise),
+    metric.minDelta,
+    metric.resolution,
+  );
+  const gain = metric.better === "lower" ? older.median - current.median : current.median - older.median;
+  const verdict = gain < -threshold ? "regressed" : gain > threshold ? "improved" : "flat";
+  return { verdict, threshold, gain };
+}
+
 function judge(metric, base, samples) {
   const current = { median: median(samples), noise: noise(samples) };
   if (!base) return { verdict: "new", current, threshold: null, gain: null };
   if (base.unit !== metric.unit || base.better !== metric.better) {
     return { verdict: "reset", current, threshold: null, gain: null };
   }
-  const threshold = Math.max(
-    metric.tolerance * Math.abs(base.median),
-    NOISE_SIGMAS * Math.max(base.noise, current.noise),
-    metric.minDelta,
-  );
-  const gain = metric.better === "lower" ? base.median - current.median : current.median - base.median;
-  const verdict = gain < -threshold ? "regressed" : gain > threshold ? "improved" : "flat";
-  return { verdict, current, threshold, gain };
+  return { ...compare(metric, base, current), current };
 }
 
 function fmt(x) {
   if (x === null || x === undefined) return "-";
-  return Math.abs(x) >= 100 ? x.toFixed(0) : String(Number(x.toPrecision(3)));
+  return Math.abs(x) >= 100 ? x.toFixed(0).replace(/\B(?=(\d{3})+$)/g, ",") : String(Number(x.toPrecision(3)));
+}
+
+function fmtRatio(ratio) {
+  return `${ratio.toFixed(ratio < 2 ? 2 : ratio < 100 ? 1 : 0)}x`;
+}
+
+// "5.9x faster": how many times better the current median is than an older one.
+// Null when a ratio would mislead: a zero or negative operand has no multiple.
+function speedup(metric, from, to) {
+  const [good, bad] = TIME_UNITS.has(metric.unit.toLowerCase()) ? ["faster", "slower"] : metric.better === "lower" ? ["lower", "higher"] : ["higher", "lower"];
+  if (from < 0 || to < 0 || from === to) return null;
+  if (to === 0) return metric.better === "lower" ? "eliminated" : "dropped to 0";
+  if (from === 0) return null;
+  const ratio = metric.better === "lower" ? from / to : to / from;
+  return ratio >= 1 ? `${fmtRatio(ratio)} ${good}` : `${fmtRatio(1 / ratio)} ${bad}`;
 }
 
 function report(rows) {
   const lines = [
-    "| Metric | Baseline | Current | Change | Threshold | Verdict |",
-    "|--------|----------|---------|--------|-----------|---------|",
+    "| Metric | Baseline | Current | Change | Speedup | Since first | Threshold | Verdict |",
+    "|--------|----------|---------|--------|---------|-------------|-----------|---------|",
   ];
   for (const { metric, base, result } of rows) {
     const unit = ` ${metric.unit}`;
@@ -284,7 +314,14 @@ function report(rows) {
     const baseline = base ? `${fmt(base.median)}${unit}` : "-";
     const current = `${fmt(result.current.median)}${unit} (n=${result.n})`;
     const threshold = result.threshold === null ? "-" : `${fmt(result.threshold)}${unit}`;
-    lines.push(`| ${metric.id} (${metric.better} is better) | ${baseline} | ${current} | ${change} | ${threshold} | ${result.verdict} |`);
+    const moved = result.verdict === "improved" || result.verdict === "regressed";
+    const versusBase = (moved && speedup(metric, base.median, result.current.median)) || "-";
+    // The first value this machine ever recorded for the metric survives every
+    // promotion, so the gain of a whole series of changes stays on the report.
+    const first = result.gain === null ? null : (base.first ?? base);
+    const sinceFirst = (first && compare(metric, first, result.current).verdict !== "flat" && speedup(metric, first.median, result.current.median)) || null;
+    const versusFirst = sinceFirst ? `${sinceFirst} (${fmt(first.median)}${unit} at ${first.ref})` : "-";
+    lines.push(`| ${metric.id} (${metric.better} is better) | ${baseline} | ${current} | ${change} | ${versusBase} | ${versusFirst} | ${threshold} | ${result.verdict} |`);
   }
   return lines.join("\n");
 }
@@ -315,17 +352,17 @@ function check(root, config, opts) {
   if (regressed.length) {
     lines.push(`FAIL: ${regressed.map((r) => r.metric.id).join(", ")} regressed. Baselines unchanged.`);
   } else if (promotable.length && opts.promote) {
-    for (const { metric, samples, result } of promotable) {
+    for (const { metric, base, samples, result } of promotable) {
       const key = bucketFor(metric);
       const bucket = (baselines.buckets[key] ??= { env: metric.stable ? "machine-independent" : run.env, metrics: {} });
+      const entry = { median: result.current.median, noise: result.current.noise, ref: run.ref, date: run.date };
+      const previous = base && { median: base.median, noise: base.noise, ref: base.ref, date: base.date };
       bucket.metrics[metric.id] = {
-        median: result.current.median,
-        noise: result.current.noise,
+        ...entry,
         unit: metric.unit,
         better: metric.better,
         samples,
-        ref: run.ref,
-        date: run.date,
+        first: result.verdict === "improved" ? (base.first ?? previous) : entry,
       };
     }
     writeJson(baselinesFile, sortKeys(baselines));

@@ -72,3 +72,5 @@ security-review
 security-bounty-hunter
 # The rewritten helmsman plans through decision packets; a page restating it would drift.
 helmsman-explain
+# Folded into perf-ratchet, which now owns launch measurement and techniques (launch.md).
+optimizing-startup
