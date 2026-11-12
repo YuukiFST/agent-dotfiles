@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 // Sample memory and CPU of a process tree (the root plus every descendant, so
 // Electron and browser helpers count) and print one JSON line for ratchet.mjs:
-//   {"rss_mb_peak":..,"rss_mb_mean":..,"cpu_pct_mean":..,"samples":..}
-// cpu_pct is one core = 100, so a busy 4-core app can read 400.
+//   {"rss_mb_peak":..,"rss_mb_mean":..,"private_mb_peak":..,"private_mb_mean":..,
+//    "cpu_pct_mean":..,"cpu_pct_peak":..,"cpu_us":..,"cpu_resolution_us":..,
+//    "threads_peak":..,"handles_peak":..,"window_us":..,"samples":..}
+// cpu_pct is one core = 100, so a busy 4-core app can read 400. cpu_us is the CPU
+// time the tree consumed inside the sampled window, read from the kernel's own
+// counters, which advance in steps of cpu_resolution_us per running thread.
+// private_mb is memory no other process shares; it is left out when the OS
+// refuses to report it for any process of the tree.
 //
 //   node probe.mjs [--settle 5] [--duration 10] [--interval 1] -- <app command>
 //   node probe.mjs --pid <pid> [--duration 10] [--interval 1]
+//   node probe.mjs [--settle 5] --scenario "<driver command>" -- <app command>
 //
+// --scenario runs a command that drives the app (scroll, type) and samples from
+// its start to its exit instead of for --duration; scenario_us is its wall time.
 // A launched app is killed with its tree after sampling; an attached --pid is left
 // running. Windows and Linux only (/proc and Win32_Process).
 import { spawn, spawnSync } from "node:child_process";
@@ -21,14 +30,18 @@ function die(message) {
 }
 
 function parseArgs(argv) {
-  const opts = { settle: 5, duration: 10, interval: 1, pid: null, command: null };
+  const opts = { settle: 5, duration: 10, interval: 1, pid: null, command: null, scenario: null };
   const dash = argv.indexOf("--");
   const flags = dash === -1 ? argv : argv.slice(0, dash);
   if (dash !== -1) opts.command = argv.slice(dash + 1).join(" ");
   for (let i = 0; i < flags.length; i += 2) {
     const key = flags[i].replace(/^--/, "");
+    if (key === "scenario" && flags[i + 1]) {
+      opts.scenario = flags[i + 1];
+      continue;
+    }
     const value = Number(flags[i + 1]);
-    if (!(key in opts) || key === "command" || !Number.isFinite(value) || value < 0) die(`bad flag ${flags[i]} ${flags[i + 1] ?? ""}`);
+    if (!(key in opts) || key === "command" || key === "scenario" || !Number.isFinite(value) || value < 0) die(`bad flag ${flags[i]} ${flags[i + 1] ?? ""}`);
     opts[key] = value;
   }
   if ((opts.pid === null) === !opts.command) die("give either --pid <pid> or -- <app command>");
@@ -54,10 +67,29 @@ function getconf(name, fallback) {
 }
 
 // Linux: /proc/<pid>/stat; comm may hold spaces and parens, so split after the last ")".
+function linuxPrivateBytes(pid) {
+  try {
+    const rollup = fs.readFileSync(`/proc/${pid}/smaps_rollup`, "utf8");
+    let kb = 0;
+    for (const line of rollup.matchAll(/^Private_(?:Clean|Dirty):\s+(\d+) kB$/gm)) kb += Number(line[1]);
+    return kb * 1024;
+  } catch {
+    return null; // another user's process, or it exited
+  }
+}
+
+function linuxOpenFiles(pid) {
+  try {
+    return fs.readdirSync(`/proc/${pid}/fd`).length;
+  } catch {
+    return 0;
+  }
+}
+
 function linuxSampler() {
   const pageBytes = getconf("PAGESIZE", 4096);
   const ticksPerSec = getconf("CLK_TCK", 100);
-  return async function sample(rootPid) {
+  const sample = async function sample(rootPid) {
     const procs = [];
     for (const entry of fs.readdirSync("/proc")) {
       if (!/^\d+$/.test(entry)) continue;
@@ -68,10 +100,12 @@ function linuxSampler() {
         continue; // exited between readdir and read
       }
       const f = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
-      procs.push({ pid: Number(entry), ppid: Number(f[1]), cpuSec: (Number(f[11]) + Number(f[12])) / ticksPerSec, rssBytes: Number(f[21]) * pageBytes });
+      procs.push({ pid: Number(entry), ppid: Number(f[1]), cpuSec: (Number(f[11]) + Number(f[12])) / ticksPerSec, rssBytes: Number(f[21]) * pageBytes, threads: Number(f[17]) });
     }
-    return descendants(rootPid, procs);
+    return descendants(rootPid, procs).map((p) => ({ ...p, privateBytes: linuxPrivateBytes(p.pid), handles: linuxOpenFiles(p.pid) }));
   };
+  sample.cpuResolutionUs = Math.round(1e6 / ticksPerSec);
+  return sample;
 }
 
 // Windows: one long-lived PowerShell answers each sample request on stdin, since a
@@ -81,8 +115,8 @@ function windowsSampler() {
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 while ($null -ne ($line = [Console]::In.ReadLine())) {
-  Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,WorkingSetSize,KernelModeTime,UserModeTime |
-    ForEach-Object { '{0} {1} {2} {3}' -f $_.ProcessId, $_.ParentProcessId, $_.WorkingSetSize, ($_.KernelModeTime + $_.UserModeTime) }
+  Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,WorkingSetSize,KernelModeTime,UserModeTime,PrivatePageCount,ThreadCount,HandleCount |
+    ForEach-Object { '{0} {1} {2} {3} {4} {5} {6}' -f $_.ProcessId, $_.ParentProcessId, $_.WorkingSetSize, ($_.KernelModeTime + $_.UserModeTime), $_.PrivatePageCount, $_.ThreadCount, $_.HandleCount }
   'END'
 }`;
   const encoded = Buffer.from(script, "utf16le").toString("base64");
@@ -97,8 +131,8 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
     const body = buffer.slice(0, end);
     buffer = buffer.slice(end + 3);
     const procs = body.trim().split(/\r?\n/).filter(Boolean).map((line) => {
-      const [pid, ppid, ws, cpu100ns] = line.trim().split(" ").map(Number);
-      return { pid, ppid, rssBytes: ws, cpuSec: cpu100ns / 1e7 };
+      const [pid, ppid, ws, cpu100ns, privateBytes, threads, handles] = line.trim().split(" ").map(Number);
+      return { pid, ppid, rssBytes: ws, cpuSec: cpu100ns / 1e7, privateBytes, threads, handles };
     });
     const resolve = pending;
     pending = null;
@@ -110,6 +144,8 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
       ps.stdin.write("\n");
     });
   sample.close = () => ps.stdin.end();
+  // Windows charges CPU time to a thread once per clock interrupt, 15.625 ms apart.
+  sample.cpuResolutionUs = 15625;
   return sample;
 }
 
@@ -141,20 +177,45 @@ async function main() {
   await sample(rootPid); // the first CIM query loads modules and runs slow; keep it off the clock
   const points = [];
   const count = Math.max(2, Math.round(opts.duration / opts.interval) + 1);
+  const total = (tree, field) => tree.reduce((sum, p) => sum + p[field], 0);
+  const takePoint = async () => {
+    // A CIM query takes a few hundred ms; the midpoint is the best estimate of
+    // when its CPU counters were read.
+    const asked = performance.now();
+    const tree = await sample(rootPid);
+    const answered = performance.now();
+    if (tree.length === 0) throw new Error(`process ${rootPid} is not running${points.length === 0 ? "" : " any more"}`);
+    points.push({
+      t: (asked + answered) / 2000,
+      rssBytes: total(tree, "rssBytes"),
+      cpuSec: total(tree, "cpuSec"),
+      privateBytes: tree.some((p) => p.privateBytes === null) ? null : total(tree, "privateBytes"),
+      threads: total(tree, "threads"),
+      handles: total(tree, "handles"),
+    });
+  };
+  let scenarioUs = null;
   try {
-    for (let i = 0; i < count; i++) {
-      // A CIM query takes a few hundred ms; the midpoint is the best estimate of
-      // when its CPU counters were read.
-      const asked = performance.now();
-      const tree = await sample(rootPid);
-      const answered = performance.now();
-      if (tree.length === 0) throw new Error(`process ${rootPid} is not running${i === 0 ? "" : " any more"}`);
-      points.push({
-        t: (asked + answered) / 2000,
-        rssBytes: tree.reduce((sum, p) => sum + p.rssBytes, 0),
-        cpuSec: tree.reduce((sum, p) => sum + p.cpuSec, 0),
+    if (opts.scenario) {
+      await takePoint();
+      const started = process.hrtime.bigint();
+      const driver = spawn(opts.scenario, { shell: true, stdio: ["ignore", "ignore", "inherit"] });
+      const exit = new Promise((resolve, reject) => {
+        driver.on("error", reject);
+        driver.on("exit", (code) => {
+          scenarioUs = Number((process.hrtime.bigint() - started) / 1000n);
+          resolve(code);
+        });
       });
-      if (i < count - 1) await sleep(opts.interval * 1000);
+      let code;
+      while ((code = await Promise.race([exit, sleep(opts.interval * 1000)])) === undefined) await takePoint();
+      if (code !== 0) throw new Error(`scenario "${opts.scenario}" exited ${code}`);
+      await takePoint();
+    } else {
+      for (let i = 0; i < count; i++) {
+        await takePoint();
+        if (i < count - 1) await sleep(opts.interval * 1000);
+      }
     }
   } finally {
     sample.close?.();
@@ -165,10 +226,22 @@ async function main() {
   // negative interval reads as idle rather than as negative load.
   const cpuPct = points.slice(1).map((p, i) => Math.max(0, (p.cpuSec - points[i].cpuSec) / (p.t - points[i].t)) * 100);
   const mb = (bytes) => Number((bytes / 2 ** 20).toFixed(1));
+  const peak = (field) => Math.max(...points.map((p) => p[field]));
+  const mean = (field) => points.reduce((sum, p) => sum + p[field], 0) / points.length;
+  const first = points[0];
+  const last = points[points.length - 1];
   const result = {
-    rss_mb_peak: mb(Math.max(...points.map((p) => p.rssBytes))),
-    rss_mb_mean: mb(points.reduce((sum, p) => sum + p.rssBytes, 0) / points.length),
+    rss_mb_peak: mb(peak("rssBytes")),
+    rss_mb_mean: mb(mean("rssBytes")),
+    ...(points.every((p) => p.privateBytes !== null) && { private_mb_peak: mb(peak("privateBytes")), private_mb_mean: mb(mean("privateBytes")) }),
     cpu_pct_mean: Number((cpuPct.reduce((a, b) => a + b, 0) / cpuPct.length).toFixed(1)),
+    cpu_pct_peak: Number(Math.max(...cpuPct).toFixed(1)),
+    cpu_us: Math.max(0, Math.round((last.cpuSec - first.cpuSec) * 1e6)),
+    cpu_resolution_us: sample.cpuResolutionUs,
+    threads_peak: peak("threads"),
+    handles_peak: peak("handles"),
+    window_us: Math.round((last.t - first.t) * 1e6),
+    ...(scenarioUs !== null && { scenario_us: scenarioUs }),
     samples: points.length,
   };
   process.stdout.write(`${JSON.stringify(result)}\n`);

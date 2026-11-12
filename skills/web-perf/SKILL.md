@@ -1,6 +1,6 @@
 ---
 name: web-perf
-description: Measure and fix website performance - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse, sluggish interactions, layout shifts, heavy bundles and web fonts. Use for an audit of a URL or web codebase, or to verify a fix before and after. App launch time goes to optimizing-startup, a regression gate to perf-ratchet.
+description: Measure and fix website performance - slow loads, Core Web Vitals (LCP, INP, CLS), Lighthouse, sluggish interactions, layout shifts, heavy bundles, web fonts, memory, dropped frames and slow API calls. Use for an audit of a URL or web codebase, or to verify a fix before and after. App launch time and a regression gate go to perf-ratchet.
 license: Apache-2.0 AND MIT (see LICENSE)
 ---
 <!-- Source: https://github.com/cloudflare/skills/tree/main/skills/web-perf and addyosmani/web-quality-skills (notices in LICENSE); description routes tie cases to sibling skills -->
@@ -85,7 +85,8 @@ Copy this checklist and tick it as you go:
 - [ ] 4 Insights
 - [ ] 5 Network
 - [ ] 6 Codebase (skip without source access)
-- [ ] 7 Fix and verify
+- [ ] 7 Coverage
+- [ ] 8 Fix and verify
 ```
 
 ### 1 Scope
@@ -175,7 +176,13 @@ Fetch `network-get <id>` only for a request that backs a finding.
 With source access, read [references/codebase.md](references/codebase.md): stack detection, bundle and tree-shaking checks, polyfills, compression, caching headers, budgets.
 Without a running page, every finding here is a **hypothesis** paired with the trace or insight that would confirm it.
 
-### 7 Fix and verify
+### 7 Coverage
+
+Answer every row of [references/coverage.md](references/coverage.md): splitting, prefetching, caching layers, over-rendering, virtualization, workers, memory, dropped frames, API latency, error rate and the rest.
+The trace finds the worst problem; the table shows what else the page pays for.
+Skip it only when the user asked about one metric.
+
+### 8 Fix and verify
 
 Apply fixes only to measured bottlenecks, then re-run phase 3 under identical conditions and report before and after.
 Field improvement stays **pending**: CrUX is a rolling 28-day window and RUM needs new visits, so never claim a field gain right after a deploy.
@@ -196,6 +203,7 @@ Then, in order:
 3. **Hypotheses**: source-only findings, each with the measurement that would confirm it.
 4. **Recommendations**: specific changes with the code or config snippet.
 5. **Codebase findings**: detected stack and bundle opportunities; omit without source access.
-6. **Verification status**: what was re-measured, what stays pending, remaining uncertainty.
+6. **Coverage**: one line per row of the coverage table with its answer.
+7. **Verification status**: what was re-measured, what stays pending, remaining uncertainty.
 
-An excellent page gets the evidence table and one line saying so.
+An excellent page gets the evidence table, the coverage lines and one line saying so.

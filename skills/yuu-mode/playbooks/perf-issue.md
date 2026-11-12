@@ -1,7 +1,7 @@
 # Perf issue
 
 Every fix ties to a measurement; reading source is not measuring.
-Web pages route to `web-perf` and desktop launch time to `optimizing-startup`; this playbook covers the rest.
+Web pages route to `web-perf`, and a desktop app's launch, quit, typing, scrolling, RAM or CPU to `perf-ratchet`; this playbook covers the rest.
 A project with `.perf/ratchet.json` takes its baseline and its final gate from `perf-ratchet`, so the fix also proves no other metric got worse.
 
 1. Capture a baseline on the real workload plus a profile or trace of it, and vet it and every later number with `principle-explain-the-number`.

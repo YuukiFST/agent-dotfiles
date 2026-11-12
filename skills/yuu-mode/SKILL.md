@@ -72,9 +72,8 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Settle a design or behavior question with a throwaway build | `prototype` |
 | A whole new project from a loose idea, or a feature too big for one session | `helmsman` |
 | Slow web page, Core Web Vitals, Lighthouse score | `web-perf` |
-| Slow desktop app launch | `optimizing-startup` |
 | Any other measured slowness | `playbooks/perf-issue.md` |
-| Performance baselines that must never regress, or a project with `.perf/ratchet.json` | `perf-ratchet` |
+| Slow desktop app (launch, quit, typing, scrolling, RAM, CPU), performance baselines that must never regress, or a project with `.perf/ratchet.json` | `perf-ratchet` |
 
 ### Review
 
