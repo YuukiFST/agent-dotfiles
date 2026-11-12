@@ -70,7 +70,7 @@ iOS has no checklist here.
 | Energy, Pixel 6 or newer only | `scroll.energy_total_uws` | System-wide energy over the measured block, not the app's share | Macrobenchmark `PowerMetric` (`energyTotalUws`) |
 
 - **A physical device, or no baseline:** Macrobenchmark refuses an emulator and a low battery, and the app under test is `profileable` and not debuggable.
-  With no device attached, Setup's rule for a target that cannot run on this machine applies, and the benchmark module is written with the measurement scripts.
+  With no device attached, Setup step 5 applies, and the benchmark module is written with the measurement scripts.
 - **The device is part of the id:** `ratchet.mjs` buckets by the host machine, so prefix each device-bound id with the device model (`pixel8.launch.cold_ttid_us`).
 - **Pin the compilation mode:** pass `CompilationMode` explicitly (`Partial(baselineProfileMode = BaselineProfileMode.Require)` for what users get), since it moves every time metric.
 - **Feed the gate by hand:** one `./gradlew :macrobenchmark:connectedCheck` yields every iteration of every metric in the `benchmarkData.json` under `build/outputs/connected_android_test_additional_output/`; a script under `.perf/measure/` reads `benchmarks[].metrics.<name>.runs[]`, multiplies milliseconds by 1,000 and calls `ratchet.mjs record <id> <values>`.
