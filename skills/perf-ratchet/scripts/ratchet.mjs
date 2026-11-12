@@ -6,6 +6,7 @@
 //   node ratchet.mjs measure [--only a,b] [--stable-only]
 //   node ratchet.mjs record <metric-id> <value>...
 //   node ratchet.mjs check   [--only a,b] [--stable-only] [--no-promote]
+//   node ratchet.mjs blocked <what is missing>
 //
 // Exit codes: 0 pass, 1 regression, 2 usage, config or measurement error.
 import { spawnSync } from "node:child_process";
@@ -379,6 +380,35 @@ function check(root, config, opts) {
   return regressed.length ? EXIT_REGRESSED : EXIT_PASS;
 }
 
+// The target cannot run on this machine (no device, no toolchain): the config and
+// the measurement scripts are still owed, so the next machine that can run it
+// only has to measure. Writes the report and never a sample or a baseline.
+function blocked(root, config, opts) {
+  const missing = opts.positional.join(" ").trim();
+  if (!missing) fail('blocked needs what is missing, e.g. blocked "no Android device attached"');
+  const measureDir = path.join(root, ".perf", "measure");
+  const scripts = fs.existsSync(measureDir) ? fs.readdirSync(measureDir) : [];
+  if (scripts.length === 0) {
+    fail(".perf/measure/ holds no measurement script; write the scripts a machine that can run the target will use (perf-ratchet SKILL.md, Setup step 3)");
+  }
+  const lines = [
+    `No baseline recorded: ${missing}.`,
+    "Nothing was measured on this machine, and every fix made without a baseline is unmeasured.",
+    "",
+    "| Metric | Unit | Fed by |",
+    "|--------|------|--------|",
+    ...config.metrics.map((m) => `| ${m.id} (${m.better} is better) | ${m.unit} | ${m.command ? `\`${m.command}\`` : `\`ratchet.mjs record ${m.id} <value>...\``} |`),
+    "",
+    `Measurement scripts: ${scripts.map((name) => `.perf/measure/${name}`).join(", ")}.`,
+    "On a machine that can run the target: `node .perf/bin/ratchet.mjs measure`, then `check`.",
+  ];
+  const text = lines.join("\n");
+  ensureRunsIgnored(root);
+  fs.mkdirSync(path.dirname(runFile(root)), { recursive: true });
+  fs.writeFileSync(path.join(root, ".perf", "runs", "report.md"), `${text}\n`);
+  process.stdout.write(`${text}\n`);
+}
+
 // Stable key order keeps the committed baselines file diff-friendly.
 function sortKeys(value) {
   if (Array.isArray(value) || value === null || typeof value !== "object") return value;
@@ -387,9 +417,9 @@ function sortKeys(value) {
 
 function main(argv) {
   const opts = parseArgs(argv);
-  const commands = { measure, record, check };
+  const commands = { measure, record, check, blocked };
   const handler = commands[opts.command];
-  if (!handler) fail(`usage: ratchet.mjs <measure|record|check> [...]; got "${opts.command ?? ""}"`);
+  if (!handler) fail(`usage: ratchet.mjs <measure|record|check|blocked> [...]; got "${opts.command ?? ""}"`);
   const root = findRoot(process.cwd());
   return handler(root, loadConfig(root), opts) ?? EXIT_PASS;
 }
