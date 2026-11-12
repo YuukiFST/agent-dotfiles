@@ -35,6 +35,8 @@ Run it from the project; it finds `.perf/` in the working directory or a parent.
 ## Setup
 
 Done when `.perf/ratchet.json` covers every metric the user agreed to and the first `check` wrote `.perf/baselines.json`.
+A target that cannot run on this machine (an Android app with no device attached, a missing toolchain) still gets steps 1 to 4, then Setup stops: the report says no baseline was recorded, names what is missing and lists the fixes the code suggests as unmeasured.
+A number from another host or an emulator is never a sample.
 
 1. Detect the project type and propose metrics from [metrics.md](metrics.md), adding every area the user named ("FPS on tab X").
    For a desktop, web or Android app, answer every row of its checklist: proposed, or not applicable with the reason.
