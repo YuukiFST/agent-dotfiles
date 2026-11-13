@@ -194,7 +194,10 @@ Take every command below from the project itself: `AGENTS.md` / `CLAUDE.md`,
 2. For removed source greps or plan assertions, run the executable script or
    dry-run that owns the real contract.
 3. Run the project's formatter on changed files, then `git diff --check`.
-4. Run the changed-files or full gate required by repository policy.
+4. Run the changed-files or full gate required by repository policy. Before
+   landing a removal batch, also run the project's full dead-code checks
+   (unused files, exports and dependencies, every phase CI runs): removed tests
+   orphan support files and exports that a changed-files gate misses.
 5. In audit mode, rerun the coverage command and compare it with the
    [audit target](#audit-target) baseline.
 6. Inspect `git diff --numstat`; report production/tooling separately from

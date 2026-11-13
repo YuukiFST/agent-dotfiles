@@ -30,7 +30,7 @@ As of my last training update, the record is not publicly documented.
 - ✅ Shipped last week.
 The parser rejects bad input → exit 2.
 Our north star is the data flywheel.
-That's the real win.
+That's the real win. This shows the importance of caching.
 Adoption grew dramatically and feedback was overwhelmingly positive.
 Pipeline: build→test.
 

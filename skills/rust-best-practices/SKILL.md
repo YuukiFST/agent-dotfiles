@@ -27,12 +27,11 @@ The repository's own `rustfmt.toml`, `clippy.toml`, `[lints]` and established co
   a "base" struct, `Manager`/`Factory` types, `throw_if_null` helpers) are smells.
 - **Make invalid states unrepresentable.** Push invariants into types: enums instead of
   bool flags and "must be X if Y" comments, newtypes for units and IDs, fallible
-  constructors that validate once. The compiler then enforces what a comment could only
-  request.
+  constructors that validate once. Then the compiler enforces what a comment only requests.
 - **Application code is not library code.** Library code (anything with external users)
   follows the API-design rules below strictly. Application code should favor simplicity
-  and directness: concrete types, `anyhow`-style errors, `Vec` return values, no
-  speculative generality.
+  and directness: concrete types, `String` or `&str` rather than `impl Into<String>`
+  parameters, `anyhow`-style errors, `Vec` return values, no speculative generality.
 - **Let the tools do the work.** rustfmt owns formatting, clippy owns idiom checks, the
   compiler owns memory safety. Spend your attention on design.
 
@@ -223,8 +222,8 @@ docs which fields equality ignores.
   }
   ```
 
-- Hide implementation iterator types behind `impl Iterator<Item = T>` (internal APIs) or
-  a newtype (public APIs you must keep stable).
+- Library code returns iterators, not a `Vec` collected only to return, behind `impl
+  Iterator<Item = T>` (internal APIs) or a newtype (public APIs you must keep stable).
 - Expose each public item at exactly one path. Don't `pub use` a foreign crate's items
   unless you are an umbrella crate. Avoid leaking third-party types into your public API;
   feature-gate `serde` impls behind a feature named `serde`. If a dependency's type must
@@ -288,7 +287,7 @@ Pick the mechanism by contract:
 input, never rely on `catch_unwind` for control flow (it does nothing under
 `panic = "abort"` and can leave state inconsistent), and never catch a panic and continue
 inside a library. Where a panicking convenience is justified, pair it with a fallible API
-(`get` / `get_unchecked`, `new` / `try_new`) and document it under `# Panics`.
+(`v[i]` / `v.get(i)`, `new` / `try_new`) and document it under `# Panics`.
 
 **Every intentional panic carries a message with the relevant values:**
 `assert!(buf.len() >= HEADER, "buffer too small: {} bytes", buf.len())`,
@@ -357,8 +356,8 @@ panic, `# Safety` for every `unsafe fn`.
 - **Import style:** one `use` per module path (`use foo::bar::{Bar, Baz};`); types and
   traits imported and used unqualified (`Regex`); free functions qualified by their module
   (`mem::take`, `fs::read`). Import a trait inside the function that needs it unless the
-  whole file uses it. No glob imports except `use super::*` in test modules and
-  `use Enum::*` inside a function that matches on it.
+  whole file uses it. No globs except `use super::*` in tests, `use Enum::*` in a function
+  that matches on it, and a framework's prelude such as `use bevy::prelude::*`.
 - **Magic numbers** become named `const`s with a doc comment saying where the value
   comes from and what changing it affects.
 - **Logging:** structured events through `tracing` or `log`, not `println!` / `dbg!`,
@@ -370,6 +369,7 @@ panic, `# Safety` for every `unsafe fn`.
 - Any `unsafe` block, `unsafe fn` or FFI boundary: [references/unsafe-ffi.md](references/unsafe-ffi.md).
 - Crate or module layout, a new dependency or feature flag, or a change that may break semver: [references/crates.md](references/crates.md).
 - Optimizing code after a measurement: [references/performance.md](references/performance.md).
+- The crate depends on `bevy` or `bevy_ecs`: [references/bevy.md](references/bevy.md), before writing any system.
 
 ## 8. Documentation and comments
 

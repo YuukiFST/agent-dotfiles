@@ -254,8 +254,10 @@ function launch(...args) {
 // comes 60 ms later, and it read saved state for 1234 us through 3 file calls.
 const MARKED_APP = `const zero = process.hrtime.bigint();
 const us = () => Number((process.hrtime.bigint() - zero) / 1000n);
-process.stdout.write("@perf mark main " + us() + "\\n");
+const mainAt = us();
+process.stdout.write("@perf mark main " + mainAt + "\\n");
 setTimeout(() => {
+  while (us() - mainAt < 60000); // setTimeout's millisecond clock can fire a little early on Windows
   process.stdout.write("@perf mark window " + us() + "\\n@perf span read_state 1234\\n@perf count state_file_calls 3\\n@perf done\\n");
 }, 60);
 setInterval(() => {}, 1000);
