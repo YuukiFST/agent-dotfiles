@@ -21,4 +21,10 @@ Run `browser-harness skill` before the first browser call of a task and follow w
 
 ## Local rules
 
-- The first connection to the user's Chrome needs a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, both by the user. When `browser-harness --doctor` does not report `daemon alive`, ask the user for that step instead of retrying.
+These cover upstream guidance newer than the PyPI release that `browser-harness skill` prints; drop each once that text carries it.
+
+- The first connection to the user's Chrome needs a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, both by the user. When `browser-harness --doctor` does not report `daemon alive`, ask the user for that step and keep the waiting command running instead of rerunning it.
+- **One daemon:** omit `BU_NAME` and reuse the default daemon across sites, tabs and tasks; each new local daemon opens another CDP connection and another Allow prompt. Several agents share it by taking turns.
+- **Stay in the background:** call `activate_tab()` only when the user asks to see that tab, since it brings Chrome to the foreground. For a page that pauses while hidden, wrap the step in `cdp("Emulation.setFocusEmulationEnabled", enabled=True)` and disable it in a `finally`.
+- **Raw CDP params are keywords:** `cdp("Input.insertText", text="hello")`; the second positional argument is a session ID.
+- At task end, close the tabs the task opened unless the user still needs them.
