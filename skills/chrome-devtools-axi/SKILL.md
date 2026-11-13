@@ -1,6 +1,6 @@
 ---
 name: chrome-devtools-axi
-description: "Profile and debug a web page in Chrome through the chrome-devtools-axi CLI - performance traces, Lighthouse, network and CPU emulation, console and network inspection. Use for DevTools debugging and raw traces; auditing a slow site goes to web-perf, browsing, flows, forms and page extraction to browser-harness."
+description: "Profile and debug a web page in Chrome through the chrome-devtools-axi CLI - performance traces, Lighthouse, network and CPU emulation, console and network inspection. Use for DevTools debugging and raw traces; auditing a slow site goes to web-perf, browsing, flows, forms and page extraction to browser-use."
 user-invocable: false
 author: Kun Chen (kunchenguid)
 metadata:
@@ -14,7 +14,7 @@ metadata:
 
 Agent ergonomic interface for profiling and debugging a Chrome page.
 
-Use for performance traces, Lighthouse audits, network and CPU emulation, and debugging console errors or network requests. Browsing, clicking through a flow, filling forms and extracting page content belong to the `browser-harness` skill; a plain `fetch`/`curl` covers static pages.
+Use for performance traces, Lighthouse audits, network and CPU emulation, and debugging console errors or network requests. Browsing, clicking through a flow, filling forms and extracting page content belong to the `browser-use` skill; a plain `fetch`/`curl` covers static pages.
 
 ## Current guidance lives in the CLI
 

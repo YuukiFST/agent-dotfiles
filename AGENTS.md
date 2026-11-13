@@ -30,7 +30,7 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 
 1. **Find the row.** Match OS and machine to a row above.
    Done when you hold its harness list; a harness outside the row stays unsynced, since an extra one grows a config dir nobody keeps current.
-2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, gh-axi, chrome-devtools-axi, browser-harness, and in OpenCode the caveman-lean, ponytail-subagent and goal plugins), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
+2. **Install or sync.** A harness in the row not yet set up, or missing a tool (rtk, gh-axi, chrome-devtools-axi, browser-use, and in OpenCode the caveman-lean, ponytail-subagent and goal plugins), gets its setup script from `README.md` § Already cloned (idempotent, also the updater); otherwise run the row's sync command.
    `all` exists only in `sync-config.ps1`; `sync-config.sh` takes one harness per run.
    The scripts copy the working tree of their own checkout, uncommitted files included, so a checkout on another branch installs that branch: run the sync from a tree at `origin/main`, or tell the user to.
    Done when every command exits 0 and ends with `Config synced (...)`.
@@ -40,9 +40,9 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 4. **Verify.** Done when every check passes, or each failure is traced to a missing prerequisite and reported.
    Run checks 1 and 2 plus the checks for the row's harnesses and report each by number with its result; `drift` or a hand diff answers check 1 alone, and a check not run leaves the sync reported as unverified.
    1. `bin/agent-cli drift` prints `summary: 0 drift`: rules, payload files, git hooks and every `skills/<name>/` match their live copies byte for byte, the global `core.hooksPath` points at `~/.claude/git-hooks`, and no `REMOVED.txt` skill is still live.
-   2. `browser-harness --version` prints a version, and `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
+   2. `browser-use --version` prints a version, and `chrome-devtools-axi open https://example.com && chrome-devtools-axi snapshot` returns a page snapshot.
       A snapshot failure means Chrome is missing, not that the repo drifted.
-      browser-harness reaches the user's Chrome only after a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click, which `browser-harness --doctor` reports as `daemon alive`.
+      browser-use reaches the user's Chrome only after a one-time tick at `chrome://inspect/#remote-debugging` and an Allow click; until then a call ends `permission-blocked`, while `browser-use --doctor` checks the install, daemon and browser.
    3. pi only: `pi --version` exits 0, and `show-shot <any png>` renders in the terminal.
    4. OpenCode only: `node scripts/opencode-plugins.mjs wait` exits 0 and prints `caveman`, `ponytail-subagent` and `local.goal-mode.server`, and `~/.config/opencode/cli.json` lists the goal plugin.
       One `opencode plugin list` proves nothing: a directory the server has not loaded yet answers with only the goal plugin, ID `-`, so that script polls, with a limit, until the answer settles.

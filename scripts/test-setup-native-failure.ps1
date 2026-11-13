@@ -13,7 +13,7 @@ $StubScripts = Join-Path $Work "scripts"
 $StubBin = Join-Path $Work "bin"
 New-Item -ItemType Directory -Force -Path $TempHome, $StubScripts, $StubBin | Out-Null
 
-foreach ($sibling in "sync-config.ps1", "install-rtk.ps1", "install-browser-harness.ps1", "remove-fff.ps1") {
+foreach ($sibling in "sync-config.ps1", "install-rtk.ps1", "install-browser-use.ps1", "remove-fff.ps1") {
   Set-Content (Join-Path $StubScripts $sibling) "# stub: takes any arguments, does nothing"
 }
 foreach ($helper in Get-ChildItem $Scripts -Filter "*.ps1" | Where-Object Name -like "invoke-*") {

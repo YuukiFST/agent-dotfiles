@@ -22,8 +22,8 @@ Write-Host "[3/6] fff MCP (retired, unregister)"
 Write-Host "[4/6] gh-axi + chrome-devtools-axi"
 Invoke-Native npm install -g gh-axi chrome-devtools-axi
 
-Write-Host "[5/6] browser-harness"
-& "$PSScriptRoot\install-browser-harness.ps1"
+Write-Host "[5/6] browser-use"
+& "$PSScriptRoot\install-browser-use.ps1"
 
 Write-Host "[6/6] Plugins"
 foreach ($m in "YuukiFST/caveman-lean", "anthropics/claude-plugins-official", "YuukiFST/ponytail-subagent") {

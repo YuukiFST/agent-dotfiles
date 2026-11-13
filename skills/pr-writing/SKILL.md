@@ -47,7 +47,7 @@ A later push reruns the check and updates the body.
 | New API or feature | The code someone would write to use it. A pure addition has no "before": show it on its own. |
 | Anything else | A small table, a diagram, or an HTML page comparing both versions. |
 
-Capture browser evidence with `browser-harness`.
+Capture browser evidence with `browser-use`.
 Attach it with `gh pr create --attach '<file>#<alt>'` or `gh pr edit <n> --attach`; gh-axi has no attach flag.
 
 No runnable check: write **Not verified** and why.

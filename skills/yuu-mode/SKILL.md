@@ -105,7 +105,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Task | Route |
 |------|-------|
 | Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
-| Drive a web page in a real browser | `browser-harness` |
+| Drive a web page in a real browser | `browser-use` |
 | Performance trace, Lighthouse audit or DevTools debugging of a page | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
 | Audit or refresh a verify-<app> skill and its feature map | `maintain-verification-skill` |
@@ -120,7 +120,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 
 - **Observe before you ask.** A "which approach" fork whose answer you could see by running something (behavior, timing, layout, output) gets a `prototype` or a quick run, and the result decides.
   Ask the user only for a product or preference call no experiment settles.
-- **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `browser-harness` for web UIs, a real CLI run, or `curl` for a service.
+- **Verify on the surface the user touches.** A project skill under `.claude/skills/verify-*` comes first; otherwise `browser-use` for web UIs, a real CLI run, or `curl` for a service.
   A web run passes when the flow completes and, on each page it visits, no console error shows that a run of the same flow, captured before the first edit or from a worktree at the base ref, did not show, and no request fails or repeats unless the flow means it to.
   An inconclusive run or a run on the wrong surface is not a pass: report it as such.
 - **Contested or risky change:** `interrogate` before it ships.

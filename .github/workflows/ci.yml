@@ -99,14 +99,14 @@ jobs:
       - name: Run opencode-plugins cold-directory regression test
         run: bash scripts/test-regression-opencode-plugins-cold-directory.sh
 
-  browser-harness-install:
-    name: browser-harness install
+  browser-use-install:
+    name: browser-use install
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # uv tool install --force fails halfway on Windows while a daemon holds the tool's Scripts dir.
-      - name: Run browser-harness daemon regression test
+      - name: Run browser-use daemon regression test
         run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
 
   rtk-install-linux:

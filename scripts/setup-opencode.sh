@@ -29,9 +29,9 @@ node "$(dirname "$0")/add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal
 echo "[5/7] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
-echo "[6/7] browser-harness"
-bash "$(dirname "$0")/install-browser-harness.sh" ||
-  echo "Note: browser-harness install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
+echo "[6/7] browser-use"
+bash "$(dirname "$0")/install-browser-use.sh" ||
+  echo "Note: browser-use install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
 
 echo "[7/7] fff MCP (retired, unregister)"
 bash "$(dirname "$0")/remove-fff.sh"

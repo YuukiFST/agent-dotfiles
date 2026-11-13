@@ -19,9 +19,9 @@ npm install -g chrome-devtools-axi@latest gh-axi@latest
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 
-echo "[4/5] browser-harness"
-bash "$(dirname "$0")/install-browser-harness.sh" ||
-  echo "Note: browser-harness install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
+echo "[4/5] browser-use"
+bash "$(dirname "$0")/install-browser-use.sh" ||
+  echo "Note: browser-use install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
 
 echo "[5/5] Claude Code plugins"
 for p in caveman-lean@caveman-lean ponytail-subagent@ponytail-subagent; do

@@ -22,8 +22,8 @@ Invoke-Native npm install -g chrome-devtools-axi@latest gh-axi@latest
 # Windows runs Claude Code only — pi/Cursor live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 
-Write-Host "[4/5] browser-harness"
-& "$PSScriptRoot\install-browser-harness.ps1"
+Write-Host "[4/5] browser-use"
+& "$PSScriptRoot\install-browser-use.ps1"
 
 Write-Host "[5/5] Claude Code plugins"
 foreach ($p in "caveman-lean@caveman-lean", "ponytail-subagent@ponytail-subagent") {
