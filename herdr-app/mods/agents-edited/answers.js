@@ -9,7 +9,8 @@ import { hc } from "herdr";
 const RELOAD_MS = 1500;
 const SCREEN_TAIL = 30;
 // "❯ 1. Yes" / "  2. Yes, and don't ask again for git commands" / "  3. No (esc)"
-const OPTION = /^\s*(?:[❯>›]\s*)?(\d{1,2})\.\s+(.+?)\s*$/;
+// OpenCode draws its question inside a bar: "  ┃  1. Red".
+const OPTION = /^\s*(?:[┃│]\s*)?(?:[❯>›]\s*)?(\d{1,2})\.\s+(.+?)\s*$/;
 
 // The numbered options of the menu at the bottom of the screen (the last run that starts at 1).
 export function menuOptions(lines) {
