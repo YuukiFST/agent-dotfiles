@@ -272,12 +272,12 @@ function scopeSwitch(t, view) {
 
 function sidePanel(t, tree, view) {
   return v_flex().w(SIDE_WIDTH).flex_none().min_h(0).border_l(1).border_color(t.border)
-    .child(v_flex().flex_none().p(14).gap(4).border_b(1).border_color(t.border)
-      .child(div().text_size(12).text_color(t.dim).child(tree.sessions === 1 ? "In the context window" : "Average per session"))
+    .child(v_flex().flex_none().px(12).pb(14).gap(4).border_b(1).border_color(t.border)
+      .child(div().h(30).flex().items_center().text_size(12).text_color(t.dim).child(tree.sessions === 1 ? "In the context window" : "Average per session"))
       .child(div().font_family(NUMBER_FONT).text_size(20).text_color(t.foreground).child(kilo(tree.average)))
       .child(div().text_size(12).text_color(t.dim).child(tree.sessions === 1 && tree.window ? `of ${kilo(tree.window)} (${percent(tree.average / tree.window)})` : `${tree.sessions} ${tree.sessions === 1 ? "session" : "sessions"} · ${kilo(tree.sum)} total`))
       .when(!tree.counted, (el) => el.child(div().text_size(11).text_color(t.dim).child("Estimated until context-meter runs"))))
-    .child(v_flex().id("ctx-ranking").flex_1().min_h(0).p(14).gap(10).overflow_y_scrollbar()
+    .child(v_flex().id("ctx-ranking").flex_1().min_h(0).px(12).py(14).gap(10).overflow_y_scrollbar()
       .child(topConsumers(t, tree))
       .children(tree.categories.map((c) => sideRow(t, c, tree.average, view))));
 }
@@ -335,10 +335,11 @@ export class TreemapTiles extends View {
 // tiles: the retained TreemapTiles.
 export function contextTreemap(t, tree, view, tiles) {
   const panel = h_flex().items_stretch().flex_1().min_w(0).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden();
-  if (!tree) return panel.child(div().p(10).child(view.leading));
+  // The header is as tall as the summary strip and the Notes header, so the first rows share a line.
+  if (!tree) return panel.child(h_flex().h(30).px(12).items_center().child(view.leading));
   return panel
-    .child(v_flex().flex_1().min_w(0).p(10).gap(8)
-      .child(h_flex().h(22).flex_none().min_w(0).overflow_hidden().gap(12).items_center()
+    .child(v_flex().flex_1().min_w(0).px(12).pb(12).gap(8)
+      .child(h_flex().h(30).flex_none().min_w(0).overflow_hidden().gap(12).items_center()
         .child(view.leading)
         .child(scopeSwitch(t, view))
         .child(legend(t)))

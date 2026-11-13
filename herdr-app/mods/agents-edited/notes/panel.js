@@ -400,7 +400,7 @@ export class NotesPanel {
     const harness = this.harness();
     const newSessionLabel = harness ? `New ${harness.name} session` : "New session";
     const targetLabel = target === NEW_SESSION ? newSessionLabel : `${target.address} · ${target.space_name}`;
-    return v_flex().flex_none().p(10).gap(8).border_t(1).border_color(t.border)
+    return v_flex().flex_none().px(12).py(10).gap(8).border_t(1).border_color(t.border)
       .when(Boolean(this.feedback), (el) => el.child(div().flex_none().text_size(11.5).whitespace_normal().text_color(this.feedback.isError ? t.blocked : t.muted).child(this.feedback.text)))
       .when(this.isPickerOpen, (el) => el.child(this.sessionPicker(project, sessions, target)))
       .child(h_flex().flex_none().gap(8).items_center()
@@ -415,7 +415,7 @@ export class NotesPanel {
 
   composer() {
     const t = theme();
-    return v_flex().id("composer").flex_none().p(10).gap(8).border_b(1).border_color(t.border).on_key_down((e, cx) => this.key(e, cx))
+    return v_flex().id("composer").flex_none().px(12).py(10).gap(8).border_b(1).border_color(t.border).on_key_down((e, cx) => this.key(e, cx))
       .child(Textarea.new(this.draft).flex_none().px(8).py(6).rounded(6).border_1().border_color(t.input).bg(t.background).text_size(12.5).text_color(t.foreground))
       .when(this.draftImages.length > 0, (el) => el.child(h_flex().flex_none().flex_wrap().gap(6).children(this.draftImages.map((path, i) => this.thumbnail(`draft-${i}`, path, (_e, cx) => this.detachDraftImage(path, cx))))))
       .child(h_flex().flex_none().gap(6).items_center()
@@ -426,23 +426,24 @@ export class NotesPanel {
 
   noteList(project, open, done) {
     const t = theme();
-    return v_flex().id("note-list").flex_1().min_h(0).p(10).gap(8).overflow_y_scrollbar()
-      .when(!project.notes.length, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("No notes in this project.")))
+    return v_flex().id("note-list").flex_1().min_h(0).px(12).py(10).gap(8).overflow_y_scrollbar()
+      .when(!project.notes.length, (el) => el.child(div().py(8).text_size(12).text_color(t.dim).child("No notes in this project.")))
       .children([...open, ...done].map((note) => this.noteCard(project, note)));
   }
 
   header(project) {
     const t = theme();
     const isArmed = this.armedDeleteId === project?.id;
-    return v_flex().flex_none().px(10).py(6).gap(4).border_b(1).border_color(t.border)
-      .child(h_flex().gap(6).items_center().flex_wrap()
+    // The first row is as tall as the summary strip beside it, so both read on one line.
+    return v_flex().flex_none().px(12).pb(6).gap(4).border_b(1).border_color(t.border)
+      .child(h_flex().min_h(30).gap(6).items_center().flex_wrap()
         .child(div().flex_none().text_size(11).text_color(t.dim).child("Notes"))
         .child(this.copyLocationButton(project))
         .children((this.book?.projects ?? []).map((p) => this.projectChip(p, p.id === project?.id)))
         .child(this.action("add-project", "+ Project", t.muted, (_e, cx) => this.addProject(cx))))
       .when(Boolean(project), (el) => el.child(h_flex().gap(6).items_center()
         .child(div().id("project-folder").flex_1().min_w(0).truncate().text_ellipsis_start().text_size(11).text_color(t.dim).tooltip(project.folder).child(project.folder))
-        .child(this.action("del-project", isArmed ? "Delete project and notes?" : "Remove", isArmed ? t.blocked : t.dim, (_e, cx) => this.deleteProject(project, cx)))));
+        .child(this.action("del-project", isArmed ? "Delete project and notes?" : "Remove", isArmed ? t.blocked : t.dim, (_e, cx) => this.deleteProject(project, cx)).mr_neg_1p5())));
   }
 
   emptyState() {
