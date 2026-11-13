@@ -121,7 +121,7 @@ export default class ClaudeUsage extends View {
     return h_flex().size_full().px(14).gap(14).items_center().bg(t.chrome).border_t(1).border_color(t.border)
       .text_size(12).text_color(t.muted)
       .child(div().text_color(t.accent).child("Claude"))
-      .when(!hasReading, (el) => el.child(div().text_color(t.dim).child("no reading yet: sign in to Claude Code")))
+      .when(!hasReading, (el) => el.child(div().text_color(t.dim).child(this.planUsage?.reading?.error ?? "no reading yet: sign in to Claude Code")))
       .when(hasReading, (el) => el.child(this.window(t, "week", this.planUsage.windowOf("week"))))
       .when(Boolean(tokens), (el) => el
         .child(sep())
