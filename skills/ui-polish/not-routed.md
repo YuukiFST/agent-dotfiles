@@ -1,7 +1,8 @@
 # Not routed
 
 - `REFS/emilkowalski-skills/skills/write-swift/`: Swift language practice, not interface work.
-- `REFS/jakubkrehel-skills/skills/teardown/`: drawings of physical objects, not interface work; it ships as the standalone `teardown` skill.
+- `REFS/jakubkrehel-skills/skills/afk/`: unattended project work on a branch while the user is away, not interface work.
+- `REFS/emilkowalski-skills/skills/learn-taste/`: turns a session's design corrections into project rules; it runs only when the user invokes it, after the work this router does.
 - `REFS/mengto-skills/agent-skills/ui/design-first-ui-prompting/ARTICLE.md` and `demo/`: model and tool picks, template selling, and "craft signals" (numbered labels, beam animations) that `no-ai-design-slop` `ARTICLE.md` lists as slop. The router reads the skill's `SKILL.md` only.
 - Sections no step reads, each covered elsewhere: `no-ai-design-slop` **Make motion explain something** (the `animate` gate), `no-ai-design-slop/ARTICLE.md` **Prompt Vocabulary** (phrasing for follow-up prompts; findings name problems in the owning domain's terms), and `design-first-ui-prompting` **Rules that improve consistency** and **Fast iteration checklist** (image-model prompting; its layout, hierarchy and copy first is Build's order).
 - craft parts not routed, each with its reason. A part goes out when any sentence or snippet value in it contradicts any of the three repos, whichever one this router prefers in a tie:
