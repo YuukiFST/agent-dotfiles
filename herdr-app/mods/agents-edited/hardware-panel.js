@@ -113,7 +113,7 @@ function machineMeters(t, a) {
   const ramPlot = plot(t, "plot-ram", chartPoints(a.history, now, usedPct), heatColor(t, 100 * (1 - a.ram.freeGb / a.ram.totalGb)), signalXs);
   return h_flex().flex_1().min_h(METER_MIN_HEIGHT).items_stretch().gap(10)
     .child(meterCard(t, "meter-cpu", "CPU", `${Math.round(a.cpu.average)}% over 2m`, String(Math.round(a.cpu.now)), "% in use", cpuPlot))
-    .child(meterCard(t, "meter-ram", "Memory", `lowest ${a.ram.lowestGb.toFixed(1)} GB in 10m`, a.ram.freeGb.toFixed(1), `GB free of ${Math.round(a.ram.totalGb)}`, ramPlot));
+    .child(meterCard(t, "meter-ram", "Memory", `peak ${(a.ram.totalGb - a.ram.lowestGb).toFixed(1)} GB in 10m`, (a.ram.totalGb - a.ram.freeGb).toFixed(1), `GB used of ${Math.round(a.ram.totalGb)}`, ramPlot));
 }
 
 function alertBanner(t, id, tooltip, text) {

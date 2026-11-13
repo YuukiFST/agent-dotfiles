@@ -1,8 +1,8 @@
 // Notes per project, on the status board: write them, keep them, send them to an agent session.
 
-import { div, image } from "gpui-kit";
+import { div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, Textarea, TextareaState } from "gpui-base";
-import { agents, hc, pickFolder, run, theme, watchFolder } from "herdr";
+import { agents, hc, notify, pickFolder, run, theme, watchFolder } from "herdr";
 import { harnessSwitch, loadHarnesses } from "../harness-switch.js";
 import { SHARED_DIR, composeMessage, copyImage, folderName, imageAsset, isImagePath, isNotesFile, newId, openImage, pasteImage, readBook, removeImages, sessionsFor, updateBook } from "./store.js";
 
@@ -12,7 +12,23 @@ const PROJECT_KEY = "notes.project";
 const HARNESS_KEY = "notes.harness";
 const SWITCH_TILE_SIZE = 22;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const COPIED_TOAST_MS = 2000;
 const twoDigits = (value) => String(value).padStart(2, "0");
+const windowsPath = (path) => path.replace(/\//g, "\\");
+
+// What the copy icon puts on the clipboard: where the notes live and how one reads, so the
+// person's prompt says what to do with them (review them, check what is done, add one).
+const notesLocation = (project) => {
+  const file = windowsPath(`${SHARED_DIR()}/notes.json`);
+  const where = project
+    ? `Herdr Notes for the project ${project.name} (${windowsPath(project.folder)}): the entry of "projects" in ${file} whose "folder" is that path.`
+    : `Herdr Notes: ${file}, one entry per project in "projects".`;
+  return [
+    where,
+    'Each note: {"id", "text", "images": [image paths], "created_at": ms, "done_at": ms when marked done or null while open, "sent": {"to", "at"} or null}.',
+    'To add a note: reread the file, append to that project\'s "notes" with a new id, created_at = now in ms, images [], done_at null and sent null, keep the JSON valid and leave everything else untouched.',
+  ].join("\n");
+};
 const clock = (ms) => {
   const date = new Date(ms);
   return `${MONTHS[date.getMonth()]} ${date.getDate()} ${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
@@ -286,6 +302,18 @@ export class NotesPanel {
       .hover((s) => s.bg(t.hover)).on_click(onClick).child(label);
   }
 
+  copyLocationButton(project) {
+    const t = theme();
+    return h_flex().id("copy-notes-location").flex_none().h(22).px(4).items_center().rounded(5).cursor_pointer()
+      .text_color(t.dim).hover((s) => s.bg(t.hover).text_color(t.foreground))
+      .tooltip("Copy where these notes live, to paste into an agent's prompt")
+      .on_click((_e, cx) => {
+        cx.write_to_clipboard(notesLocation(project));
+        notify({ title: "Notes location copied", level: "success", timeout: COPIED_TOAST_MS });
+      })
+      .child(svg("mods/agents-edited/notes/copy.svg").size(12));
+  }
+
   button(id, label, isPrimary, onClick) {
     const t = theme();
     return div().id(id).flex_none().px(10).h(26).flex().items_center().rounded(6).text_size(12).cursor_pointer()
@@ -408,7 +436,8 @@ export class NotesPanel {
     const isArmed = this.armedDeleteId === project?.id;
     return v_flex().flex_none().px(10).py(6).gap(4).border_b(1).border_color(t.border)
       .child(h_flex().gap(6).items_center().flex_wrap()
-        .child(div().flex_none().pr(4).text_size(11).text_color(t.dim).child("Notes"))
+        .child(div().flex_none().text_size(11).text_color(t.dim).child("Notes"))
+        .child(this.copyLocationButton(project))
         .children((this.book?.projects ?? []).map((p) => this.projectChip(p, p.id === project?.id)))
         .child(this.action("add-project", "+ Project", t.muted, (_e, cx) => this.addProject(cx))))
       .when(Boolean(project), (el) => el.child(h_flex().gap(6).items_center()
