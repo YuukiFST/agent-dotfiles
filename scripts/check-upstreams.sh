@@ -83,8 +83,11 @@ check_row() { # $1 = target, $2 = repo, $3 = path, $4 = pin, $5 = branch (empty 
   query="since=$pin_date&per_page=100"
   [ "$3" = . ] || query="$query&path=$3"
   [ -z "$5" ] || query="$query&sha=$5"
+  # since= is inclusive, so commits sharing the pin's timestamp come back too; the list is
+  # newest first, so everything from the pin on is already reviewed (a rebase gives ties).
   commits="$(gh api --paginate "repos/$2/commits?$query" \
-    --jq ".[] | select(.sha | startswith(\"$4\") | not) | \"\(.sha[:7]) \(.commit.committer.date[:10]) \(.commit.message | split(\"\n\")[0])\"" 2>&1)" \
+    --jq ".[] | \"\(.sha) \(.commit.committer.date[:10]) \(.commit.message | split(\"\n\")[0])\"" 2>&1 \
+    | awk -v pin="$4" 'index($1, pin) == 1 { exit } { $1 = substr($1, 1, 7); print }')" \
     || { report_error "$1" "$source" "commit list failed: ${commits##*$'\n'}"; return; }
   [ -z "$commits" ] || report_change "$1" "$2" "$3" "$4" "$commits"
 }
