@@ -3,7 +3,7 @@
 
 Used by ui-polish audit.md step 1 when a site is known only by its URL. It runs the
 page function of unslop's scripts/snapshot.mjs (read from the ui-refs clone) in
-browser-harness, or in chrome-devtools-axi when browser-harness is not installed,
+browser-use, or in chrome-devtools-axi when browser-use is not installed,
 so no Playwright is needed.
 
     python capture-url.py <url> <out-dir> [--theme dark|light] [--backend harness|axi]
@@ -97,7 +97,7 @@ try:
 finally:
     close_tab(tab)
 """
-    run(["browser-harness"], input=program)
+    run(["browser-use"], input=program)
     return encoded_file.read_text()
 
 
@@ -141,7 +141,7 @@ def main():
     parser.add_argument("url")
     parser.add_argument("out", type=Path)
     parser.add_argument("--theme", choices=("dark", "light"), default="")
-    parser.add_argument("--backend", choices=("harness", "axi"), help="default: browser-harness, falling back to chrome-devtools-axi when it fails")
+    parser.add_argument("--backend", choices=("harness", "axi"), help="default: browser-use, falling back to chrome-devtools-axi when it fails")
     args = parser.parse_args()
     out = args.out.resolve()
     refuse_unignored(out)

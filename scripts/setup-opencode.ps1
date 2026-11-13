@@ -29,8 +29,8 @@ Invoke-Native node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/o
 Write-Host "[5/7] gh-axi + chrome-devtools-axi"
 Invoke-Native npm install -g gh-axi chrome-devtools-axi
 
-Write-Host "[6/7] browser-harness"
-& "$PSScriptRoot\install-browser-harness.ps1"
+Write-Host "[6/7] browser-use"
+& "$PSScriptRoot\install-browser-use.ps1"
 
 Write-Host "[7/7] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"

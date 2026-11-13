@@ -22,9 +22,9 @@ bash "$(dirname "$0")/remove-fff.sh"
 echo "[4/6] gh-axi + chrome-devtools-axi"
 npm install -g gh-axi chrome-devtools-axi
 
-echo "[5/6] browser-harness"
-bash "$(dirname "$0")/install-browser-harness.sh" ||
-  echo "Note: browser-harness install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
+echo "[5/6] browser-use"
+bash "$(dirname "$0")/install-browser-use.sh" ||
+  echo "Note: browser-use install failed (uv-managed Python needs nix-ld on NixOS); see https://github.com/browser-use/browser-harness/blob/main/install.md"
 
 echo "[6/6] Plugins"
 for m in YuukiFST/caveman-lean anthropics/claude-plugins-official YuukiFST/ponytail-subagent; do

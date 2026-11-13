@@ -74,3 +74,5 @@ security-bounty-hunter
 helmsman-explain
 # Folded into perf-ratchet, which now owns launch measurement and techniques (launch.md).
 optimizing-startup
+# Renamed to browser-use with the CLI: browser-harness is now the engine inside browser-use.
+browser-harness

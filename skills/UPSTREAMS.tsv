@@ -22,8 +22,8 @@ ai-tells	blader/humanizer	SKILL.md	b48c832
 ai-tells	petergyang/no-ai-slop	.	000650b
 ai-tells	cursor/plugins	pstack/skills/unslop	bc697d0
 anatomy	wheresryan22/anatomy	.	1482e84
-browser-harness	browser-use/browser-harness	SKILL.md	9abe45d
-browser-harness	browser-use/browser-harness	.	389d9c0
+browser-use	browser-use/browser-use	browser_use/skills/browser-use/SKILL.md	8321164
+browser-use	browser-use/browser-harness	.	389d9c0
 chrome-devtools-axi	kunchenguid/chrome-devtools-axi	skills/chrome-devtools-axi	75dd6ca
 chrome-devtools-axi	kunchenguid/chrome-devtools-axi	.	1dbdac1
 code-simplifier	anthropics/claude-plugins-official	plugins/code-simplifier/agents/code-simplifier.md	ceb9b72
