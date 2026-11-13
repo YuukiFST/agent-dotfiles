@@ -1,16 +1,16 @@
 #!/usr/bin/env pwsh
-# E2E regression test for scripts/install-browser-harness.ps1 with stub uv and browser-harness on PATH
+# E2E regression test for scripts/install-browser-use.ps1 with stub uv and browser-use on PATH
 # and a real process running `python -m browser_harness.daemon`: the install must not start while
 # one runs, because `uv tool install --force` fails halfway on Windows and breaks the tool.
 # Stops only the processes this test started.
 # Run: pwsh -NoProfile -File scripts/test-regression-browser-harness-daemon.ps1
 $ErrorActionPreference = "Stop"
 
-$installScript = Join-Path $PSScriptRoot "install-browser-harness.ps1"
+$installScript = Join-Path $PSScriptRoot "install-browser-use.ps1"
 $work = Join-Path ([IO.Path]::GetTempPath()) "bh-regression-$PID"
 New-Item -ItemType Directory -Force -Path "$work\bin", "$work\tools", "$work\pkg\browser_harness" | Out-Null
 "@echo %* >> `"$work\uv-calls.log`"`r`n@if `"%1 %2`"==`"tool dir`" echo $work\tools" | Set-Content "$work\bin\uv.cmd"
-"@echo 9.9.9" | Set-Content "$work\bin\browser-harness.cmd"
+"@echo 9.9.9" | Set-Content "$work\bin\browser-use.cmd"
 "import time; time.sleep(60)" | Set-Content "$work\pkg\browser_harness\daemon.py"
 $env:Path = "$work\bin;$env:Path"
 
