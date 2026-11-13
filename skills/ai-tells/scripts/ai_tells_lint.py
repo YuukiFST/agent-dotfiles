@@ -253,6 +253,8 @@ RULES: list[Rule] = [
         rf"that{APOS}s the (?:real|whole) (?:win|point|story|trick)",
         r"this changes everything",
         r"every\. single\.",
+        r"this shows the importance of",
+        r"the message was clear:",
     ),
 ]
 

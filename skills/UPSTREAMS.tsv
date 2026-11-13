@@ -18,6 +18,7 @@
 # ui-polish has no rows: it reads its references from live clones (update-refs.sh).
 ai-copywriter	mikiarlo3/ai-copywriter	.	08b53b1
 ai-tells	akitaonrails/my-skills	humanizer	8a7d0e5
+ai-tells	blader/humanizer	SKILL.md	b48c832
 ai-tells	petergyang/no-ai-slop	.	000650b
 ai-tells	cursor/plugins	pstack/skills/unslop	bc697d0
 anatomy	wheresryan22/anatomy	.	1482e84

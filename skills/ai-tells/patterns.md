@@ -35,20 +35,21 @@ State the positive half directly.
 Keep a contrast only when the negative half corrects a belief the reader actually holds, or when both halves carry information.
 
 > Before: It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere.
-> After: The heavy beat adds to the aggressive tone.
+> After: The heavy beat makes the song sound more aggressive.
 
 > Before: This does not mean every choice is equal. It means there is no external system that confirms which choice is right.
-> After: No external system confirms which choice is right, although the choices still have different consequences.
+> After: The choices differ, but no outside system will tell you which one is right.
 
 ### one-line-closer
 
 *Strong. Linted (stock phrases only).*
 
-Watch for: a one-sentence paragraph that restates the paragraph before it; "That is the real win."; the same closer after several sections; a row of fragments ("No aesthetic prior.
+Watch for: a one-sentence paragraph that restates the paragraph before it; "That is the real win."; the same closer after several sections; a sentence after an example, scene, or number that names what it showed ("This shows the importance of...", "The message was clear:", "It was a lesson in patience."); a row of fragments ("No aesthetic prior.
 No nostalgia."); a final line that turns the point into a cute metaphor or mic drop; one word in ALL CAPS or split by periods ("every. single. day.").
 
 The line asks the reader to pause on a claim instead of adding to it.
-Delete a closer that repeats; do not rewrite it into a better metaphor, and do not keep its rhythm.
+Delete a closer that repeats, including one that explains an example the reader just saw; do not rewrite it into a better metaphor, and do not keep its rhythm.
+Keep it when it adds a fact or consequence the example does not show.
 End on the clearest concrete sentence already in the text.
 Merge a row of fragments into one sentence with a specific claim.
 One short sentence that carries a new fact is fine.
@@ -56,7 +57,7 @@ One short sentence that carries a new fact is fine.
 Copy register: a headline or a LinkedIn line break is format, not a tell, while each line still carries information.
 
 > Before: Then AlphaEvolve arrived. It had no preference for symmetry. No aesthetic prior. No nostalgia for human taste. The old rules were gone.
-> After: AlphaEvolve changed the search because it did not favor symmetry or human-looking designs. That made some older assumptions less useful.
+> After: AlphaEvolve had no preference for symmetry or for designs that look human-made, so the old rules stopped applying.
 
 ### mannered-prose
 
@@ -69,7 +70,7 @@ Write the literal claim.
 `metaphor-jargon` covers the metaphor nouns.
 
 > Before: Symmetry is the language of trust. Efficiency becomes a trap when teams forget the human layer.
-> After: Symmetric layouts often feel more predictable to users. Teams can over-optimize workflows and miss how people actually use them.
+> After: Symmetric layouts often feel more predictable to users. Teams can over-optimize workflows and miss how people use them.
 
 ### staged-opener
 
@@ -110,8 +111,8 @@ The text answers an objection or rejects an option that appears nowhere else, us
 Remove the defense; if it holds a real claim, state the claim.
 Keep an objection the text attributes or answers in full, and an option a reader would actually weigh.
 
-> Before: Session tokens rotate every 24 hours. A tempting approach would be to restart the auth service on a cron job, but that would drop every session. Rotation happens in place.
-> After: Session tokens rotate every 24 hours, in place, and clients refresh transparently.
+> Before: Session tokens rotate every 24 hours. A tempting approach would be to restart the auth service on a cron job, but that would drop every session. Rotation happens in place, and clients refresh transparently.
+> After: Session tokens rotate in place every 24 hours, and clients refresh transparently.
 
 ### metadiscourse
 
@@ -219,8 +220,9 @@ List the items directly, or name the one that matters.
 
 *Weak alone.*
 
-Watch for: third-party, cross-functional, data-driven, high-quality, real-time, long-term, end-to-end hyphenated in every position.
+Watch for: data-driven, high-quality, well-documented, real-time, long-term hyphenated in every position.
 Keep the hyphen before a noun (a high-quality report); drop it after the noun (the report is high quality).
+Words the dictionary always hyphenates, such as third-party and cross-functional, keep it everywhere.
 
 ## Inflation and borrowed authority
 
@@ -252,7 +254,7 @@ The lint prints the plain swap.
 
 *Strong. Linted.*
 
-Watch for: stands as a testament, a pivotal moment, plays a key role, marks a milestone, reflects a broader, lasting legacy, setting the stage for, evolving landscape, indelible mark; a stock "Challenges and Future Outlook" section; a send-off (the future looks bright, exciting times ahead, a step in the right direction).
+Watch for: stands as a testament, a pivotal moment, plays a key role, marks a milestone, reflects a broader, lasting legacy, setting the stage for, evolving landscape, indelible mark; a stock "Challenges and Future Outlook" section; a closing paragraph (the future looks bright, exciting times ahead, a step in the right direction).
 
 An ordinary detail is said to mark a change, prove a legacy, or promise a future.
 Keep the fact and drop the significance.
@@ -289,7 +291,7 @@ Watch for: a trailing clause with highlighting, underscoring, emphasizing, ensur
 
 The clause bolts a claimed meaning onto a simple fact.
 Keep the fact.
-Replace the rider with the real consequence, or delete it; keep it only when the source supports what it claims.
+Replace the -ing clause with the real consequence, or delete it; keep it only when the source supports what it claims.
 
 > Before: The launch adds file search, highlighting the team's commitment to better workflows.
 > After: The launch adds file search, so users find old drafts without leaving the editor.
@@ -298,7 +300,7 @@ Replace the rider with the real consequence, or delete it; keep it only when the
 
 *Strong. Linted.*
 
-Watch for: nestled, in the heart of, breathtaking, stunning, must-visit, renowned, world-class, boasts, rich cultural heritage, diverse array, groundbreaking.
+Watch for: nestled, in the heart of, breathtaking, stunning, must-visit, renowned, world-class, rich cultural heritage, diverse array, groundbreaking.
 The text reads like an advertisement for a place, product, or organization.
 State what the thing is.
 
@@ -330,7 +332,7 @@ Simple verbs replaced with longer ones.
 Use is, are, and has.
 
 > Before: Gallery 825 serves as LAAA's exhibition space. The gallery features four separate spaces and boasts over 3,000 square feet.
-> After: Gallery 825 is LAAA's exhibition space. It has four rooms totaling 3,000 square feet.
+> After: Gallery 825 is LAAA's exhibition space. It has four separate spaces and more than 3,000 square feet.
 
 ## Formatting by rule
 
@@ -351,14 +353,14 @@ Use prose where two sentences read better than bullets.
 > - **Performance:** Performance has been enhanced through optimized algorithms.
 > - **Security:** Security has been strengthened with end-to-end encryption.
 >
-> After: The update speeds up load times and adds end-to-end encryption.
+> After: The update adds faster algorithms and end-to-end encryption.
 
 ### decorative-heading
 
 *Weak alone. Linted (title case, emoji).*
 
-Headings in title case, emojis or arrows on headings and bullets, a horizontal rule between every section, a top heading that repeats the title, headers over two-sentence sections.
-Use sentence case, remove the decoration, and drop headers the section length does not need.
+Headings in title case, emojis or arrows on headings and bullets, a horizontal rule between every section, a top heading that repeats the title, headers over two-sentence sections, a heading written for effect ("The decision, on one screen").
+Use sentence case, remove the decoration, drop headers the section length does not need, and name what the section holds ("How the six options compare").
 
 > Before: ## 🚀 Strategic Negotiations And Global Partnerships
 > After: ## Strategic negotiations and global partnerships
@@ -397,7 +399,7 @@ State what the source does not show, or cut the sentence.
 Never present a guess as a fact.
 
 > Before: Information about her early life is not publicly available, suggesting she maintains a low profile. She likely grew up in a middle-class household.
-> After: Her early life is not documented in the available sources.
+> After: The sources say nothing about her early life.
 
 ### heading-echo
 
@@ -406,16 +408,34 @@ Never present a guess as a fact.
 A heading followed by a one-line paragraph that restates it before the real content ("## Performance / Speed matters.").
 Delete the echo.
 
-### previous-version
+### self-description
 
-*Strong. Technical register.*
+*Strong. A single description of the page is weak alone.*
 
-Docs and comments describe what the text replaced instead of current behavior ("This function was added to replace the previous approach").
+The text describes itself instead of its subject: what it replaced ("This function was added to replace the previous approach"), how it was assembled or sourced ("compiled from", "anything unconfirmed is flagged rather than guessed"), or a layout the reader can already see ("the table below compares", "this section is organized by owner").
 Describe the thing as it is.
 Mention the old version only in changelogs, release notes, and migration guides.
+Keep a source credit the reader can follow and a caveat that changes what the reader should do; cut the account of how the text was made.
+State a convention only when the reader cannot infer it, and state it once.
 
 > Before: This function was added to replace the previous approach of iterating through all items, which caused O(n²) performance.
 > After: This function uses a hash map for O(1) lookups.
+
+## Writing for the wrong reader
+
+A model writes for a reader who shares no context, because that fits the widest range of cases.
+A reply in a thread has a reader who already knows the background.
+
+### re-explaining
+
+*Strong. Replies only.*
+
+Watch for: a short reply that restates the problem, walks through the diagnosis, and lays out the evidence before it reaches the decision; a query, command, or set of numbers included to prove a plan will work; background the other person wrote or already agreed to; the answer itself sitting in the last line.
+
+Act only when you can see the surrounding conversation or the text plainly is a reply; if you cannot tell, ask or leave it alone.
+Lead with the decision and keep only the reasoning that would change whether the reader agrees: usually one fact they lack and any link they need to act.
+The diagnosis and the proof that a plan works belong in the ticket or document that follows; a reviewer raising a topic is not a request for the full write-up.
+Each sentence can read fine alone, so this survives sentence-level cleanup.
 
 ## Plain speech
 
