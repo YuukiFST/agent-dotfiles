@@ -12,11 +12,18 @@ const METER_MIN_HEIGHT = 136;
 const HERO_SIZE = 28;
 const CONSUMER_ROW_HEIGHT = 30;
 const BAR_HEIGHT = 3;
-const CPU_COLUMN = 104;
-const RAM_COLUMN = 120;
-const NUMBER_WIDTH = 52;
+// As wide as the column's widest figure ("100%", "10.0 GB"), so each figure sits by its bar.
+const CPU_FIGURE_WIDTH = 30;
+const RAM_FIGURE_WIDTH = 50;
 const VERDICT_ROW_HEIGHT = 34;
 const STATE_COLUMN = 48;
+const ROW_GAP = 12;
+const JOB_GAP = 14;
+const NOTE_GAP = 6;
+// A text's width estimated from its length: the 12.5px UI font averages ~6.3px a glyph, and the
+// estimate rounds up so a name fits; the name truncates if one ever runs longer.
+const GLYPH_PX = 7;
+const NAME_COLUMN_MAX = 260;
 const CHART_SLOTS = 120;
 const CHART_SPAN_MS = 10 * 60000;
 const CHART_HEADROOM_PCT = 8;
@@ -113,7 +120,7 @@ function machineMeters(t, a) {
   const ramPlot = plot(t, "plot-ram", chartPoints(a.history, now, usedPct), heatColor(t, 100 * (1 - a.ram.freeGb / a.ram.totalGb)), signalXs);
   return h_flex().flex_1().min_h(METER_MIN_HEIGHT).items_stretch().gap(10)
     .child(meterCard(t, "meter-cpu", "CPU", `${Math.round(a.cpu.average)}% over 2m`, String(Math.round(a.cpu.now)), "% in use", cpuPlot))
-    .child(meterCard(t, "meter-ram", "Memory", `lowest ${a.ram.lowestGb.toFixed(1)} GB in 10m`, a.ram.freeGb.toFixed(1), `GB free of ${Math.round(a.ram.totalGb)}`, ramPlot));
+    .child(meterCard(t, "meter-ram", "Memory", `peak ${(a.ram.totalGb - a.ram.lowestGb).toFixed(1)} GB in 10m`, (a.ram.totalGb - a.ram.freeGb).toFixed(1), `GB used of ${Math.round(a.ram.totalGb)}`, ramPlot));
 }
 
 function alertBanner(t, id, tooltip, text) {
@@ -142,33 +149,45 @@ function jobName(t, row) {
     .when(Boolean(row.note), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(row.note)));
 }
 
-function verdictRow(t, group, isFirst) {
+const textWidth = (text) => (text ? text.length * GLYPH_PX : 0);
+const jobsWidth = (group) => group.rows.reduce((sum, row) => sum + textWidth(row.name) + (row.note ? NOTE_GAP + textWidth(row.note) : 0), JOB_GAP * (group.rows.length - 1));
+const consumerWidth = (c) => textWidth(c.name) + (c.mostly ? NOTE_GAP + textWidth(c.mostly) : 0);
+
+// One column for the verdicts' jobs and the consumers' names, as wide as the longest of them: the
+// reasons and the bars start right after the names, on one shared line.
+function nameColumn(a) {
+  const widest = Math.max(0, ...verdictGroups(a.rows).map((g) => STATE_COLUMN + ROW_GAP + jobsWidth(g)), ...a.consumers.map(consumerWidth));
+  return Math.min(NAME_COLUMN_MAX, Math.ceil(widest));
+}
+
+function verdictRow(t, group, isFirst, column) {
   const color = stateColor(t, group.state);
   const isOk = group.state === STATE.ok;
-  return h_flex().id(`verdict-${group.rows[0].id}`).flex_none().h(VERDICT_ROW_HEIGHT).px(12).gap(12).items_center()
+  return h_flex().id(`verdict-${group.rows[0].id}`).flex_none().h(VERDICT_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center()
     .when(!isOk, (el) => el.bg(color + TINT_ALPHA))
     .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
     .child(h_flex().w(STATE_COLUMN).flex_none().gap(6).items_center().text_size(11)
       .child(dot(color))
       .child(div().flex_none().font_medium().text_color(color).child(STATE_WORD[group.state])))
-    .child(h_flex().flex_none().gap(14).items_center().children(group.rows.map((row) => jobName(t, row))))
-    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().text_size(11.5).text_color(color).child(isOk ? "" : group.why)));
+    .child(h_flex().w(column - STATE_COLUMN - ROW_GAP).flex_none().min_w(0).overflow_hidden().gap(JOB_GAP).items_center().children(group.rows.map((row) => jobName(t, row))))
+    .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(color).child(isOk ? "" : group.why));
 }
 
-function canIRun(t, a) {
+function canIRun(t, a, column) {
   const groups = verdictGroups(a.rows);
   return v_flex().flex_none().gap(6)
     .child(sectionTitle(t, "Can I run", `${a.room.cores.toFixed(1)} cores · ${a.room.ramGb.toFixed(1)} GB spare`))
     .child(v_flex().flex_none().rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_hidden()
-      .children(groups.map((group, i) => verdictRow(t, group, i === 0))))
+      .children(groups.map((group, i) => verdictRow(t, group, i === 0, column))))
     .when(Boolean(a.advice), (el) => el.child(div().flex_none().truncate().text_size(11.5).text_color(t.accent).child(a.advice)));
 }
 
-function usageCell(t, width, share, text) {
-  return h_flex().w(width).flex_none().gap(8).items_center()
+// Grows with the row, so the space beside a name is bar, not a gap.
+function usageCell(t, share, text, figureWidth) {
+  return h_flex().flex_1().min_w(0).gap(8).items_center()
     .child(div().flex_1().min_w(0).h(BAR_HEIGHT).rounded(1).bg(t.border)
       .child(div().h(BAR_HEIGHT).rounded(1).bg(heatColor(t, share)).w(`${Math.min(100, Math.max(share >= 0.5 ? 3 : 0, share))}%`)))
-    .child(div().w(NUMBER_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_size(11.5).text_color(t.muted).child(text));
+    .child(div().w(figureWidth).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_size(11.5).text_color(t.muted).child(text));
 }
 
 function consumerTooltip(c) {
@@ -177,40 +196,42 @@ function consumerTooltip(c) {
   return `${running}${shortLived}`;
 }
 
-function consumerRow(t, c, totalGb, isFirst) {
-  return h_flex().id(`consumer-${c.name}`).flex_none().h(CONSUMER_ROW_HEIGHT).px(12).gap(14).items_center().hover((s) => s.bg(t.raised))
+function consumerRow(t, c, totalGb, isFirst, column) {
+  return h_flex().id(`consumer-${c.name}`).flex_none().h(CONSUMER_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().hover((s) => s.bg(t.raised))
     .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
     .tooltip(consumerTooltip(c))
-    .child(h_flex().flex_1().min_w(0).gap(6).items_center()
+    .child(h_flex().w(column).flex_none().min_w(0).gap(NOTE_GAP).items_center()
       .child(div().min_w(0).truncate().text_size(12.5).text_color(c.isSession ? t.foreground : t.muted).child(c.name))
       .when(Boolean(c.mostly), (el) => el.child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(c.mostly))))
-    .child(usageCell(t, CPU_COLUMN, c.cpu, `${Math.round(c.cpu)}%`))
-    .child(usageCell(t, RAM_COLUMN, (100 * c.ramGb) / totalGb, `${c.ramGb.toFixed(1)} GB`));
+    .child(usageCell(t, c.cpu, `${Math.round(c.cpu)}%`, CPU_FIGURE_WIDTH))
+    .child(usageCell(t, (100 * c.ramGb) / totalGb, `${c.ramGb.toFixed(1)} GB`, RAM_FIGURE_WIDTH));
 }
 
-function consumerList(t, a) {
+function consumerList(t, a, column) {
   if (!a.consumers.length) return sectionTitle(t, "Top consumers", "Nothing heavy running");
   return v_flex().flex_none().gap(6)
     .child(sectionTitle(t, "Top consumers", "CPU · RAM"))
     .child(v_flex().flex_none().rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_hidden()
-      .children(a.consumers.map((c, i) => consumerRow(t, c, a.ram.totalGb, i === 0))));
+      .children(a.consumers.map((c, i) => consumerRow(t, c, a.ram.totalGb, i === 0, column))));
 }
 
 export function hardwareMonitor(t, analysis, leading) {
-  const panel = v_flex().flex_1().min_w(0).p(10).gap(SECTION_GAP).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden();
-  const title = (status) => h_flex().h(22).flex_none().gap(10).items_center()
+  const panel = v_flex().flex_1().min_w(0).px(12).pb(12).gap(SECTION_GAP).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden();
+  // As tall as the summary strip and the Notes header, so the first rows share a line.
+  const title = (status) => h_flex().h(30).flex_none().gap(10).items_center()
     .child(leading).child(div().flex_none().text_size(12).font_medium().text_color(t.foreground).child("Hardware Monitor"))
     .child(h_flex().flex_1().min_w(0).gap(6).items_center().justify_end().text_size(12).children(status));
   if (!analysis) return panel.child(title([div().text_color(t.dim).child("Measuring the machine…")]));
   const { isBad, text } = analysis.headline;
   const hasAlerts = Boolean(analysis.signal) || analysis.stuck.length > 0;
   const statusColor = isBad ? t.blocked : t.ansi2;
+  const column = nameColumn(analysis);
   return panel
     .child(title([dot(statusColor), div().min_w(0).truncate().text_color(isBad ? t.blocked : t.muted).child(analysis.signal ? "Low memory" : text)]))
     .when(hasAlerts, (el) => el.child(v_flex().flex_none().gap(6)
       .when(Boolean(analysis.signal), (box) => box.child(signalBanner(t, analysis)))
       .children(analysis.stuck.map((p) => stuckBanner(t, p)))))
     .child(machineMeters(t, analysis))
-    .child(canIRun(t, analysis))
-    .child(consumerList(t, analysis));
+    .child(canIRun(t, analysis, column))
+    .child(consumerList(t, analysis, column));
 }

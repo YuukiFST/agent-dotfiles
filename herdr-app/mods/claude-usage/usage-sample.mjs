@@ -1,6 +1,7 @@
 // The Claude plan usage, read with Claude Code's own sign-in from the endpoint behind
 // claude.ai/settings/usage. Only Claude Code refreshes the token: its refresh tokens rotate, so
-// a refresh here would sign it out. An expired token keeps the last reading until it renews it.
+// a refresh here would sign it out. A failed reading replaces the last one, so a switched or
+// expired sign-in never shows another account's usage.
 //   node usage-sample.mjs <file>
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -53,8 +54,7 @@ async function readUsage() {
   return { at: Date.now(), plan: planOf(sign_in), windows: windowsOf(await response.json()), error: null };
 }
 
-const previous = await readFile(file, "utf8").then(JSON.parse).catch(() => null);
-const text = JSON.stringify({ ...previous, ...(await readUsage()), checkedAt: Date.now() });
+const text = JSON.stringify({ ...(await readUsage()), checkedAt: Date.now() });
 await mkdir(dirname(file), { recursive: true });
 const temporary = `${file}.${process.pid}`;
 await writeFile(temporary, text);

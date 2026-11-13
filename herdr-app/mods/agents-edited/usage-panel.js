@@ -16,9 +16,11 @@ const SAMPLE_STALE_MS = 30000;
 const READING_STALE_MS = 15 * 60000;
 const GIB = 1073741824;
 const METER_BLOCKS = 10;
-const LABEL_WIDTH = 42;
-const PERCENT_WIDTH = 34;
-const DETAIL_WIDTH = 78;
+// Fits "Session", the longest label the plan sends.
+const LABEL_WIDTH = 56;
+// As wide as "100%" and "renewed": the figures sit beside their bar, the bar takes the rest.
+const PERCENT_WIDTH = 28;
+const DETAIL_WIDTH = 44;
 
 const USAGE_VIEW_KEY = "usage.view";
 const CLAUDE_VIEW = "claude";
@@ -166,7 +168,8 @@ export function usagePanel(t, panel) {
   const reading = panel.plan.reading;
   const windows = reading?.windows ?? [];
   const waiting = (text) => div().px(12).pb(6).text_size(11).text_color(t.dim).child(text);
-  const section = () => v_flex().flex_grow_1().pb(4);
+  // pb 6 puts the last row's middle on the Notes send bar's beside it.
+  const section = () => v_flex().flex_grow_1().pb(6);
   const switcher = harnessSwitch(t, "usage-view", panel.harnesses, panel.view, SWITCH_TILE_SIZE, (view, cx) => panel.showView(view, cx));
   const claudeSection = () => section()
     .child(sectionTitle(t, "Claude", reading ? planNote(reading) : "", switcher))

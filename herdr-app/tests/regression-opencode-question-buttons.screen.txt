@@ -1,0 +1,17 @@
+     + 1 thought
+     → Asked 1 question
+  ┃
+  ┃  Questions
+  ┃
+  ┃  Which color do you prefer?
+  ┃
+  ┃  1. Red
+  ┃     Red
+  ┃  2. Green
+  ┃     Green
+  ┃  3. Blue
+  ┃     Blue
+  ┃  4. Type your own answer
+  ┃
+  ┃  ↑↓ select  enter submit  esc dismiss
+  ┃

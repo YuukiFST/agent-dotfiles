@@ -57,9 +57,11 @@ const number = (text, color) => numberCell(div()).font_family(NUMBER_FONT).text_
 
 const dot = (color) => div().size(6).flex_none().rounded(3).bg(color);
 
-function summaryCell(t, label, value, color, first) {
-  return h_flex().flex_1().min_w(0).h(30).px(10).gap(6).items_center()
+// isEnd: the value ends where the sessions table's Tokens column ends.
+function summaryCell(t, label, value, color, first, isEnd) {
+  return h_flex().flex_1().min_w(0).h(30).px(12).gap(6).items_center()
     .when(!first, (el) => el.border_l(1).border_color(t.border))
+    .when(isEnd, (el) => el.justify_end())
     .when(Boolean(color), (el) => el.child(dot(color)))
     .child(div().flex_none().text_size(12).text_color(t.dim).child(label))
     .child(div().flex_none().font_family(NUMBER_FONT).text_size(13).text_color(value === "0" ? t.dim : t.foreground).child(value));
@@ -73,7 +75,7 @@ function summary(t, list, board) {
   }, 0);
   return h_flex().flex_none().rounded(8).border(1).border_color(t.border).bg(t.surface)
     .children(SUMMARY_STATES.map((id, i) => summaryCell(t, STATES[id].word, count(id), STATES[id].color(t), i === 0)))
-    .child(summaryCell(t, "Tokens", kilo(total), null, false));
+    .child(summaryCell(t, "Tokens", kilo(total), null, false, true));
 }
 
 function sessionRow(t, a, ctx, board) {
@@ -113,7 +115,7 @@ function stateGroup(t, id, members, ctx, board) {
 function sessionsPanel(t, list, ctx, board) {
   const groups = Object.keys(STATES).map((id) => [id, list.filter((a) => stateOf(a) === id)]).filter(([, members]) => members.length);
   return v_flex().flex_1().min_h(0).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden()
-    .child(h_flex().h(26).flex_none().px(12).gap(10).items_center().text_size(11).text_color(t.dim)
+    .child(h_flex().h(26).flex_none().px(12).gap(8).items_center().text_size(11).text_color(t.dim)
       .child(div().flex_1().min_w(0).child("Sessions"))
       .child(numberCell(div()).child("Time"))
       .child(numberCell(div()).child("Tokens")))
