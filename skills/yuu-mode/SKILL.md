@@ -95,6 +95,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Make prose read less AI-written, or audit a draft | `ai-tells` |
 | New marketing copy, titles, microcopy, CTAs, LinkedIn or strategic blog posts | `ai-copywriter` |
 | Docs, RFCs, readmes or other technical prose | `technical-writing` |
+| Article built only from verbatim Wikipedia sentences, credited under CC BY-SA | `wiki-collage` |
 | A pull request description | `pr-writing` |
 | Improve a project `CLAUDE.md` from its own session transcripts | `backpass` |
 | A skill, `AGENTS.md` or `CLAUDE.md` | `writing-for-agents` |
