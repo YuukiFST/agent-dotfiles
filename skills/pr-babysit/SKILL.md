@@ -12,7 +12,7 @@ metadata:
 
 The loop is `scripts/babysit.mjs`, plain code with no model in it.
 Each `tick` snapshots every open PR you authored (`gh search prs --author @me`, then `gh pr view --json`), puts each PR in one state, picks at most one next action, and skips any action the ledger already holds for that head commit.
-State lives outside every repo, in `$PR_BABYSIT_HOME` or `~/.local/state/pr-babysit`: `snapshot.json`, `plan.txt`, `ledger.jsonl`, `sessions.json` and `briefs/`.
+State lives outside every repo, in `$PR_BABYSIT_HOME` or `~/.local/state/pr-babysit`: `snapshot.json`, `plan.txt`, `ledger.jsonl`, `sessions.json`, `briefs/` and `logs/` (each fix agent's output, its drafted replies included).
 
 ## Steps
 
@@ -36,10 +36,10 @@ Rules run top to bottom; the first match is the PR's state.
 | `conflict` | `mergeable` is `CONFLICTING` | `fix:conflict` |
 | `ci-red` | a check failed, errored, timed out or was cancelled | `fix:ci` |
 | `ci-pending` | a check is still running | wait |
-| `review-feedback` | a human other than you reviewed or commented after the head commit | `fix:review` |
+| `review-feedback` | someone with write access (`OWNER`, `MEMBER`, `COLLABORATOR`) other than you reviewed or commented after the head commit and after the last `fix:review` for it | `fix:review` |
 | `merge-unknown` | `mergeable` not yet computed (`UNKNOWN`) | wait |
 | `ready` | approved, or no review required, green and `MERGEABLE` | `ask:merge` |
-| `awaiting-review` | review still required | after 4 h without one, inside working hours (Mon to Fri, 9 to 18), at most every 3 days: `ask:nudge` |
+| `awaiting-review` | review still required | after 4 h without one (counted from the head commit or the last `fix:review`), inside working hours (Mon to Fri, 9 to 18), at most every 3 days: `ask:nudge` |
 
 A `fix:` action writes a brief to `briefs/`: the failing checks and their log links, or the review text fenced as untrusted data, and the done criteria for the agent.
 
@@ -56,6 +56,7 @@ Start at L0; raise the level with `--level` only when the user says so.
 
 Nudging reviewers is a message to other people, so at every level it stays a question.
 The fix command is `claude --resume <session> -p "Fix the PR described in <brief>"`; `$PR_BABYSIT_DISPATCH` swaps it for another harness.
+On Windows the `claude` on PATH is an npm `.cmd` shim that `spawn` cannot start, so point `$PR_BABYSIT_DISPATCH` at `claude.exe` under `npm/node_modules/@anthropic-ai/claude-code/bin/`; a start that fails prints `dispatch failed` and retries on the next tick.
 
 ## Test
 

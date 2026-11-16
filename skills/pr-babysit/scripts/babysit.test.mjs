@@ -56,18 +56,33 @@ test("L0 puts each PR in one state, plans at most one action, and starts no agen
   assert.match(brief, /log: https:\/\/github.com\/acme\/app\/actions\/runs\/9\/job\/1/);
   assert.match(brief, /replies to reviewers are drafted in your report, not posted/);
   assert.equal(fs.existsSync(log), false, "L0 must not start an agent");
+  // Review text that carries its own fence stays inside the data block.
+  const review = fs.readFileSync(path.join(dir, "briefs", "acme_app_5_5555555_fix-review.md"), "utf8");
+  const outsideFences = review.replace(/^(`{3,})text\n[\s\S]*?\n\1$/gm, "");
+  assert.match(review, /^````text\nRename fetchAll/m);
+  assert.equal(outsideFences.match(/^## Done when$/gm).length, 1);
 });
 
-test("a second tick on the same head commit repeats no action", () => {
+test("a later tick on the same head commit repeats no action, and handled feedback frees the merge question", () => {
   const dir = fs.mkdtempSync(path.join(scratch, "ledger-"));
   tick(dir, "L0");
   const briefsBefore = fs.readdirSync(path.join(dir, "briefs")).length;
   const second = tick(dir, "L0");
-  const acted = second.split("\n").filter((l) => l.includes(" -> ") && !l.includes("-> wait"));
+  assert.match(second, /acme\/app#10 \S+ ready .*-> ask:merge/);
+  assert.match(second, /acme\/app#6 .*-> wait \(nudge asked less than 3 days ago\)/);
+  assert.match(second, /acme\/app#5 \S+ awaiting-review .*-> wait \(review requested 0h ago\)/);
+  const third = tick(dir, "L0");
+  const acted = third.split("\n").filter((l) => l.includes(" -> ") && !l.includes("-> wait"));
   assert.equal(acted.length, 4);
   for (const line of acted) assert.match(line, /skipped \(ledger: done at this head\)$/);
-  assert.match(second, /acme\/app#6 .*-> wait \(nudge asked less than 3 days ago\)/);
   assert.equal(fs.readdirSync(path.join(dir, "briefs")).length, briefsBefore);
+});
+
+test("a fix agent that fails to start is reported and retried, not recorded as done", () => {
+  const dir = fs.mkdtempSync(path.join(scratch, "fail-"));
+  babysit(["register", "acme/app#3", "--session", "sess-3", "--cwd", dir, "--state-dir", dir]);
+  const env = { PR_BABYSIT_DISPATCH: JSON.stringify(["pr-babysit-no-such-agent", "{brief}"]) };
+  for (let i = 0; i < 2; i++) assert.match(tick(dir, "L1", env), /acme\/app#3 .*-> fix:ci dispatch failed \(ENOENT\)/);
 });
 
 test("L1 sends a fix only to the session registered for that PR, and still asks before any nudge", async () => {

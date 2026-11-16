@@ -21,29 +21,27 @@ function checkName(check) {
   return check.name ?? check.context ?? "unnamed check";
 }
 
-export function isBot(author) {
-  if (!author) return true;
-  return Boolean(author.is_bot) || /\[bot\]$/.test(author.login ?? "");
-}
+// gh returns bots as plain logins (github-actions, copilot-pull-request-reviewer as CONTRIBUTOR),
+// so feedback counts only from accounts with write access to the repo.
+const TEAM = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 
 function headCommitAt(pr) {
   const head = pr.commits?.find((c) => c.oid === pr.headRefOid) ?? pr.commits?.at(-1);
   return Date.parse(head?.committedDate ?? pr.createdAt);
 }
 
-// Reviews and comments from a human other than the PR author, newer than the head commit:
-// feedback the last push has not answered yet.
-function unansweredFeedback(pr) {
-  const since = headCommitAt(pr);
-  const me = pr.author?.login;
-  const fromOthers = (author) => !isBot(author) && author.login !== me;
+// Team reviews and comments, other than the PR author's, newer than both the head commit and
+// the last fix:review sent for this head (handledAt): feedback nobody has acted on yet.
+function unansweredFeedback(pr, handledAt) {
+  const since = Math.max(headCommitAt(pr), handledAt);
+  const fromTeam = (item) => TEAM.has(item.authorAssociation) && item.author?.login !== pr.author?.login;
   const reviews = (pr.reviews ?? [])
     .filter((r) => r.state === "CHANGES_REQUESTED" || r.state === "COMMENTED")
-    .filter((r) => fromOthers(r.author) && Date.parse(r.submittedAt) > since)
-    .map((r) => ({ author: r.author.login, kind: `review ${r.state}`, body: r.body ?? "" }));
+    .filter((r) => fromTeam(r) && Date.parse(r.submittedAt) > since)
+    .map((r) => ({ author: r.author.login, kind: `review ${r.state}`, body: r.body ?? "", at: r.submittedAt }));
   const comments = (pr.comments ?? [])
-    .filter((c) => fromOthers(c.author) && Date.parse(c.createdAt) > since)
-    .map((c) => ({ author: c.author.login, kind: "comment", body: c.body ?? "" }));
+    .filter((c) => fromTeam(c) && Date.parse(c.createdAt) > since)
+    .map((c) => ({ author: c.author.login, kind: "comment", body: c.body ?? "", at: c.createdAt }));
   return [...reviews, ...comments];
 }
 
@@ -53,21 +51,24 @@ export function readRisk(body) {
 }
 
 // Rules run top to bottom; the first that matches is the PR's only state.
-export function classify(pr) {
+export function classify(pr, handledAt = 0) {
   if (pr.isDraft) return { state: "draft" };
   if (pr.mergeable === "CONFLICTING") return { state: "conflict", detail: [`conflicts with ${pr.baseRefName ?? "base"}`] };
   const checks = pr.statusCheckRollup ?? [];
   const red = checks.filter((c) => checkVerdict(c) === "red");
   if (red.length) return { state: "ci-red", detail: red.map(checkName), checks: red };
   if (checks.some((c) => checkVerdict(c) === "pending")) return { state: "ci-pending" };
-  const feedback = unansweredFeedback(pr);
-  if (feedback.length) return { state: "review-feedback", detail: feedback.map((f) => `${f.kind} by ${f.author}`), feedback };
+  const feedback = unansweredFeedback(pr, handledAt);
+  if (feedback.length) {
+    const newest = feedback.map((f) => f.at).sort().at(-1);
+    return { state: "review-feedback", detail: feedback.map((f) => `${f.kind} by ${f.author}`), feedback, newest };
+  }
   // GitHub computes mergeability lazily: the first read of a PR often says UNKNOWN.
   if (pr.mergeable !== "MERGEABLE") return { state: "merge-unknown" };
   const approved = pr.reviewDecision === "APPROVED";
   const noReviewNeeded = !pr.reviewDecision && !(pr.reviewRequests ?? []).length;
   if (approved || noReviewNeeded) return { state: "ready" };
-  return { state: "awaiting-review", since: Math.max(Date.parse(pr.createdAt), headCommitAt(pr)) };
+  return { state: "awaiting-review", since: Math.max(Date.parse(pr.createdAt), headCommitAt(pr), handledAt) };
 }
 
 export function inWorkingHours(now) {
@@ -84,7 +85,10 @@ export function nextAction(pr, verdict, { now, ledger }) {
   const head = pr.headRefOid;
   const wait = (reason) => ({ action: "wait", reason });
   const fixKind = FIX_KIND[verdict.state];
-  if (fixKind) return { action: `fix:${fixKind}`, key: `${id}@${head}:fix:${fixKind}`, reason: verdict.detail.join("; ") };
+  if (fixKind) {
+    const key = `${id}@${head}:fix:${fixKind}${verdict.newest ? `:${verdict.newest}` : ""}`;
+    return { action: `fix:${fixKind}`, key, reason: verdict.detail.join("; ") };
+  }
   if (verdict.state === "draft") return wait("draft");
   if (verdict.state === "ci-pending") return wait("checks running");
   if (verdict.state === "merge-unknown") return wait("GitHub has not computed mergeability yet");
