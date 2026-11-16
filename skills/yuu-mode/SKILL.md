@@ -106,6 +106,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Task | Route |
 |------|-------|
 | Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
+| Keep open PRs moving on a timer: red pipelines, conflicts, review feedback, merge questions | `pr-babysit` |
 | Drive a web page in a real browser | `browser-use` |
 | Performance trace, Lighthouse audit or DevTools debugging of a page | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |

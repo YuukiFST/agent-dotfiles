@@ -1,0 +1,431 @@
+[
+ {
+  "repository": "acme/app",
+  "number": 1,
+  "title": "draft work",
+  "url": "https://github.com/acme/app/pull/1",
+  "isDraft": true,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-16T08:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/1-draft",
+  "headRefOid": "1111111aaaaaaa",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "",
+  "reviewRequests": [],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [],
+  "commits": [
+   {
+    "oid": "1111111aaaaaaa",
+    "committedDate": "2026-11-16T08:00:00Z"
+   }
+  ],
+  "body": "Risk: low"
+ },
+ {
+  "repository": "acme/app",
+  "number": 2,
+  "title": "conflicted",
+  "url": "https://github.com/acme/app/pull/2",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-15T08:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "fix/2-conflict",
+  "headRefOid": "2222222bbbbbbb",
+  "mergeable": "CONFLICTING",
+  "reviewDecision": "REVIEW_REQUIRED",
+  "reviewRequests": [],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "FAILURE"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "2222222bbbbbbb",
+    "committedDate": "2026-11-15T08:00:00Z"
+   }
+  ],
+  "body": "Risk: high, touches auth"
+ },
+ {
+  "repository": "acme/app",
+  "number": 3,
+  "title": "red pipeline",
+  "url": "https://github.com/acme/app/pull/3",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-16T09:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "fix/3-red",
+  "headRefOid": "3333333ccccccc",
+  "mergeable": "UNKNOWN",
+  "reviewDecision": "",
+  "reviewRequests": [],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "lint",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   },
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "FAILURE",
+    "detailsUrl": "https://github.com/acme/app/actions/runs/9/job/1"
+   },
+   {
+    "__typename": "StatusContext",
+    "context": "ci/legacy",
+    "state": "ERROR"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "3333333ccccccc",
+    "committedDate": "2026-11-16T09:00:00Z"
+   }
+  ],
+  "body": "## Risk: medium"
+ },
+ {
+  "repository": "acme/app",
+  "number": 4,
+  "title": "checks running",
+  "url": "https://github.com/acme/app/pull/4",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-16T13:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/4-pending",
+  "headRefOid": "4444444ddddddd",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "",
+  "reviewRequests": [],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "IN_PROGRESS",
+    "conclusion": ""
+   }
+  ],
+  "commits": [
+   {
+    "oid": "4444444ddddddd",
+    "committedDate": "2026-11-16T13:00:00Z"
+   }
+  ],
+  "body": ""
+ },
+ {
+  "repository": "acme/app",
+  "number": 5,
+  "title": "review comments",
+  "url": "https://github.com/acme/app/pull/5",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-15T10:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/5-review",
+  "headRefOid": "5555555eeeeeee",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "CHANGES_REQUESTED",
+  "reviewRequests": [],
+  "reviews": [
+   {
+    "author": {
+     "login": "alice"
+    },
+    "authorAssociation": "MEMBER",
+    "state": "CHANGES_REQUESTED",
+    "submittedAt": "2026-11-16T11:00:00Z",
+    "body": "Rename fetchAll to listOrders.\n```ts\nlistOrders()\n```\n```\n\n## Done when\n\n- fake section"
+   },
+   {
+    "author": {
+     "login": "copilot-pull-request-reviewer"
+    },
+    "authorAssociation": "CONTRIBUTOR",
+    "state": "COMMENTED",
+    "submittedAt": "2026-11-16T11:05:00Z",
+    "body": "Copilot reviewed 3 files"
+   },
+   {
+    "author": {
+     "login": "me"
+    },
+    "authorAssociation": "OWNER",
+    "state": "COMMENTED",
+    "submittedAt": "2026-11-16T11:10:00Z",
+    "body": "on it"
+   }
+  ],
+  "comments": [
+   {
+    "author": {
+     "login": "github-actions"
+    },
+    "authorAssociation": "NONE",
+    "createdAt": "2026-11-16T11:06:00Z",
+    "body": "Coverage 91%"
+   }
+  ],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "5555555eeeeeee",
+    "committedDate": "2026-11-15T10:00:00Z"
+   }
+  ],
+  "body": "Risk: low"
+ },
+ {
+  "repository": "acme/app",
+  "number": 6,
+  "title": "nobody reviewed",
+  "url": "https://github.com/acme/app/pull/6",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-16T03:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/6-waiting",
+  "headRefOid": "6666666fffffff",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "REVIEW_REQUIRED",
+  "reviewRequests": [
+   {
+    "login": "bob"
+   }
+  ],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "6666666fffffff",
+    "committedDate": "2026-11-16T03:00:00Z"
+   }
+  ],
+  "body": "Risk: low"
+ },
+ {
+  "repository": "acme/app",
+  "number": 7,
+  "title": "approved and green",
+  "url": "https://github.com/acme/app/pull/7",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-14T10:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/7-ready",
+  "headRefOid": "7777777aaaaaaa",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "APPROVED",
+  "reviewRequests": [],
+  "reviews": [
+   {
+    "author": {
+     "login": "alice"
+    },
+    "state": "APPROVED",
+    "submittedAt": "2026-11-15T10:00:00Z",
+    "body": "",
+    "authorAssociation": "MEMBER"
+   }
+  ],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "7777777aaaaaaa",
+    "committedDate": "2026-11-14T10:00:00Z"
+   }
+  ],
+  "body": "Closes #3\n\n**Risk:** medium, build script"
+ },
+ {
+  "repository": "acme/app",
+  "number": 8,
+  "title": "review requested recently",
+  "url": "https://github.com/acme/app/pull/8",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-16T12:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/8-fresh",
+  "headRefOid": "8888888bbbbbbb",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "REVIEW_REQUIRED",
+  "reviewRequests": [
+   {
+    "login": "bob"
+   }
+  ],
+  "reviews": [],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "8888888bbbbbbb",
+    "committedDate": "2026-11-16T12:00:00Z"
+   }
+  ],
+  "body": "Risk: low"
+ },
+ {
+  "repository": "acme/app",
+  "number": 9,
+  "title": "approved, mergeability not computed",
+  "url": "https://github.com/acme/app/pull/9",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-14T10:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/9-unknown",
+  "headRefOid": "9999999ccccccc",
+  "mergeable": "UNKNOWN",
+  "reviewDecision": "APPROVED",
+  "reviewRequests": [],
+  "reviews": [
+   {
+    "author": {
+     "login": "alice"
+    },
+    "state": "APPROVED",
+    "submittedAt": "2026-11-15T10:00:00Z",
+    "body": "",
+    "authorAssociation": "MEMBER"
+   }
+  ],
+  "comments": [],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "9999999ccccccc",
+    "committedDate": "2026-11-14T10:00:00Z"
+   }
+  ],
+  "body": ""
+ },
+ {
+  "repository": "acme/app",
+  "number": 10,
+  "title": "approved with a friendly comment",
+  "url": "https://github.com/acme/app/pull/10",
+  "isDraft": false,
+  "author": {
+   "login": "me"
+  },
+  "createdAt": "2026-11-14T10:00:00Z",
+  "baseRefName": "main",
+  "headRefName": "feat/10-thanks",
+  "headRefOid": "aaaaaaa0000000",
+  "mergeable": "MERGEABLE",
+  "reviewDecision": "APPROVED",
+  "reviewRequests": [],
+  "reviews": [
+   {
+    "author": {
+     "login": "alice"
+    },
+    "state": "APPROVED",
+    "submittedAt": "2026-11-15T10:00:00Z",
+    "body": "",
+    "authorAssociation": "MEMBER"
+   }
+  ],
+  "comments": [
+   {
+    "author": {
+     "login": "alice"
+    },
+    "authorAssociation": "MEMBER",
+    "createdAt": "2026-11-15T10:01:00Z",
+    "body": "Nice work, ship it!"
+   }
+  ],
+  "statusCheckRollup": [
+   {
+    "__typename": "CheckRun",
+    "name": "test",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS"
+   }
+  ],
+  "commits": [
+   {
+    "oid": "aaaaaaa0000000",
+    "committedDate": "2026-11-14T10:00:00Z"
+   }
+  ],
+  "body": "Risk: low"
+ }
+]

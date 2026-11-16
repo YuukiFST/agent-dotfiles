@@ -253,6 +253,19 @@ jobs:
       - name: Run the ratchet, probe and count end-to-end tests
         run: node --test skills/perf-ratchet/scripts/ratchet.test.mjs
 
+  pr-babysit:
+    name: pr-babysit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+
+      # Replays a recorded snapshot through the CLI, so the job needs no gh login.
+      - name: Run the pr-babysit end-to-end tests
+        run: node --test skills/pr-babysit/scripts/babysit.test.mjs
+
   agent-cli:
     name: agent-cli
     runs-on: ubuntu-latest
