@@ -1,0 +1,9 @@
+pr-babysit L0 2026-11-16T14:00:00.000Z open=8
+acme/app#1 1111111 draft risk=low -> wait (draft)
+acme/app#2 2222222 conflict risk=high -> fix:conflict (conflicts with main) would ask you: no session registered; brief briefs/acme_app_2_2222222_fix-conflict.md
+acme/app#3 3333333 ci-red risk=medium -> fix:ci (test; ci/legacy) would resume session sess-3; brief briefs/acme_app_3_3333333_fix-ci.md
+acme/app#4 4444444 ci-pending risk=unknown -> wait (checks running)
+acme/app#5 5555555 review-feedback risk=low -> fix:review (review CHANGES_REQUESTED by alice) would ask you: no session registered; brief briefs/acme_app_5_5555555_fix-review.md
+acme/app#6 6666666 awaiting-review risk=low -> ask:nudge (no review for 11h) question: ask reviewers of acme/app#6 to look (no review for 11h)? 1) yes, I write it  2) not now
+acme/app#7 7777777 ready risk=medium -> ask:merge (green and mergeable) question: merge acme/app#7 at 7777777 (risk medium)? 1) merge  2) wait  3) close
+acme/app#8 8888888 awaiting-review risk=low -> wait (review requested 2h ago)
