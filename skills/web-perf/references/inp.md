@@ -1,6 +1,6 @@
 # INP: Interaction to Next Paint
 
-Read when field INP is poor, an interaction trace shows a slow interaction, or `INPBreakdown`, `ForcedReflow`, `DOMSize`, or `ThirdParties` flags main-thread cost.
+Read when field INP is poor, an interaction trace shows a slow interaction, a lazily loaded component opens late, or `INPBreakdown`, `ForcedReflow`, `DOMSize`, or `ThirdParties` flags main-thread cost.
 
 A load trace has no INP.
 Record one with `chrome-devtools-axi perf-start --no-reload --no-auto-stop`, perform the interaction (`click`, `type`, `press`), then `perf-stop`, and query `perf-insight NO_NAVIGATION INPBreakdown`.
@@ -54,6 +54,26 @@ In React, `startTransition` marks non-urgent state updates so urgent input rende
 - **Framework rendering**: profile the affected state transition; memoize only where the trace shows repeated work.
 - **High-frequency handlers**: debounce or throttle scroll, resize, and input handlers that do layout or network work.
 - **CPU-heavy computation**: move it to a Web Worker and measure the serialization cost.
+
+## Lazy components on interaction
+
+A dialog, palette or route behind `React.lazy` (or `next/dynamic`, built on it) that the first interaction opens pays the chunk download, then a Suspense fallback React holds for up to 300 ms (`FALLBACK_THROTTLE_MS` in `react-reconciler`), even when the module is already cached.
+Start the import on intent (`pointerenter`, `focus`, `pointerdown`, or idle time for a global shortcut such as ⌘K) and render the loaded module directly, so only a still-pending load suspends:
+
+```javascript
+export function preloadable(load) {
+  let Loaded, pending;
+  const preload = () => (pending ??= load().then((m) => (Loaded = m.default)));
+  function Component(props) {
+    const C = Loaded ?? use(preload()); // suspends only if not loaded yet
+    return <C {...props} />;
+  }
+  return Object.assign(Component, { preload });
+}
+```
+
+For routes, call the router's own preload (`router.prefetch` in Next.js, `preloadRoute` in TanStack Router) from the same intent events; a pointer-trajectory predictor (`js.foresight`) fires earlier than hover, and earns its dependency only where hover measurably arrives too late.
+Confirm in the interaction trace that the fallback frame is gone, and in the network log that each preload is used.
 
 ## Inspect one session (lab only)
 
