@@ -27,6 +27,8 @@ Most readers stop early, so put what matters first:
 
 A repository's pull request template keeps its shape; fit these parts into it.
 
+Every PR carries a `Risk: low|medium|high` line with its reason, read by `pr-babysit`: low is docs, tests or a feature behind a flag that stays off; medium is build scripts, CI or config; high is data loss, secrets, auth or turning a flag on.
+
 Two additions, when they apply:
 
 - **Tests:** a PR adding tests lists each one with its source (global CODING_STANDARDS.md, "Human authority"), so the reviewer settles the expected behavior before reading the code.

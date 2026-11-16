@@ -96,6 +96,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Make prose read less AI-written, or audit a draft | `ai-tells` |
 | New marketing copy, titles, microcopy, CTAs, LinkedIn or strategic blog posts | `ai-copywriter` |
 | Docs, RFCs, readmes or other technical prose | `technical-writing` |
+| Article built only from verbatim Wikipedia sentences, credited under CC BY-SA | `wiki-collage` |
 | A pull request description | `pr-writing` |
 | Improve a project `CLAUDE.md` from its own session transcripts | `backpass` |
 | A skill, `AGENTS.md` or `CLAUDE.md` | `writing-for-agents` |
@@ -106,6 +107,7 @@ A casual question or one-line answer gets answered directly, with no route line,
 | Task | Route |
 |------|-------|
 | Ship a change end to end (issue, PR, review, merge, cleanup) when the user invoked `/git-workflow` | `git-workflow` |
+| Keep open PRs moving on a timer: red pipelines, conflicts, review feedback, merge questions | `pr-babysit` |
 | Drive a web page in a real browser | `browser-use` |
 | Performance trace, Lighthouse audit or DevTools debugging of a page | `chrome-devtools-axi` |
 | Give a project a scripted verify-<app> skill | `create-verification-skill` |
