@@ -58,12 +58,18 @@ In React, `startTransition` marks non-urgent state updates so urgent input rende
 ## Lazy components on interaction
 
 A dialog, palette or route behind `React.lazy` (or `next/dynamic`, built on it) that the first interaction opens pays the chunk download, then a Suspense fallback React holds for up to 300 ms (`FALLBACK_THROTTLE_MS` in `react-reconciler`), even when the module is already cached.
-Start the import on intent (`pointerenter`, `focus`, `pointerdown`, or idle time for a global shortcut such as ⌘K) and render the loaded module directly, so only a still-pending load suspends:
+Start the import on intent (`pointerenter`, `focus`, `pointerdown`, or idle time for a global shortcut such as ⌘K) and render the loaded module directly, so only a still-pending load suspends (React 19 `use`; on React 18, call `load()` on intent and keep `React.lazy`):
 
-```javascript
+```jsx
+import { use } from "react";
+
 export function preloadable(load) {
   let Loaded, pending;
-  const preload = () => (pending ??= load().then((m) => (Loaded = m.default)));
+  const preload = () =>
+    (pending ??= load().then(
+      (m) => (Loaded = m.default),
+      (error) => { pending = undefined; throw error; }, // a failed chunk retries on the next intent
+    ));
   function Component(props) {
     const C = Loaded ?? use(preload()); // suspends only if not loaded yet
     return <C {...props} />;
@@ -72,7 +78,7 @@ export function preloadable(load) {
 }
 ```
 
-For routes, call the router's own preload (`router.prefetch` in Next.js, `preloadRoute` in TanStack Router) from the same intent events; a pointer-trajectory predictor (`js.foresight`) fires earlier than hover, and earns its dependency only where hover measurably arrives too late.
+For routes, call the router's own preload (`router.prefetch` in Next.js, `preloadRoute` in TanStack Router) from the same intent events, and call `X.preload().catch(() => {})` there so a failed preload stays handled; a pointer-trajectory predictor (`js.foresight`) fires earlier than hover, and earns its dependency only where hover measurably arrives too late.
 Confirm in the interaction trace that the fallback frame is gone, and in the network log that each preload is used.
 A preload hides a slow response only when the intent comes early enough: make the chunk and the request it waits on fast first (`perf-ratchet`), then preload what network distance still leaves.
 
