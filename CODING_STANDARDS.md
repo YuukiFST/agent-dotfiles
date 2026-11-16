@@ -80,3 +80,4 @@ Disk is finite and a Rust `target/` reaches gigabytes in a day: a session ends w
 - **Uniform entry points:** the same command does the same thing across projects (`bin/deploy`, tag-release, layout), so an agent runs "deploy" without guessing.
 - **Second occurrence → encode:** a class of problem seen twice (style, API misuse, missing check), or a PR rejected for an unwritten convention, gets a proposal to encode it, cheapest enforceable option first: a type, a lint rule, a test, a hook or CI step.
   Prose (CLAUDE.md, a skill) holds only what no tool can check; once a tool enforces a rule, delete its prose.
+- **Fast local gate:** a git hook lints and formats changed files, plus an incremental typecheck, in under 10 s; agents skip prose steps.
