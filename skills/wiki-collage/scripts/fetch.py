@@ -55,6 +55,7 @@ def get(lang: str, out_dir: Path, titles: list[str]) -> None:
 def main() -> None:
     # The Windows console defaults to cp1252, which mangles accented titles and sentences.
     sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
     if len(sys.argv) >= 4 and sys.argv[1] == "search":
         search(sys.argv[2], " ".join(sys.argv[3:]))
     elif len(sys.argv) >= 5 and sys.argv[1] == "get":
