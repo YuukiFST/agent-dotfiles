@@ -109,6 +109,20 @@ test("check refuses a run that skipped a configured metric", () => {
   assert.equal(baselineMedian(root, "lcp"), 1200);
 });
 
+// The timeout only catches a hung probe: under a loaded machine the PowerShell sampler alone
+// can take over a minute, and the finally blocks below stop whatever a killed probe left.
+const PROBE_TIMEOUT_MS = 300_000;
+
+// Only for an app a failed probe left running: after a probe that succeeded, the app's pid is
+// freed and may already belong to an unrelated process.
+function stopLeftoverApp(pid) {
+  try {
+    process.kill(pid);
+  } catch {
+    // exited between the failure and this cleanup
+  }
+}
+
 test("probe reads the memory of a launched app and stops it afterwards", () => {
   const scratch = fs.mkdtempSync(path.join(scratchRoot, "probe-"));
   const app = path.join(scratch, "app.js");
@@ -117,10 +131,11 @@ test("probe reads the memory of a launched app and stops it afterwards", () => {
 setInterval(() => require("fs").writeFileSync(${JSON.stringify(heartbeat)}, Date.now() + " " + process.pid), 200);
 `);
   const readBeat = () => fs.readFileSync(heartbeat, "utf8").split(" ").map(Number);
+  let appStopped = false;
   try {
     const res = spawnSync(process.execPath, [PROBE, "--settle", "2", "--duration", "2", "--", `"${process.execPath}"`, `"${app}"`], {
       encoding: "utf8",
-      timeout: 60_000,
+      timeout: PROBE_TIMEOUT_MS,
     });
     assert.equal(res.status, 0, res.stderr || res.error?.message);
     const result = JSON.parse(res.stdout.trim());
@@ -130,15 +145,9 @@ setInterval(() => require("fs").writeFileSync(${JSON.stringify(heartbeat)}, Date
     const [lastBeat] = readBeat();
     spawnSync(process.execPath, ["-e", "setTimeout(() => {}, 1000)"]);
     assert.equal(readBeat()[0], lastBeat, "the app kept running after probe exited");
+    appStopped = true;
   } finally {
-    // The app outlives a broken probe; stop it so a red run leaves nothing behind.
-    if (fs.existsSync(heartbeat)) {
-      try {
-        process.kill(readBeat()[1]);
-      } catch {
-        // already stopped, as a passing run leaves it
-      }
-    }
+    if (!appStopped && fs.existsSync(heartbeat)) stopLeftoverApp(readBeat()[1]);
   }
 });
 
@@ -237,19 +246,19 @@ setInterval(() => {
 fs.writeFileSync(${JSON.stringify(go)}, "");
 const poll = setInterval(() => fs.existsSync(${JSON.stringify(go)}) || clearInterval(poll), 50);
 `);
+  let probeFinished = false;
   try {
     const res = spawnSync(process.execPath, [PROBE, "--settle", "2", "--scenario", `"${process.execPath}" "${scenario}"`, "--", `"${process.execPath}"`, `"${app}"`], {
       encoding: "utf8",
-      timeout: 60_000,
+      timeout: PROBE_TIMEOUT_MS,
     });
     assert.equal(res.status, 0, res.stderr || res.error?.message);
+    probeFinished = true;
     const result = JSON.parse(res.stdout.trim());
     assert.ok(result.cpu_us >= 950_000 && result.cpu_us <= 1_300_000, `cpu_us ${result.cpu_us} should be the one second of CPU the app burned`);
     assert.ok(result.scenario_us >= 1_000_000, `scenario_us ${result.scenario_us} should cover the second the work took`);
   } finally {
-    // A probe killed by the timeout leaves the app running; stop it so a red run leaves nothing behind.
-    const pid = fs.existsSync(pidFile) ? Number(fs.readFileSync(pidFile, "utf8")) : 0;
-    if (pid && pidAlive(pid)) process.kill(pid);
+    if (!probeFinished && fs.existsSync(pidFile)) stopLeftoverApp(Number(fs.readFileSync(pidFile, "utf8")));
   }
 });
 
