@@ -74,6 +74,7 @@ export function preloadable(load) {
 
 For routes, call the router's own preload (`router.prefetch` in Next.js, `preloadRoute` in TanStack Router) from the same intent events; a pointer-trajectory predictor (`js.foresight`) fires earlier than hover, and earns its dependency only where hover measurably arrives too late.
 Confirm in the interaction trace that the fallback frame is gone, and in the network log that each preload is used.
+A preload hides a slow response only when the intent comes early enough: make the chunk and the request it waits on fast first (`perf-ratchet`), then preload what network distance still leaves.
 
 ## Inspect one session (lab only)
 
