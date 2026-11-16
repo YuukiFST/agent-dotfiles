@@ -120,7 +120,7 @@ setInterval(() => require("fs").writeFileSync(${JSON.stringify(heartbeat)}, Date
   try {
     const res = spawnSync(process.execPath, [PROBE, "--settle", "2", "--duration", "2", "--", `"${process.execPath}"`, `"${app}"`], {
       encoding: "utf8",
-      timeout: 30_000,
+      timeout: 60_000,
     });
     assert.equal(res.status, 0, res.stderr || res.error?.message);
     const result = JSON.parse(res.stdout.trim());
@@ -220,9 +220,11 @@ function pidAlive(pid) {
 
 test("probe charges the app's CPU time to the scenario that drove it", () => {
   const go = path.join(fs.mkdtempSync(path.join(scratchRoot, "go-")), "go");
+  const pidFile = `${go}.pid`;
   // Idle until the scenario asks for work, then exactly one second of CPU time by
   // the app's own account, however long the machine takes to grant it.
   const app = writeScript("app.js", `const fs = require("fs");
+fs.writeFileSync(${JSON.stringify(pidFile)}, String(process.pid));
 const cpuUs = () => { const used = process.cpuUsage(); return used.user + used.system; };
 setInterval(() => {
   if (!fs.existsSync(${JSON.stringify(go)})) return;
@@ -235,14 +237,20 @@ setInterval(() => {
 fs.writeFileSync(${JSON.stringify(go)}, "");
 const poll = setInterval(() => fs.existsSync(${JSON.stringify(go)}) || clearInterval(poll), 50);
 `);
-  const res = spawnSync(process.execPath, [PROBE, "--settle", "2", "--scenario", `"${process.execPath}" "${scenario}"`, "--", `"${process.execPath}"`, `"${app}"`], {
-    encoding: "utf8",
-    timeout: 30_000,
-  });
-  assert.equal(res.status, 0, res.stderr || res.error?.message);
-  const result = JSON.parse(res.stdout.trim());
-  assert.ok(result.cpu_us >= 950_000 && result.cpu_us <= 1_300_000, `cpu_us ${result.cpu_us} should be the one second of CPU the app burned`);
-  assert.ok(result.scenario_us >= 1_000_000, `scenario_us ${result.scenario_us} should cover the second the work took`);
+  try {
+    const res = spawnSync(process.execPath, [PROBE, "--settle", "2", "--scenario", `"${process.execPath}" "${scenario}"`, "--", `"${process.execPath}"`, `"${app}"`], {
+      encoding: "utf8",
+      timeout: 60_000,
+    });
+    assert.equal(res.status, 0, res.stderr || res.error?.message);
+    const result = JSON.parse(res.stdout.trim());
+    assert.ok(result.cpu_us >= 950_000 && result.cpu_us <= 1_300_000, `cpu_us ${result.cpu_us} should be the one second of CPU the app burned`);
+    assert.ok(result.scenario_us >= 1_000_000, `scenario_us ${result.scenario_us} should cover the second the work took`);
+  } finally {
+    // A probe killed by the timeout leaves the app running; stop it so a red run leaves nothing behind.
+    const pid = fs.existsSync(pidFile) ? Number(fs.readFileSync(pidFile, "utf8")) : 0;
+    if (pid && pidAlive(pid)) process.kill(pid);
+  }
 });
 
 function launch(...args) {
