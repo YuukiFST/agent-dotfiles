@@ -20,7 +20,7 @@ A row with no measured cost gets a note, never a recommendation, per the Judgmen
 | Bundle splitting, route-based loading | Code for other routes or rarely opened components in the entry chunk; routes and heavy components behind `import()` | Bundler stats or analyzer; script list on two different routes |
 | Tree shaking | Whole-library and barrel imports, `sideEffects`, two versions of one package | `DuplicatedJavaScript`; [codebase.md](codebase.md) |
 | Legacy code and polyfills | Transpiled or polyfilled code shipped to modern browsers | `LegacyJavaScript`; [codebase.md](codebase.md) |
-| Prefetching | The next likely navigation's document and chunks fetched ahead; prefetches nobody uses | `network --type prefetch`; [lcp.md](lcp.md), Speculation Rules |
+| Prefetching | The next likely navigation's document, chunks and data fetched ahead, on intent (hover, focus, `pointerdown`) where the viewport does not trigger it; prefetches nobody uses | `network --type prefetch`; [lcp.md](lcp.md), Speculation Rules, [inp.md](inp.md#lazy-components-on-interaction) |
 | Preload, priority, preconnect | LCP resource and critical fonts discovered early; no unused preconnect | `LCPDiscovery`, `NetworkDependencyTree` |
 | Image optimization | Format, dimensions against rendered size, lazy loading below the fold only | `ImageDelivery`; [lcp.md](lcp.md) |
 | Font loading | Font bytes, families and weights on the first screen, swap behavior, subsetting | `FontDisplay`, `network --type font`; [lcp.md](lcp.md) |
