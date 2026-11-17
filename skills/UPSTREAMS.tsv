@@ -68,6 +68,7 @@ teardown	jakubkrehel/skills	skills/teardown	37744ed
 teach	mattpocock/skills	skills/productivity/teach	ad5400b
 technical-writing	cursor/plugins	pstack/skills/technical-writing	00b14f1
 test-audit	openclaw/openclaw	.agents/skills/test-audit	3195fba
+test-audit	caldoai/skills	skills/prune-tests	bd73b2e
 typescript-best-practices	cursor/plugins	pstack/skills/typescript-best-practices	0317eb8
 web-perf	cloudflare/skills	skills/web-perf	29de2b2
 web-perf	addyosmani/web-quality-skills	skills/performance	afa8da9
