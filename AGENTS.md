@@ -14,6 +14,9 @@ This file is; the root `CLAUDE.md` only imports it, because by default Claude Co
 - **Seeds are machine-owned:** `settings.json` (Claude Code, `sync-config.ps1` only) is written only when absent, and in `pi/settings.json` the `defaultProvider`, `defaultModel` and `defaultThinkingLevel` keys apply on first install only.
   Once written, the live value belongs to the machine and a sync leaves it alone; the rest of pi's `settings.json` is a merge in which `enabledModels`, `theme` and `packages` converge from the repo and pi-owned keys like `lastChangelogVersion` survive.
 - **Commits and pushes follow `rules/git.md`** (hooks in `git-hooks/`).
+- **No eval, no ship:** a change to a skill or playbook (new rules, a diet, a description) is pushed only with a before/after eval showing no quality loss: `skills/skill-diet/references/eval.md` for a model-invoked skill, `skills/yuu-mode/playbooks/eval.md` for a user-invoked skill or a playbook.
+  Until then it stays on a local branch, and a change no eval setup covers (a description's triggering) stays there too, unless the user waives the eval for that change.
+  The commit message carries the pass rates per version.
 - **Sensitive paths** for `interrogate` in this repo: `AGENTS.md`, `CLAUDE.md`, `GLOBAL.md` and `rules/` (instructions every session loads), `skills/interrogate/` and `skills/git-workflow/` (the review and merge gate), `hooks/`, `mods/`, `git-hooks/`, `scripts/` and `.github/workflows/` (code run on every machine or in CI), `settings.json` (Claude Code permissions and hooks), `pi/cloak.json` (secret masking), `pi/extensions/`, `rtk/config.toml` and `herdr-app/` (live harness config).
 
 ## Machines
