@@ -1,8 +1,8 @@
 ---
 name: test-audit
-description: "Invoke whenever writing, changing, reviewing, or sweeping tests. Authoring gate plus audit of low-value, implementation-coupled or duplicative tests and their test-only seams. A whole-codebase survey goes to improve."
+description: "Invoke whenever writing, changing, reviewing, sweeping, or pruning tests. Authoring gate plus audit of low-value, implementation-coupled or duplicative tests and their test-only seams. A whole-codebase survey goes to improve."
 ---
-<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md -->
+<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md; value criterion, the past/platform/type-system junk patterns and EXAMPLE.md from caldoai/skills prune-tests (MIT) -->
 
 # Test Audit
 
@@ -67,6 +67,10 @@ The shared checklist for both modes: the authoring gate rejects a new test that
 matches one, and audits hunt for existing tests that do.
 
 - assertion-free coverage probes;
+- absence checks for removed code: a deleted feature asserted gone, a moved
+  module asserted absent from its old path;
+- tests no code change can fail: the platform or framework (an element
+  renders, an event fires) or what the type system already guarantees;
 - self-comparisons and identity copiers;
 - copied fixtures, inventories, manifests, or export lists;
 - exact source, import, or string greps;
@@ -79,7 +83,7 @@ matches one, and audits hunt for existing tests that do.
 - golden, snapshot or expect output a reviewer cannot read: an unlabeled dump,
   a whole object graph, unstable ordering, or unmasked timestamps, ids and
   paths, so its diff hides the behavior change;
-- mocks that implement the asserted behavior, or one identical mock standing in
+- mocks of the unit under test, mocks that implement the asserted behavior, or one identical mock standing in
   for different APIs;
 - fixtures that supply the receipt, admission, or callback ordering the owner
   should produce, or persistence asserted against a store the path never writes;
@@ -93,7 +97,8 @@ matches one, and audits hunt for existing tests that do.
 ## Value bar
 
 Tests justify their maintenance cost by protecting behavior, a credible
-regression, or an independently meaningful contract. In an audit, an existing
+regression, or an independently meaningful contract: a test should change only
+when that behavior changes, and fail only when it regresses. In an audit, an existing
 test that must change for behavior-preserving source reorganization is suspect,
 not automatically deletable; the authoring gate still rejects new ones.
 
@@ -179,7 +184,8 @@ globals, wrappers, and dead production paths instead of preserving aliases.
 Move retained regressions to their canonical owners. Consolidate repeated
 package or dependency assertions into one generic contract.
 
-Prefer net-negative production LOC. Do not add replacement tests that restate
+[EXAMPLE.md](EXAMPLE.md) shows one batch as a diff: rewrites, deletions, and a
+deleted test-only seam. Prefer net-negative production LOC. Do not add replacement tests that restate
 the same implementation, and do not convert uncertain candidates into cleanup
 to increase deletion counts.
 
