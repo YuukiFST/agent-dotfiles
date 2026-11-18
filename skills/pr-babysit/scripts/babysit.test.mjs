@@ -97,3 +97,28 @@ test("L1 sends a fix only to the session registered for that PR, and still asks 
   assert.match(plan, /acme\/app#2 .* no session registered: hand the brief to an agent/);
   assert.match(plan, /acme\/app#6 .*-> ask:nudge .*question: ask reviewers/);
 });
+
+// Source: the user's go-ahead (2026-11-18) on the Claude Code team's rule, "If a check is still
+// failing after three rounds, Claude stops and brings in a human" (claude.dev/blog/how-the-claude-code-team-thinks-about-verification).
+test("a fix sent for 3 earlier commits of a PR becomes a question to you, not a 4th fix", () => {
+  const seed = (dir, heads, mode) => {
+    const lines = heads.map((head, i) =>
+      JSON.stringify({ key: `acme/app#3@${head}:fix:ci:${mode}`, pr: "acme/app#3", head, action: "fix:ci", level: "L0", at: `2026-11-1${i}T10:00:00.000Z` }),
+    );
+    fs.writeFileSync(path.join(dir, "ledger.jsonl"), lines.join("\n") + "\n");
+  };
+  const stuck = fs.mkdtempSync(path.join(scratch, "rounds-3-"));
+  seed(stuck, ["aaa0001", "aaa0002", "aaa0003"], "dry");
+  const plan = tick(stuck, "L0");
+  assert.match(plan, /acme\/app#3 3333333 ci-red .*-> ask:help \(fix:ci already sent for 3 earlier commits: test; ci\/legacy\) question: the fix agent is not converging on acme\/app#3/);
+  assert.equal(fs.existsSync(path.join(stuck, "briefs", "acme_app_3_3333333_fix-ci.md")), false);
+  assert.match(tick(stuck, "L0"), /acme\/app#3 .*-> ask:help skipped \(ledger: done at this head\)/);
+
+  const two = fs.mkdtempSync(path.join(scratch, "rounds-2-"));
+  seed(two, ["aaa0001", "aaa0002"], "dry");
+  assert.match(tick(two, "L0"), /acme\/app#3 3333333 ci-red .*-> fix:ci \(test; ci\/legacy\)/);
+
+  const otherMode = fs.mkdtempSync(path.join(scratch, "rounds-live-"));
+  seed(otherMode, ["aaa0001", "aaa0002", "aaa0003"], "live");
+  assert.match(tick(otherMode, "L0"), /acme\/app#3 3333333 ci-red .*-> fix:ci \(test; ci\/legacy\)/);
+});
