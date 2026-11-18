@@ -1,8 +1,11 @@
 ---
 name: test-audit
 description: "Invoke whenever writing, changing, reviewing, sweeping, or pruning tests. Authoring gate plus audit of low-value, implementation-coupled or duplicative tests and their test-only seams. A whole-codebase survey goes to improve."
+metadata:
+  tested-with: "claude-code claude-sonnet-5-5:medium"
+  tested-on: "2026-11-18"
 ---
-<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md; value criterion, the past/platform/type-system junk patterns and EXAMPLE.md from caldoai/skills prune-tests (MIT) -->
+<!-- Source: openclaw/openclaw main (adapted: validation and landing bound to the target project's own commands; default audit target added); description routes tie cases to sibling skills; E2E rule is a pointer to CODING_STANDARDS.md; value criterion, the past/platform/type-system junk patterns and EXAMPLE.md from caldoai/skills prune-tests (MIT); the network-double junk pattern from interfere-inc/landmines strict-msw (MIT) -->
 
 # Test Audit
 
@@ -85,6 +88,8 @@ matches one, and audits hunt for existing tests that do.
   paths, so its diff hides the behavior change;
 - mocks of the unit under test, mocks that implement the asserted behavior, or one identical mock standing in
   for different APIs;
+- network doubles that pass an unmatched request through to the real network
+  instead of failing the test;
 - fixtures that supply the receipt, admission, or callback ordering the owner
   should produce, or persistence asserted against a store the path never writes;
 - capability tests that restate declared flags instead of exercising the
@@ -138,10 +143,8 @@ example:
 - UI, apps, scripts, and tooling;
 - a cross-cutting pattern sweep.
 
-Outside campaign mode, work in high-confidence batches rather than one large
-speculative inventory, and keep batching until the
-[audit target](#audit-target) is met. Hunt for the
-[junk patterns](#junk-patterns).
+Outside campaign mode, hunt for the [junk patterns](#junk-patterns) in
+high-confidence batches.
 
 ## Retention bar
 
