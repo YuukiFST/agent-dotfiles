@@ -3,6 +3,7 @@
 
 export const NUDGE_AFTER_MS = 4 * 3600e3;
 export const NUDGE_SPACING_MS = 3 * 86400e3;
+export const MAX_FIX_ROUNDS = 3;
 export const LEVELS = ["L0", "L1", "L2", "L3"];
 
 const RED = new Set(["FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE"]);
@@ -79,13 +80,26 @@ export function inWorkingHours(now) {
 
 const FIX_KIND = { conflict: "conflict", "ci-red": "ci", "review-feedback": "review" };
 
-// ledger: entries already recorded, each { key, pr, action, at }.
-export function nextAction(pr, verdict, { now, ledger }) {
+// The same fix already sent for MAX_FIX_ROUNDS earlier commits of this PR, in this mode:
+// the agent is not converging, so the loop stops and hands the PR to a person.
+function earlierFixRounds(ledger, id, head, action, mode) {
+  const heads = ledger
+    .filter((e) => e.pr === id && e.action === action && e.head !== head && e.key.endsWith(`:${mode}`))
+    .map((e) => e.head);
+  return new Set(heads).size;
+}
+
+// ledger: entries already recorded, each { key, pr, head, action, at }; mode: "dry" or "live".
+export function nextAction(pr, verdict, { now, ledger, mode = "dry" }) {
   const id = prId(pr);
   const head = pr.headRefOid;
   const wait = (reason) => ({ action: "wait", reason });
   const fixKind = FIX_KIND[verdict.state];
   if (fixKind) {
+    const rounds = earlierFixRounds(ledger, id, head, `fix:${fixKind}`, mode);
+    if (rounds >= MAX_FIX_ROUNDS) {
+      return { action: "ask:help", key: `${id}@${head}:ask:help:${fixKind}`, reason: `fix:${fixKind} already sent for ${rounds} earlier commits: ${verdict.detail.join("; ")}` };
+    }
     const key = `${id}@${head}:fix:${fixKind}${verdict.newest ? `:${verdict.newest}` : ""}`;
     return { action: `fix:${fixKind}`, key, reason: verdict.detail.join("; ") };
   }

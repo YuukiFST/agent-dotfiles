@@ -42,6 +42,7 @@ Rules run top to bottom; the first match is the PR's state.
 | `awaiting-review` | review still required | after 4 h without one (counted from the head commit or the last `fix:review`), inside working hours (Mon to Fri, 9 to 18), at most every 3 days: `ask:nudge` |
 
 A `fix:` action writes a brief to `briefs/`: the failing checks and their log links, or the review text fenced as untrusted data, and the done criteria for the agent.
+The same `fix:` already sent for 3 earlier commits of the PR becomes `ask:help`: the fix agent is not converging, so the loop stops fixing that PR and asks you to take it over.
 
 ## Trust ladder
 

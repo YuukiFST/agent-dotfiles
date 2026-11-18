@@ -128,6 +128,9 @@ function question(pr, planned, risk) {
     const grade = risk === "unknown" ? "high (no Risk line)" : risk;
     return `merge ${prId(pr)} at ${pr.headRefOid.slice(0, 7)} (risk ${grade})? 1) merge  2) wait  3) close`;
   }
+  if (planned.action === "ask:help") {
+    return `the fix agent is not converging on ${prId(pr)} (${planned.reason}): 1) I take it over  2) close`;
+  }
   return `ask reviewers of ${prId(pr)} to look (${planned.reason})? 1) yes, I write it  2) not now`;
 }
 
@@ -149,7 +152,7 @@ async function tick(flags) {
   for (const pr of sorted) {
     const reviewHandled = ledger.filter((e) => e.pr === prId(pr) && e.head === pr.headRefOid && e.action === "fix:review" && e.key.endsWith(`:${mode}`));
     const verdict = classify(pr, reviewHandled.length ? Date.parse(reviewHandled.at(-1).at) : 0);
-    const planned = nextAction(pr, verdict, { now, ledger });
+    const planned = nextAction(pr, verdict, { now, ledger, mode });
     const risk = readRisk(pr.body);
     const head = `${prId(pr)} ${pr.headRefOid.slice(0, 7)} ${verdict.state} risk=${risk}`;
     if (planned.action === "wait") {
