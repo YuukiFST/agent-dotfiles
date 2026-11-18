@@ -1,6 +1,9 @@
 ---
 name: interrogate
-description: "Adversarial code review of a diff, branch or PR: parallel read-only reviewers on the models in reviewers.md, runtime findings rerun until proven or refuted, a lead verdict (Act on / Consider / Noted / Dismissed), with reviewer count, lenses and a blast-radius proof scaled to the diff's risk. Use for a code review, 'review this PR', 'interrogate', 'what could this break', 'blast radius', or the review step before a merge."
+description: "Read before you review any diff, branch, commit or PR, in any language ('review', 'revise', 'revisar', 'check before merge', 'what could this break', 'blast radius', 'interrogate'): an adversarial review that edits nothing and ends in a verdict (Act on / Consider / Noted / Dismissed). Parallel read-only reviewers on the models in reviewers.md, runtime findings rerun until proven or refuted, reviewer count, lenses and a blast-radius proof scaled to the diff's risk."
+metadata:
+  tested-with: "claude-code claude-sonnet-5-5:medium; claude-code claude-haiku-5-5:medium"
+  tested-on: "2026-11-18"
 ---
 
 # Interrogate
