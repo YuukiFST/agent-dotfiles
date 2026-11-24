@@ -17,8 +17,8 @@ Invoke-Native "$Bin\rtk.exe" --version
 Write-Host "[2/5] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"
 
-Write-Host "[3/5] npm globals (chrome-devtools-axi, gh-axi)"
-Invoke-Native npm install -g chrome-devtools-axi@latest gh-axi@latest
+Write-Host "[3/5] npm globals (chrome-devtools-axi, gh-axi, agent-browser)"
+Invoke-Native npm install -g chrome-devtools-axi@latest gh-axi@latest agent-browser@latest
 # Windows runs Claude Code only — pi/Cursor live on the NixOS box and are
 # updated by their own scripts there. Nothing else to refresh here.
 

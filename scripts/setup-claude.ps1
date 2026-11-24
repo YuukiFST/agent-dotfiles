@@ -19,8 +19,8 @@ Write-Host "[2/6] rtk"
 Write-Host "[3/6] fff MCP (retired, unregister)"
 & "$PSScriptRoot\remove-fff.ps1"
 
-Write-Host "[4/6] gh-axi + chrome-devtools-axi"
-Invoke-Native npm install -g gh-axi chrome-devtools-axi
+Write-Host "[4/6] gh-axi + chrome-devtools-axi + agent-browser"
+Invoke-Native npm install -g gh-axi chrome-devtools-axi agent-browser
 
 Write-Host "[5/6] browser-use"
 & "$PSScriptRoot\install-browser-use.ps1"

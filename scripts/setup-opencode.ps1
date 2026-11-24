@@ -26,8 +26,8 @@ if ($LASTEXITCODE -ne 0) { throw "OpenCode plugin step failed, see the error abo
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 Invoke-Native node "$PSScriptRoot\add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
 
-Write-Host "[5/7] gh-axi + chrome-devtools-axi"
-Invoke-Native npm install -g gh-axi chrome-devtools-axi
+Write-Host "[5/7] gh-axi + chrome-devtools-axi + agent-browser"
+Invoke-Native npm install -g gh-axi chrome-devtools-axi agent-browser
 
 Write-Host "[6/7] browser-use"
 & "$PSScriptRoot\install-browser-use.ps1"

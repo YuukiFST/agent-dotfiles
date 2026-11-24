@@ -14,8 +14,8 @@ rtk --version
 echo "[2/5] fff MCP (retired, unregister)"
 bash "$(dirname "$0")/remove-fff.sh"
 
-echo "[3/5] npm globals (chrome-devtools-axi, gh-axi)"
-npm install -g chrome-devtools-axi@latest gh-axi@latest
+echo "[3/5] npm globals (chrome-devtools-axi, gh-axi, agent-browser)"
+npm install -g chrome-devtools-axi@latest gh-axi@latest agent-browser@latest
 # pi is updated by setup-pi.sh (re-runnable), not from here — it is a separate harness,
 # not a Claude Code dependency.
 

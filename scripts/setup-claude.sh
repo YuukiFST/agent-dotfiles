@@ -19,8 +19,8 @@ rtk init -g --hook-only
 echo "[3/6] fff MCP (retired, unregister)"
 bash "$(dirname "$0")/remove-fff.sh"
 
-echo "[4/6] gh-axi + chrome-devtools-axi"
-npm install -g gh-axi chrome-devtools-axi
+echo "[4/6] gh-axi + chrome-devtools-axi + agent-browser"
+npm install -g gh-axi chrome-devtools-axi agent-browser
 
 echo "[5/6] browser-use"
 bash "$(dirname "$0")/install-browser-use.sh" ||

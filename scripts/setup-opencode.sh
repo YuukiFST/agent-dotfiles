@@ -26,8 +26,8 @@ node "$(dirname "$0")/opencode-plugins.mjs" install
 # never writes. Same run, idempotent, and it keeps the machine's theme/keybinds.
 node "$(dirname "$0")/add-opencode-tui-plugin.mjs" "@prevalentware/opencode-goal-plugin"
 
-echo "[5/7] gh-axi + chrome-devtools-axi"
-npm install -g gh-axi chrome-devtools-axi
+echo "[5/7] gh-axi + chrome-devtools-axi + agent-browser"
+npm install -g gh-axi chrome-devtools-axi agent-browser
 
 echo "[6/7] browser-use"
 bash "$(dirname "$0")/install-browser-use.sh" ||
