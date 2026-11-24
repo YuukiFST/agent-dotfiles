@@ -34,5 +34,8 @@ A project's own `CLAUDE.md` / `AGENTS.md` overrides this; scale ceremony to the 
 
 - **AXI CLIs first:** a `{domain}-axi` CLI is built for agents and beats the matching MCP server, plain CLI or hand-rolled script on tokens and accuracy.
   `gh-axi` for GitHub (reuses the `gh auth login` session; raw `gh` only for what it lacks).
-- **Browser:** `browser-use` drives Chrome for pages a `curl` can't read; `chrome-devtools-axi` only for performance traces, Lighthouse and DevTools debugging.
+- **Browser:** `agent-browser` drives a page or flow a `curl` can't read, in its own Chrome and a `--session` per task: read `agent-browser skills get core` first, send known steps as one `batch --bail`, and `wait` for the new state after a click that changes the page, before reading it.
+  `browser-use` drives the user's logged-in Chrome and any step whose skill names it; `chrome-devtools-axi` only for performance traces, Lighthouse and DevTools debugging.
+- **New browser E2E suite:** Flashwright, a Playwright fork with the same API (`npm i -D @playwright/test@npm:flashwright-test`); a project with an E2E runner keeps it unless I ask to migrate.
+  It reuses the browser context between tests: set `isolation: 'strict'` when a test needs a fresh one.
 - **RTK:** a PreToolUse hook rewrites Bash commands to `rtk` form, so write them plain.
