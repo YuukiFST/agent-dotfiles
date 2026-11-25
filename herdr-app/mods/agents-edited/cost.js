@@ -9,6 +9,7 @@ const REFRESH_MS = 10 * 60000;
 // The first reading walks every transcript, about half a minute; exec stops at 30 s by default.
 const SAMPLE_TIMEOUT_MS = 10 * 60000;
 const REPO_KEY = "cost.repo";
+const HIDDEN_KEY = "cost.hiddenRepos";
 
 const parseReading = (text) => {
   try {
@@ -26,6 +27,8 @@ export class CostWatch {
     this.isChecking = false;
     this.checkedAt = 0;
     this.repo = localStorage.getItem(REPO_KEY) ?? ALL_REPOS;
+    this.hidden = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) ?? "[]"));
+    this.isChoosing = false;
   }
 
   // Called from render, so nothing runs while the panel is hidden.
@@ -67,10 +70,22 @@ export class CostWatch {
     cx.notify();
   }
 
-  // Kept until the reading or the repository changes: the board renders far more often than that.
+  toggleChoosing(cx) {
+    this.isChoosing = !this.isChoosing;
+    cx.notify();
+  }
+
+  toggleHidden(repo, cx) {
+    if (!this.hidden.delete(repo)) this.hidden.add(repo);
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify([...this.hidden]));
+    this.shown = null;
+    cx.notify();
+  }
+
+  // Kept until the reading, the repository or the hidden ones change: the board renders far more often than that.
   analysis() {
     if (!this.reading) return null;
-    this.shown ??= costAnalysis(this.reading, this.repo);
+    this.shown ??= costAnalysis(this.reading, this.repo, this.hidden);
     return this.shown;
   }
 }

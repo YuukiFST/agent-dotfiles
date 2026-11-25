@@ -24,6 +24,7 @@ const COUNT_WIDTH = 64;
 const GLYPH_PX = 7;
 const NAME_COLUMN_MAX = 220;
 const ICON_SIZE = 13;
+const CHECKBOX_SIZE = 13;
 // Its middle on the last rows of the usage panel and the Notes composer beside it.
 const FOOTER_HEIGHT = 48;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -31,7 +32,7 @@ const AXIS_STEPS = [1, 2, 2.5, 5, 10];
 
 const dollars = (n) => `$${n.toFixed(2)}`;
 const dayText = (at) => `${MONTHS[new Date(at).getMonth()]} ${new Date(at).getDate()}`;
-const repoName = (repo) => (repo === ALL_REPOS ? "All repositories" : repo);
+const repoName = (repo, hasHidden) => (repo !== ALL_REPOS ? repo : hasHidden ? "Shown repositories" : "All repositories");
 const tasksText = (n) => `${n} ${n === 1 ? "task" : "tasks"}`;
 
 function changeText(pct) {
@@ -82,12 +83,14 @@ function chart(t, { points }) {
     .child(h_flex().flex_none().pl(AXIS_WIDTH).justify_between().font_family(NUMBER_FONT).text_size(10).text_color(t.dim).child("30d ago").child("now"));
 }
 
+const hasHidden = ({ choices }) => choices.some((choice) => choice.isHidden);
+
 function title(t, analysis, leading) {
   // As tall as the summary strip and the Notes header, so the first rows share a line.
   return h_flex().h(30).flex_none().gap(10).items_center()
     .child(leading)
     .child(div().flex_none().text_size(12).font_medium().text_color(t.foreground).child("Cost per task"))
-    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().text_size(12).text_color(t.muted).child(analysis ? repoName(analysis.repo) : "")));
+    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().text_size(12).text_color(t.muted).child(analysis ? repoName(analysis.repo, hasHidden(analysis)) : "")));
 }
 
 function figure(t, label, value, note, isFirst) {
@@ -113,28 +116,62 @@ function sectionTitle(t, text, note) {
 
 const figureCell = (t, width, text) => div().w(width).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_size(11.5).text_color(t.muted).child(text);
 
-function repoRow(t, cost, row, isLit, highest, column, isFirst) {
+function chooseButton(t, cost) {
+  return h_flex().id("cost-choose").flex_none().px(6).mr_neg_1p5().h(18).items_center().rounded(4).cursor_pointer()
+    .text_size(11).text_color(cost.isChoosing ? t.accent : t.muted).hover((s) => s.text_color(t.foreground))
+    .tooltip("Choose which repositories show and count in the totals")
+    .on_click((_e, cx) => cost.toggleChoosing(cx))
+    .child(cost.isChoosing ? "Done" : "Choose");
+}
+
+function checkbox(t, isOn) {
+  return div().size(CHECKBOX_SIZE).flex_none().flex().items_center().justify_center().rounded(3).border(1).border_color(isOn ? t.accent : t.dim)
+    .when(isOn, (el) => el.child(div().size(7).rounded(1).bg(t.accent)));
+}
+
+function choiceRow(t, cost, choice, isFirst) {
+  const isShown = !choice.isHidden;
+  return h_flex().id(`cost-choice-${choice.repo}`).flex_none().h(REPO_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
+    .hover((s) => s.bg(t.raised))
+    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
+    .on_click((_e, cx) => cost.toggleHidden(choice.repo, cx))
+    .child(checkbox(t, isShown))
+    .child(div().min_w(0).truncate().text_size(12.5).text_color(isShown ? t.foreground : t.dim).child(choice.repo))
+    .child(div().flex_none().font_family(NUMBER_FONT).text_size(11.5).text_color(t.dim).child(tasksText(choice.count)));
+}
+
+function repoRow(t, cost, row, name, isLit, highest, column, isFirst) {
   const share = (100 * row.median) / highest;
   return h_flex().id(`cost-repo-${row.repo}`).flex_none().h(REPO_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
     .bg(isLit ? t.selected : t.background)
     .hover((s) => s.bg(t.raised))
     .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
     .on_click((_e, cx) => cost.pick(row.repo, cx))
-    .child(div().w(column).flex_none().truncate().text_size(12.5).text_color(isLit ? t.foreground : t.muted).child(repoName(row.repo)))
+    .child(div().w(column).flex_none().truncate().text_size(12.5).text_color(isLit ? t.foreground : t.muted).child(name))
     .child(div().flex_1().min_w(0).h(BAR_HEIGHT).rounded(1).bg(t.border)
       .child(div().h(BAR_HEIGHT).rounded(1).bg(t.accent).w(`${Math.max(1, share)}%`)))
     .child(figureCell(t, COST_WIDTH, dollars(row.median)))
     .child(figureCell(t, COUNT_WIDTH, tasksText(row.count)));
 }
 
-function repoList(t, cost, { repo, repos }) {
-  if (!repos.length) return div();
+function repoRows(t, cost, analysis) {
+  const { repo, repos, choices } = analysis;
+  if (cost.isChoosing) return choices.map((choice, i) => choiceRow(t, cost, choice, i === 0));
+  const nameOf = (row) => repoName(row.repo, hasHidden(analysis));
   const highest = Math.max(...repos.map((r) => r.median));
-  const column = Math.min(NAME_COLUMN_MAX, Math.max(...repos.map((r) => repoName(r.repo).length * GLYPH_PX)));
+  const column = Math.min(NAME_COLUMN_MAX, Math.max(...repos.map((r) => nameOf(r).length * GLYPH_PX)));
+  return repos.map((row, i) => repoRow(t, cost, row, nameOf(row), row.repo === repo, highest, column, i === 0));
+}
+
+function repoList(t, cost, analysis) {
+  if (!analysis.choices.length) return div();
+  const rows = repoRows(t, cost, analysis);
+  const hiddenCount = analysis.choices.filter((choice) => choice.isHidden).length;
+  const note = `${cost.isChoosing ? "click to show or hide" : "median · tasks, 30 days"}${hiddenCount ? ` · ${hiddenCount} hidden` : ""}`;
   return v_flex().flex_none().gap(6)
-    .child(sectionTitle(t, "Repositories", "median · tasks, 30 days"))
-    .child(v_flex().id("cost-repos").max_h(REPOS_MAX_HEIGHT).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
-      .children(repos.map((row, i) => repoRow(t, cost, row, row.repo === repo, highest, column, i === 0))));
+    .child(sectionTitle(t, "Repositories", note).child(chooseButton(t, cost)))
+    .when(rows.length > 0, (el) => el.child(v_flex().id("cost-repos").max_h(REPOS_MAX_HEIGHT).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
+      .children(rows)));
 }
 
 function footer(t, analysis) {
