@@ -50,10 +50,13 @@ export async function pullLayouts(workspaces) {
   for (const w of workspaces) await copyLayout(w.layout, MAIN_HOME(), SECOND_HOME());
 }
 
-// changedPaths: what watchFolder(LAYOUTS_DIR()) reported.
+// changedPaths: what watchFolder(LAYOUTS_DIR()) reported. Matched by file name, since the
+// watcher's spelling of the folder (drive case, short names) need not match appHome(); a batch
+// holding the folder itself means "refresh everything" (herdr.d.ts, watchFolder).
 export async function pushLayouts(workspaces, changedPaths) {
-  const changed = changedPaths.map(slash);
+  const names = changedPaths.map((p) => slash(p).split("/").pop().toLowerCase());
+  const isWholeFolder = names.includes("layouts");
   for (const w of workspaces) {
-    if (changed.includes(layoutFile(slash(appHome()), w.layout))) await copyLayout(w.layout, slash(appHome()), otherHome());
+    if (isWholeFolder || names.includes(`${w.layout}.json`.toLowerCase())) await copyLayout(w.layout, slash(appHome()), otherHome());
   }
 }
