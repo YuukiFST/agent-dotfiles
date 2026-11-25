@@ -1,6 +1,6 @@
 // The board as a status dashboard (props { compact: true }): a summary strip, the sessions grouped
-// by state in a list that scrolls on its own, and beside it the context map, the Hardware Monitor or
-// the Disk panel.
+// by state in a list that scrolls on its own, and beside it the context map, the Hardware Monitor,
+// the Disk panel or the Cost panel.
 
 import { spaceListName } from "./session-name.js";
 import { div, svg } from "gpui-kit";
@@ -9,6 +9,7 @@ import { home } from "herdr";
 import { iconSwitch } from "./harness-switch.js";
 import { hardwareMonitor } from "./hardware-panel.js";
 import { diskPanel } from "./disk-panel.js";
+import { costPanel } from "./cost-panel.js";
 import { icon } from "./insight.js";
 import { averageContextTree, contextTreemap } from "./ctxmap/treemap.js";
 import { usagePanel } from "./usage-panel.js";
@@ -22,6 +23,8 @@ const RIGHT_PANEL_KEY = "status.rightPanel";
 const CONTEXT_PANEL = "context";
 const HARDWARE_PANEL = "hardware";
 const DISK_PANEL = "disk";
+const COST_PANEL = "cost";
+const RIGHT_PANELS = [CONTEXT_PANEL, HARDWARE_PANEL, DISK_PANEL, COST_PANEL];
 const RIGHT_SWITCH_TILE_SIZE = 18;
 const NUMBER_WIDTH = 54;
 const GAP = 8;
@@ -154,7 +157,7 @@ const sameMaps = (a, b) => a.length === b?.length && a.every((map, i) => map ===
 function rightPanelSwitch(t, board, hardware) {
   const option = (key, tooltip, file, hasAlert) => ({ key, tooltip, isEnabled: true, hasAlert, icon: (size, color) => svg(`mods/agents-edited/icons/${file}.svg`).size(size).flex_none().text_color(color) });
   const isHardwareBad = board.rightPanel !== HARDWARE_PANEL && Boolean(hardware?.headline.isBad);
-  const options = [option(CONTEXT_PANEL, "Context Window Map", "context", false), option(HARDWARE_PANEL, hardware?.headline.text ?? "Hardware Monitor", "hardware", isHardwareBad), option(DISK_PANEL, "Disk", "disk", false)];
+  const options = [option(CONTEXT_PANEL, "Context Window Map", "context", false), option(HARDWARE_PANEL, hardware?.headline.text ?? "Hardware Monitor", "hardware", isHardwareBad), option(DISK_PANEL, "Disk", "disk", false), option(COST_PANEL, "Cost per task", "cost", false)];
   return iconSwitch(t, "right-panel", options, board.rightPanel, RIGHT_SWITCH_TILE_SIZE, (key, cx) => {
     board.rightPanel = key;
     localStorage.setItem(RIGHT_PANEL_KEY, key);
@@ -164,12 +167,13 @@ function rightPanelSwitch(t, board, hardware) {
 
 export const savedRightPanel = () => {
   const saved = localStorage.getItem(RIGHT_PANEL_KEY);
-  return saved === HARDWARE_PANEL || saved === DISK_PANEL ? saved : CONTEXT_PANEL;
+  return RIGHT_PANELS.includes(saved) ? saved : CONTEXT_PANEL;
 };
 
 function shownRightPanel(t, board, hardware, view, panelSwitch, cx) {
   if (board.rightPanel === HARDWARE_PANEL) return hardwareMonitor(t, hardware, panelSwitch);
   if (board.rightPanel === DISK_PANEL) return diskPanel(t, board.disk, panelSwitch, cx);
+  if (board.rightPanel === COST_PANEL) return costPanel(t, board.cost, panelSwitch, cx);
   return contextTreemap(t, board.shownContextTree, { ...view, leading: panelSwitch }, board.treemapTiles);
 }
 

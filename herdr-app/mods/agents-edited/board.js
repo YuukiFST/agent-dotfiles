@@ -14,6 +14,7 @@ import { ContextMaps, contextMap, contextSummary } from "./ctxmap/view.js";
 import { SilentAgents } from "./silent.js";
 import { kilo, savedRightPanel, statusBoard, tilde } from "./status-board.js";
 import { DiskWatch } from "./disk.js";
+import { CostWatch } from "./cost.js";
 import { UsagePanel } from "./usage-panel.js";
 import { NotesPanel } from "./notes/panel.js";
 import { FinishGlow } from "./finish-glow.js";
@@ -65,6 +66,7 @@ export class AgentBoard {
     this.usagePanel = props()?.compact ? new UsagePanel(cx) : null;
     this.notesPanel = props()?.compact ? new NotesPanel(cx) : null;
     this.disk = props()?.compact ? new DiskWatch(cx) : null;
+    this.cost = props()?.compact ? new CostWatch() : null;
     this.finishGlow = new FinishGlow();
     this.hovered = null;
     this.treemapTiles = props()?.compact ? cx.new(TreemapTiles, { tree: null }) : null;
