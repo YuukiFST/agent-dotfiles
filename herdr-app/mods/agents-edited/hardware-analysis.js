@@ -48,13 +48,19 @@ export function clock(ms) {
 }
 
 // The session a process works for: the nearest ancestor that is a session's terminal. known keeps
-// the answer across readings, because agents' helpers outlive the shells that started them.
+// the answer across readings, because agents' helpers outlive the shells that started them; a live
+// terminal's name comes first, because a session can be renamed.
 function sessionFinder(byId, sessionOfPid, known) {
+  // Windows reuses a dead parent's id: a parent that started after its child is another process.
+  const parentOf = (id) => {
+    const p = byId.get(id);
+    const startedAfter = byId.get(p?.parent)?.started > p?.started;
+    return startedAfter ? null : p?.parent;
+  };
   const find = (id, seen = new Set()) => {
     if (!id || seen.has(id)) return null;
-    if (known.has(id)) return known.get(id);
     seen.add(id);
-    const session = sessionOfPid.get(id) ?? find(byId.get(id)?.parent, seen);
+    const session = sessionOfPid.get(id) ?? find(parentOf(id), seen) ?? known.get(id) ?? null;
     if (session) known.set(id, session);
     return session;
   };
