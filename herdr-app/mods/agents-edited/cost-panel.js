@@ -15,8 +15,8 @@ const AXIS_LABEL_HEIGHT = 12;
 const BAND_ALPHA = "2e";
 const ROW_GAP = 8;
 const REPO_ROW_HEIGHT = 30;
-// Eight whole rows and the border.
-const REPOS_MAX_HEIGHT = 242;
+const REPOS_VISIBLE = 8;
+const LIST_BORDERS = 2;
 const BAR_HEIGHT = 3;
 // "$100.00" and "999 tasks" in Geist Mono 11.5px.
 const COST_WIDTH = 50;
@@ -168,9 +168,14 @@ function repoList(t, cost, analysis) {
   const rows = repoRows(t, cost, analysis);
   const hiddenCount = analysis.choices.filter((choice) => choice.isHidden).length;
   const note = `${cost.isChoosing ? "click to show or hide" : "median · tasks, 30 days"}${hiddenCount ? ` · ${hiddenCount} hidden` : ""}`;
-  return v_flex().flex_none().gap(6)
+  // A scroll area needs a set height: under max_h it cuts its rows off and never scrolls. While
+  // choosing, the list takes the chart's place.
+  const visible = cost.isChoosing ? rows.length : Math.min(rows.length, REPOS_VISIBLE);
+  return v_flex().gap(6)
+    .when(cost.isChoosing, (el) => el.flex_1().min_h(0))
+    .when(!cost.isChoosing, (el) => el.flex_none())
     .child(sectionTitle(t, "Repositories", note).child(chooseButton(t, cost)))
-    .when(rows.length > 0, (el) => el.child(v_flex().id("cost-repos").max_h(REPOS_MAX_HEIGHT).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
+    .when(rows.length > 0, (el) => el.child(v_flex().id("cost-repos").h(visible * REPO_ROW_HEIGHT + LIST_BORDERS).flex_shrink(1).min_h(0).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
       .children(rows)));
 }
 
@@ -190,6 +195,6 @@ export function costPanel(t, cost, leading, cx) {
     .child(v_flex().flex_1().min_h(0).px(12).pb(12).gap(SECTION_GAP)
       .child(title(t, analysis, leading))
       .when(!analysis, (el) => el.child(div().text_size(12).text_color(t.dim).child(waiting)))
-      .when(Boolean(analysis), (el) => el.child(figures(t, analysis)).child(chart(t, analysis)).child(repoList(t, cost, analysis))))
+      .when(Boolean(analysis), (el) => el.child(figures(t, analysis)).when(!cost.isChoosing, (box) => box.child(chart(t, analysis))).child(repoList(t, cost, analysis))))
     .child(footer(t, analysis));
 }
