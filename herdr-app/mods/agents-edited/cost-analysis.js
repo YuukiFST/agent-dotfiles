@@ -44,20 +44,23 @@ function reposOf(tasks, now) {
   return recent.length ? [summary(ALL_REPOS, recent), ...repos] : [];
 }
 
-// points: one per day with enough tasks, share 0 (30 days ago) to 1 (now). repos: the last 30 days.
-export function costAnalysis(reading, wantedRepo) {
+// points: one per day with enough tasks, share 0 (30 days ago) to 1 (now). repos: the last 30 days,
+// without the hidden ones, which leave the totals too. choices: every repository, hidden or not.
+export function costAnalysis(reading, wantedRepo, hidden) {
   const now = reading.checkedAt;
   const finished = reading.tasks.filter((task) => task.endAt <= now - FINISHED_AFTER_MS);
-  const priced = finished.filter((task) => task.cost !== null);
+  const allPriced = finished.filter((task) => task.cost !== null);
+  const priced = allPriced.filter((task) => !hidden.has(task.repo));
   const repos = reposOf(priced, now);
   const repo = repos.some((r) => r.repo === wantedRepo) ? wantedRepo : ALL_REPOS;
-  const isInScope = (task) => repo === ALL_REPOS || task.repo === repo;
+  const isInScope = (task) => !hidden.has(task.repo) && (repo === ALL_REPOS || task.repo === repo);
   const points = pointsOf(priced.filter(isInScope), now);
   const first = points[0] ?? null;
   const last = points.at(-1)?.at === now ? points.at(-1) : null;
   return {
     repo,
     repos,
+    choices: reposOf(allPriced, now).filter((r) => r.repo !== ALL_REPOS).map((r) => ({ ...r, isHidden: hidden.has(r.repo) })),
     points,
     first,
     last,
