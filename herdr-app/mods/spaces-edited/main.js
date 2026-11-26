@@ -5,7 +5,10 @@
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+import { BackgroundWork } from "./background.js";
+import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, props } from "herdr";
+import { MARK, glyph, projectColor, tone } from "./marks.js";
+import { orchestratorSpace } from "./orchestrator-space.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -32,27 +35,6 @@ const base = (path) => path.replace(/\/+$/, "").split("/").pop();
 // for this often, in repos the list shows, while the window is in front.
 const FALLBACK = 60000;
 
-// What a stored color name looks like on an avatar (the same in every mod
-// that draws space avatars): one strong color per hue, light and dark alike.
-const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
-
-// A project's avatar color, the same for the same repo or folder wherever it shows.
-function projectColor(name) {
-  const colors = Object.values(MARK);
-  let h = 0;
-  for (const ch of String(name ?? "").toLowerCase()) h = (h * 31 + ch.codePointAt(0)) >>> 0;
-  return colors[h % colors.length];
-}
-
-// A space speaks up only when something in it needs you.
-export function glyph(status) {
-  return status === "blocked" ? "!" : status === "done" ? "●" : "·";
-}
-
-export function tone(t, status) {
-  return t[status] ?? t.unknown;
-}
-
 // A sidebar row pulled this far right opens the drop-zone overlay (a vertical pull reorders).
 const DRAG_OUT_PX = 30;
 const DRAG_OUT_MS = 3000;
@@ -78,6 +60,7 @@ export default class Spaces extends View {
     this.reconnecting = JSON.parse(localStorage.getItem("machines.reconnecting") ?? "{}");
     for (const state of Object.values(this.reconnecting)) state.busy = false;
     this.folded = new Set(JSON.parse(localStorage.getItem("machines.folded") ?? "[]"));
+    this.background = new BackgroundWork(cx);
     this.refreshMachines(cx);
     cx.timer.every(15000, cx => this.refreshMachines(cx));
     // `git status` walks the whole tree, on another machine a process there:
@@ -282,9 +265,11 @@ export default class Spaces extends View {
   // Spaces in order, each worktree space moved under its main checkout's.
   ordered() {
     const sp = spaces(), ps = panes();
+    // { "hideOrchestrator": true }: the Sessions sidebar, whose Orchestration tab shows that space.
+    const hidden = props()?.hideOrchestrator ? orchestratorSpace(sp, ps)?.id : null;
     const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
     for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
-    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
+    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id) && r.w.id !== hidden);
     const mains = new Set(list.filter((r) => r.g && !r.g.linked).map((r) => r.g.repo));
     const nested = (r) => r.g?.linked && mains.has(r.g.repo);
     const out = [];
@@ -466,7 +451,7 @@ export default class Spaces extends View {
         const folder = base((p.cwd ?? "").replaceAll("\\", "/"));
         const g = p.cwd ? this.git[JSON.stringify([w.machine ?? null, p.cwd])] ?? null : null;
         const name = chosenName.get(p.terminal) || origin[p.terminal]?.name || clean(p.title) || folder || p.terminal;
-        const status = statusOf.get(p.terminal);
+        const status = this.background.status(p.terminal, statusOf.get(p.terminal));
         return h_flex().id(`session-${p.pane}`).relative().h(28).flex_none().pl(8).pr(8).gap(8).items_center().rounded(8).text_size(12)
           .cursor_pointer().when(on, (el) => el.bg(t.selected)).when(!on, (el) => el.hover((s) => s.bg(t.hover)))
           .tooltip(p.cwd ?? p.terminal)
@@ -511,7 +496,15 @@ export default class Spaces extends View {
       .when(!w.active, (el) => el.hover((s) => s.bg(t.hover)))
       .on_click(() => run("space.select", { id: w.id }))
       .child(div().text_color(w.active ? t.foreground : t.muted).child(String(i + 1)))
-      .child(div().text_color(tone(t, w.status)).child(glyph(w.status)));
+      .child(div().text_color(tone(t, this.spaceStatus(w))).child(glyph(this.spaceStatus(w))));
+  }
+
+  // The core's status for a space, "working" while a session in it runs background work.
+  spaceStatus(w) {
+    if (w.status !== "done" && w.status !== "idle") return w.status;
+    const tabs = new Set((w.tabs ?? []).map((x) => x.id));
+    const running = panes().some((p) => tabs.has(p.tab) && p.terminal && this.background.status(p.terminal, "done") === "working");
+    return running ? "working" : w.status;
   }
 
   render() {
