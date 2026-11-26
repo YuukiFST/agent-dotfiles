@@ -21,6 +21,10 @@ const LABEL_WIDTH = 56;
 // As wide as "100%" and "renewed": the figures sit beside their bar, the bar takes the rest.
 const PERCENT_WIDTH = 28;
 const DETAIL_WIDTH = 44;
+// As wide as "656.9M" and "max 656.9M" in the number font.
+const TOKENS_WIDTH = 44;
+const BEST_WIDTH = 68;
+const TOKENS_BAR_HEIGHT = 3;
 
 const USAGE_VIEW_KEY = "usage.view";
 const CLAUDE_VIEW = "claude";
@@ -141,18 +145,28 @@ function statRow(t, label, value) {
     .child(div().flex_1().min_w(0).flex().justify_end().font_family(NUMBER_FONT).text_color(t.foreground).child(div().truncate().child(value)));
 }
 
-function tokenPeriodCell(t, label, period) {
-  return h_flex().id(`tokens-${label}`).flex_1().min_w(0).gap(6).items_center().tooltip(tokenBreakdown(period))
-    .child(div().flex_none().text_color(t.muted).child(label))
-    .child(div().flex_none().font_family(NUMBER_FONT).text_size(11).text_color(t.foreground).child(tokenCount(period.tokens)));
+const dayText = (at) => new Date(at).toLocaleDateString("en-CA");
+
+// best: the busiest period of this kind, the current one included. The bar is this one's share of it.
+function tokenPeriodRow(t, label, period, best = period) {
+  const isRecord = period.tokens >= best.tokens;
+  const share = best.tokens > 0 ? Math.min(100, (100 * period.tokens) / best.tokens) : 0;
+  const tooltip = `${tokenBreakdown(period)} · max ${tokenCount(best.tokens)} from ${dayText(best.since)}`;
+  return h_flex().id(`tokens-${label}`).flex_1().min_h(24).px(12).gap(8).items_center().text_size(11).tooltip(tooltip)
+    .child(div().w(LABEL_WIDTH).flex_none().truncate().text_size(12).text_color(t.muted).child(label))
+    .child(div().flex_1().min_w(0).h(TOKENS_BAR_HEIGHT).rounded(1).bg(t.border)
+      .child(div().h(TOKENS_BAR_HEIGHT).rounded(1).bg(t.accent).w(`${share}%`)))
+    .child(div().w(TOKENS_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(t.foreground).child(tokenCount(period.tokens)))
+    .child(div().w(BEST_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(isRecord ? t.ansi2 : t.dim)
+      .child(isRecord ? "record" : `max ${tokenCount(best.tokens)}`));
 }
 
-function tokenPeriodsRow(t, { today, week, month, allTime }) {
-  return h_flex().flex_1().min_h(24).px(12).gap(12).items_center().text_size(12)
-    .child(tokenPeriodCell(t, "Today", today))
-    .child(tokenPeriodCell(t, "Week", week))
-    .child(tokenPeriodCell(t, "Month", month))
-    .child(tokenPeriodCell(t, "All", allTime));
+function tokenPeriodRows(t, { today, week, month, best }) {
+  return [
+    tokenPeriodRow(t, "Today", today, best?.today),
+    tokenPeriodRow(t, "Week", week, best?.week),
+    tokenPeriodRow(t, "Month", month, best?.month),
+  ];
 }
 
 function openCodeRows(t, usage) {
@@ -168,13 +182,14 @@ export function usagePanel(t, panel) {
   const reading = panel.plan.reading;
   const windows = reading?.windows ?? [];
   const waiting = (text) => div().px(12).pb(6).text_size(11).text_color(t.dim).child(text);
-  // pb 6 puts the last row's middle on the Notes send bar's beside it.
-  const section = () => v_flex().flex_grow_1().pb(6);
+  // The bottom padding puts the last row's middle on the Notes send bar's beside it: 6 under the
+  // OpenCode rows, 10 under the Claude gauges and token rows.
+  const section = (bottom = 6) => v_flex().flex_grow_1().pb(bottom);
   const switcher = harnessSwitch(t, "usage-view", panel.harnesses, panel.view, SWITCH_TILE_SIZE, (view, cx) => panel.showView(view, cx));
-  const claudeSection = () => section()
+  const claudeSection = () => section(10)
     .child(sectionTitle(t, "Claude", reading ? planNote(reading) : "", switcher))
     .children(windows.length ? windows.map((w) => planGauge(t, w)) : [waiting(reading?.error ?? "Reading the plan…")])
-    .when(Boolean(panel.tokens.reading), (el) => el.child(tokenPeriodsRow(t, panel.tokens.reading)));
+    .when(Boolean(panel.tokens.reading), (el) => el.children(tokenPeriodRows(t, panel.tokens.reading)));
   const openCodeSection = () => section()
     .child(sectionTitle(t, "OpenCode", "last 7 days", switcher))
     .children(panel.opencode ? openCodeRows(t, panel.opencode) : [waiting("No reading yet")]);
