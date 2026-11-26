@@ -16,21 +16,10 @@ import { SilentAgents } from "./silent.js";
 import { alertLight, alertOf, alertOrb } from "./attention.js";
 import { FinishGlow } from "./finish-glow.js";
 import { followFocusRequests } from "./focus-follow.js";
+import { orchestratorSpace } from "./orchestrator-space.js";
+import { clean, lead, title } from "./tab-title.js";
 
 
-const clean = (s) => (s ?? "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
-
-function lead(tab, all = panes()) {
-  const mine = all.filter(p => p.tab === tab.id && p.terminal);
-  return mine.find(p => p.program?.agent) ?? mine.find(p => p.focused) ?? mine[0];
-}
-
-function title(tab, l) {
-  const prog = l?.program?.name;
-  const live = clean(l?.title);
-  const telling = live && live !== prog && !/^[~/]|^[A-Za-z]:\\/.test(live) && !live.includes("@") && live.toLowerCase() !== l?.program?.key;
-  return (tab.name === prog || !tab.named) && telling ? live : tab.name;
-}
 const RANK = { blocked: 4, done: 3, working: 2, idle: 1 };
 // A sub-agent without a pane isn't in agents(): its raw word, error counting as
 // blocked. It's never done: it reports to its parent, and the parent's done is the news.
@@ -221,7 +210,10 @@ export default class Agents extends View {
     const side = new Set(sideList());
     const collapsed = narrow();
     const sort = sortOf();
-    let list = this.finishGlow.apply(withBackground(this.silent.with(agents()), this.contexts), Date.now());
+    // { "hideOrchestrator": true }: the Sessions sidebar, whose Orchestration tab shows that space.
+    const hidden = props()?.hideOrchestrator ? orchestratorSpace()?.id : null;
+    const listed = hidden ? agents().filter((a) => a.space !== hidden) : agents();
+    let list = this.finishGlow.apply(withBackground(this.silent.with(listed), this.contexts), Date.now());
     this.clock.watch(list, cx);
     this.listed = new Map(list.map((a) => [a.address, a.status]));
     const all = terminals();

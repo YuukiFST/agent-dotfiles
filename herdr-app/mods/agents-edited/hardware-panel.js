@@ -1,9 +1,9 @@
-// The Hardware Monitor, in the place of the Context Window Map: can a job run now, why not, and what
-// to close. Only what can be acted on: Windows's own processes never show.
+// The Hardware Monitor, in the place of the Context Window Map: how busy the machine is, what is
+// stuck, and what uses the most. Only what can be acted on: Windows's own processes never show.
 
 import { Background, PathBuilder, div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { STATE, clock, verdictGroups } from "./hardware-analysis.js";
+import { clock } from "./hardware-analysis.js";
 
 const NUMBER_FONT = "Geist Mono";
 const SECTION_GAP = 14;
@@ -15,10 +15,7 @@ const BAR_HEIGHT = 3;
 // As wide as the column's widest figure ("100%", "10.0 GB"), so each figure sits by its bar.
 const CPU_FIGURE_WIDTH = 30;
 const RAM_FIGURE_WIDTH = 50;
-const VERDICT_ROW_HEIGHT = 34;
-const STATE_COLUMN = 48;
 const ROW_GAP = 12;
-const JOB_GAP = 14;
 const NOTE_GAP = 6;
 // A text's width estimated from its length: the 12.5px UI font averages ~6.3px a glyph, and the
 // estimate rounds up so a name fits; the name truncates if one ever runs longer.
@@ -33,9 +30,7 @@ const TINT_ALPHA = "14";
 const TINT_BORDER_ALPHA = "50";
 const HOT_PCT = 85;
 const WARM_PCT = 60;
-const STATE_WORD = { [STATE.ok]: "OK", [STATE.tight]: "Tight", [STATE.wait]: "Wait" };
 
-const stateColor = (t, state) => ({ [STATE.ok]: t.ansi2, [STATE.tight]: t.ansi3, [STATE.wait]: t.blocked })[state];
 const heatColor = (t, pct) => (pct >= HOT_PCT ? t.blocked : pct >= WARM_PCT ? t.ansi3 : t.accent);
 
 const dot = (color, size = 6) => div().size(size).flex_none().rounded(size / 2).bg(color);
@@ -143,43 +138,13 @@ function stuckBanner(t, p) {
   return alertBanner(t, `stuck-${p.id}`, tooltip, `Stuck? ${p.name} ${p.id}: ${p.cores.toFixed(1)} core${since}`);
 }
 
-function jobName(t, row) {
-  return h_flex().id(`job-${row.id}`).flex_none().gap(5).items_center().tooltip(row.tooltip)
-    .child(div().flex_none().text_size(12.5).text_color(t.foreground).child(row.name))
-    .when(Boolean(row.note), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(row.note)));
-}
-
 const textWidth = (text) => (text ? text.length * GLYPH_PX : 0);
-const jobsWidth = (group) => group.rows.reduce((sum, row) => sum + textWidth(row.name) + (row.note ? NOTE_GAP + textWidth(row.note) : 0), JOB_GAP * (group.rows.length - 1));
 const consumerWidth = (c) => textWidth(c.name) + (c.mostly ? NOTE_GAP + textWidth(c.mostly) : 0);
 
-// One column for the verdicts' jobs and the consumers' names, as wide as the longest of them: the
-// reasons and the bars start right after the names, on one shared line.
+// The consumers' name column, as wide as the longest name: the bars start right after the names.
 function nameColumn(a) {
-  const widest = Math.max(0, ...verdictGroups(a.rows).map((g) => STATE_COLUMN + ROW_GAP + jobsWidth(g)), ...a.consumers.map(consumerWidth));
+  const widest = Math.max(0, ...a.consumers.map(consumerWidth));
   return Math.min(NAME_COLUMN_MAX, Math.ceil(widest));
-}
-
-function verdictRow(t, group, isFirst, column) {
-  const color = stateColor(t, group.state);
-  const isOk = group.state === STATE.ok;
-  return h_flex().id(`verdict-${group.rows[0].id}`).flex_none().h(VERDICT_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center()
-    .when(!isOk, (el) => el.bg(color + TINT_ALPHA))
-    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
-    .child(h_flex().w(STATE_COLUMN).flex_none().gap(6).items_center().text_size(11)
-      .child(dot(color))
-      .child(div().flex_none().font_medium().text_color(color).child(STATE_WORD[group.state])))
-    .child(h_flex().w(column - STATE_COLUMN - ROW_GAP).flex_none().min_w(0).overflow_hidden().gap(JOB_GAP).items_center().children(group.rows.map((row) => jobName(t, row))))
-    .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(color).child(isOk ? "" : group.why));
-}
-
-function canIRun(t, a, column) {
-  const groups = verdictGroups(a.rows);
-  return v_flex().flex_none().gap(6)
-    .child(sectionTitle(t, "Can I run", `${a.room.cores.toFixed(1)} cores · ${a.room.ramGb.toFixed(1)} GB spare`))
-    .child(v_flex().flex_none().rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_hidden()
-      .children(groups.map((group, i) => verdictRow(t, group, i === 0, column))))
-    .when(Boolean(a.advice), (el) => el.child(div().flex_none().truncate().text_size(11.5).text_color(t.accent).child(a.advice)));
 }
 
 // Grows with the row, so the space beside a name is bar, not a gap.
@@ -232,6 +197,5 @@ export function hardwareMonitor(t, analysis, leading) {
       .when(Boolean(analysis.signal), (box) => box.child(signalBanner(t, analysis)))
       .children(analysis.stuck.map((p) => stuckBanner(t, p)))))
     .child(machineMeters(t, analysis))
-    .child(canIRun(t, analysis, column))
     .child(consumerList(t, analysis, column));
 }

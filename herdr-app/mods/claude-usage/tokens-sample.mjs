@@ -2,7 +2,8 @@
 // subagents included, read from its transcripts. Only what a transcript gained since the last run
 // is read: the ledger beside the reading keeps each message's usage, so a reading costs little
 // after the first one. Claude Code deletes old transcripts (cleanupPeriodDays), so the ledger folds
-// messages older than every period into `archive`, the only record left of them.
+// messages older than every period into `archive`, the only record left of them. `best` holds the
+// busiest day, week and month seen, current ones included.
 //   node tokens-sample.mjs <file>
 import { mkdir, open, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -51,12 +52,24 @@ function billingMonthStart(subscribedAt, now) {
   return thisMonth <= now.getTime() ? thisMonth : billingDateIn(anchor, now.getUTCFullYear(), now.getUTCMonth() - 1);
 }
 
+const dayStart = (at) => {
+  const d = new Date(at);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+};
+
 function periodStarts(now, planUsage, subscribedAt) {
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const today = dayStart(now.getTime());
   const week = planWeekStart(planUsage, now);
   const month = billingMonthStart(subscribedAt, now);
   return { today, week, month, oldest: Math.min(today, week, month) };
 }
+
+// The start of the day, plan week and billing month a message at `at` belongs to.
+const periodOf = (starts, subscribedAt) => ({
+  today: dayStart,
+  week: (at) => starts.week + Math.floor((at - starts.week) / WEEK_MS) * WEEK_MS,
+  month: (at) => billingMonthStart(subscribedAt, new Date(at)),
+});
 
 async function transcriptPaths() {
   const entries = await readdir(transcriptsDir, { recursive: true, withFileTypes: true });
@@ -136,6 +149,50 @@ function foldOldMessages(ledger, before) {
   ledger.foldedBefore = before;
 }
 
+const tokensOf = (message) => message[INPUT] + message[OUTPUT] + message[CACHE_WRITE] + message[CACHE_READ];
+
+// The busiest day, week and month seen. Folding drops the messages a period is summed from, so the
+// best of each runs on every reading, while every period it could beat is still whole.
+// Returns whether a record moved.
+function raiseRecords(records, messages, periodStartOf) {
+  let hasMoved = false;
+  for (const [kind, startOf] of Object.entries(periodStartOf)) {
+    const totals = new Map();
+    for (const message of messages) {
+      const since = startOf(message[0]);
+      totals.set(since, (totals.get(since) ?? 0) + tokensOf(message));
+    }
+    for (const [since, tokens] of totals) {
+      if (tokens <= (records[kind]?.tokens ?? 0)) continue;
+      records[kind] = { since, tokens };
+      hasMoved = true;
+    }
+  }
+  return hasMoved;
+}
+
+// The ledger of every transcript Claude Code still keeps, read whole, for what an incremental
+// ledger has already folded away.
+async function wholeLedger(paths) {
+  const whole = emptyLedger();
+  await readNewLines(whole, paths);
+  return whole;
+}
+
+// A period can start before the fold when its anchor moves (a new subscription date or plan reset).
+// The messages it now covers come back from the transcripts and leave the archive, which holds them.
+function unfold(ledger, whole, before) {
+  for (const [id, message] of Object.entries(whole.messages)) {
+    if (message[0] < before || message[0] >= ledger.foldedBefore || ledger.messages[id]) continue;
+    ledger.messages[id] = message;
+    ledger.archive.input = Math.max(0, ledger.archive.input - message[INPUT]);
+    ledger.archive.output = Math.max(0, ledger.archive.output - message[OUTPUT]);
+    ledger.archive.cacheWrite = Math.max(0, ledger.archive.cacheWrite - message[CACHE_WRITE]);
+    ledger.archive.cacheRead = Math.max(0, ledger.archive.cacheRead - message[CACHE_READ]);
+  }
+  ledger.foldedBefore = before;
+}
+
 function totalSince(messages, since, base = { input: 0, output: 0, cacheWrite: 0, cacheRead: 0 }) {
   const inPeriod = messages.filter((message) => message[0] >= since);
   const sum = (field) => inPeriod.reduce((total, message) => total + message[field], 0);
@@ -166,12 +223,23 @@ const emptyLedger = () => ({
 
 const now = new Date();
 const account = await readJson(accountFile);
-const starts = periodStarts(now, await readJson(planUsageFile), account?.oauthAccount?.subscriptionCreatedAt);
+const subscribedAt = account?.oauthAccount?.subscriptionCreatedAt;
+const starts = periodStarts(now, await readJson(planUsageFile), subscribedAt);
+const periodStartOf = periodOf(starts, subscribedAt);
 const stored = await readJson(ledgerFile);
 const isCurrentLedger = stored?.version === LEDGER_VERSION;
 const ledger = isCurrentLedger ? stored : emptyLedger();
-const { offsets, hasNewLines } = await readNewLines(ledger, await transcriptPaths());
+const paths = await transcriptPaths();
+const { offsets, hasNewLines } = await readNewLines(ledger, paths);
 ledger.offsets = offsets;
+// A fresh ledger has just read every transcript whole, so only an older one needs the extra pass.
+const shouldUnfold = starts.oldest < ledger.foldedBefore;
+const hadRecords = Boolean(ledger.records);
+const whole = isCurrentLedger && (shouldUnfold || !hadRecords) ? await wholeLedger(paths) : null;
+if (shouldUnfold) unfold(ledger, whole, starts.oldest);
+ledger.records ??= {};
+if (!hadRecords && whole) raiseRecords(ledger.records, Object.values(whole.messages), periodStartOf);
+const hasNewRecord = raiseRecords(ledger.records, Object.values(ledger.messages), periodStartOf);
 const shouldFold = starts.oldest > ledger.foldedBefore;
 if (shouldFold) foldOldMessages(ledger, starts.oldest);
 const messages = Object.values(ledger.messages);
@@ -180,9 +248,10 @@ const reading = JSON.stringify({
   week: totalSince(messages, starts.week),
   month: totalSince(messages, starts.month),
   allTime: { ...totalSince(messages, 0, ledger.archive), since: firstMessageAt(ledger, messages) },
+  best: ledger.records,
   checkedAt: Date.now(),
 });
 await mkdir(dirname(file), { recursive: true });
-if (hasNewLines || shouldFold || !isCurrentLedger) await writeWhole(ledgerFile, JSON.stringify(ledger));
+if (hasNewLines || shouldFold || shouldUnfold || hasNewRecord || !hadRecords || !isCurrentLedger) await writeWhole(ledgerFile, JSON.stringify(ledger));
 await writeWhole(file, reading);
 process.stdout.write(reading);

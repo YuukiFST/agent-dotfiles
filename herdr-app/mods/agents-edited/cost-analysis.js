@@ -7,6 +7,7 @@ const WINDOW_MS = 7 * DAY_MS;
 const DAYS_SHOWN = 30;
 // Fewer tasks than this in a window say more about those tasks than about the repository.
 const MIN_TASKS = 3;
+const MIN_LISTED_TASKS = 10;
 // A session quiet for less may still be going: its cost is not final.
 const FINISHED_AFTER_MS = 3600000;
 
@@ -38,7 +39,7 @@ function reposOf(tasks, now) {
   const recent = tasks.filter((task) => task.endAt > now - DAYS_SHOWN * DAY_MS);
   const summary = (repo, members) => ({ repo, count: members.length, median: quantile(sortedCosts(members), 0.5) });
   const repos = [...Map.groupBy(recent, (task) => task.repo)]
-    .filter(([, members]) => members.length >= MIN_TASKS)
+    .filter(([, members]) => members.length >= MIN_LISTED_TASKS)
     .map(([repo, members]) => summary(repo, members))
     .sort((a, b) => b.count - a.count);
   return recent.length ? [summary(ALL_REPOS, recent), ...repos] : [];

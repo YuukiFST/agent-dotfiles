@@ -1,8 +1,8 @@
 // Keeps hardware-watch.ps1 running while the status board shows, and turns its readings into what
-// the Hardware Monitor draws: which jobs fit, and what could be closed to make room.
+// the Hardware Monitor draws: how busy the machine is, what is stuck, and what uses the most.
 
 import { agents, appHome, exec, hc, home, panes, readTextFile, writeTextFile } from "herdr";
-import { advice, consumers, cpuTrend, headline, isDockerRunning, isWorthShowing, lowestFreeGb, readiness, recentSignal, stuckProcesses } from "./hardware-analysis.js";
+import { consumers, cpuTrend, headline, isWorthShowing, lowestFreeGb, recentSignal, stuckProcesses } from "./hardware-analysis.js";
 import { spaceListName } from "./session-name.js";
 
 const FOLDER = () => `${home()}/.config/herdr-app/data/hardware`;
@@ -10,7 +10,6 @@ const READ_MS = 15000;
 const WANTED_MS = 30000;
 const WATCHER_STALE_MS = 45000;
 const HISTORY_MS = 10 * 60000;
-const WORST_RAM_WINDOW_MS = 5 * 60000;
 const SHOWN_CONSUMERS = 8;
 const GIB = 1073741824;
 
@@ -118,20 +117,8 @@ export class HardwareWatch {
     const signal = recentSignal(signals, now);
     const reading = { ...this.reading, totalRamGb };
     const list = consumers(reading, this.previous, this.sessionOfPid(), this.sessionOfProcess);
-    const room = { cores: Math.max(0, cores * (1 - trend.average / 100)), ramGb: lowestFreeGb(this.history, freeGb, now - WORST_RAM_WINDOW_MS) };
-    const rows = readiness({
-      ...room,
-      totalCores: cores,
-      diskGb: sample.diskFree / GIB,
-      diskBusyPct: 100 - (this.reading.diskIdle ?? 100),
-      dockerRunning: isDockerRunning(this.reading.processes),
-      recentSignalAt: signal?.at ?? null,
-    });
     return {
       headline: headline(trend, this.reading.queue ?? 0, cores, 100 * (1 - freeGb / totalRamGb), signal),
-      rows,
-      room,
-      advice: advice(rows, list),
       stuck: stuckProcesses(reading, this.previous, this.busySince, this.sessionOfProcess),
       consumers: list.filter(isWorthShowing).slice(0, SHOWN_CONSUMERS),
       cpu: { now: sample.cpu, average: trend.average },

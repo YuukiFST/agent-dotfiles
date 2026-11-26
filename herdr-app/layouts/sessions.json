@@ -22,35 +22,75 @@
           "window_drag": true
         },
         {
-          "id": "sidebar-lists",
-          "type": "column",
+          "id": "sidebar-tabs",
+          "type": "block",
+          "content": {
+            "mod": "crew",
+            "props": {
+              "only": "tabs"
+            }
+          },
+          "size": {
+            "px": 30
+          }
+        },
+        {
+          "id": "sidebar-view",
+          "type": "stack",
           "children": [
             {
-              "id": "spaces",
-              "type": "block",
-              "content": {
-                "mod": "spaces-edited"
-              },
-              "size": {
-                "weight": 1
-              },
-              "min": 90
+              "id": "sessions",
+              "type": "column",
+              "children": [
+                {
+                  "id": "sidebar-lists",
+                  "type": "column",
+                  "children": [
+                    {
+                      "id": "spaces",
+                      "type": "block",
+                      "content": {
+                        "mod": "spaces-edited",
+                        "props": {
+                          "hideOrchestrator": true
+                        }
+                      },
+                      "size": {
+                        "weight": 1
+                      },
+                      "min": 90
+                    },
+                    {
+                      "id": "agents",
+                      "type": "block",
+                      "content": {
+                        "mod": "agents-edited",
+                        "props": {
+                          "followFocus": true,
+                          "hideOrchestrator": true
+                        }
+                      },
+                      "size": {
+                        "weight": 1
+                      },
+                      "min": 90
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "id": "agents",
+              "id": "orchestration",
               "type": "block",
               "content": {
-                "mod": "agents-edited",
-                "props": {
-                  "followFocus": true
-                }
-              },
-              "size": {
-                "weight": 1
-              },
-              "min": 90
+                "mod": "crew"
+              }
             }
-          ]
+          ],
+          "active": "sessions",
+          "size": {
+            "weight": 1
+          }
         }
       ],
       "size": {
@@ -140,6 +180,19 @@
                 "mod": "claude-usage",
                 "props": {
                   "only": "network"
+                }
+              }
+            },
+            {
+              "id": "crew-count",
+              "type": "block",
+              "size": {
+                "px": 84
+              },
+              "content": {
+                "mod": "crew",
+                "props": {
+                  "only": "count"
                 }
               }
             },
