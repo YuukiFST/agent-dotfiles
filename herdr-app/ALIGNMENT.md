@@ -25,7 +25,7 @@ A row reads as one unit: a figure, a reason or a control sits one gap (6, 8, 12 
 - **Content-sized columns:** a column is as wide as its widest content.
   A figure column fits its widest format (`"100%"` 28px, `"10.0 GB"` 50px in `Geist Mono` 11.5px), right-aligned so the digits line up.
   A name column fits the longest name present, estimated at 7px a glyph of the 12.5px UI font (`hardware-panel.js` `nameColumn`), with a cap and truncation past it.
-- **Shared starts:** tables stacked in one panel share their name column, so every reason, bar and figure after the names starts on one line (the Hardware Monitor's "Can I run" and "Top consumers").
+- **Shared starts:** tables stacked in one panel share their name column, so every reason, bar and figure after the names starts on one line (the usage panel's plan gauges and token rows).
 - **Proximity first:** when a shared line between panels would push a value away from its label, the value stays by its label; a cross-panel line is kept only where it costs no empty space (the inset line, the first and last rows, the row's last figure ending on the inset line).
 
 ## Proving it
