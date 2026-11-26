@@ -7,6 +7,8 @@ import { knownAgents } from "herdr";
 
 const HARNESSES = ["claude", "opencode"];
 const SWITCH_OFF_OPACITY = 0.45;
+// Dimmer than an off tile, so one that cannot be picked does not look like one a click away.
+const SWITCH_DISABLED_OPACITY = 0.2;
 const SWITCH_PADDING = 2;
 const ICON_SHARE = 0.65;
 const ALERT_DOT_SIZE = 6;
@@ -28,9 +30,10 @@ export function iconSwitch(t, id, options, litKey, tileSize, onPick) {
       const isOn = option.key === litKey;
       return h_flex().id(`${id}-${option.key}`).relative().flex_none().size(tileSize).items_center().justify_center().rounded(4)
         .bg(isOn ? t.selected : t.raised)
-        .tooltip(option.tooltip)
+        .tooltip(option.tooltip).accessibility_label(option.tooltip).aria_selected(isOn)
         .when(option.isEnabled, (el) => el.cursor_pointer().on_click((_e, cx) => onPick(option.key, cx)))
-        .child(div().opacity(isOn ? 1 : SWITCH_OFF_OPACITY).child(option.icon(iconSize, t.foreground)))
+        .when(option.isEnabled && !isOn, (el) => el.hover((s) => s.bg(t.hover)))
+        .child(div().opacity(isOn ? 1 : option.isEnabled ? SWITCH_OFF_OPACITY : SWITCH_DISABLED_OPACITY).child(option.icon(iconSize, t.foreground)))
         .when(Boolean(option.hasAlert), (el) => el.child(div().absolute().top(0).right(0).size(ALERT_DOT_SIZE).rounded(3).bg(t.blocked)));
     }));
 }
@@ -38,7 +41,7 @@ export function iconSwitch(t, id, options, litKey, tileSize, onPick) {
 export function harnessSwitch(t, id, harnesses, litKey, tileSize, onPick) {
   const options = harnesses.map((agent) => ({
     key: agent.key,
-    tooltip: agent.installed ? agent.name : `${agent.name} is not installed`,
+    tooltip: agent.installed ? agent.name : `Install ${agent.name} to use it here`,
     icon: (size, color) => agentIcon(agent, size, color),
     isEnabled: agent.installed,
   }));
