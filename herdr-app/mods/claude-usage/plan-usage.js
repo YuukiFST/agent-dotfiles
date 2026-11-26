@@ -14,7 +14,8 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
-function remaining(seconds) {
+// seconds: a span. "45m", "3h05", "2d4h".
+export function remaining(seconds) {
   const m = Math.max(0, Math.round(seconds / 60));
   if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
@@ -32,6 +33,8 @@ export function resetsText(resetsAt) {
 }
 
 export function tokenCount(n) {
+  if (!Number.isFinite(n)) return "—";
+  if (n < 1e3) return String(Math.round(n));
   if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
   return n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${(n / 1e3).toFixed(1)}k`;
 }
@@ -66,6 +69,8 @@ class SharedReading {
     this.reading = null;
     this.readingText = null;
     this.isFetching = false;
+    // The last fetch failed: the view says so instead of waiting on a reading that is not coming.
+    this.hasFailed = false;
     this.check(cx);
     cx.timer.every(CHECK_MS, (cx) => this.check(cx));
   }
@@ -85,7 +90,9 @@ class SharedReading {
       this.isFetching = true;
       const r = await exec("node", [`${appHome()}/mods/claude-usage/${this.script}`, this.file]).catch(() => null);
       this.isFetching = false;
-      if (r?.code === 0) this.show(r.stdout, cx);
+      this.hasFailed = r?.code !== 0;
+      if (this.hasFailed) cx.notify();
+      else this.show(r.stdout, cx);
     });
   }
 }

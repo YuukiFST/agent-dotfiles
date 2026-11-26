@@ -5,34 +5,16 @@ import { v_flex, h_flex, Textarea, TextareaState } from "gpui-base";
 import { agents, hc, notify, pickFolder, run, theme, watchFolder } from "herdr";
 import { harnessSwitch, loadHarnesses } from "../harness-switch.js";
 import { SHARED_DIR, composeMessage, copyImage, folderName, imageAsset, isImagePath, isNotesFile, newId, openImage, pasteImage, readBook, removeImages, sessionsFor, updateBook } from "./store.js";
+import { ACCEPTED_IMAGES, because, clock, notesLocation, plural } from "./words.js";
 
 const NEW_SESSION = "new";
 const PICKER_MAX_HEIGHT = 190;
 const PROJECT_KEY = "notes.project";
 const HARNESS_KEY = "notes.harness";
 const SWITCH_TILE_SIZE = 22;
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const COPIED_TOAST_MS = 2000;
-const twoDigits = (value) => String(value).padStart(2, "0");
-const windowsPath = (path) => path.replace(/\//g, "\\");
-
-// What the copy icon puts on the clipboard: where the notes live and how one reads, so the
-// person's prompt says what to do with them (review them, check what is done, add one).
-const notesLocation = (project) => {
-  const file = windowsPath(`${SHARED_DIR()}/notes.json`);
-  const where = project
-    ? `Herdr Notes for the project ${project.name} (${windowsPath(project.folder)}): the entry of "projects" in ${file} whose "folder" is that path.`
-    : `Herdr Notes: ${file}, one entry per project in "projects".`;
-  return [
-    where,
-    'Each note: {"id", "text", "images": [image paths], "created_at": ms, "done_at": ms when marked done or null while open, "sent": {"to", "at"} or null}.',
-    'To add a note: reread the file, append to that project\'s "notes" with a new id, created_at = now in ms, images [], done_at null and sent null, keep the JSON valid and leave everything else untouched.',
-  ].join("\n");
-};
-const clock = (ms) => {
-  const date = new Date(ms);
-  return `${MONTHS[date.getMonth()]} ${date.getDate()} ${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`;
-};
+const COPIED_TOAST_MS = 5000;
+// Wide enough for a note's actions and the send bar on one line: the board's side columns give way first.
+const NOTES_MIN_WIDTH = 320;
 
 export class NotesPanel {
   constructor(cx) {
@@ -47,18 +29,22 @@ export class NotesPanel {
     this.isBusy = false;
     this.feedback = null;
     this.draftImages = [];
-    this.draft = TextareaState.new({ placeholder: "New note (Ctrl+Enter saves)", rows: 4 });
+    this.draft = TextareaState.new({ placeholder: "New note", rows: 4 });
     this.draft.set_auto_grow(4, 10);
     this.draft.on("paste_other", (_e, cx) => this.attachPastedImage(cx));
     cx.spawn(async (cx) => {
-      this.book = (await readBook()) ?? { projects: [] };
+      const book = await readBook();
+      this.isUnreadable = !book;
+      this.book = book ?? { projects: [] };
       cx.notify();
       this.harnesses = await loadHarnesses().catch(() => []);
       cx.notify();
       for (;;) {
         const changed = await watchFolder(SHARED_DIR());
         if (!changed.some(isNotesFile) && !changed.includes(SHARED_DIR())) continue;
-        this.book = (await readBook()) ?? this.book;
+        const book = await readBook();
+        this.isUnreadable = !book;
+        this.book = book ?? this.book;
         cx.notify();
       }
     });
@@ -79,8 +65,9 @@ export class NotesPanel {
     cx.notify();
   }
 
-  say(text, isError = false) {
-    this.feedback = { text, isError };
+  // at: "compose" shows it under the note being written, "send" in the send bar.
+  say(text, isError = false, at = "send") {
+    this.feedback = { text, isError, at };
   }
 
   // Writes, redraws, and shows any error on the panel itself.
@@ -90,7 +77,7 @@ export class NotesPanel {
         this.book = await updateBook(change);
         afterSave?.();
       } catch (error) {
-        this.say(`Not saved: ${error?.message ?? error}`, true);
+        this.say(`Not saved${because(error)}. Try again, or fix notes.json in .config\\herdr-app-shared if it repeats`, true, "compose");
       }
       cx.notify();
     });
@@ -137,7 +124,7 @@ export class NotesPanel {
         const path = await pasteImage();
         if (path) this.draftImages.push(path);
       } catch (error) {
-        this.say(`Image not pasted: ${error?.message ?? error}`, true);
+        this.say(`Image not pasted${because(error)}. Copy it again, or drop the file instead`, true, "compose");
       }
       cx.notify();
     });
@@ -145,13 +132,14 @@ export class NotesPanel {
 
   attachDroppedFiles(paths, cx) {
     const images = paths.filter(isImagePath);
-    if (images.length < paths.length) this.say("Only images can be attached.", true);
+    const skipped = paths.length - images.length;
+    if (skipped) this.say(`Skipped ${plural(skipped, "file")}: only ${ACCEPTED_IMAGES} images attach`, true, "compose");
     cx.notify();
     cx.spawn(async (cx) => {
       try {
         for (const path of images) this.draftImages.push(await copyImage(path));
       } catch (error) {
-        this.say(`Image not attached: ${error?.message ?? error}`, true);
+        this.say(`Image not attached${because(error)}. Check the file still exists and drop it again`, true, "compose");
       }
       cx.notify();
     });
@@ -247,9 +235,9 @@ export class NotesPanel {
         this.book = await updateBook((book) => {
           for (const note of book.projects.find((p) => p.id === project.id).notes) if (ids.has(note.id)) note.sent = sent;
         });
-        this.say(`Sent to ${destination}.`);
+        this.say(`Sent to ${destination}`);
       } catch (error) {
-        this.say(`Not sent: ${error?.message ?? error}`, true);
+        this.say(`Not sent${because(error)}. Pick another session or try again`, true);
       }
       this.isBusy = false;
       cx.notify();
@@ -268,7 +256,7 @@ export class NotesPanel {
 
   async startSession(project, notes) {
     const agent = this.harness();
-    if (!agent) throw new Error("neither Claude Code nor OpenCode is installed");
+    if (!agent) throw new Error("install Claude Code or OpenCode to start a session");
     run("space.new", { name: project.name, folder: project.folder, argv: agent.run, task: composeMessage(project, notes, true) });
     return `new ${agent.name} session`;
   }
@@ -296,17 +284,20 @@ export class NotesPanel {
     }
   }
 
-  action(id, label, color, onClick) {
+  // edge: "first" or "last" when the action starts or ends a row, so its glyphs sit on the inset line (ALIGNMENT.md).
+  action(id, label, color, onClick, edge = null) {
     const t = theme();
     return div().id(id).flex_none().px(6).h(22).flex().items_center().rounded(5).text_size(11.5).text_color(color).cursor_pointer()
+      .when(edge === "first", (el) => el.ml_neg_1p5()).when(edge === "last", (el) => el.mr_neg_1p5())
       .hover((s) => s.bg(t.hover)).on_click(onClick).child(label);
   }
 
   copyLocationButton(project) {
     const t = theme();
-    return h_flex().id("copy-notes-location").flex_none().h(22).px(4).items_center().rounded(5).cursor_pointer()
-      .text_color(t.dim).hover((s) => s.bg(t.hover).text_color(t.foreground))
-      .tooltip("Copy where these notes live, to paste into an agent's prompt")
+    const label = "Copy where these notes live, to paste into an agent's prompt";
+    return h_flex().id("copy-notes-location").flex_none().size(22).items_center().justify_center().rounded(5).cursor_pointer()
+      .text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground))
+      .tooltip(label).accessibility_label(label)
       .on_click((_e, cx) => {
         cx.write_to_clipboard(notesLocation(project));
         notify({ title: "Notes location copied", level: "success", timeout: COPIED_TOAST_MS });
@@ -318,26 +309,27 @@ export class NotesPanel {
     const t = theme();
     return div().id(id).flex_none().px(10).h(26).flex().items_center().rounded(6).text_size(12).cursor_pointer()
       .bg(isPrimary ? t.solid : t.raised).text_color(isPrimary ? t.solid_foreground : t.foreground)
-      .hover((s) => s.opacity(0.88)).on_click(onClick).child(label);
+      .hover((s) => (isPrimary ? s.opacity(0.88) : s.bg(t.hover))).on_click(onClick).child(label);
   }
 
   projectChip(project, isActive) {
     const t = theme();
     const open = project.notes.filter((n) => !n.done_at).length;
-    return h_flex().id(`project-${project.id}`).h(24).px(8).gap(6).items_center().rounded(6).cursor_pointer().text_size(12)
-      .bg(isActive ? t.selected : t.raised).text_color(isActive ? t.foreground : t.muted).hover((s) => s.bg(t.hover))
-      .tooltip(project.folder).on_click((_e, cx) => this.selectProject(project.id, cx))
-      .child(project.name).child(div().text_size(11).text_color(t.dim).child(String(open)));
+    return h_flex().id(`project-${project.id}`).max_w_full().min_w(0).h(24).px(8).gap(6).items_center().rounded(6).cursor_pointer().text_size(12)
+      .text_color(isActive ? t.foreground : t.muted).when(isActive, (el) => el.bg(t.selected)).when(!isActive, (el) => el.hover((s) => s.bg(t.hover)))
+      .aria_selected(isActive).tooltip(project.folder).on_click((_e, cx) => this.selectProject(project.id, cx))
+      .child(div().min_w(0).truncate().child(project.name)).child(div().flex_none().text_size(11).text_color(t.muted).child(String(open)));
   }
 
   thumbnail(id, path, onRemove) {
     const t = theme();
-    return h_flex().id(`thumb-${id}`).flex_none().relative().rounded(5).border_1().border_color(t.border).cursor_pointer()
-      .tooltip("Open image").on_click(() => openImage(path))
+    return h_flex().id(`thumb-${id}`).flex_none().max_w_full().overflow_hidden().relative().rounded(5).border_1().border_color(t.border).cursor_pointer()
+      .tooltip("Open image").accessibility_label("Open image").on_click(() => openImage(path))
       .child(image(imageAsset(path)).w(104).h(72).rounded(4))
-      .when(Boolean(onRemove), (el) => el.child(div().id(`detach-${id}`).absolute().top(2).right(2).size(16).flex().items_center().justify_center()
-        .rounded(4).bg(t.chrome).text_size(11).text_color(t.foreground).hover((s) => s.bg(t.hover))
-        .on_click((e, cx) => { cx.stop_propagation(); onRemove(e, cx); }).child("×")));
+      .when(Boolean(onRemove), (el) => el.child(div().id(`detach-${id}`).absolute().top(2).left(2).size(24).flex().items_center().justify_center()
+        .rounded(4).bg(t.chrome).text_color(t.foreground).hover((s) => s.bg(t.hover))
+        .tooltip("Remove image").accessibility_label("Remove image")
+        .on_click((e, cx) => { cx.stop_propagation(); onRemove(e, cx); }).child(svg("mods/workspace-chrome/x.svg").size(12))));
   }
 
   noteState(note) {
@@ -346,31 +338,33 @@ export class NotesPanel {
     return "";
   }
 
-  noteCard(project, note) {
+  // A row between dividers, like the board's other lists; the note being edited takes the selected fill.
+  noteRow(project, note) {
     const t = theme();
     const lines = note.text.split("\n").map((line, i) => div().id(`line-${note.id}-${i}`).min_h(16).whitespace_normal().child(line));
     const isArmed = this.armedDeleteId === note.id;
-    return v_flex().id(`note-${note.id}`).flex_none().p(10).gap(6).rounded(8).bg(t.background).border_1()
-      .border_color(this.editingId === note.id ? t.accent : t.border)
-      .when(Boolean(note.done_at), (el) => el.opacity(0.55))
-      .when(Boolean(note.text), (el) => el.child(v_flex().gap(2).text_size(12.5).text_color(t.foreground).children(lines)))
+    const state = this.noteState(note);
+    return v_flex().id(`note-${note.id}`).flex_none().px(12).py(10).gap(6).border_b(1).border_color(t.border)
+      .when(this.editingId === note.id, (el) => el.bg(t.selected))
+      .when(Boolean(note.text), (el) => el.child(v_flex().gap(2).text_size(12.5).text_color(note.done_at ? t.muted : t.foreground).children(lines)))
       .when(Boolean(note.images?.length), (el) => el.child(h_flex().flex_wrap().gap(6).children(note.images.map((path, i) => this.thumbnail(`${note.id}-${i}`, path, null)))))
-      .child(h_flex().gap(2).items_center()
-        .when(!note.done_at, (el) => el.child(this.action(`send-${note.id}`, note.sent ? "Resend" : "Send", t.accent, (_e, cx) => this.send(project, [note], cx))))
-        .child(this.action(`edit-${note.id}`, "Edit", t.muted, (_e, cx) => this.startEdit(note, cx)))
+      .child(h_flex().flex_wrap().items_center()
+        .when(!note.done_at, (el) => el.child(this.action(`send-${note.id}`, note.sent ? "Resend" : "Send", t.accent, (_e, cx) => this.send(project, [note], cx), "first")))
+        .child(this.action(`edit-${note.id}`, "Edit", t.muted, (_e, cx) => this.startEdit(note, cx), note.done_at ? "first" : null))
         .child(this.action(`done-${note.id}`, note.done_at ? "Reopen" : "Done", t.muted, (_e, cx) => {
           this.changeNote(project, note.id, (n) => { n.done_at = n.done_at ? null : Date.now(); }, cx);
         }))
-        .child(div().flex_1().min_w(0).px(6).truncate().text_size(11).text_color(t.dim).child(this.noteState(note)))
-        .child(this.action(`del-${note.id}`, isArmed ? "Confirm" : "Delete", isArmed ? t.blocked : t.dim, (_e, cx) => this.deleteNote(project, note.id, cx))));
+        .child(div().id(`state-${note.id}`).flex_1().min_w(0).px(6).truncate().text_size(11).text_color(t.muted).when(Boolean(state), (el) => el.tooltip(state)).child(state))
+        .child(this.action(`del-${note.id}`, isArmed ? "Delete note" : "Delete", isArmed ? t.blocked : t.muted, (_e, cx) => this.deleteNote(project, note.id, cx), "last")));
   }
 
   sessionRow(id, label, detail, isChosen, onClick) {
     const t = theme();
     return h_flex().id(id).h(28).flex_none().px(8).gap(8).items_center().rounded(6).cursor_pointer().text_size(12)
-      .bg(isChosen ? t.selected : t.background).hover((s) => s.bg(t.hover)).on_click(onClick)
+      .bg(isChosen ? t.selected : t.background).when(!isChosen, (el) => el.hover((s) => s.bg(t.hover)))
+      .aria_selected(isChosen).tooltip(`${label} · ${detail}`).on_click(onClick)
       .child(div().flex_none().text_color(t.foreground).child(label))
-      .child(div().flex_1().min_w(0).truncate().text_color(t.dim).child(detail));
+      .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(detail));
   }
 
   sessionPicker(project, sessions, target) {
@@ -384,13 +378,21 @@ export class NotesPanel {
         `${harness.name} in ${folderName(project.folder)}`, target === NEW_SESSION,
         (_e, cx) => this.chooseTarget(project, NEW_SESSION, cx))))
       .children(rows)
-      .when(!rows.length && !harness, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("No open sessions.")));
+      .when(!rows.length && !harness, (el) => el.child(div().p(8).text_size(12).text_color(t.muted).whitespace_normal()
+        .child("No open sessions. Install Claude Code or OpenCode to start one")));
   }
 
   // Lit only while a send would really start that agent.
   harnessSwitch(project, target) {
     const lit = target === NEW_SESSION ? this.harness()?.key : null;
     return harnessSwitch(theme(), "harness-switch", this.harnesses, lit, SWITCH_TILE_SIZE, (key, cx) => this.chooseHarness(project, key, cx));
+  }
+
+  // The last message, where its action happened: under the note being written, or in the send bar.
+  feedbackLine(at) {
+    const t = theme();
+    if (this.feedback?.at !== at) return null;
+    return div().flex_none().text_size(11.5).whitespace_normal().text_color(this.feedback.isError ? t.blocked : t.muted).child(this.feedback.text);
   }
 
   sendBar(project, pending) {
@@ -400,62 +402,69 @@ export class NotesPanel {
     const harness = this.harness();
     const newSessionLabel = harness ? `New ${harness.name} session` : "New session";
     const targetLabel = target === NEW_SESSION ? newSessionLabel : `${target.address} · ${target.space_name}`;
+    const feedback = this.feedbackLine("send");
     return v_flex().flex_none().px(12).py(10).gap(8).border_t(1).border_color(t.border)
-      .when(Boolean(this.feedback), (el) => el.child(div().flex_none().text_size(11.5).whitespace_normal().text_color(this.feedback.isError ? t.blocked : t.muted).child(this.feedback.text)))
+      .when(Boolean(feedback), (el) => el.child(feedback))
       .when(this.isPickerOpen, (el) => el.child(this.sessionPicker(project, sessions, target)))
-      .child(h_flex().flex_none().gap(8).items_center()
+      .child(h_flex().flex_none().flex_wrap().gap(8).items_center()
         .child(this.harnessSwitch(project, target))
-        .child(h_flex().id("session-toggle").flex_1().min_w(0).h(26).px(8).gap(6).items_center().rounded(6).cursor_pointer()
+        .child(h_flex().id("session-toggle").flex_1().min_w(80).h(26).px(8).gap(6).items_center().rounded(6).cursor_pointer()
           .bg(t.raised).hover((s) => s.bg(t.hover)).text_size(12).text_color(t.foreground)
+          .tooltip(`Send to ${targetLabel}`).accessibility_label(`Send to ${targetLabel}`)
           .on_click((_e, cx) => this.togglePicker(cx))
           .child(div().flex_1().min_w(0).truncate().child(targetLabel))
-          .child(div().text_color(t.dim).child(this.isPickerOpen ? "▾" : "▴")))
-        .when(pending.length > 0, (el) => el.child(this.button("send-pending", `Send ${pending.length}`, true, (_e, cx) => this.send(project, pending, cx)))));
+          .child(svg(`mods/workspace-chrome/chevron-${this.isPickerOpen ? "down" : "right"}.svg`).size(12).flex_none().text_color(t.muted)))
+        .when(pending.length > 0, (el) => el.child(this.button("send-pending", `Send ${plural(pending.length, "note")}`, true, (_e, cx) => this.send(project, pending, cx)))));
   }
 
   composer() {
     const t = theme();
+    const feedback = this.feedbackLine("compose");
     return v_flex().id("composer").flex_none().px(12).py(10).gap(8).border_b(1).border_color(t.border).on_key_down((e, cx) => this.key(e, cx))
-      .child(Textarea.new(this.draft).flex_none().px(8).py(6).rounded(6).border_1().border_color(t.input).bg(t.background).text_size(12.5).text_color(t.foreground))
+      .child(Textarea.new(this.draft).accessibility_label("New note").flex_none().px(8).py(6).rounded(6).border_1().border_color(t.input).bg(t.background).text_size(12.5).text_color(t.foreground))
       .when(this.draftImages.length > 0, (el) => el.child(h_flex().flex_none().flex_wrap().gap(6).children(this.draftImages.map((path, i) => this.thumbnail(`draft-${i}`, path, (_e, cx) => this.detachDraftImage(path, cx))))))
+      .when(Boolean(feedback), (el) => el.child(feedback))
       .child(h_flex().flex_none().gap(6).items_center()
-        .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child("Paste or drop images"))
+        .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.muted).child(`Paste or drop images · Ctrl+Enter ${this.editingId ? "saves" : "adds"}`))
         .when(Boolean(this.editingId), (el) => el.child(this.button("cancel-edit", "Cancel", false, (_e, cx) => { this.cancelEdit(); cx.notify(); })))
         .child(this.button("save-note", this.editingId ? "Save" : "Add", false, (_e, cx) => this.saveDraft(cx))));
   }
 
   noteList(project, open, done) {
     const t = theme();
-    return v_flex().id("note-list").flex_1().min_h(0).px(12).py(10).gap(8).overflow_y_scrollbar()
-      .when(!project.notes.length, (el) => el.child(div().py(8).text_size(12).text_color(t.dim).child("No notes in this project.")))
-      .children([...open, ...done].map((note) => this.noteCard(project, note)));
+    return v_flex().id("note-list").flex_1().min_h(0).overflow_y_scrollbar()
+      .when(!project.notes.length, (el) => el.child(div().px(12).py(18).text_size(12).text_color(t.muted).child("No notes yet. Write one above and press Ctrl+Enter")))
+      .children([...open, ...done].map((note) => this.noteRow(project, note)));
   }
 
   header(project) {
     const t = theme();
     const isArmed = this.armedDeleteId === project?.id;
+    const noteCount = project?.notes.length ?? 0;
     // The first row is as tall as the summary strip beside it, so both read on one line.
     return v_flex().flex_none().px(12).pb(6).gap(4).border_b(1).border_color(t.border)
-      .child(h_flex().min_h(30).gap(6).items_center().flex_wrap()
-        .child(div().flex_none().text_size(11).text_color(t.dim).child("Notes"))
+      .child(h_flex().id("project-tabs").min_h(30).max_h(84).overflow_y_scrollbar().gap(6).items_center().flex_wrap()
+        .child(div().flex_none().text_size(11).text_color(t.muted).child("Notes"))
         .child(this.copyLocationButton(project))
         .children((this.book?.projects ?? []).map((p) => this.projectChip(p, p.id === project?.id)))
-        .child(this.action("add-project", "+ Project", t.muted, (_e, cx) => this.addProject(cx))))
+        .child(this.action("add-project", "Add project", t.muted, (_e, cx) => this.addProject(cx))))
       .when(Boolean(project), (el) => el.child(h_flex().gap(6).items_center()
-        .child(div().id("project-folder").flex_1().min_w(0).truncate().text_ellipsis_start().text_size(11).text_color(t.dim).tooltip(project.folder).child(project.folder))
-        .child(this.action("del-project", isArmed ? "Delete project and notes?" : "Remove", isArmed ? t.blocked : t.dim, (_e, cx) => this.deleteProject(project, cx)).mr_neg_1p5())));
+        .child(div().id("project-folder").flex_1().min_w(0).truncate().text_ellipsis_start().text_size(11).text_color(t.muted).tooltip(project.folder).child(project.folder))
+        .child(this.action("del-project", isArmed ? `Delete project and ${plural(noteCount, "note")}` : "Delete project", isArmed ? t.blocked : t.muted,
+          (_e, cx) => this.deleteProject(project, cx), "last"))));
   }
 
   emptyState() {
     const t = theme();
-    return v_flex().flex_1().items_center().justify_center().gap(10).p(20).text_size(12.5).text_color(t.dim)
-      .child("Add a project's folder to start.")
+    const box = v_flex().flex_1().items_center().justify_center().gap(10).p(20).text_size(12.5).text_color(t.muted);
+    if (this.isUnreadable) return box.child(div().whitespace_normal().child("notes.json in .config\\herdr-app-shared could not be read. Fix the file and the notes come back"));
+    return box.child("Add a project's folder to start")
       .child(this.button("first-project", "Add project", true, (_e, cx) => this.addProject(cx)));
   }
 
   render(t) {
     const project = this.project();
-    const card = v_flex().id("notes").flex_1().min_h(0).min_w(0).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden()
+    const card = v_flex().id("notes").flex_1().min_h(0).min_w(NOTES_MIN_WIDTH).rounded(8).border(1).border_color(t.border).bg(t.surface).overflow_hidden()
       .on_drop((e, cx) => this.attachDroppedFiles(e.paths, cx)).child(this.header(project));
     if (!this.book) return card;
     if (!project) return card.child(this.emptyState());

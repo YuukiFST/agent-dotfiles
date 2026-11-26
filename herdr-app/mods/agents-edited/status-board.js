@@ -195,5 +195,6 @@ export function statusBoard(t, list, ctx, board, cx) {
         .child(sessionsPanel(t, list, ctx, board)))
       .child(v_flex().h(USAGE_HEIGHT).flex_none().child(usagePanel(t, board.usagePanel))))
     .child(board.notesPanel.render(t))
-    .child(h_flex().w(CONTEXT_WIDTH).flex_none().min_h(0).items_stretch().child(rightPanel));
+    // Gives way below its width when the window is narrow, so Notes keeps room for its rows.
+    .child(h_flex().w(CONTEXT_WIDTH).flex_shrink_1().min_w(0).min_h(0).items_stretch().child(rightPanel));
 }
