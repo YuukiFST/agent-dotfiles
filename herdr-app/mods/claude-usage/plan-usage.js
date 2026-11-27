@@ -14,29 +14,33 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
-// seconds: a span. "45m", "3h05", "2d4h".
+// seconds: a span. "45m", "3h 05m", "2d 4h": the Sessions table's format.
 export function remaining(seconds) {
   const m = Math.max(0, Math.round(seconds / 60));
   if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h${pad2(m % 60)}`;
-  return `${Math.floor(h / 24)}d${h % 24}h`;
+  if (h < 24) return `${h}h ${pad2(m % 60)}m`;
+  return `${Math.floor(h / 24)}d ${h % 24}h`;
 }
 
-// resetsAt: epoch seconds. "3d5h".
+// resetsAt: epoch seconds. "3d 5h".
 export const timeLeft = (resetsAt) => remaining(resetsAt - Date.now() / 1000);
 
-// resetsAt: epoch seconds. "resets Sun 15:59 · in 3d5h".
+// resetsAt: epoch seconds. "resets Sun 15:59 · in 3d 5h".
 export function resetsText(resetsAt) {
   const d = new Date(resetsAt * 1000);
   return `resets ${WEEKDAYS[d.getDay()]} ${pad2(d.getHours())}:${pad2(d.getMinutes())} · in ${remaining(resetsAt - Date.now() / 1000)}`;
 }
 
+// The one format for a token count, in every panel: "950", "9.8k", "74k", "1.7M", "1.3B". Each
+// step starts where the one below would round up to 1000, so "1000k" never shows.
 export function tokenCount(n) {
   if (!Number.isFinite(n)) return "—";
-  if (n < 1e3) return String(Math.round(n));
-  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
-  return n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : `${(n / 1e3).toFixed(1)}k`;
+  if (n < 999.5) return String(Math.round(n));
+  if (n < 9.95e3) return `${(n / 1e3).toFixed(1)}k`;
+  if (n < 999.5e3) return `${Math.round(n / 1e3)}k`;
+  if (n < 999.95e6) return `${(n / 1e6).toFixed(1)}M`;
+  return `${(n / 1e9).toFixed(1)}B`;
 }
 
 function dateTimeText(at) {

@@ -8,6 +8,7 @@
 import { div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { exec, readTextFile, writeTextFile, appHome, home } from "herdr";
+import { tokenCount } from "../plan-usage.js";
 
 const RERUN_MS = 15000;
 const ITEMS_SHOWN = 4;
@@ -29,7 +30,7 @@ const COLOR = {
   other: "ansi7",
 };
 
-const kilo = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${Math.round(n / 1e3)}k` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(Math.round(n)));
+const kilo = tokenCount;
 const amount = (n, exact) => `${exact === false ? "~" : ""}${kilo(n)}`;
 const pct = (part, whole) => (whole > 0 ? (100 * part) / whole : 0);
 const share = (part, whole) => `${Math.round(pct(part, whole))}%`;

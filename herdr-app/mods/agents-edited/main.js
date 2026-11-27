@@ -71,7 +71,7 @@ export default class Agents extends View {
       .border_b(1).border_color(t.border).text_size(12).cursor_pointer()
       .on_click(() => run("pane.focus", { terminal: address }))
       .when(Boolean(a), (el) => el.child(this.status(t, a, true)))
-      .child(div().flex_1().min_w(0).truncate().text_color(a?.focused ? t.foreground : t.muted).child(name))
+      .child(div().id(`side-name-${address}`).flex_1().min_w(0).truncate().text_color(a?.focused ? t.foreground : t.muted).tooltip(name).child(name))
       .child(div().id(`side-close-${address}`).px(5).rounded(4).text_color(t.dim).cursor_pointer()
         .hover((s) => s.bg(t.hover).text_color(t.foreground)).tooltip("Remove from side by side")
         .on_click((_e, cx) => { cx.stop_propagation(); toggleSide(address); })
@@ -180,7 +180,7 @@ export default class Agents extends View {
         .when(Boolean(l), el => el.border_l(1.5).border_color(t.border))
         .when(l === "└" || l === "├", el => el.border_b(1.5).rounded_bl(6))))
       .when(Boolean(pic), el => el.child(div().mr(8).child(pic)))
-      .child(div().flex_1().truncate().text_color(on ? t.foreground : t.muted).child(k.name || k.template || k.program?.name || k.address))
+      .child(((n) => div().id(`kid-name-${k.address}`).flex_1().truncate().text_color(on ? t.foreground : t.muted).tooltip(n).child(n))(k.name || k.template || k.program?.name || k.address))
       .child(this.status(t, { status: st }, compact));
   }
 
@@ -188,7 +188,7 @@ export default class Agents extends View {
   status(t, a, compact = false) {
     const color = t[a.status] ?? t.dim;
     const alert = alertOf(t, a.status);
-    if (alert) {
+    if (alert && !(compact && a.status === "done")) { // compact done: the dot below, so the orb means needs you
       const showsWord = a.status === "blocked" && !compact;
       return h_flex().flex_none().gap(5).items_center().child(alertOrb(alert))
         .when(showsWord, (el) => el.child(div().text_size(11).font_medium().text_color(alert.color).child(alert.word)));
@@ -265,7 +265,7 @@ export default class Agents extends View {
       const top = sts.reduce((m, s) => ((RANK[s] ?? 0) > (RANK[m] ?? 0) ? s : m), null);
       const open = !this.folded.has(a.address);
       return div()
-        .id(`fold-${a.address}`)
+        .id(`fold-${a.address}`).tooltip(open ? "Hide sub-agents" : "Show sub-agents")
         .h(18)
         .px(3)
         .gap(3)
@@ -322,7 +322,7 @@ export default class Agents extends View {
           .rounded(8)
           .when(a.focused, (el) => el.bg(t.selected))
           .when(!a.focused, (el) => el.hover((s) => s.bg(t.hover)))
-          .on_click(() => run("pane.focus", { pane: a.pane }))
+          .tooltip([a.space_name, a.tab_name || a.title].filter(Boolean).join(" · ") || a.address).on_click(() => run("pane.focus", { pane: a.pane }))
           .child(div().flex_1().min_w(0).whitespace_nowrap().text_right().text_color(t.muted).child(String(i + 1)))
           .child(h_flex().w(14).flex_none().items_center().justify_center().child(this.status(t, a, true)));
       }
@@ -444,12 +444,12 @@ export default class Agents extends View {
           run("pane.focus", { pane: a.pane });
         })
         .child(h_flex().h(30).items_center().gap(9)
-        .when(Boolean(pic), el => el.child(div().id(`agent-fold-${a.address}`)
+        .when(Boolean(pic), el => el.child(div().id(`agent-fold-${a.address}`).w(18).flex_none().flex().justify_center() // the Spaces badge's width, so names share a column
           .when(subs.length > 0, el => el.on_click((_e, cx) => {
             cx.stop_propagation();
             this.folded.has(a.address) ? this.folded.delete(a.address) : this.folded.add(a.address);
             cx.notify();
-          })).child(pic)))
+          }).tooltip(this.folded.has(a.address) ? "Show sub-agents" : "Hide sub-agents")).child(pic)))
         .child(h_flex().flex_1().min_w(0).gap(5).items_center()
           .child(div().id(`ag-name-${a.address}`).min_w(0).max_w(full && tail ? 120 : 200).truncate().text_color(idle ? t.muted : t.foreground).tooltip(name).child(name))
           .when(full && Boolean(tail), el => el.child(div().id(`ag-tail-${a.address}`).flex_1().min_w(0).truncate().text_color(t.dim).tooltip(tail).child(`\u00b7 ${tail}`))))

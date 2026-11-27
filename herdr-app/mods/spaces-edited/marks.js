@@ -12,9 +12,10 @@ export function projectColor(name) {
   return colors[h % colors.length];
 }
 
-// A space speaks up only when something in it needs you.
+// A space speaks up only when something in it needs you. Each status has its own glyph, so none is
+// told apart by its color alone.
 export function glyph(status) {
-  return status === "blocked" ? "!" : status === "done" ? "●" : "·";
+  return status === "blocked" ? "!" : status === "done" ? "●" : status === "working" ? "…" : "·";
 }
 
 export function tone(t, status) {

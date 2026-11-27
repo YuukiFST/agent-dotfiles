@@ -4,6 +4,7 @@
 import { View, div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme } from "herdr";
+import { tokenCount } from "../plan-usage.js";
 
 const NUMBER_FONT = "Geist Mono";
 const SIDE_WIDTH = 224;
@@ -26,7 +27,7 @@ const HEAT = [
 ];
 
 const heat = (t, share) => t[HEAT.find((h) => share >= h.from).color];
-const kilo = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${Math.round(n / 1e3)}k` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(Math.round(n)));
+const kilo = tokenCount;
 const amount = (item) => `${item.exact === false ? "~" : ""}${kilo(item.tokens)}`;
 const percent = (share) => `${Math.round(share * 100)}%`;
 const byTokens = (x, y) => y.tokens - x.tokens;
@@ -262,12 +263,13 @@ function topConsumers(t, tree) {
 }
 
 function scopeSwitch(t, view) {
-  const arrow = (id, text, onPress) => div().id(id).w(24).h(20).flex().items_center().justify_center().rounded(4).cursor_pointer()
+  const arrow = (id, text, name, onPress) => div().id(id).w(24).h(24).flex().items_center().justify_center().rounded(4).cursor_pointer()
+    .tooltip(name).accessibility_label(name)
     .text_size(13).text_color(t.dim).hover((s) => s.bg(t.raised).text_color(t.foreground)).on_click((_e, cx) => onPress(cx)).child(text);
   return h_flex().flex_1().min_w(0).gap(2).items_center()
-    .child(arrow("ctx-scope-back", "‹", (cx) => view.onStep(-1, cx)))
+    .child(arrow("ctx-scope-back", "‹", "Previous session", (cx) => view.onStep(-1, cx)))
     .child(div().min_w(0).truncate().text_size(12).text_color(t.foreground).child(view.scope))
-    .child(arrow("ctx-scope-next", "›", (cx) => view.onStep(1, cx)));
+    .child(arrow("ctx-scope-next", "›", "Next session", (cx) => view.onStep(1, cx)));
 }
 
 function sidePanel(t, tree, view) {

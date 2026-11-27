@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Shoots one layout in a throwaway window, for checking a mod's alignment against its neighbours.
 // The window copies this home's mods and data, joins the running core read-only, and quits after.
-//   node tests/shot-layout.mjs <layout> <out.png> [--window <window.json>] [--settle <ms>]
+//   node tests/shot-layout.mjs <layout> <out.png> [--window <window.json>] [--settle <ms>] [--set <mod>:<key>=<value>]...
 // --window takes the geometry of the window the person sees (a maximized second monitor is
 // ~/.config/herdr-app-2/window.json); without it the shot is this home's window.json size.
 import { spawn, spawnSync } from "node:child_process";
@@ -30,6 +30,20 @@ for (const file of ["settings.json", "keys.json", "installed.json", "seen.json"]
 for (const dir of ["mods", "layouts", "themes", "icons", "fonts", "assets", "data"]) {
   if (fs.existsSync(path.join(appHome, dir))) fs.cpSync(path.join(appHome, dir), path.join(home, dir), { recursive: true, dereference: true });
 }
+// --set <mod>:<key>=<value>, repeatable: shoots a state a mod keeps in localStorage (a switcher's
+// view, a picked project) by writing it into every store file of that mod in the copy.
+process.argv.forEach((arg, i) => {
+  if (arg !== "--set") return;
+  const [, mod, key, value] = process.argv[i + 1]?.match(/^([^:]+):([^=]+)=(.*)$/) ?? [];
+  if (!mod) throw new Error(`--set takes <mod>:<key>=<value>, got ${process.argv[i + 1]}`);
+  const dir = path.join(home, "data", mod);
+  fs.mkdirSync(dir, { recursive: true });
+  const stores = fs.readdirSync(dir).filter((f) => /^store.*\.json$/.test(f));
+  for (const file of stores.length ? stores : ["store.json"]) {
+    const store = fs.existsSync(path.join(dir, file)) ? JSON.parse(fs.readFileSync(path.join(dir, file), "utf8")) : {};
+    fs.writeFileSync(path.join(dir, file), JSON.stringify({ ...store, [key]: value }));
+  }
+});
 if (fs.existsSync(windowFile)) fs.copyFileSync(windowFile, path.join(home, "window.json"));
 const state = JSON.parse(fs.readFileSync(path.join(appHome, "shared.json"), "utf8"));
 fs.writeFileSync(path.join(home, "shared.json"), JSON.stringify({ ...state, layout }));

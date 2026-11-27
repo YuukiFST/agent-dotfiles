@@ -21,6 +21,7 @@ const NOTE_GAP = 6;
 // estimate rounds up so a name fits; the name truncates if one ever runs longer.
 const GLYPH_PX = 7;
 const NAME_COLUMN_MAX = 260;
+const CONSUMERS_TITLE = "Top consumers";
 const CHART_SLOTS = 120;
 const CHART_SPAN_MS = 10 * 60000;
 const CHART_HEADROOM_PCT = 8;
@@ -28,8 +29,9 @@ const CHART_GRID_LEVELS = [25, 50, 75];
 const AREA_TOP_ALPHA = "44";
 const TINT_ALPHA = "14";
 const TINT_BORDER_ALPHA = "50";
-const HOT_PCT = 85;
-const WARM_PCT = 60;
+// The same thresholds as the plan gauges and the footer meters, so one reading has one color.
+const HOT_PCT = 90;
+const WARM_PCT = 70;
 
 const heatColor = (t, pct) => (pct >= HOT_PCT ? t.blocked : pct >= WARM_PCT ? t.ansi3 : t.accent);
 
@@ -38,7 +40,7 @@ const dot = (color, size = 6) => div().size(size).flex_none().rounded(size / 2).
 function sectionTitle(t, text, note) {
   return h_flex().flex_none().h(18).items_center().gap(8).text_size(11).text_color(t.dim)
     .child(div().flex_none().font_medium().child(text))
-    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().font_family(NUMBER_FONT).text_size(10.5).child(note ?? "")));
+    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().child(note ?? "")));
 }
 
 // Coordinates are percent of the plot, so the curve follows the card as the window resizes.
@@ -92,16 +94,16 @@ function plot(t, id, points, color, signalXs) {
     .children(signalXs.map((x) => div().absolute().top(0).bottom(0).left(percentOf(x)).w(1).bg(t.blocked)));
 }
 
-const timeAxis = (t) => h_flex().flex_none().justify_between().px(14).pt(4).pb(8).font_family(NUMBER_FONT).text_size(10).text_color(t.dim).child("10m").child("now");
+const timeAxis = (t) => h_flex().flex_none().justify_between().px(12).pt(4).pb(8).font_family(NUMBER_FONT).text_size(10).text_color(t.dim).child("10m").child("now");
 
 function meterCard(t, id, label, detail, value, unit, plotEl) {
   return v_flex().id(id).flex_1().min_w(0).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_hidden()
-    .child(v_flex().flex_none().gap(2).px(14).pt(12)
+    .child(v_flex().flex_none().gap(2).px(12).pt(12)
       .child(h_flex().justify_between().items_center().gap(8).text_size(11).text_color(t.dim)
         .child(div().flex_none().font_medium().child(label))
-        .child(div().min_w(0).truncate().font_family(NUMBER_FONT).text_size(10.5).child(detail)))
-      .child(h_flex().items_baseline().gap(5).font_family(NUMBER_FONT)
-        .child(div().flex_none().text_size(HERO_SIZE).text_color(t.foreground).child(value))
+        .child(div().min_w(0).truncate().child(detail)))
+      .child(h_flex().items_baseline().gap(6)
+        .child(div().flex_none().font_family(NUMBER_FONT).text_size(HERO_SIZE).text_color(t.foreground).child(value))
         .child(div().flex_none().text_size(12).text_color(t.muted).child(unit))))
     .child(plotEl)
     .child(timeAxis(t));
@@ -114,8 +116,8 @@ function machineMeters(t, a) {
   const cpuPlot = plot(t, "plot-cpu", chartPoints(a.history, now, (h) => h.cpu), heatColor(t, a.cpu.now), []);
   const ramPlot = plot(t, "plot-ram", chartPoints(a.history, now, usedPct), heatColor(t, 100 * (1 - a.ram.freeGb / a.ram.totalGb)), signalXs);
   return h_flex().flex_1().min_h(METER_MIN_HEIGHT).items_stretch().gap(10)
-    .child(meterCard(t, "meter-cpu", "CPU", `${Math.round(a.cpu.average)}% over 2m`, String(Math.round(a.cpu.now)), "% in use", cpuPlot))
-    .child(meterCard(t, "meter-ram", "Memory", `peak ${(a.ram.totalGb - a.ram.lowestGb).toFixed(1)} GB in 10m`, (a.ram.totalGb - a.ram.freeGb).toFixed(1), `GB used of ${Math.round(a.ram.totalGb)}`, ramPlot));
+    .child(meterCard(t, "meter-cpu", "CPU", `${Math.round(a.cpu.average)}% over 2m`, `${Math.round(a.cpu.now)}%`, "in use", cpuPlot))
+    .child(meterCard(t, "meter-ram", "Memory", `peak ${(a.ram.totalGb - a.ram.lowestGb).toFixed(1)} GB in 10m`, `${(a.ram.totalGb - a.ram.freeGb).toFixed(1)} GB`, `of ${Math.round(a.ram.totalGb)} GB used`, ramPlot));
 }
 
 function alertBanner(t, id, tooltip, text) {
@@ -135,15 +137,16 @@ function signalBanner(t, a) {
 function stuckBanner(t, p) {
   const since = p.started ? ` since ${clock(p.started)}` : "";
   const tooltip = `Process ${p.id}${p.session ? ` in ${p.session}` : ", no session"}. Holding a core for minutes usually means a loop nobody is watching.`;
-  return alertBanner(t, `stuck-${p.id}`, tooltip, `Stuck? ${p.name} ${p.id}: ${p.cores.toFixed(1)} core${since}`);
+  return alertBanner(t, `stuck-${p.id}`, tooltip, `Stuck? ${p.name} ${p.id}: ${p.cores.toFixed(1)} cores${since}`);
 }
 
 const textWidth = (text) => (text ? text.length * GLYPH_PX : 0);
 const consumerWidth = (c) => textWidth(c.name) + (c.mostly ? NOTE_GAP + textWidth(c.mostly) : 0);
 
-// The consumers' name column, as wide as the longest name: the bars start right after the names.
+// The consumers' name column, as wide as the longest name or the column's own header: the bars
+// start right after the names.
 function nameColumn(a) {
-  const widest = Math.max(0, ...a.consumers.map(consumerWidth));
+  const widest = Math.max(textWidth(CONSUMERS_TITLE), ...a.consumers.map(consumerWidth));
   return Math.min(NAME_COLUMN_MAX, Math.ceil(widest));
 }
 
@@ -156,14 +159,15 @@ function usageCell(t, share, text, figureWidth) {
 }
 
 function consumerTooltip(c) {
+  const name = c.mostly ? `${c.name} (${c.mostly})` : c.name;
   const running = `${c.count} ${c.count === 1 ? "process" : "processes"} running${c.isSession ? " in this session" : ""}`;
   const shortLived = c.shortLivedCpu >= 1 ? `. ${Math.round(c.shortLivedCpu)}% CPU from processes that started and ended since the last reading` : "";
-  return `${running}${shortLived}`;
+  return `${name}: ${running}${shortLived}`;
 }
 
-function consumerRow(t, c, totalGb, isFirst, column) {
+function consumerRow(t, c, totalGb, column) {
   return h_flex().id(`consumer-${c.name}`).flex_none().h(CONSUMER_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().hover((s) => s.bg(t.raised))
-    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
+    .border_t(1).border_color(t.border)
     .tooltip(consumerTooltip(c))
     .child(h_flex().w(column).flex_none().min_w(0).gap(NOTE_GAP).items_center()
       .child(div().min_w(0).truncate().text_size(12.5).text_color(c.isSession ? t.foreground : t.muted).child(c.name))
@@ -172,12 +176,22 @@ function consumerRow(t, c, totalGb, isFirst, column) {
     .child(usageCell(t, (100 * c.ramGb) / totalGb, `${c.ramGb.toFixed(1)} GB`, RAM_FIGURE_WIDTH));
 }
 
+// The header names each figure column over its figures, built with the rows' own columns.
+function consumerHeader(t, column) {
+  const label = (width, text) => h_flex().flex_1().min_w(0).justify_end().child(div().w(width).flex_none().flex().justify_end().child(text));
+  return h_flex().flex_none().h(18).gap(ROW_GAP).items_center().text_size(11).text_color(t.dim)
+    .child(div().w(column).flex_none().font_medium().child(CONSUMERS_TITLE))
+    .child(label(CPU_FIGURE_WIDTH, "CPU"))
+    .child(label(RAM_FIGURE_WIDTH, "Memory"));
+}
+
 function consumerList(t, a, column) {
-  if (!a.consumers.length) return sectionTitle(t, "Top consumers", "Nothing heavy running");
+  if (!a.consumers.length) return sectionTitle(t, CONSUMERS_TITLE, "Nothing heavy running");
   return v_flex().flex_none().gap(6)
-    .child(sectionTitle(t, "Top consumers", "CPU · RAM"))
-    .child(v_flex().flex_none().rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_hidden()
-      .children(a.consumers.map((c, i) => consumerRow(t, c, a.ram.totalGb, i === 0, column))));
+    .child(consumerHeader(t, column))
+    // Bleeds to the panel's border like the Sessions rows; each row's padding puts its text back on
+    // the inset line.
+    .child(v_flex().flex_none().mx_neg_3().children(a.consumers.map((c) => consumerRow(t, c, a.ram.totalGb, column))));
 }
 
 export function hardwareMonitor(t, analysis, leading) {

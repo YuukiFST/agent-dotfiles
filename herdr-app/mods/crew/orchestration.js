@@ -9,6 +9,10 @@ import { GROUPS, age, attentionOf, countText, detailOf, groupOf, progressOf } fr
 const TINT_ALPHA = "14";
 const BADGE_ALPHA = "26";
 const AGE_WIDTH = 24;
+// As wide as "10 of 10", so every card's step bar ends on one line down the list.
+const STEPS_WIDTH = 44;
+// More steps than this are drawn as this many pills: past it a pill is under 4px wide.
+const MAX_PILLS = 20;
 const DOT_SIZE = 6;
 // A crewmate's lines start under its group's name: past the dot and one gap.
 const CHILD_INDENT = DOT_SIZE + 8;
@@ -19,7 +23,7 @@ const BADGE_HEIGHT = 16;
 export function needsOf(t, roster, decisions, now) {
   const needing = roster.crew.filter((c) => groupOf(c, now) === "needs");
   const isBlocking = decisions.length > 0 || needing.some((c) => attentionOf(c, now) === "blocked");
-  return { count: needing.length + decisions.length, color: isBlocking ? t.blocked : t.done };
+  return { count: needing.length + decisions.length, color: isBlocking ? t.blocked : t.working };
 }
 
 function statusColor(t, c, now) {
@@ -31,7 +35,8 @@ function statusColor(t, c, now) {
 function groupColor(t, groupId, members, now) {
   if (groupId === "running") return t.working;
   if (groupId === "finished") return t.dim;
-  return members.some((c) => attentionOf(c, now) === "blocked") ? t.blocked : t.done;
+  // Never blue: across the app blue says done, and this group asks for the person.
+  return members.some((c) => attentionOf(c, now) === "blocked") ? t.blocked : t.working;
 }
 
 function badge(t, text, color) {
@@ -46,11 +51,13 @@ function textAction(t, id, label, action) {
 }
 
 function stepBar(t, name, progress, color) {
-  const pills = Array.from({ length: progress.total }, (_, i) =>
-    div().flex_1().h(PILL_HEIGHT).rounded(1).bg(i < progress.done ? color : t.border));
+  const shown = Math.min(progress.total, MAX_PILLS);
+  const lit = Math.round((shown * progress.done) / progress.total);
+  const pills = Array.from({ length: shown }, (_, i) =>
+    div().flex_1().h(PILL_HEIGHT).rounded(1).bg(i < lit ? color : t.border));
   return h_flex().id(`crew-steps-${name}`).h(14).gap(6).items_center()
     .child(h_flex().flex_1().min_w(0).gap(2).items_center().children(pills))
-    .child(div().flex_none().text_color(t.dim).child(`${progress.done} of ${progress.total}`));
+    .child(div().w(STEPS_WIDTH).flex_none().flex().justify_end().font_family("Geist Mono").text_color(t.dim).child(`${progress.done} of ${progress.total}`));
 }
 
 function crewRow(t, c, now, actions) {
@@ -111,25 +118,26 @@ function orchestratorRow(t, orchestrator, actions) {
     .when(Boolean(orchestrator.status), (el) => el.child(div().flex_none().text_size(11).font_medium().text_color(color).child(orchestrator.status)));
 }
 
-function decisionBlock(t, d, amber) {
+function decisionBlock(t, d) {
   return v_flex().id(`crew-decision-${d.id}`).flex_none().pl(6).pb(8).gap(4)
     .child(div().pr(8).text_size(12.5).text_color(t.foreground).child(d.question))
-    .when(Boolean(d.crewmate), (el) => el.child(div().pr(8).truncate().text_size(11).text_color(t.dim).child(d.crewmate)))
+    .when(Boolean(d.crewmate), (el) => el.child(div().id(`crew-decision-who-${d.id}`).pr(8).truncate().text_size(11).text_color(t.dim).tooltip(d.crewmate).child(d.crewmate)))
     .child(v_flex().gap(2).children(d.options.map((o, i) => v_flex().id(`crew-option-${d.id}-${i}`).px(8).py(5).rounded(6).gap(2)
-      .when(o.isRecommended, (el) => el.bg(amber + TINT_ALPHA))
+      .when(o.isRecommended, (el) => el.bg(t.accent + TINT_ALPHA))
       // A label that wraps sends the tag to the next line instead of leaving it beside a block.
       .child(h_flex().flex_wrap().gap_x(6).items_center()
         .child(div().min_w(0).text_size(12).text_color(t.foreground).child(o.label))
-        .when(o.isRecommended, (el) => el.child(div().flex_none().text_size(10.5).font_medium().text_color(amber).child("recommended"))))
+        .when(o.isRecommended, (el) => el.child(div().flex_none().text_size(10.5).font_medium().text_color(t.accent).child("recommended"))))
       .when(Boolean(o.effect), (el) => el.child(div().text_size(11).text_color(t.muted).child(o.effect))))));
 }
 
 function decisionsSection(t, decisions) {
-  const amber = t.ansi3;
-  return v_flex().id("crew-decisions").flex_none().mt(8).border_l(2).border_color(amber)
-    .child(h_flex().h(30).pl(6).gap(8).items_center().text_size(12).font_medium().text_color(amber)
+  // The badge counting these decisions is red; the list it counts says so in the same color.
+  const color = t.blocked;
+  return v_flex().id("crew-decisions").flex_none().mt(8).border_l(2).border_color(color)
+    .child(h_flex().h(30).pl(6).gap(8).items_center().text_size(12).font_medium().text_color(color)
       .child(`Pending decisions (${decisions.length})`))
-    .children(decisions.map((d) => decisionBlock(t, d, amber)))
+    .children(decisions.map((d) => decisionBlock(t, d)))
     .child(div().pl(6).pr(8).pb(4).text_size(11).text_color(t.dim).child("Answer in the orchestrator chat"));
 }
 

@@ -18,12 +18,14 @@ const GIB = 1073741824;
 const METER_BLOCKS = 10;
 // Fits "Session", the longest label the plan sends.
 const LABEL_WIDTH = 56;
-// As wide as "100%" and "renewed": the figures sit beside their bar, the bar takes the rest.
-const PERCENT_WIDTH = 28;
-const DETAIL_WIDTH = 48;
-// As wide as "656.9M" and "max 656.9M" in the number font.
-const TOKENS_WIDTH = 44;
-const BEST_WIDTH = 68;
+// The plan gauges and the token rows share every column, so their bars end on one line and each
+// figure column's right edge runs straight down. FIGURE_WIDTH fits "656.9M" and "100%",
+// DETAIL_WIDTH fits "max 656.9M" and "renewed", in the number font at FIGURE_SIZE.
+const FIGURE_WIDTH = 44;
+const DETAIL_WIDTH = 70;
+// The figure size of every table in the window (Sessions, Hardware, Disk, Cost).
+const FIGURE_SIZE = 11.5;
+const LABEL_SIZE = 12.5;
 const TOKENS_BAR_HEIGHT = 3;
 // The pace tick stands this far above and below the token bar, so it reads over the fill.
 const PACE_TICK_OVERHANG = 2;
@@ -115,14 +117,14 @@ function gauge(t, label, pct, detail, tooltip) {
   const hasPercent = Number.isFinite(pct);
   const warning = pct >= 90 ? t.blocked : pct >= 70 ? t.ansi3 : null;
   // Anything above zero lights a block, so 3% of the week never reads as unused; all ten light only at 100%.
-  const lit = pct > 0 ? Math.max(1, Math.floor(METER_BLOCKS * Math.min(pct, 100) / 100)) : 0;
+  const lit = pct > 0 ? Math.max(1, Math.round(METER_BLOCKS * Math.min(pct, 100) / 100)) : 0;
   const blocks = Array.from({ length: METER_BLOCKS }, (_, i) =>
     div().flex_1().h(10).rounded(1).bg(i < lit ? warning ?? t.accent : t.border));
-  return h_flex().id(`usage-${label}`).flex_1().min_h(24).px(12).gap(8).items_center().text_size(11)
+  return h_flex().id(`usage-${label}`).flex_1().min_h(24).px(12).gap(8).items_center().text_size(FIGURE_SIZE)
     .tooltip(tooltip ? `${label} · ${tooltip}` : label)
-    .child(div().w(LABEL_WIDTH).flex_none().truncate().text_size(12).text_color(t.muted).child(label))
+    .child(div().w(LABEL_WIDTH).flex_none().truncate().text_size(LABEL_SIZE).text_color(t.muted).child(label))
     .child(h_flex().flex_1().min_w(0).gap(2).items_center().children(blocks))
-    .child(div().w(PERCENT_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(warning ?? t.foreground).child(hasPercent ? `${Math.round(pct)}%` : "—"))
+    .child(div().w(FIGURE_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(warning ?? t.foreground).child(hasPercent ? `${Math.round(pct)}%` : "—"))
     .child(div().w(DETAIL_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(t.muted).child(div().truncate().child(detail)));
 }
 
@@ -165,35 +167,36 @@ function elapsedPct(kind, since) {
 
 // best: the busiest period of this kind, the current one included. The bar is this one's share of
 // it, and the tick how much of the period has passed: a fill past the tick is ahead of record pace.
-function tokenPeriodRow(t, label, period, best, isFirst) {
+function tokenPeriodRow(t, label, period, best) {
   const isRecord = Boolean(best) && period.tokens >= best.tokens;
   const share = best?.tokens > 0 ? Math.min(100, (100 * period.tokens) / best.tokens) : 0;
   const pace = elapsedPct(label, period.since);
   const periodName = label === "Today" ? "day" : label.toLowerCase();
   const tooltip = [tokenBreakdown(period), best && `max ${tokenCount(best.tokens)} from ${dayText(best.since)}`, `${Math.round(pace)}% of the ${periodName} gone`].filter(Boolean).join(" · ");
-  return h_flex().id(`tokens-${label}`).flex_1().min_h(24).px(12).gap(8).items_center().text_size(11).tooltip(tooltip)
-    .when(isFirst, (el) => el.border_t(1).border_color(t.border))
-    .child(div().w(LABEL_WIDTH).flex_none().truncate().text_size(12).text_color(t.muted).child(label))
+  return h_flex().id(`tokens-${label}`).flex_1().min_h(24).px(12).gap(8).items_center().text_size(FIGURE_SIZE).tooltip(tooltip)
+    .child(div().w(LABEL_WIDTH).flex_none().truncate().text_size(LABEL_SIZE).text_color(t.muted).child(label))
     .child(div().relative().flex_1().min_w(0).h(TOKENS_BAR_HEIGHT).rounded(1).bg(t.border)
       .child(div().h(TOKENS_BAR_HEIGHT).rounded(1).bg(t.accent).w(`${share}%`))
       .when(Boolean(best), (el) => el.child(div().absolute().top(-PACE_TICK_OVERHANG).left(`${pace}%`).w(1).h(TOKENS_BAR_HEIGHT + 2 * PACE_TICK_OVERHANG).bg(t.muted))))
-    .child(div().w(TOKENS_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(t.foreground).child(tokenCount(period.tokens)))
-    .child(div().w(BEST_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(isRecord ? t.ansi2 : t.muted)
+    .child(div().w(FIGURE_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(t.foreground).child(tokenCount(period.tokens)))
+    .child(div().w(DETAIL_WIDTH).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_color(isRecord ? t.ansi2 : t.muted)
       .child(!best ? "" : isRecord ? "record" : `max ${tokenCount(best.tokens)}`));
 }
 
+// Titled, so its "Week" never reads as the plan's "Week" limit above it.
 function tokenPeriodRows(t, { today, week, month, best }) {
   return [
-    tokenPeriodRow(t, "Today", today, best?.today, true),
-    tokenPeriodRow(t, "Week", week, best?.week, false),
-    tokenPeriodRow(t, "Month", month, best?.month, false),
+    sectionTitle(t, "Tokens", "bar: share of the busiest · tick: time gone").border_t(1).border_color(t.border),
+    tokenPeriodRow(t, "Today", today, best?.today),
+    tokenPeriodRow(t, "Week", week, best?.week),
+    tokenPeriodRow(t, "Month", month, best?.month),
   ];
 }
 
 function openCodeRows(t, usage) {
   return [
     statRow(t, "Tokens", tokenCount(usage.tokens)),
-    statRow(t, "Cost", Number.isFinite(usage.cost) ? `${usage.cost.toFixed(2)}` : "—"),
+    statRow(t, "Cost", Number.isFinite(usage.cost) ? `$${usage.cost.toFixed(2)}` : "—"),
     statRow(t, "Sessions", String(usage.sessions ?? "—")),
     statRow(t, "Top model", usage.topModel ?? "—"),
   ];

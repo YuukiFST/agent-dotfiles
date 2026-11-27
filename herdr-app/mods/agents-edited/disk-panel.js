@@ -50,6 +50,8 @@ const SPARKS_PER_GENERATION = 10;
 const SPARK_RISE = [20, 90];
 const SPARK_DRIFT = [6, 56];
 const HEAT_WIDTH = 24;
+// Slower than three flashes a second, the limit for anything that flickers on screen.
+const FLICKER_PERIOD_MS = 700;
 const FOLDER_ROW_HEIGHT = 30;
 const FOLDER_COLUMN_MAX = 300;
 const GIB = 1073741824;
@@ -181,13 +183,13 @@ function segmentBox(t, segment, cells, isClearing) {
     .child(pathLayer(RECT, Background.linear_gradient(180, color + BOX_TOP_ALPHA, color + BOX_BOTTOM_ALPHA)))
     .child(pathLayer(gridPath(cells.columns, cells.rows, cells.top - 1), color + UNLIT_ALPHA))
     .children(lit.map((path) => pathLayer(path, color + LIT_ALPHA)
-      .when(isClearing, (el) => el.loop("opacity", { from: 0.45, to: 1, period: 320 }))));
+      .when(isClearing, (el) => el.loop("opacity", { from: 0.45, to: 1, period: FLICKER_PERIOD_MS }))));
 }
 
 // A burning edge: a white-hot line where the caches end, flickering.
 function burnLine(t, x, height) {
   return div().absolute().top(-2).left(x - 1).w(2).h(height + 4).rounded(1).bg(t.foreground)
-    .loop("opacity", { from: 0.35, to: 1, period: 260 });
+    .loop("opacity", { from: 0.35, to: 1, period: FLICKER_PERIOD_MS });
 }
 
 // The caches glowing hot just behind the burning edge.
@@ -279,14 +281,15 @@ function title(t, disk, view, leading) {
 function hero(t, view) {
   if (!view) {
     return v_flex().flex_none().gap(2)
-      .child(div().h(34).flex().items_center().text_size(14).text_color(t.muted).child("Measuring the drive…"))
+      .child(div().h(34).flex().items_center().text_size(13).text_color(t.muted).child("Measuring the drive…"))
       .child(div().h(18).text_size(11.5).text_color(t.dim).child("The first scan walks every folder once, about half a minute."));
   }
   const job = view.job;
+  // The title already says Scanning beside its spinner; the line under the figure says where.
   const status = job
     ? h_flex().gap(8).items_center().min_w(0)
-      .child(div().flex_none().text_size(12).text_color(t.foreground).child(job.kind === "clean" ? "Clearing caches" : "Scanning"))
-      .child(div().id("disk-job-path").min_w(0).truncate().text_ellipsis_start().font_family(NUMBER_FONT).text_size(11).text_color(t.dim).child(job.path ? tilde(job.path) : "starting…"))
+      .when(job.kind === "clean", (el) => el.child(div().flex_none().text_size(12).text_color(t.foreground).child("Clearing caches")))
+      .child(div().id("disk-job-path").min_w(0).truncate().text_ellipsis_start().text_size(11.5).text_color(t.dim).tooltip(job.path ?? "").child(job.path ? tilde(job.path) : "starting…"))
     : view.freed != null
       ? h_flex().gap(6).items_center().text_size(12)
         .child(div().flex_none().text_color(t.ansi2).child(`Freed ${sizeText(view.freed)}`))
@@ -326,16 +329,16 @@ function legend(t, view, cachePaths) {
 function sectionTitle(t, text, note) {
   return h_flex().flex_none().h(18).items_center().gap(8).text_size(11).text_color(t.dim)
     .child(div().flex_none().font_medium().child(text))
-    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().font_family(NUMBER_FONT).text_size(10.5).child(note)));
+    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().child(note)));
 }
 
-function folderRow(t, folder, usedBytes, column, isFirst) {
+function folderRow(t, folder, usedBytes, column) {
   const category = CATEGORIES.find((c) => c.key === folder.category) ?? CATEGORIES.find((c) => c.key === "system");
   const color = category.color(t);
   const share = (100 * folder.bytes) / usedBytes;
   return h_flex().id(`disk-folder-${folder.path}`).flex_none().h(FOLDER_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
     .hover((s) => s.bg(t.raised))
-    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
+    .border_t(1).border_color(t.border)
     .tooltip(`${category.label}: ${folder.path}
 Click to open it in Explorer`)
     .on_click(() => exec("explorer.exe", [folder.path]).catch(() => null))
@@ -351,9 +354,11 @@ function largestFolders(t, view, folders) {
   if (!folders.length) return div();
   const column = Math.min(FOLDER_COLUMN_MAX, Math.max(...folders.map((f) => tilde(f.path).length * GLYPH_PX)));
   return v_flex().flex_1().min_h(0).gap(6)
-    .child(sectionTitle(t, "Largest folders", "click to open"))
-    .child(v_flex().id("disk-folders").flex_shrink(1).min_h(0).rounded(8).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
-      .children(folders.map((f, i) => folderRow(t, f, view.usedBytes, column, i === 0))));
+    .child(sectionTitle(t, "Largest folders", "opens in Explorer"))
+    // Bleeds to the panel's border like the Sessions rows; each row's padding puts its text back on
+    // the inset line.
+    .child(v_flex().id("disk-folders").mx_neg_3().flex_shrink(1).min_h(0).overflow_y_scrollbar()
+      .children(folders.map((f) => folderRow(t, f, view.usedBytes, column))));
 }
 
 function clearButton(t, disk, view) {
@@ -362,13 +367,13 @@ function clearButton(t, disk, view) {
   const isEnabled = Boolean(view) && !disk.isBusy && caches > 0;
   const isConfirming = view?.isConfirming && isEnabled;
   const text = isClearing ? "Clearing…" : isConfirming ? `Clear ${sizeText(caches)}?` : "Clear caches";
-  return h_flex().id("disk-clear").flex_none().h(28).px(12).items_center().rounded(6).border(1)
+  // The Notes Add button's shape, so the window has one secondary button; disabled is one opacity.
+  return h_flex().id("disk-clear").flex_none().h(26).px(10).items_center().rounded(6)
     .text_size(12).font_medium()
-    .border_color(isConfirming ? t.blocked : t.border)
     .bg(isConfirming ? `${t.blocked}24` : t.raised)
-    .text_color(isConfirming ? t.blocked : isEnabled ? t.foreground : t.dim)
+    .text_color(isConfirming ? t.blocked : t.foreground)
     .when(isEnabled, (el) => el.cursor_pointer().hover((s) => s.bg(isConfirming ? `${t.blocked}3a` : t.hover)).on_click((_e, cx) => disk.clearCaches(cx)))
-    .when(isClearing, (el) => el.opacity(0.6))
+    .when(!isEnabled, (el) => el.opacity(0.4))
     .child(text);
 }
 

@@ -8,11 +8,18 @@ const SAMPLE_FRESH_MS = 4000;
 const SAMPLE_FILE = () => `${home()}/.config/herdr-app/data/claude-usage/system-sample.json`;
 const isNetworkOnly = () => props()?.only === "network";
 const METER_BLOCKS = 10;
+// Figures in the number font at a fixed width, so a 5s reading that gains a digit moves nothing
+// beside it: "100%", and "↓999K". The network-only block is 120px wide, so rates stay short.
+const NUMBER_FONT = "Geist Mono";
+const PERCENT_WIDTH = 30;
+const RATE_WIDTH = 40;
 
 function rate(bytesPerSec) {
   if (bytesPerSec >= 1048576) return `${(bytesPerSec / 1048576).toFixed(1)}M`;
   return `${Math.round(bytesPerSec / 1024)}K`;
 }
+
+const figure = (text, color) => div().font_family(NUMBER_FONT).text_color(color).child(text);
 
 export default class ClaudeUsage extends View {
   init(_props, cx) {
@@ -69,7 +76,7 @@ export default class ClaudeUsage extends View {
       div().w(6).h(10).rounded(1).bg(i < lit ? warning ?? t.accent : t.border));
     return h_flex().gap(6).items_center()
       .child(div().text_color(t.dim).child(label))
-      .child(div().text_color(warning ?? t.foreground).child(`${Math.round(pct)}%`))
+      .child(figure(`${Math.round(pct)}%`, warning ?? t.foreground).w(PERCENT_WIDTH).flex_none().flex().justify_end())
       .child(h_flex().gap(2).items_center().children(blocks));
   }
 
@@ -85,7 +92,7 @@ export default class ClaudeUsage extends View {
   tokenPeriod(t, label, period) {
     return h_flex().id(`tokens-${label}`).gap(6).items_center().tooltip(tokenBreakdown(period))
       .child(div().text_color(t.dim).child(label))
-      .child(div().text_color(t.foreground).child(tokenCount(period.tokens)));
+      .child(figure(tokenCount(period.tokens), t.foreground));
   }
 
   cpuAndRam(t, s, sep) {
@@ -93,8 +100,8 @@ export default class ClaudeUsage extends View {
       this.meter(t, "CPU", s.cpu),
       sep(),
       h_flex().gap(6).items_center()
-        .child(this.meter(t, "RAM", 100 * s.usedGb / s.totalGb))
-        .child(div().text_color(t.dim).child(`${s.usedGb.toFixed(1)}/${s.totalGb.toFixed(0)} GB`)),
+        .child(this.meter(t, "Memory", 100 * s.usedGb / s.totalGb))
+        .child(figure(`${s.usedGb.toFixed(1)} of ${s.totalGb.toFixed(0)} GB`, t.dim)),
     ];
   }
 
@@ -107,7 +114,13 @@ export default class ClaudeUsage extends View {
   // A footer with room for the network alone: { "only": "network" }.
   networkOnly(t, s) {
     return h_flex().size_full().px(14).gap(14).items_center().justify_end().bg(t.chrome).border_t(1).border_color(t.border).text_size(12).text_color(t.muted)
-      .when(Boolean(s), (el) => el.child(div().text_color(t.dim).child(`↓${rate(s.rx)} ↑${rate(s.tx)}`)));
+      .when(Boolean(s), (el) => el.child(this.network(t, s)));
+  }
+
+  network(t, s) {
+    return h_flex().id("network").gap(6).items_center().tooltip(`Network per second: ${rate(s.rx)}B down, ${rate(s.tx)}B up`)
+      .child(figure(`↓${rate(s.rx)}`, t.dim).w(RATE_WIDTH).flex_none().flex().justify_end())
+      .child(figure(`↑${rate(s.tx)}`, t.dim).w(RATE_WIDTH).flex_none().flex().justify_end());
   }
 
   render() {
@@ -121,22 +134,22 @@ export default class ClaudeUsage extends View {
     return h_flex().size_full().px(14).gap(14).items_center().bg(t.chrome).border_t(1).border_color(t.border)
       .text_size(12).text_color(t.muted)
       .child(div().text_color(t.accent).child("Claude"))
-      .when(!hasReading, (el) => el.child(div().text_color(t.dim).child(this.planUsage?.reading?.error ?? "no reading yet: sign in to Claude Code")))
-      .when(hasReading, (el) => el.child(this.window(t, "week", this.planUsage.windowOf("week"))))
+      .when(!hasReading, (el) => el.child(div().text_color(t.dim).child(this.planUsage?.reading?.error ?? "No plan reading yet. Sign in to Claude Code if this stays")))
+      .when(hasReading, (el) => el.child(this.window(t, "Week", this.planUsage.windowOf("week"))))
       .when(Boolean(tokens), (el) => el
         .child(sep())
-        .child(this.tokenPeriod(t, "today", tokens.today))
-        .child(this.tokenPeriod(t, "week", tokens.week))
-        .child(this.tokenPeriod(t, "month", tokens.month))
-        .child(this.tokenPeriod(t, "all", tokens.allTime)))
+        .child(this.tokenPeriod(t, "Today", tokens.today))
+        .child(this.tokenPeriod(t, "Week", tokens.week))
+        .child(this.tokenPeriod(t, "Month", tokens.month))
+        .child(this.tokenPeriod(t, "All", tokens.allTime)))
       .child(div().flex_1())
       .when(Boolean(s), (el) => el
         .children(this.cpuAndRam(t, s, sep))
         .child(sep())
         .child(h_flex().gap(6).items_center()
           .child(this.meter(t, "C:", s.diskPct))
-          .child(div().text_color(t.dim).child(`${s.diskFreeGb.toFixed(0)} GB`)))
+          .child(figure(`${s.diskFreeGb.toFixed(0)} GB free`, t.dim)))
         .child(sep())
-        .child(div().text_color(t.dim).child(`↓${rate(s.rx)} ↑${rate(s.tx)}`)));
+        .child(this.network(t, s)));
   }
 }

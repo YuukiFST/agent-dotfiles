@@ -65,7 +65,7 @@ export default class Workspaces extends View {
   }
 
   numberChip(t, index, isShown) {
-    return div().id(`ws-${index}`).w(20).h(18).flex().items_center().justify_center().rounded(4).cursor_pointer().text_size(11)
+    return div().id(`ws-${index}`).w(24).h(18).flex().items_center().justify_center().rounded(4).cursor_pointer().text_size(11)
       .bg(isShown ? t.selected : t.chrome).text_color(isShown ? t.foreground : t.dim)
       .hover((s) => s.bg(t.hover).text_color(t.foreground))
       .tooltip(this.workspaces[index].name)

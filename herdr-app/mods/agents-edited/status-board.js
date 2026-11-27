@@ -14,10 +14,12 @@ import { icon } from "./insight.js";
 import { averageContextTree, contextTreemap } from "./ctxmap/treemap.js";
 import { usagePanel } from "./usage-panel.js";
 import { alertLight, alertOf, alertOrb } from "./attention.js";
+import { tokenCount } from "./plan-usage.js";
 
 const NUMBER_FONT = "Geist Mono";
 const SESSIONS_WIDTH = 470;
 const CONTEXT_WIDTH = 660;
+// The usage panel's least height: it grows past this when the plan sends more limits.
 const USAGE_HEIGHT = 170;
 const RIGHT_PANEL_KEY = "status.rightPanel";
 const CONTEXT_PANEL = "context";
@@ -25,7 +27,8 @@ const HARDWARE_PANEL = "hardware";
 const DISK_PANEL = "disk";
 const COST_PANEL = "cost";
 const RIGHT_PANELS = [CONTEXT_PANEL, HARDWARE_PANEL, DISK_PANEL, COST_PANEL];
-const RIGHT_SWITCH_TILE_SIZE = 18;
+// 22 plus the switch's 2px gap puts the tiles' middles 24px apart, the least a pointer target takes.
+const RIGHT_SWITCH_TILE_SIZE = 22;
 const NUMBER_WIDTH = 54;
 const GAP = 8;
 
@@ -39,7 +42,7 @@ const SUMMARY_STATES = ["blocked", "finished", "working"];
 
 const stateOf = (a) => (a.status === "blocked" || a.status === "working" ? a.status : a.status === "done" ? "finished" : "idle");
 
-export const kilo = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
+export const kilo = tokenCount;
 
 // The folder with the home folder as ~.
 export function tilde(cwd) {
@@ -59,7 +62,7 @@ function elapsed(ms) {
 const tokensOf = (session) => session.input + session.cache_write + session.cache_read + session.output;
 const lastPart = (cwd) => cwd.replaceAll("\\", "/").replace(/\/+$/, "").split("/").pop();
 const numberCell = (el) => el.w(NUMBER_WIDTH).flex_none().flex().justify_end();
-const number = (text, color) => numberCell(div()).font_family(NUMBER_FONT).text_size(12).text_color(color).child(text);
+const number = (text, color) => numberCell(div()).font_family(NUMBER_FONT).text_size(11.5).text_color(color).child(text);
 
 const dot = (color) => div().size(6).flex_none().rounded(3).bg(color);
 
@@ -100,7 +103,7 @@ function sessionRow(t, a, ctx, board) {
       .child(alert ? alertOrb(alert) : div().w(14).flex_none())
       .children([icon(a.program, 14, t.foreground)].filter(Boolean))
       .child(v_flex().flex_1().min_w(0)
-        .child(div().truncate().text_size(13).font_medium().text_color(isWorking ? t.muted : t.foreground).child(name))
+        .child(div().id(`status-name-${a.address}`).truncate().text_size(13).font_medium().text_color(isWorking ? t.muted : t.foreground).tooltip(name).child(name))
         .when(Boolean(cwd), (el) => el.child(div().id(`status-path-${a.address}`).truncate().text_ellipsis_start().text_size(11).text_color(t.dim).tooltip(cwd).child(tilde(cwd)))))
       .child(number(since ? elapsed(Date.now() - since) : "—", t.muted))
       .child(number(session ? kilo(tokensOf(session)) : "—", isWorking ? t.muted : t.foreground)))
@@ -126,7 +129,7 @@ function sessionsPanel(t, list, ctx, board) {
       .child(numberCell(div()).child("Time"))
       .child(numberCell(div()).child("Tokens")))
     .child(v_flex().id("status-sessions").flex_1().min_h(0).overflow_y_scrollbar()
-      .when(list.length === 0, (el) => el.child(div().p(14).border_t(1).border_color(t.border).text_size(13).text_color(t.dim).child("No agents running.")))
+      .when(list.length === 0, (el) => el.child(div().p(14).border_t(1).border_color(t.border).text_size(13).text_color(t.dim).child("No agents running")))
       .children(groups.map(([id, members]) => stateGroup(t, id, members, ctx, board))));
 }
 
@@ -193,7 +196,7 @@ export function statusBoard(t, list, ctx, board, cx) {
       .child(v_flex().flex_1().min_h(0).gap(GAP)
         .child(summary(t, list, board))
         .child(sessionsPanel(t, list, ctx, board)))
-      .child(v_flex().h(USAGE_HEIGHT).flex_none().child(usagePanel(t, board.usagePanel))))
+      .child(v_flex().min_h(USAGE_HEIGHT).flex_none().child(usagePanel(t, board.usagePanel))))
     .child(board.notesPanel.render(t))
     // Gives way below its width when the window is narrow, so Notes keeps room for its rows.
     .child(h_flex().w(CONTEXT_WIDTH).flex_shrink_1().min_w(0).min_h(0).items_stretch().child(rightPanel));

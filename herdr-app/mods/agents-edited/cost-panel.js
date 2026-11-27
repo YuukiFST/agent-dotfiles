@@ -16,13 +16,13 @@ const BAND_ALPHA = "2e";
 const ROW_GAP = 8;
 const REPO_ROW_HEIGHT = 30;
 const REPOS_VISIBLE = 8;
-const LIST_BORDERS = 2;
 const BAR_HEIGHT = 3;
-// "$100.00" and "999 tasks" in Geist Mono 11.5px.
+// "$100.00" and "1000 tasks" in Geist Mono 11.5px.
 const COST_WIDTH = 50;
-const COUNT_WIDTH = 64;
+const COUNT_WIDTH = 70;
 const GLYPH_PX = 7;
 const NAME_COLUMN_MAX = 220;
+const REPOS_TITLE = "Repositories";
 const ICON_SIZE = 13;
 const CHECKBOX_SIZE = 13;
 // Its middle on the last rows of the usage panel and the Notes composer beside it.
@@ -32,7 +32,7 @@ const AXIS_STEPS = [1, 2, 2.5, 5, 10];
 
 const dollars = (n) => `$${n.toFixed(2)}`;
 const dayText = (at) => `${MONTHS[new Date(at).getMonth()]} ${new Date(at).getDate()}`;
-const repoName = (repo, hasHidden) => (repo !== ALL_REPOS ? repo : hasHidden ? "Shown repositories" : "All repositories");
+const repoName = (repo, hasHidden) => (repo !== ALL_REPOS ? repo : hasHidden ? "Selected repositories" : "All repositories");
 const tasksText = (n) => `${n} ${n === 1 ? "task" : "tasks"}`;
 
 function changeText(pct) {
@@ -102,16 +102,17 @@ function figure(t, label, value, note, isFirst) {
 }
 
 function figures(t, { first, last, changePct }) {
+  const since = first ? `since the week ending ${dayText(first.at)}` : "over the period shown";
   return h_flex().flex_none().gap(12).items_stretch()
     .child(figure(t, "Median now", last ? dollars(last.median) : "—", last ? `${tasksText(last.count)} in the last 7 days` : "under 3 tasks in 7 days", true))
     .child(figure(t, "At the start", first ? dollars(first.median) : "—", first ? `week ending ${dayText(first.at)}` : "no week with 3 tasks", false))
-    .child(figure(t, "Change", changeText(changePct), "over the period shown", false));
+    .child(figure(t, "Change", changeText(changePct), since, false));
 }
 
 function sectionTitle(t, text, note) {
   return h_flex().flex_none().h(18).items_center().gap(8).text_size(11).text_color(t.dim)
     .child(div().flex_none().font_medium().child(text))
-    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().font_family(NUMBER_FONT).text_size(10.5).child(note)));
+    .child(div().flex_1().min_w(0).flex().justify_end().child(div().truncate().child(note)));
 }
 
 const figureCell = (t, width, text) => div().w(width).flex_none().flex().justify_end().font_family(NUMBER_FONT).text_size(11.5).text_color(t.muted).child(text);
@@ -129,53 +130,71 @@ function checkbox(t, isOn) {
     .when(isOn, (el) => el.child(div().size(7).rounded(1).bg(t.accent)));
 }
 
-function choiceRow(t, cost, choice, isFirst) {
+// The list bleeds to the panel's border like the Sessions rows; each row's padding puts its text
+// back on the inset line.
+const listRow = (t, id) => h_flex().id(id).flex_none().h(REPO_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
+  .hover((s) => s.bg(t.raised)).border_t(1).border_color(t.border);
+
+// The counts end on the tasks column of the default view, so switching views moves no figure.
+function choiceRow(t, cost, choice, column) {
   const isShown = !choice.isHidden;
-  return h_flex().id(`cost-choice-${choice.repo}`).flex_none().h(REPO_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
-    .hover((s) => s.bg(t.raised))
-    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
+  return listRow(t, `cost-choice-${choice.repo}`)
     .on_click((_e, cx) => cost.toggleHidden(choice.repo, cx))
     .child(checkbox(t, isShown))
-    .child(div().min_w(0).truncate().text_size(12.5).text_color(isShown ? t.foreground : t.dim).child(choice.repo))
-    .child(div().flex_none().font_family(NUMBER_FONT).text_size(11.5).text_color(t.dim).child(tasksText(choice.count)));
+    .child(div().id(`cost-choice-name-${choice.repo}`).w(column).flex_none().truncate().text_size(12.5).text_color(isShown ? t.foreground : t.dim).tooltip(choice.repo).child(choice.repo))
+    .child(div().flex_1())
+    .child(figureCell(t, COUNT_WIDTH, tasksText(choice.count)));
 }
 
-function repoRow(t, cost, row, name, isLit, highest, column, isFirst) {
+function repoRow(t, cost, row, name, isLit, highest, column) {
   const share = (100 * row.median) / highest;
-  return h_flex().id(`cost-repo-${row.repo}`).flex_none().h(REPO_ROW_HEIGHT).px(12).gap(ROW_GAP).items_center().cursor_pointer()
-    .bg(isLit ? t.selected : t.background)
-    .hover((s) => s.bg(t.raised))
-    .when(!isFirst, (el) => el.border_t(1).border_color(t.border))
+  return listRow(t, `cost-repo-${row.repo}`)
+    .when(isLit, (el) => el.bg(t.selected))
     .on_click((_e, cx) => cost.pick(row.repo, cx))
-    .child(div().w(column).flex_none().truncate().text_size(12.5).text_color(isLit ? t.foreground : t.muted).child(name))
+    .child(div().id(`cost-repo-name-${row.repo}`).w(column).flex_none().truncate().text_size(12.5).text_color(isLit ? t.foreground : t.muted).tooltip(name).child(name))
     .child(div().flex_1().min_w(0).h(BAR_HEIGHT).rounded(1).bg(t.border)
       .child(div().h(BAR_HEIGHT).rounded(1).bg(t.accent).w(`${Math.max(1, share)}%`)))
     .child(figureCell(t, COST_WIDTH, dollars(row.median)))
     .child(figureCell(t, COUNT_WIDTH, tasksText(row.count)));
 }
 
-function repoRows(t, cost, analysis) {
+const nameColumn = (names) => Math.min(NAME_COLUMN_MAX, Math.max(REPOS_TITLE.length * GLYPH_PX, ...names.map((name) => name.length * GLYPH_PX)));
+
+function repoRows(t, cost, analysis, column) {
   const { repo, repos, choices } = analysis;
-  if (cost.isChoosing) return choices.map((choice, i) => choiceRow(t, cost, choice, i === 0));
-  const nameOf = (row) => repoName(row.repo, hasHidden(analysis));
+  if (cost.isChoosing) return choices.map((choice) => choiceRow(t, cost, choice, column));
   const highest = Math.max(...repos.map((r) => r.median));
-  const column = Math.min(NAME_COLUMN_MAX, Math.max(...repos.map((r) => nameOf(r).length * GLYPH_PX)));
-  return repos.map((row, i) => repoRow(t, cost, row, nameOf(row), row.repo === repo, highest, column, i === 0));
+  return repos.map((row) => repoRow(t, cost, row, repoName(row.repo, hasHidden(analysis)), row.repo === repo, highest, column));
+}
+
+// Built with the rows' own columns, so "median" and "tasks" sit over their figures.
+function repoHeader(t, cost, column, note) {
+  const label = (width, text) => div().w(width).flex_none().flex().justify_end().child(text);
+  return h_flex().flex_none().h(18).gap(ROW_GAP).items_center().text_size(11).text_color(t.dim)
+    .child(div().w(column).flex_none().font_medium().child(REPOS_TITLE))
+    .child(h_flex().flex_1().min_w(0).gap(8).items_center().justify_end().child(div().truncate().child(note)).child(chooseButton(t, cost)))
+    .child(label(COST_WIDTH, "median"))
+    .child(label(COUNT_WIDTH, "tasks"));
 }
 
 function repoList(t, cost, analysis) {
   if (!analysis.choices.length) return div();
-  const rows = repoRows(t, cost, analysis);
+  const names = cost.isChoosing ? analysis.choices.map((c) => c.repo) : analysis.repos.map((r) => repoName(r.repo, hasHidden(analysis)));
+  const column = nameColumn(names);
+  const rows = repoRows(t, cost, analysis, column);
   const hiddenCount = analysis.choices.filter((choice) => choice.isHidden).length;
-  const note = `${cost.isChoosing ? "click to show or hide" : "median · tasks, 30 days"}${hiddenCount ? ` · ${hiddenCount} hidden` : ""}`;
+  const hidden = hiddenCount ? ` · ${hiddenCount} hidden` : "";
+  const header = cost.isChoosing
+    ? sectionTitle(t, REPOS_TITLE, `click to show or hide${hidden}`).child(chooseButton(t, cost))
+    : repoHeader(t, cost, column, `last 30 days${hidden}`);
   // A scroll area needs a set height: under max_h it cuts its rows off and never scrolls. While
   // choosing, the list takes the chart's place.
   const visible = cost.isChoosing ? rows.length : Math.min(rows.length, REPOS_VISIBLE);
   return v_flex().gap(6)
     .when(cost.isChoosing, (el) => el.flex_1().min_h(0))
     .when(!cost.isChoosing, (el) => el.flex_none())
-    .child(sectionTitle(t, "Repositories", note).child(chooseButton(t, cost)))
-    .when(rows.length > 0, (el) => el.child(v_flex().id("cost-repos").h(visible * REPO_ROW_HEIGHT + LIST_BORDERS).flex_shrink(1).min_h(0).rounded(CARD_RADIUS).border(1).border_color(t.border).bg(t.background).overflow_y_scrollbar()
+    .child(header)
+    .when(rows.length > 0, (el) => el.child(v_flex().id("cost-repos").mx_neg_3().h(visible * REPO_ROW_HEIGHT).flex_shrink(1).min_h(0).overflow_y_scrollbar()
       .children(rows)));
 }
 
@@ -183,7 +202,7 @@ function footer(t, analysis) {
   const unpriced = analysis?.unpriced ? ` ${tasksText(analysis.unpriced)} with no estimate left out.` : "";
   const text = `API list prices, one task per Claude Code session. Band: the middle half.${unpriced}`;
   return h_flex().flex_none().h(FOOTER_HEIGHT).px(12).gap(8).items_center().border_t(1).border_color(t.border)
-    .child(svg("mods/agents-edited/icons/cost.svg").size(ICON_SIZE).flex_none().text_color(t.accent))
+    .child(svg("mods/agents-edited/icons/cost.svg").size(ICON_SIZE).flex_none().text_color(t.muted))
     .child(div().id("cost-footer").flex_1().min_w(0).truncate().text_size(12).text_color(t.muted).tooltip("Subagents count in their session; headless runs (claude -p) are left out.").child(text));
 }
 
